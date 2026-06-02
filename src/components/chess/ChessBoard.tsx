@@ -149,6 +149,26 @@ export function ChessBoard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Resize affidabile: il CSS dimensiona, l'observer fa solo ridisegnare chessground
+  // (pezzi/coordinate riallineati) quando il quadrato cambia misura. Throttle via rAF.
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    let raf = 0;
+    const observer = new ResizeObserver(() => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        apiRef.current?.redrawAll();
+      });
+    });
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // Sincronizzazione: a ogni cambio di props rilancia .set() (mai ricreare l'istanza).
   useEffect(() => {
     const api = apiRef.current;
@@ -199,8 +219,8 @@ export function ChessBoard({
   };
 
   return (
-    <div className={cn("relative aspect-square w-full select-none", className)}>
-      <div ref={wrapRef} className="h-full w-full" />
+    <div className={cn("board-square relative select-none", className)}>
+      <div ref={wrapRef} />
 
       {pending && (
         <div

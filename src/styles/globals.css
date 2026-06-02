@@ -133,6 +133,43 @@ html.lenis body {
   height: 100%;
 }
 
+/* Wrapper quadrato robusto: chessground non ha dimensioni proprie, riempie questo
+   quadrato a larghezza fluida con un tetto su desktop. È il fix centrale del layout. */
+.board-square {
+  width: 100%;
+  max-width: var(--board-max, 640px);
+  aspect-ratio: 1 / 1;
+  margin-inline: auto;
+}
+.board-square > .cg-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+/* Layout responsivo delle pagine board + EvalBar + pannelli:
+   colonna su mobile, affiancato su desktop. */
+.board-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.board-layout .board-square {
+  --board-max: 100%;
+}
+@media (min-width: 900px) {
+  .board-layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .board-layout .board-square {
+    --board-max: clamp(360px, 48vw, 640px);
+  }
+  .board-layout .side-panel {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
 /* Pattern a scacchiera generato dai token: chiara = --surface, scura = --surface-2. */
 .cg-wrap cg-board {
   background-color: var(--surface);
@@ -149,6 +186,7 @@ html.lenis body {
     -12.5% 0;
   border: 1px solid var(--border);
   border-radius: 4px;
+  box-sizing: border-box; /* il bordo resta dentro il quadrato (cg-wrap è content-box) */
 }
 
 /* Coordinate a/h, 1/8 in monospace, colore attenuato. */
