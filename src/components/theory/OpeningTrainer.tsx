@@ -270,7 +270,7 @@ export function OpeningTrainer({
               {lineNote && <p className="text-sm text-text-muted">{lineNote}</p>}
               {phase === "end" && (
                 <Button size="sm" onClick={startLine}>
-                  Allena un'altra linea
+                  Allena un&apos;altra linea
                 </Button>
               )}
             </CardContent>

@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
   reconcile,
-  rowsToTree,
   slugify,
   type RepertoireMoveRow,
   type PieceColor,
