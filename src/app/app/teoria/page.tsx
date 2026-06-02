@@ -53,6 +53,14 @@ export default async function TeoriaPage() {
                 <Link href="/app/teoria/aperture" className="text-sm text-text-muted hover:text-text">
                   Sfoglia l&apos;albero ECO →
                 </Link>
+              ) : ramo.type === "endgame" ? (
+                <Link href="/app/teoria/finali" className="text-sm text-text-muted hover:text-text">
+                  Sfoglia tutti i finali →
+                </Link>
+              ) : ramo.type === "middlegame" ? (
+                <Link href="/app/teoria/mediogioco" className="text-sm text-text-muted hover:text-text">
+                  Sfoglia i temi →
+                </Link>
               ) : (
                 <span className="text-sm text-text-muted">{ramo.desc}</span>
               )}

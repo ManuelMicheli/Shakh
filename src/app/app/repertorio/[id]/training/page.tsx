@@ -38,6 +38,18 @@ export default async function TrainingPage({
   const moveRows = (rows as RepertoireMoveRow[] | null) ?? [];
   const tree = rowsToTree(moveRows);
 
+  // Rimando alle Trappole (06d §5): segnala le trappole note la cui posizione
+  // d'innesco combacia con una posizione del repertorio in allenamento.
+  const posKey = (fen: string) => fen.split(" ").slice(0, 4).join(" ");
+  const treeKeys = new Set(Object.values(tree.nodes).map((n) => posKey(n.fen)));
+  const { data: trapRows } = await supabase
+    .from("traps")
+    .select("name, slug, trigger_fen")
+    .eq("published", true);
+  const trapWarnings = ((trapRows as { name: string; slug: string; trigger_fen: string }[] | null) ?? [])
+    .filter((t) => treeKeys.has(posKey(t.trigger_fen)))
+    .map((t) => ({ fen: t.trigger_fen, name: t.name, slug: t.slug }));
+
   // Item in scadenza appartenenti a QUESTO repertorio.
   const ids = moveRows.map((r) => r.id);
   let dueIds: string[] = [];
@@ -73,6 +85,7 @@ export default async function TrainingPage({
         tree={tree}
         dueIds={dueIds}
         reviewMode={reviewMode}
+        trapWarnings={trapWarnings}
       />
     </div>
   );

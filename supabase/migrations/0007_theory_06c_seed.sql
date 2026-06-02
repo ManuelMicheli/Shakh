@@ -1,0 +1,108 @@
+-- 0007_theory_06c_seed.sql
+-- Contenuti-vetrina del ramo Teoria (prompt 06c): 5 finali fondamentali + 3 temi
+-- di mediogioco. Generato da scripts/seed-theory-06c.mts — idempotente sullo slug.
+--
+-- Correttezza: le linee dei FINALI sono il gioco ottimale di ENTRAMBI i lati
+-- secondo la tablebase Lichess; le posizioni di pratica hanno esito verificato
+-- (scripts/verify-endgames.mts). Mediogioco: posizioni/linee valide per legalità
+-- con chess.js. Le spiegazioni in italiano sono BOZZE DA REVISIONE.
+
+insert into content_items (type, title, slug, summary, body, start_fen, line_pgn, order_index, published)
+values
+(
+  'endgame',
+  'Re e pedone contro re',
+  're-e-pedone-contro-re',
+  'Opposizione e regola del quadrato: la base di tutti i finali.',
+  '{"intro":"Il finale più elementare e più importante: un solo pedone. Vincere dipende dall''OPPOSIZIONE (i re in colonna, una casa di mezzo, con la mossa all''avversario) e dal controllo delle case chiave davanti al pedone. Il re deve precedere il pedone, non spingerlo a caso. (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"4k3/8/4K3/8/4P3/8/8/8 w - - 0 1","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"e5","uci":"e4e5","fen":"4k3/8/4K3/4P3/8/8/8/8 b - - 0 1","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"Kd8","uci":"e8d8","fen":"3k4/8/4K3/4P3/8/8/8/8 w - - 1 2","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"Kf7","uci":"e6f7","fen":"3k4/5K2/8/4P3/8/8/8/8 b - - 2 2","children":["n4"]},"n4":{"id":"n4","parentId":"n3","ply":4,"san":"Kc7","uci":"d8c7","fen":"8/2k2K2/8/4P3/8/8/8/8 w - - 3 3","children":["n5"]},"n5":{"id":"n5","parentId":"n4","ply":5,"san":"e6","uci":"e5e6","fen":"8/2k2K2/4P3/8/8/8/8/8 b - - 0 3","children":["n6"]},"n6":{"id":"n6","parentId":"n5","ply":6,"san":"Kb6","uci":"c7b6","fen":"8/5K2/1k2P3/8/8/8/8/8 w - - 1 4","children":["n7"]},"n7":{"id":"n7","parentId":"n6","ply":7,"san":"e7","uci":"e6e7","fen":"8/4PK2/1k6/8/8/8/8/8 b - - 0 4","children":["n8"]},"n8":{"id":"n8","parentId":"n7","ply":8,"san":"Kc5","uci":"b6c5","fen":"8/4PK2/8/2k5/8/8/8/8 w - - 1 5","children":["n9"]},"n9":{"id":"n9","parentId":"n8","ply":9,"san":"e8=Q","uci":"e7e8q","fen":"4Q3/5K2/8/2k5/8/8/8/8 b - - 0 5","children":["n10"]},"n10":{"id":"n10","parentId":"n9","ply":10,"san":"Kd4","uci":"c5d4","fen":"4Q3/5K2/8/8/3k4/8/8/8 w - - 1 6","children":["n11"]},"n11":{"id":"n11","parentId":"n10","ply":11,"san":"Qe1","uci":"e8e1","fen":"8/5K2/8/8/3k4/8/8/4Q3 b - - 2 6","children":["n12"]},"n12":{"id":"n12","parentId":"n11","ply":12,"san":"Kd3","uci":"d4d3","fen":"8/5K2/8/8/8/3k4/8/4Q3 w - - 3 7","children":[]}},"rootId":"n0","seq":13},"steps":[{"nodeId":"n0","text":"Il re bianco è già due traverse davanti al pedone: condizione, da sola, vincente. Qui il pedone può correre, perché il re lo scorta.","shapes":[{"orig":"e6","brush":"green"}]},{"nodeId":"n2","text":"Il re accompagna il pedone passo dopo passo: è il re a garantire la promozione, non la fretta della spinta. Quando manca il vantaggio del re, conta l''opposizione (vedi sopra)."},{"nodeId":"n5","text":"Scortato dal re, il pedone raggiunge l''ottava e promuove. Lo schema da ricordare: nei finali di re e pedone il re viene prima del pedone."}],"practice":{"fen":"4k3/8/4K3/8/4P3/8/8/8 w - - 0 1","userColor":"white","goal":"win","progressKey":"kp_vs_k","hint":"Il re davanti al pedone vale più di una spinta affrettata: cerca le case chiave e l''opposizione."}}'::jsonb,
+  '4k3/8/4K3/8/4P3/8/8/8 w - - 0 1',
+  '1. e5 Kd8 2. Kf7 Kc7 3. e6 Kb6 4. e7 Kc5 5. e8=Q Kd4 6. Qe1 Kd3',
+  0,
+  true
+),
+(
+  'endgame',
+  'Posizione di Lucena (torre)',
+  'posizione-di-lucena',
+  'La tecnica del «ponte» per vincere il finale di torre con un pedone.',
+  '{"intro":"La posizione vinta per eccellenza nei finali di torre: il pedone è in settima, il proprio re davanti, il re avversario tagliato. La tecnica vincente è il PONTE: si porta la torre sulla quarta traversa per pararsi dagli scacchi e far uscire il re. (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"3K4/3P4/5k2/8/8/8/r7/4R3 w - - 0 1","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"Ke8","uci":"d8e8","fen":"4K3/3P4/5k2/8/8/8/r7/4R3 b - - 1 1","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"Rd2","uci":"a2d2","fen":"4K3/3P4/5k2/8/8/8/3r4/4R3 w - - 2 2","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"d8=Q+","uci":"d7d8q","fen":"3QK3/8/5k2/8/8/8/3r4/4R3 b - - 0 2","children":["n4"]},"n4":{"id":"n4","parentId":"n3","ply":4,"san":"Rxd8+","uci":"d2d8","fen":"3rK3/8/5k2/8/8/8/8/4R3 w - - 0 3","children":["n5"]},"n5":{"id":"n5","parentId":"n4","ply":5,"san":"Kxd8","uci":"e8d8","fen":"3K4/8/5k2/8/8/8/8/4R3 b - - 0 3","children":["n6"]},"n6":{"id":"n6","parentId":"n5","ply":6,"san":"Kf5","uci":"f6f5","fen":"3K4/8/8/5k2/8/8/8/4R3 w - - 1 4","children":["n7"]},"n7":{"id":"n7","parentId":"n6","ply":7,"san":"Ke7","uci":"d8e7","fen":"8/4K3/8/5k2/8/8/8/4R3 b - - 2 4","children":["n8"]},"n8":{"id":"n8","parentId":"n7","ply":8,"san":"Kg5","uci":"f5g5","fen":"8/4K3/8/6k1/8/8/8/4R3 w - - 3 5","children":["n9"]},"n9":{"id":"n9","parentId":"n8","ply":9,"san":"Rf1","uci":"e1f1","fen":"8/4K3/8/6k1/8/8/8/5R2 b - - 4 5","children":["n10"]},"n10":{"id":"n10","parentId":"n9","ply":10,"san":"Kg6","uci":"g5g6","fen":"8/4K3/6k1/8/8/8/8/5R2 w - - 5 6","children":["n11"]},"n11":{"id":"n11","parentId":"n10","ply":11,"san":"Rf6+","uci":"f1f6","fen":"8/4K3/5Rk1/8/8/8/8/8 b - - 6 6","children":["n12"]},"n12":{"id":"n12","parentId":"n11","ply":12,"san":"Kg5","uci":"g6g5","fen":"8/4K3/5R2/6k1/8/8/8/8 w - - 7 7","children":[]}},"rootId":"n0","seq":13},"steps":[{"nodeId":"n0","text":"Pedone in settima, re bianco davanti, re nero tagliato dalla torre: è la posizione di Lucena, vinta. Serve solo la tecnica giusta per far uscire il re senza perdere il pedone.","shapes":[{"orig":"d7","brush":"green"},{"orig":"e1","dest":"e4","brush":"blue"}]},{"nodeId":"n3","text":"Una via concreta e fortissima: promuovere e, dopo il cambio delle torri, restare con Torre e Re contro Re. Nella pratica qui sotto puoi invece allenare passo passo la tecnica del «ponte»."},{"nodeId":"n6","text":"Resta un finale di Torre e Re contro Re: vittoria elementare. L''essenziale era non perdere il pedone in settima."}],"practice":{"fen":"3K4/3P4/5k2/8/8/8/r7/4R3 w - - 0 1","userColor":"white","goal":"win","progressKey":"lucena","hint":"Costruisci il «ponte»: porta la torre sulla quarta traversa, così potrai frapporla agli scacchi e liberare il re."}}'::jsonb,
+  '3K4/3P4/5k2/8/8/8/r7/4R3 w - - 0 1',
+  '1. Ke8 Rd2 2. d8=Q+ Rxd8+ 3. Kxd8 Kf5 4. Ke7 Kg5 5. Rf1 Kg6 6. Rf6+ Kg5',
+  1,
+  true
+),
+(
+  'endgame',
+  'Posizione di Philidor (torre)',
+  'posizione-di-philidor',
+  'La difesa che patta il finale di torre quando l''avversario è in vantaggio.',
+  '{"intro":"Il metodo difensivo da conoscere a memoria: finché il pedone avversario non raggiunge la sesta traversa, la torre difensiva resta sulla TERZA traversa (la sesta vista dall''attaccante) e impedisce al re nemico di avanzare. Appena il pedone spinge, la torre va dietro a dare scacchi: patta. (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"8/4k3/r7/3KP3/8/8/8/7R b - - 0 1","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"Ra2","uci":"a6a2","fen":"8/4k3/8/3KP3/8/8/r7/7R w - - 1 2","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"e6","uci":"e5e6","fen":"8/4k3/4P3/3K4/8/8/r7/7R b - - 0 2","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"Rb2","uci":"a2b2","fen":"8/4k3/4P3/3K4/8/8/1r6/7R w - - 1 3","children":["n4"]},"n4":{"id":"n4","parentId":"n3","ply":4,"san":"Ra1","uci":"h1a1","fen":"8/4k3/4P3/3K4/8/8/1r6/R7 b - - 2 3","children":["n5"]},"n5":{"id":"n5","parentId":"n4","ply":5,"san":"Rc2","uci":"b2c2","fen":"8/4k3/4P3/3K4/8/8/2r5/R7 w - - 3 4","children":["n6"]},"n6":{"id":"n6","parentId":"n5","ply":6,"san":"Rb1","uci":"a1b1","fen":"8/4k3/4P3/3K4/8/8/2r5/1R6 b - - 4 4","children":["n7"]},"n7":{"id":"n7","parentId":"n6","ply":7,"san":"Ra2","uci":"c2a2","fen":"8/4k3/4P3/3K4/8/8/r7/1R6 w - - 5 5","children":["n8"]},"n8":{"id":"n8","parentId":"n7","ply":8,"san":"Rc1","uci":"b1c1","fen":"8/4k3/4P3/3K4/8/8/r7/2R5 b - - 6 5","children":["n9"]},"n9":{"id":"n9","parentId":"n8","ply":9,"san":"Rb2","uci":"a2b2","fen":"8/4k3/4P3/3K4/8/8/1r6/2R5 w - - 7 6","children":["n10"]},"n10":{"id":"n10","parentId":"n9","ply":10,"san":"Ra1","uci":"c1a1","fen":"8/4k3/4P3/3K4/8/8/1r6/R7 b - - 8 6","children":[]}},"rootId":"n0","seq":11},"steps":[{"nodeId":"n0","text":"Il difensore (il Nero) deve pattare. Con il re avversario già attivo sulla quinta, la torre si prepara a colpire da lontano: il pedone da solo non sfonda.","shapes":[{"orig":"e5","brush":"red"}]},{"nodeId":"n4","text":"Appena il pedone avanza (e6), la torre tempesta di scacchi il re da dietro: non c''è riparo. È patta. (Quando il pedone è più arretrato, prima si tiene la torre sulla sesta traversa: vedi sopra.)"}],"practice":{"fen":"8/4k3/r7/3KP3/8/8/8/7R b - - 0 1","userColor":"black","goal":"draw","progressKey":"philidor","hint":"Tieni la torre sulla sesta traversa finché il pedone non spinge; poi scendi a dare scacchi da dietro."}}'::jsonb,
+  '8/4k3/r7/3KP3/8/8/8/7R b - - 0 1',
+  '1... Ra2 2. e6 Rb2 3. Ra1 Rc2 4. Rb1 Ra2 5. Rc1 Rb2 6. Ra1',
+  2,
+  true
+),
+(
+  'endgame',
+  'Matti elementari',
+  'matti-elementari',
+  'Re+Donna contro Re e Re+Torre contro Re: la tecnica per dare matto.',
+  '{"intro":"I matti che ogni giocatore deve eseguire senza esitazione. Con la donna si spinge il re avversario verso il bordo mantenendo la distanza di cavallo per non dare stallo; con la torre si costruisce la «scala». Qui pratichi il matto di donna; nella linea vedi lo schema. (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"4k3/8/4K3/8/8/8/3Q4/8 w - - 0 1","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"Qb2","uci":"d2b2","fen":"4k3/8/4K3/8/8/8/1Q6/8 b - - 1 1","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"Kd8","uci":"e8d8","fen":"3k4/8/4K3/8/8/8/1Q6/8 w - - 2 2","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"Qb8#","uci":"b2b8","fen":"1Q1k4/8/4K3/8/8/8/8/8 b - - 3 2","children":[]}},"rootId":"n0","seq":4},"steps":[{"nodeId":"n0","text":"Con donna e re contro re solo il matto è rapidissimo. La donna restringe il re avversario verso il bordo; il proprio re si avvicina per dare il colpo finale.","shapes":[{"orig":"d2","brush":"green"}]},{"nodeId":"n2","text":"Qb8#: matto al bordo. Nota come la donna toglie le case e spinge il re sull''ultima traversa — ma attento sempre allo STALLO quando il re nemico ha poche case e il tuo re è lontano."}],"practice":{"fen":"4k3/8/4K3/8/8/8/3Q4/8 w - - 0 1","userColor":"white","goal":"win","progressKey":"kq_vs_k","hint":"Avvicina la donna a distanza di cavallo dal re nemico per restringerlo, porta il tuo re a sostegno e attento allo stallo."}}'::jsonb,
+  '4k3/8/4K3/8/8/8/3Q4/8 w - - 0 1',
+  '1. Qb2 Kd8 2. Qb8#',
+  3,
+  true
+),
+(
+  'endgame',
+  'Donna contro pedone',
+  'donna-contro-pedone',
+  'Quando la donna vince contro il pedone in settima — e quando è patta.',
+  '{"intro":"La donna vince contro un pedone in settima se questo è un pedone centrale o di cavallo: con scacchi e attacchi si guadagna il tempo per avvicinare il re, costringendo il re nemico davanti al pedone. Con pedone di torre o di alfiere ci sono trappole di stallo e spesso è patta. Qui un pedone centrale: vinto. (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"Q7/8/5K2/8/8/8/3p4/3k4 w - - 0 1","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"Ke5","uci":"f6e5","fen":"Q7/8/8/4K3/8/8/3p4/3k4 b - - 1 1","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"Kc1","uci":"d1c1","fen":"Q7/8/8/4K3/8/8/3p4/2k5 w - - 2 2","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"Qa1+","uci":"a8a1","fen":"8/8/8/4K3/8/8/3p4/Q1k5 b - - 3 2","children":["n4"]},"n4":{"id":"n4","parentId":"n3","ply":4,"san":"Kc2","uci":"c1c2","fen":"8/8/8/4K3/8/8/2kp4/Q7 w - - 4 3","children":["n5"]},"n5":{"id":"n5","parentId":"n4","ply":5,"san":"Qa4+","uci":"a1a4","fen":"8/8/8/4K3/Q7/8/2kp4/8 b - - 5 3","children":["n6"]},"n6":{"id":"n6","parentId":"n5","ply":6,"san":"Kc1","uci":"c2c1","fen":"8/8/8/4K3/Q7/8/3p4/2k5 w - - 6 4","children":["n7"]},"n7":{"id":"n7","parentId":"n6","ply":7,"san":"Qc4+","uci":"a4c4","fen":"8/8/8/4K3/2Q5/8/3p4/2k5 b - - 7 4","children":["n8"]},"n8":{"id":"n8","parentId":"n7","ply":8,"san":"Kb1","uci":"c1b1","fen":"8/8/8/4K3/2Q5/8/3p4/1k6 w - - 8 5","children":["n9"]},"n9":{"id":"n9","parentId":"n8","ply":9,"san":"Qb3+","uci":"c4b3","fen":"8/8/8/4K3/8/1Q6/3p4/1k6 b - - 9 5","children":["n10"]},"n10":{"id":"n10","parentId":"n9","ply":10,"san":"Kc1","uci":"b1c1","fen":"8/8/8/4K3/8/1Q6/3p4/2k5 w - - 10 6","children":["n11"]},"n11":{"id":"n11","parentId":"n10","ply":11,"san":"Qc3+","uci":"b3c3","fen":"8/8/8/4K3/8/2Q5/3p4/2k5 b - - 11 6","children":["n12"]},"n12":{"id":"n12","parentId":"n11","ply":12,"san":"Kd1","uci":"c1d1","fen":"8/8/8/4K3/8/2Q5/3p4/3k4 w - - 12 7","children":["n13"]},"n13":{"id":"n13","parentId":"n12","ply":13,"san":"Ke4","uci":"e5e4","fen":"8/8/8/8/4K3/2Q5/3p4/3k4 b - - 13 7","children":["n14"]},"n14":{"id":"n14","parentId":"n13","ply":14,"san":"Ke2","uci":"d1e2","fen":"8/8/8/8/4K3/2Q5/3pk3/8 w - - 14 8","children":[]}},"rootId":"n0","seq":15},"steps":[{"nodeId":"n0","text":"Pedone centrale in settima: la donna vince. Il metodo è una serie di scacchi che forza il re nero DAVANTI al proprio pedone, bloccandolo per un tempo.","shapes":[{"orig":"d2","brush":"red"}]},{"nodeId":"n4","text":"Ogni scacco guadagna un tempo: quando il re è inchiodato davanti al pedone, il re bianco si avvicina (Re5-e4…). Ripetendo lo schema, il re arriva e si vince."}],"practice":{"fen":"Q7/8/5K2/8/8/8/3p4/3k4 w - - 0 1","userColor":"white","goal":"win","progressKey":"q_vs_p","hint":"Alterna scacchi e attacchi al pedone per forzare il re nemico davanti al pedone: così guadagni il tempo per avvicinare il tuo re."}}'::jsonb,
+  'Q7/8/5K2/8/8/8/3p4/3k4 w - - 0 1',
+  '1. Ke5 Kc1 2. Qa1+ Kc2 3. Qa4+ Kc1 4. Qc4+ Kb1 5. Qb3+ Kc1 6. Qc3+ Kd1 7. Ke4 Ke2',
+  4,
+  true
+),
+(
+  'middlegame',
+  'Il pedone isolano di donna (IQP)',
+  'pedone-isolano-di-donna-iqp',
+  'Giocare con l''isolano (attività e attacco) e contro (bloccare, puntare al finale).',
+  '{"intro":"L''isolano di donna (qui il pedone d4 bianco, senza pedoni c ed e a sostenerlo) è forza e debolezza insieme: dà spazio, caselle attive (e5, c5) e iniziativa per l''attacco, ma in un finale diventa un bersaglio. Chi ce l''ha gioca per l''ATTIVITÀ; chi lo affronta BLOCCA la casa davanti (d5) e punta ai cambi. (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"r1bq1rk1/pp3ppp/2n1pn2/8/1bBP4/2N2N2/PP3PPP/R1BQ1RK1 w - - 1 10","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"Re1","uci":"f1e1","fen":"r1bq1rk1/pp3ppp/2n1pn2/8/1bBP4/2N2N2/PP3PPP/R1BQR1K1 b - - 2 10","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"b6","uci":"b7b6","fen":"r1bq1rk1/p4ppp/1pn1pn2/8/1bBP4/2N2N2/PP3PPP/R1BQR1K1 w - - 0 11","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"a3","uci":"a2a3","fen":"r1bq1rk1/p4ppp/1pn1pn2/8/1bBP4/P1N2N2/1P3PPP/R1BQR1K1 b - - 0 11","children":["n4"]},"n4":{"id":"n4","parentId":"n3","ply":4,"san":"Bxc3","uci":"b4c3","fen":"r1bq1rk1/p4ppp/1pn1pn2/8/2BP4/P1b2N2/1P3PPP/R1BQR1K1 w - - 0 12","children":["n5"]},"n5":{"id":"n5","parentId":"n4","ply":5,"san":"bxc3","uci":"b2c3","fen":"r1bq1rk1/p4ppp/1pn1pn2/8/2BP4/P1P2N2/5PPP/R1BQR1K1 b - - 0 12","children":[]}},"rootId":"n0","seq":6},"steps":[{"nodeId":"n0","text":"Ecco la struttura tipica: il pedone d4 è isolato (niente pedoni c ed e). Dà al Bianco spazio e case attive, ma va sostenuto con i pezzi, mai cambiato in un finale.","shapes":[{"orig":"d4","brush":"blue"}]},{"nodeId":"n1","text":"Le torri vanno sulle colonne semiaperte (c ed e) e i pezzi sulle case forti; l''idea a lungo termine è la rottura d4-d5 al momento giusto."}],"exercise":{"fen":"r1bq1rk1/pp3ppp/2n1pn2/8/1bBP4/2N2N2/PP3PPP/R1BQ1RK1 w - - 1 10","userColor":"white","prompt":"Il Bianco ha l''isolano su d4. Trova una mossa coerente col piano: attività dei pezzi e pressione, NON la spinta affrettata. Cosa proponi?","planHint":"Con l''isolano si gioca per l''iniziativa: piazza i pezzi sulle case attive (Ce5, alfiere su d3 verso h7, torri su c1/e1) e prepara, al momento giusto, la rottura d4-d5 che libera l''isolano e apre il gioco. Evita i cambi che ti lascerebbero un finale con il pedone debole.","relatedTacticsTheme":"kingsideAttack","progressKey":"isolani_dama"}}'::jsonb,
+  'r1bq1rk1/pp3ppp/2n1pn2/8/1bBP4/2N2N2/PP3PPP/R1BQ1RK1 w - - 1 10',
+  '10. Re1 b6 11. a3 Bxc3 12. bxc3',
+  0,
+  true
+),
+(
+  'middlegame',
+  'Colonna aperta e settima traversa',
+  'colonna-aperta-e-settima-traversa',
+  'Conquistare la colonna aperta, raddoppiare le torri, invadere in settima.',
+  '{"intro":"Le torri vivono sulle colonne aperte. Chi conquista la colonna aperta (qui la colonna c, senza pedoni) e ci porta le torri minaccia l''INVASIONE in settima traversa, dove attacca i pedoni avversari e ne immobilizza i pezzi. Se possibile si raddoppiano le torri prima di invadere. (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"2r3k1/pp3ppp/4p3/3p4/3P4/4P3/PP3PPP/2R3K1 w - - 0 1","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"Rc5","uci":"c1c5","fen":"2r3k1/pp3ppp/4p3/2Rp4/3P4/4P3/PP3PPP/6K1 b - - 1 1","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"Rxc5","uci":"c8c5","fen":"6k1/pp3ppp/4p3/2rp4/3P4/4P3/PP3PPP/6K1 w - - 0 2","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"dxc5","uci":"d4c5","fen":"6k1/pp3ppp/4p3/2Pp4/8/4P3/PP3PPP/6K1 b - - 0 2","children":[]}},"rootId":"n0","seq":4},"steps":[{"nodeId":"n0","text":"La colonna c è aperta: chi la controlla detta legge. La torre punta alla settima traversa (c7), dove i pedoni neri diventano bersagli.","shapes":[{"orig":"c1","dest":"c8","brush":"blue"},{"orig":"c7","brush":"green"}]}],"exercise":{"fen":"2r3k1/pp3ppp/4p3/3p4/3P4/4P3/PP3PPP/2R3K1 w - - 0 1","userColor":"white","prompt":"La colonna c è aperta e le torri si fronteggiano. Trova un piano per il Bianco per sfruttare la colonna e puntare alla settima traversa.","planHint":"Contendi e conquista la colonna aperta: se il Nero la lascia, Tc7 invade la settima e attacca i pedoni. Se l''avversario resta, valuta i cambi che ti aprono la strada verso c7 e centralizza il re in vista del finale.","progressKey":"colonna_aperta"}}'::jsonb,
+  '2r3k1/pp3ppp/4p3/3p4/3P4/4P3/PP3PPP/2R3K1 w - - 0 1',
+  '1. Rc5 Rxc5 2. dxc5',
+  1,
+  true
+),
+(
+  'middlegame',
+  'Case deboli e avamposti',
+  'case-deboli-e-avamposti',
+  'Creare e sfruttare un avamposto: il buon cavallo contro l''alfiere cattivo.',
+  '{"intro":"Una casa debole è una casa che l''avversario non può più difendere con un pedone. Se è nella metà campo nemica e tu puoi sostenerla con un pedone, diventa un AVAMPOSTO: il posto ideale per un cavallo, che da lì domina senza poter essere scacciato. Qui il Bianco ha un avamposto eterno su d5 (struttura alla Sveshnikov). (Bozza da revisione.)","tree":{"nodes":{"n0":{"id":"n0","parentId":null,"ply":0,"san":null,"uci":null,"fen":"r1bq1rk1/5pbp/p1np1p2/1p1Np3/4P3/N1P5/PP3PPP/R2QKB1R w KQ - 1 12","children":["n1"]},"n1":{"id":"n1","parentId":"n0","ply":1,"san":"Nc2","uci":"a3c2","fen":"r1bq1rk1/5pbp/p1np1p2/1p1Np3/4P3/2P5/PPN2PPP/R2QKB1R b KQ - 2 12","children":["n2"]},"n2":{"id":"n2","parentId":"n1","ply":2,"san":"Be6","uci":"c8e6","fen":"r2q1rk1/5pbp/p1npbp2/1p1Np3/4P3/2P5/PPN2PPP/R2QKB1R w KQ - 3 13","children":["n3"]},"n3":{"id":"n3","parentId":"n2","ply":3,"san":"Nce3","uci":"c2e3","fen":"r2q1rk1/5pbp/p1npbp2/1p1Np3/4P3/2P1N3/PP3PPP/R2QKB1R b KQ - 4 13","children":[]}},"rootId":"n0","seq":4},"steps":[{"nodeId":"n0","text":"Il cavallo su d5 è un avamposto perfetto: nessun pedone nero può cacciarlo. È il classico «buon cavallo» contro l''alfiere nero, limitato dai propri pedoni.","shapes":[{"orig":"d5","brush":"green"}]},{"nodeId":"n1","text":"Il Bianco non ha fretta: consolida l''avamposto e manovra i pezzi sulle case deboli del campo nero, dove il cavallo regna."}],"exercise":{"fen":"r1bq1rk1/5pbp/p1np1p2/1p1Np3/4P3/N1P5/PP3PPP/R2QKB1R w KQ - 1 12","userColor":"white","prompt":"Il cavallo bianco domina l''avamposto d5, mentre il Nero ha una struttura indebolita. Trova un piano per consolidare e sfruttare il vantaggio posizionale.","planHint":"L''avamposto su d5 è eterno: nessun pedone nero può scacciarlo. Il piano bianco è consolidarlo (manovra Cb1-d2-f1-e3 o c3 + Cc2-e3) e giocare sulle case deboli; il cavallo forte vale più dell''alfiere nero, limitato dai propri pedoni. Punta ad aprire un secondo fronte mantenendo il blocco su d5.","progressKey":"avamposti"}}'::jsonb,
+  'r1bq1rk1/5pbp/p1np1p2/1p1Np3/4P3/N1P5/PP3PPP/R2QKB1R w KQ - 1 12',
+  '12. Nc2 Be6 13. Nce3',
+  2,
+  true
+)
+on conflict (slug) do update set
+  type = excluded.type,
+  title = excluded.title,
+  summary = excluded.summary,
+  body = excluded.body,
+  start_fen = excluded.start_fen,
+  line_pgn = excluded.line_pgn,
+  order_index = excluded.order_index,
+  published = excluded.published;

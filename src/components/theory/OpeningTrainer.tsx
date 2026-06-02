@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
 import { OpeningExplorer } from "@/components/theory/OpeningExplorer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,13 @@ const ChessBoard = dynamic(
   { ssr: false },
 );
 
+/** Trappola nota collegata a una posizione del repertorio (rimando 06d). */
+export interface TrapWarning {
+  fen: string;
+  name: string;
+  slug: string;
+}
+
 export interface OpeningTrainerProps {
   repertoireId: string;
   name: string;
@@ -25,6 +33,8 @@ export interface OpeningTrainerProps {
   tree: SerializedMoveTree;
   dueIds: string[];
   reviewMode: boolean;
+  /** Trappole note che combaciano con posizioni del repertorio. */
+  trapWarnings?: TrapWarning[];
 }
 
 type Phase = "user" | "opponent" | "end";
@@ -34,6 +44,11 @@ function turnOf(fen: string): "w" | "b" {
   return fen.split(" ")[1] === "b" ? "b" : "w";
 }
 
+/** Chiave-posizione robusta: pezzi + tratto + arrocco + en-passant. */
+function posKey(fen: string): string {
+  return fen.split(" ").slice(0, 4).join(" ");
+}
+
 export function OpeningTrainer({
   repertoireId,
   name,
@@ -41,12 +56,20 @@ export function OpeningTrainer({
   tree,
   dueIds,
   reviewMode,
+  trapWarnings = [],
 }: OpeningTrainerProps) {
   const nodes = tree.nodes;
   const rootId = tree.rootId;
   const userTurn = color === "white" ? "w" : "b";
   const dueSet = useMemo(() => new Set(dueIds), [dueIds]);
   const boardWrapRef = useRef<HTMLDivElement>(null);
+
+  // Trappole note indicizzate per posizione (rimando al modulo Trappole, 06d).
+  const trapByPos = useMemo(() => {
+    const m = new Map<string, { name: string; slug: string }>();
+    for (const w of trapWarnings) m.set(posKey(w.fen), { name: w.name, slug: w.slug });
+    return m;
+  }, [trapWarnings]);
 
   const [currentId, setCurrentId] = useState(rootId);
   const [phase, setPhase] = useState<Phase>("user");
@@ -62,6 +85,7 @@ export function OpeningTrainer({
     node?.uci && node.uci.length >= 4
       ? [node.uci.slice(0, 2) as Square, node.uci.slice(2, 4) as Square]
       : null;
+  const currentTrap = trapByPos.get(posKey(fen));
 
   /** Un nodo ha un discendente "in scadenza" (per orientare il ripasso). */
   const subtreeHasDue = useCallback(
@@ -218,6 +242,18 @@ export function OpeningTrainer({
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="space-y-3">
+          {currentTrap && (
+            <div className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm">
+              ⚠ Attento: qui esiste la trappola{" "}
+              <Link
+                href={`/app/trappole/${currentTrap.slug}`}
+                className="font-medium underline underline-offset-2 hover:text-text"
+              >
+                {currentTrap.name}
+              </Link>
+              .
+            </div>
+          )}
           <div
             ref={boardWrapRef}
             tabIndex={0}

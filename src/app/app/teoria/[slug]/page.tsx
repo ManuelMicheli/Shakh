@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LessonViewer } from "@/components/theory/LessonViewer";
+import { EndgamePractice } from "@/components/theory/EndgamePractice";
+import { PositionalExercise } from "@/components/theory/PositionalExercise";
 import { isLesson, type ContentItemRow } from "@/lib/theory/types";
+import { hasPractice } from "@/lib/theory/endgame";
+import { hasExercise } from "@/lib/theory/middlegame";
 
 export default async function LessonPage({
   params,
@@ -30,14 +34,23 @@ export default async function LessonPage({
     );
   }
 
+  // Blocchi interattivi specifici del ramo (06c): pratica del finale contro la
+  // tablebase, esercizio posizionale del mediogioco. Il `body` resta una `Lesson`
+  // valida per il viewer; questi campi extra sono opzionali e additivi.
+  const practice = data.type === "endgame" && hasPractice(data.body) ? data.body.practice : null;
+  const exercise = data.type === "middlegame" && hasExercise(data.body) ? data.body.exercise : null;
+
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-5xl space-y-8">
       <LessonViewer
         lesson={data.body}
         type={data.type}
         title={data.title}
         coachConfigured={Boolean(process.env.ANTHROPIC_API_KEY)}
       />
+
+      {practice && <EndgamePractice practice={practice} />}
+      {exercise && <PositionalExercise exercise={exercise} />}
     </div>
   );
 }

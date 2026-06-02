@@ -1,0 +1,52 @@
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { Badge } from "@/components/ui/badge";
+import { TrapCatalog } from "@/components/traps/TrapCatalog";
+import { listTraps, countDueTraps } from "@/lib/traps/query";
+
+export const metadata = {
+  title: "Trappole · Shakh",
+};
+
+export default async function TrappolePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [traps, dueCount] = await Promise.all([
+    listTraps(supabase),
+    user ? countDueTraps(supabase, user.id) : Promise.resolve(0),
+  ]);
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">Trappole</h1>
+          <p className="mt-2 max-w-2xl text-text-muted">
+            Dalle classiche alle chicche di nicchia: l&apos;esca, lo scatto e il perché
+            vince. Tendi la trappola o impara a non caderci.
+          </p>
+        </div>
+        {dueCount > 0 && (
+          <Link
+            href="/app/trappole/ripasso"
+            className="inline-flex items-center gap-2 rounded-md border border-text bg-text px-4 py-2 text-sm font-medium text-bg transition-opacity hover:opacity-90"
+          >
+            Ripassa <Badge variant="muted">{dueCount} in scadenza</Badge>
+          </Link>
+        )}
+      </div>
+
+      {traps.length === 0 ? (
+        <p className="text-text-muted">
+          Nessuna trappola pubblicata. Applica il seed (migration{" "}
+          <span className="font-mono">0008_traps_seed.sql</span>) per popolarne il catalogo.
+        </p>
+      ) : (
+        <TrapCatalog traps={traps} />
+      )}
+    </div>
+  );
+}
