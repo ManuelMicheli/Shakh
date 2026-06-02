@@ -45,7 +45,7 @@ export default async function TrapViewerPage({
   const coachConfigured = Boolean(process.env.ANTHROPIC_API_KEY);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="space-y-8">
       {/* Metadati */}
       <div className="space-y-3">
         <Link href="/app/trappole" className="text-sm text-text-muted hover:text-text">

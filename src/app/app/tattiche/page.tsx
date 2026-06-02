@@ -57,7 +57,7 @@ export default async function TattichePage({
 
 function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }) {
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Tattiche</h1>
         <p className="mt-2 text-text-muted">
@@ -96,7 +96,7 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
 
 function ThemePicker() {
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">
           Per tema — scegli un motivo

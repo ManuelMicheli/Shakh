@@ -77,7 +77,7 @@ export default async function TrainingPage({
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="w-full">
       <OpeningTrainer
         repertoireId={rep.id}
         name={rep.name}

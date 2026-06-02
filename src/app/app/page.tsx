@@ -34,7 +34,7 @@ export default async function DashboardPage() {
   // Diagnostico non fatto: dashboard ridotta che invita all'onboarding.
   if (!profile?.onboarding_completed) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="space-y-6">
         <Header name={name} />
         <NextStep step={null} />
       </div>
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
   // Utente nuovo, nessun dato: stato vuoto pulito (no grafici vuoti).
   if (data.empty) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="space-y-6">
         <Header name={name} />
         <NextStep step={step} />
         {assignments.length > 0 && <StudentAssignments items={assignments} />}
@@ -81,7 +81,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="space-y-8">
       <Header name={name} />
       {assignments.length > 0 && <StudentAssignments items={assignments} />}
       <DashboardView data={data} middleSlot={<NextStep step={step} />} />

@@ -27,7 +27,7 @@ export default async function GameReviewPage({
     .order("ply", { ascending: true });
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="w-full">
       <GameReview
         game={{
           id: game.id,

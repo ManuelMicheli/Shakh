@@ -80,7 +80,7 @@ export default async function AssegnazioniPage({ params }: PageProps) {
   }));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="space-y-8">
       <div>
         <Link href={`/app/gruppi/${id}`} className="text-sm text-text-muted hover:text-text">
           ← {group.name}

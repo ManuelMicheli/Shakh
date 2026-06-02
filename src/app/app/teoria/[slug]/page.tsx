@@ -41,7 +41,7 @@ export default async function LessonPage({
   const exercise = data.type === "middlegame" && hasExercise(data.body) ? data.body.exercise : null;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="space-y-8">
       <LessonViewer
         lesson={data.body}
         type={data.type}

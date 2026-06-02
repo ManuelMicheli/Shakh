@@ -30,7 +30,7 @@ export default async function PercorsoPage() {
   const step = computeNextStep(currentLevel, nodes, weakest);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Percorso</h1>
         <p className="mt-2 text-text-muted">

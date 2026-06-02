@@ -32,7 +32,7 @@ export default async function RepertorioPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Il mio repertorio</h1>
         <p className="mt-2 max-w-2xl text-text-muted">

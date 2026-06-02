@@ -50,7 +50,7 @@ export default async function ClassePage({ params }: PageProps) {
   const radarAreas = data.competenceByArea.map((a) => ({ label: a.label, value: a.avgScore }));
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="space-y-8">
       <div>
         <Link href={`/app/gruppi/${id}`} className="text-sm text-text-muted hover:text-text">
           ← {group.name}

@@ -25,7 +25,7 @@ export default async function MediogiocoPage() {
   const lessons = (data as Row[] | null) ?? [];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="space-y-8">
       <div>
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">
           ← Teoria

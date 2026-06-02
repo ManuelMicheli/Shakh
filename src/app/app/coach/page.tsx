@@ -19,7 +19,7 @@ export default async function CoachPage() {
   const hasData = metrics.userMoves > 0;
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Coach</h1>
         <p className="mt-2 text-text-muted">

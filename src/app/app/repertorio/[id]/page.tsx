@@ -30,7 +30,7 @@ export default async function RepertoireEditorPage({
   const tree = rowsToTree((rows as RepertoireMoveRow[] | null) ?? []);
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="w-full">
       <RepertoireEditor
         repertoireId={rep.id}
         name={rep.name}

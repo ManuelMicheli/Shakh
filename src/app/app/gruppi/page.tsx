@@ -60,7 +60,7 @@ export default async function GruppiPage() {
     }));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">Circoli e gruppi</h1>
         <p className="mt-2 max-w-2xl text-text-muted">

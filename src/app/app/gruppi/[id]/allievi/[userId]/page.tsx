@@ -44,7 +44,7 @@ export default async function StudentDrilldownPage({ params }: PageProps) {
   const data = await loadDashboard(supabase, userId);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="space-y-8">
       <div>
         <Link href={`/app/gruppi/${id}/classe`} className="text-sm text-text-muted hover:text-text">
           ← Dashboard di classe
