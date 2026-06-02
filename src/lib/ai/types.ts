@@ -92,3 +92,14 @@ export interface CoachSynthesis {
   focusAreas: string[];
   suggestion: string;
 }
+
+/**
+ * Metriche AGGREGATE di una classe (prompt 09 §7), già calcolate in modo
+ * deterministico dall'aggregazione dei membri. Input della sintesi di classe:
+ * il modello produce SOLO la frase di sintesi, non ricalcola nulla.
+ */
+export interface ClassMetrics {
+  studentCount: number;
+  areas: { label: string; avgScore: number | null; studentsWithData: number }[];
+  commonWeaknesses: { label: string; count: number }[];
+}

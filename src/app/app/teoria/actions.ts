@@ -1,6 +1,8 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { recomputePath } from "@/lib/path/recompute";
 
 export interface ProgressResult {
   ok: boolean;
@@ -71,4 +73,32 @@ export async function recordMiddlegameAttempt(
   reasonable: boolean,
 ): Promise<ProgressResult> {
   return bumpProgress("middlegame_theme", progressKey, reasonable);
+}
+
+/**
+ * Segna una lezione come completata (tabella `content_completions`): aggancio
+ * del percorso guidato (prompt 07) al LessonViewer (06a). Idempotente — la PK
+ * impedisce duplicati — e ricalcola subito lo stato del percorso.
+ */
+export async function recordLessonCompletion(
+  contentItemId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+
+  const { error } = await supabase
+    .from("content_completions")
+    .upsert(
+      { user_id: user.id, content_item_id: contentItemId },
+      { onConflict: "user_id,content_item_id" },
+    );
+  if (error) return { ok: false, error: error.message };
+
+  await recomputePath(supabase, user.id);
+  revalidatePath("/app/percorso");
+  revalidatePath("/app");
+  return { ok: true };
 }

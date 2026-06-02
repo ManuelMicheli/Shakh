@@ -1,0 +1,60 @@
+{
+  "common": {
+    "login": "Accedi",
+    "signup": "Inizia ora",
+    "haveAccount": "Ho già un account",
+    "openApp": "Vai alla piattaforma"
+  },
+  "landing": {
+    "navCta": "Inizia ora",
+    "heroKicker": "Scacchi, capiti davvero",
+    "heroTitle": "Dal primo movimento al gioco di club.",
+    "heroSub": "Shakh ti porta da principiante a giocatore di club forte. Un coach AI in italiano spiega il <em>perché</em> di ogni mossa, ancorato ai dati del motore e alle statistiche reali.",
+    "heroCtaPrimary": "Inizia gratis",
+    "heroCtaSecondary": "Ho già un account",
+    "howTitle": "Come funziona",
+    "howSub": "Un metodo solo: studiare il perché, non memorizzare il cosa.",
+    "featAnalysisTitle": "Analisi delle tue partite",
+    "featAnalysisBody": "Importi una partita e la riguardi mossa per mossa: il motore valuta, il coach spiega dov'è girata e perché.",
+    "featPathTitle": "Percorso guidato",
+    "featPathBody": "Una mappa a livelli dal principiante al club. I nodi si sbloccano quando dimostri di padroneggiare i precedenti.",
+    "featTheoryTitle": "Teoria interattiva",
+    "featTheoryBody": "Aperture, finali e mediogioco da giocare sulla scacchiera, non da leggere. Costruisci e alleni il tuo repertorio.",
+    "featTacticsTitle": "Tattiche",
+    "featTacticsBody": "Migliaia di posizioni calibrate sul tuo livello, con ripetizione spaziata sui temi dove sei debole.",
+    "featTrapsTitle": "Trappole",
+    "featTrapsBody": "Le trappole che incontri davvero nelle tue aperture: come tenderle e come non caderci.",
+    "coachKicker": "L'angolo che cambia tutto",
+    "coachTitle": "Un coach che spiega il perché. In italiano.",
+    "coachBody": "Niente mosse a memoria. Il coach ragiona sui dati oggettivi — valutazione del motore, statistiche Lichess — e te li traduce in linguaggio chiaro: cosa minaccia quella mossa, perché la migliore è migliore, cosa allenare dopo.",
+    "coachPoint1": "Ancorato al motore Stockfish: zero allucinazioni sui numeri.",
+    "coachPoint2": "Si adatta al tuo livello stimato.",
+    "coachPoint3": "Sempre disponibile, sulla posizione che hai davanti.",
+    "finalTitle": "Pronto alla prima mossa?",
+    "finalSub": "Crea un account e fai il diagnostico: tre minuti per sapere da dove partire.",
+    "finalCta": "Inizia ora, è gratis"
+  },
+  "footer": {
+    "tagline": "La piattaforma di studio scacchistico con coach AI in italiano.",
+    "legal": "Legale",
+    "privacy": "Privacy",
+    "cookie": "Cookie policy",
+    "terms": "Termini",
+    "managePreferences": "Preferenze cookie",
+    "rights": "Tutti i diritti riservati."
+  },
+  "consent": {
+    "title": "Rispettiamo la tua privacy",
+    "body": "Usiamo cookie tecnici necessari al funzionamento e, solo col tuo consenso, cookie di preferenza per ricordare le tue impostazioni. Nessun tracciamento pubblicitario, nessuna profilazione.",
+    "accept": "Accetta",
+    "reject": "Rifiuta",
+    "customize": "Personalizza",
+    "save": "Salva preferenze",
+    "necessaryTitle": "Tecnici (necessari)",
+    "necessaryBody": "Sessione, sicurezza e preferenze di base. Sempre attivi, non richiedono consenso.",
+    "preferencesTitle": "Preferenze",
+    "preferencesBody": "Ricordano scelte non essenziali (es. layout) per migliorare l'esperienza.",
+    "alwaysOn": "Sempre attivi",
+    "moreInfo": "Maggiori informazioni nella"
+  }
+}

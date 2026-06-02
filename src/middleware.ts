@@ -1,8 +1,21 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { buildCsp, makeNonce } from "@/lib/security/csp";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  // Nonce per richiesta + CSP. Il nonce va sugli header di RICHIESTA (Next lo
+  // applica ai propri script e lo espone via x-nonce al layout); l'header CSP
+  // va anche sulla RISPOSTA per il browser.
+  const nonce = makeNonce();
+  const csp = buildCsp(nonce, process.env.NODE_ENV !== "production");
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("content-security-policy", csp);
+
+  const response = await updateSession(request, requestHeaders);
+  response.headers.set("content-security-policy", csp);
+  return response;
 }
 
 export const config = {

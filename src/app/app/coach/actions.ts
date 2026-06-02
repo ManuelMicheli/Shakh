@@ -39,6 +39,18 @@ export async function refreshProgressAndSynthesize(): Promise<SynthesisResult> {
     const synthesis = await synthesizePatterns(metrics);
     if (!synthesis)
       return { ok: false, error: "Risposta del coach non interpretabile. Riprova." };
+    // Cache dell'ultima sintesi: la dashboard (08) la mostra senza rigenerarla.
+    await supabase.from("coach_synthesis").upsert(
+      {
+        user_id: user.id,
+        summary: synthesis.summary,
+        focus_areas: synthesis.focusAreas,
+        suggestion: synthesis.suggestion,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
+    revalidatePath("/app");
     return { ok: true, synthesis };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Errore del coach AI." };

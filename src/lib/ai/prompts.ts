@@ -12,6 +12,7 @@ import type {
   PositionFacts,
   CoachSynthesis,
   UserMetrics,
+  ClassMetrics,
 } from "./types";
 
 /** Regole comuni a ogni interazione del coach. */
@@ -117,6 +118,38 @@ export function synthesisUserMessage(m: UserMetrics): string {
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+// ─────────────────── Funzione C (variante classe) — sintesi istruttore ────────
+
+export const CLASS_SYNTHESIS_SYSTEM_PROMPT = `${COMMON_RULES}
+
+Riceverai metriche AGGREGATE (già calcolate) sui punti deboli di una CLASSE di allievi: competenza media per area e punti deboli condivisi da più allievi. Devi produrre per l'istruttore una sintesi in italiano, utile a pianificare le lezioni.
+
+Rispondi ESCLUSIVAMENTE con un oggetto JSON valido, senza testo prima o dopo, senza markdown, senza blocchi di codice. Schema esatto:
+{"summary": "2-3 frasi sul livello generale della classe e i punti deboli comuni", "focusAreas": ["area 1", "area 2"], "suggestion": "una proposta concreta di lezione/attività per la classe"}
+
+Le metriche sono fatti aggregati: basa la sintesi solo su di esse, non inventare numeri né nomi di allievi.`;
+
+export function classSynthesisUserMessage(m: ClassMetrics): string {
+  const areaLines = m.areas
+    .map(
+      (a) =>
+        `  - ${a.label}: competenza media ${a.avgScore == null ? "n/d" : `${(a.avgScore * 100).toFixed(0)}%`} (${a.studentsWithData} allievi con dati)`,
+    )
+    .join("\n");
+  const weakLines = m.commonWeaknesses
+    .map((w) => `  - ${w.label}: debole in ${w.count} allievi`)
+    .join("\n");
+  return [
+    `Allievi nella classe: ${m.studentCount}.`,
+    "Competenza media per area:",
+    areaLines || "  (dati insufficienti)",
+    "Punti deboli condivisi:",
+    weakLines || "  (nessun punto debole comune marcato)",
+    "",
+    "Produci ora il JSON della sintesi di classe.",
+  ].join("\n");
 }
 
 /**

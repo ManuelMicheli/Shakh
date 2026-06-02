@@ -9,6 +9,8 @@ import {
   answerContextMessage,
   SYNTHESIS_SYSTEM_PROMPT,
   synthesisUserMessage,
+  CLASS_SYNTHESIS_SYSTEM_PROMPT,
+  classSynthesisUserMessage,
   parseSynthesis,
 } from "./prompts";
 import type {
@@ -16,6 +18,7 @@ import type {
   PositionFacts,
   ChatTurn,
   UserMetrics,
+  ClassMetrics,
   CoachSynthesis,
 } from "./types";
 
@@ -131,6 +134,25 @@ export async function synthesizePatterns(
     temperature: AI_TEMPERATURE,
     system: SYNTHESIS_SYSTEM_PROMPT,
     messages: [{ role: "user", content: synthesisUserMessage(metrics) }],
+  });
+  return parseSynthesis(textOf(msg.content));
+}
+
+/**
+ * Funzione C (variante classe): sintesi dei punti deboli aggregati di una
+ * classe per l'istruttore. Stesso principio "il dato è dato": le metriche sono
+ * deterministiche, il modello produce solo la frase di sintesi.
+ */
+export async function synthesizeClass(
+  metrics: ClassMetrics,
+): Promise<CoachSynthesis | null> {
+  const client = getAnthropic();
+  const msg = await client.messages.create({
+    model: DEFAULT_COACH_MODEL,
+    max_tokens: AI_MAX_TOKENS.synthesis,
+    temperature: AI_TEMPERATURE,
+    system: CLASS_SYNTHESIS_SYSTEM_PROMPT,
+    messages: [{ role: "user", content: classSynthesisUserMessage(metrics) }],
   });
   return parseSynthesis(textOf(msg.content));
 }

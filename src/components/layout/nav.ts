@@ -7,6 +7,7 @@ import {
   Library,
   Route,
   Bot,
+  Users,
   User,
   type LucideIcon,
 } from "lucide-react";
@@ -31,7 +32,8 @@ export const navItems: NavItem[] = [
   { label: "Trappole", href: "/app/trappole", icon: Zap },
   { label: "Teoria", href: "/app/teoria", icon: BookOpen },
   { label: "Repertorio", href: "/app/repertorio", icon: Library },
-  { label: "Percorso", href: "/app/percorso", icon: Route, comingSoon: true },
+  { label: "Percorso", href: "/app/percorso", icon: Route },
   { label: "Coach", href: "/app/coach", icon: Bot },
-  { label: "Profilo", href: "/app/profilo", icon: User, comingSoon: true },
+  { label: "Gruppi", href: "/app/gruppi", icon: Users },
+  { label: "Profilo", href: "/app/profilo", icon: User },
 ];

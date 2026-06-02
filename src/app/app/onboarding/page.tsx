@@ -1,41 +1,31 @@
-import Link from "next/link";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+
+export const metadata = { title: "Diagnostico — Shakh" };
 
 /**
- * Placeholder onboarding/diagnostico. Lo riempie il prompt 07.
+ * Diagnostico iniziale (prompt 07, §2): autovalutazione + mini-test tattico +
+ * import opzionale. Mostrato finché `onboarding_completed = false`.
  */
-export default function OnboardingPage() {
+export default async function OnboardingPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("onboarding_completed")
+    .eq("id", user.id)
+    .maybeSingle<{ onboarding_completed: boolean }>();
+
+  if (profile?.onboarding_completed) redirect("/app/percorso");
+
   return (
-    <div className="mx-auto flex min-h-[60vh] max-w-lg items-center">
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Benvenuto in Shakh</CardTitle>
-          <CardDescription>
-            Qui costruiremo il tuo profilo con un breve diagnostico per stimare
-            il tuo livello. Per ora è solo un segnaposto.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-text-muted">
-            Il diagnostico arriverà con un prossimo aggiornamento.
-          </p>
-        </CardContent>
-        <CardFooter>
-          <Link
-            href="/app"
-            className="inline-flex h-10 items-center rounded-md bg-text px-4 text-sm font-medium text-bg hover:opacity-90"
-          >
-            Vai alla dashboard
-          </Link>
-        </CardFooter>
-      </Card>
+    <div className="mx-auto max-w-2xl py-6">
+      <OnboardingFlow />
     </div>
   );
 }

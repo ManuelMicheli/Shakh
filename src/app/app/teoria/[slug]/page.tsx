@@ -47,6 +47,7 @@ export default async function LessonPage({
         type={data.type}
         title={data.title}
         coachConfigured={Boolean(process.env.ANTHROPIC_API_KEY)}
+        contentItemId={data.id}
       />
 
       {practice && <EndgamePractice practice={practice} />}

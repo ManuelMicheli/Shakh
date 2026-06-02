@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { streamAnswer } from "@/lib/ai/coach";
 import { isCoachConfigured } from "@/lib/ai/client";
+import { limitCoach, clientIp, tooMany } from "@/lib/security/ratelimit";
+import { isPlausibleFen, clampQuestion } from "@/lib/security/validate";
 import type {
   PositionFacts,
   ChatTurn,
@@ -35,8 +37,9 @@ export async function POST(req: Request) {
     return new Response("Body non valido.", { status: 400 });
   }
 
-  const { fen, turn, question } = body;
-  if (!fen || (turn !== "w" && turn !== "b") || !question?.trim()) {
+  const { fen, turn } = body;
+  const question = clampQuestion(body.question);
+  if (!isPlausibleFen(fen) || (turn !== "w" && turn !== "b") || !question) {
     return new Response("fen, turn e question richiesti.", { status: 400 });
   }
 
@@ -45,6 +48,10 @@ export async function POST(req: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return new Response("Non autenticato.", { status: 401 });
+
+  // Rate limit per-IP e per-utente: le chiamate ad Anthropic sono costose (§6).
+  const rl = await limitCoach(user.id, clientIp(req));
+  if (!rl.ok) return tooMany(rl.retryAfter);
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -70,7 +77,7 @@ export async function POST(req: Request) {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        await streamAnswer(facts, history, question.trim(), profile?.elo_estimate ?? null, (t) =>
+        await streamAnswer(facts, history, question, profile?.elo_estimate ?? null, (t) =>
           controller.enqueue(encoder.encode(t)),
         );
         controller.close();

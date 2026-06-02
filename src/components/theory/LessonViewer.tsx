@@ -18,6 +18,7 @@ import { useEngineAnalysis } from "@/lib/engine/useEngineAnalysis";
 import { toWhiteRelative, type ScoreType } from "@/lib/engine/score";
 import type { Lesson, TheoryType, Shape } from "@/lib/theory/types";
 import type { DrawShape } from "chessground/draw";
+import { recordLessonCompletion } from "@/app/app/teoria/actions";
 
 const ChessBoard = dynamic(
   () => import("@/components/chess/ChessBoard").then((m) => m.ChessBoard),
@@ -29,6 +30,8 @@ export interface LessonViewerProps {
   type: TheoryType;
   title: string;
   coachConfigured: boolean;
+  /** Id del content_item: se presente, completare i passi registra il progresso (07). */
+  contentItemId?: string;
 }
 
 /** Risolve un SAN nella posizione in una freccia verde (mossa candidata). */
@@ -46,11 +49,19 @@ function sanToArrow(fen: string, san: string): Shape | null {
  * esplorazione libera (motore) + deviazione (coach) + contesto dinamico
  * (explorer per le aperture, tablebase per i finali). Riusabile dai tre rami.
  */
-export function LessonViewer({ lesson, type, title, coachConfigured }: LessonViewerProps) {
+export function LessonViewer({
+  lesson,
+  type,
+  title,
+  coachConfigured,
+  contentItemId,
+}: LessonViewerProps) {
   const tree = useMoveTree(lesson.tree);
   const [orientation, setOrientation] = useState<"white" | "black">("white");
   const [guided, setGuided] = useState(0);
   const [engineOn, setEngineOn] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const completionSentRef = useRef(false);
   const boardWrapRef = useRef<HTMLDivElement>(null);
 
   const { goTo, currentNodeId } = tree;
@@ -80,6 +91,17 @@ export function LessonViewer({ lesson, type, title, coachConfigured }: LessonVie
   const currentStep = currentStepIndex !== null ? lesson.steps[currentStepIndex] : null;
 
   const isDeviation = !originalIds.has(currentNodeId) && tree.currentNode.parentId !== null;
+
+  // Raggiunto l'ultimo passo → lezione completata: registra (una sola volta) il
+  // completamento per il percorso guidato (07). Idempotente lato server.
+  const isLastStep =
+    currentStepIndex !== null && currentStepIndex === lesson.steps.length - 1;
+  useEffect(() => {
+    if (!isLastStep || !contentItemId || completionSentRef.current) return;
+    completionSentRef.current = true;
+    setCompleted(true);
+    void recordLessonCompletion(contentItemId);
+  }, [isLastStep, contentItemId]);
 
   // La deviazione accende il motore per valutare subito.
   useEffect(() => {
@@ -239,7 +261,14 @@ export function LessonViewer({ lesson, type, title, coachConfigured }: LessonVie
                   </Button>
                 </>
               ) : currentStep ? (
-                <p className="text-sm leading-relaxed">{currentStep.text}</p>
+                <>
+                  <p className="text-sm leading-relaxed">{currentStep.text}</p>
+                  {completed && isLastStep && (
+                    <p className="text-sm font-medium text-text">
+                      ✓ Lezione completata — registrata nel percorso.
+                    </p>
+                  )}
+                </>
               ) : (
                 <p className="text-sm text-text-muted">
                   Naviga le mosse o muovi sulla scacchiera per esplorare.

@@ -6,8 +6,14 @@ import { NextResponse, type NextRequest } from "next/server";
  * Tutto sotto /app richiede autenticazione; gli utenti loggati che visitano
  * le pagine auth vengono rimandati nell'app.
  */
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+export async function updateSession(
+  request: NextRequest,
+  requestHeaders?: Headers,
+) {
+  // requestHeaders porta nonce/CSP iniettati dal middleware: vanno propagati alla
+  // richiesta downstream perché Next applichi il nonce ai propri script.
+  const nextInit = requestHeaders ? { request: { headers: requestHeaders } } : { request };
+  let supabaseResponse = NextResponse.next(nextInit);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,7 +27,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          supabaseResponse = NextResponse.next({ request });
+          supabaseResponse = NextResponse.next(nextInit);
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           );

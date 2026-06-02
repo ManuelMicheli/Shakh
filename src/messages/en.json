@@ -1,0 +1,60 @@
+{
+  "common": {
+    "login": "Log in",
+    "signup": "Get started",
+    "haveAccount": "I already have an account",
+    "openApp": "Open the app"
+  },
+  "landing": {
+    "navCta": "Get started",
+    "heroKicker": "Chess, actually understood",
+    "heroTitle": "From your first move to club-level play.",
+    "heroSub": "Shakh takes you from beginner to a strong club player. An AI coach explains the <em>why</em> behind every move, anchored to engine data and real statistics.",
+    "heroCtaPrimary": "Start free",
+    "heroCtaSecondary": "I already have an account",
+    "howTitle": "How it works",
+    "howSub": "One method: study the why, don't memorize the what.",
+    "featAnalysisTitle": "Analysis of your games",
+    "featAnalysisBody": "Import a game and review it move by move: the engine evaluates, the coach explains where it turned and why.",
+    "featPathTitle": "Guided path",
+    "featPathBody": "A leveled map from beginner to club. Nodes unlock as you prove you've mastered the previous ones.",
+    "featTheoryTitle": "Interactive theory",
+    "featTheoryBody": "Openings, endgames and middlegame to play on the board, not to read. Build and train your repertoire.",
+    "featTacticsTitle": "Tactics",
+    "featTacticsBody": "Thousands of positions calibrated to your level, with spaced repetition on your weak themes.",
+    "featTrapsTitle": "Traps",
+    "featTrapsBody": "The traps you actually meet in your openings: how to set them and how to avoid them.",
+    "coachKicker": "The angle that changes everything",
+    "coachTitle": "A coach that explains the why.",
+    "coachBody": "No rote moves. The coach reasons over objective data — engine evaluation, Lichess statistics — and turns it into plain language: what the move threatens, why the best is best, what to train next.",
+    "coachPoint1": "Anchored to the Stockfish engine: zero hallucinated numbers.",
+    "coachPoint2": "Adapts to your estimated level.",
+    "coachPoint3": "Always available, on the position in front of you.",
+    "finalTitle": "Ready for the first move?",
+    "finalSub": "Create an account and take the diagnostic: three minutes to know where to start.",
+    "finalCta": "Get started, it's free"
+  },
+  "footer": {
+    "tagline": "The chess study platform with an AI coach.",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "cookie": "Cookie policy",
+    "terms": "Terms",
+    "managePreferences": "Cookie preferences",
+    "rights": "All rights reserved."
+  },
+  "consent": {
+    "title": "We respect your privacy",
+    "body": "We use technical cookies necessary for the platform to work and, only with your consent, preference cookies to remember your settings. No advertising tracking, no profiling.",
+    "accept": "Accept",
+    "reject": "Reject",
+    "customize": "Customize",
+    "save": "Save preferences",
+    "necessaryTitle": "Technical (necessary)",
+    "necessaryBody": "Session, security and basic preferences. Always on, no consent required.",
+    "preferencesTitle": "Preferences",
+    "preferencesBody": "Remember non-essential choices (e.g. layout) to improve the experience.",
+    "alwaysOn": "Always on",
+    "moreInfo": "More information in the"
+  }
+}

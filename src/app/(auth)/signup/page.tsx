@@ -9,6 +9,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast";
 
+/** Età in anni interi da una data ISO (yyyy-mm-dd); null se non valida. */
+function ageFromDate(iso: string): number | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+  return age;
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -16,18 +28,46 @@ export default function SignupPage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [parentalEmail, setParentalEmail] = useState("");
+  const [parentalConsent, setParentalConsent] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Età dalla data di nascita; soglia consenso digitale: 14 anni (IT).
+  const age = ageFromDate(birthDate);
+  const isMinor = age !== null && age < 14;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (age === null) {
+      toast({ title: "Inserisci la data di nascita", variant: "error" });
+      return;
+    }
+    if (isMinor && (!parentalConsent || !parentalEmail.trim())) {
+      toast({
+        title: "Serve il consenso di un genitore",
+        description:
+          "Sotto i 14 anni occorre l'email e il consenso di un genitore o tutore.",
+        variant: "error",
+      });
+      return;
+    }
+
     setLoading(true);
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        // Passato ai metadati → il trigger popola profiles.display_name.
-        data: { display_name: displayName },
+        // Passato ai metadati → il trigger popola profiles (display_name,
+        // birth_date, consenso genitoriale).
+        data: {
+          display_name: displayName,
+          birth_date: birthDate,
+          parental_consent: isMinor ? parentalConsent : false,
+          parental_email: isMinor ? parentalEmail.trim() : "",
+        },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
@@ -95,6 +135,55 @@ export default function SignupPage() {
           />
           <p className="text-xs text-text-muted">Almeno 8 caratteri.</p>
         </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="birthDate">Data di nascita</Label>
+          <Input
+            id="birthDate"
+            type="date"
+            autoComplete="bday"
+            required
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+          />
+          <p className="text-xs text-text-muted">
+            Serve a verificare il consenso digitale (in Italia: 14 anni).
+          </p>
+        </div>
+
+        {isMinor && (
+          <div className="space-y-3 rounded-md border border-border bg-surface-2 p-4">
+            <p className="text-sm">
+              Hai meno di 14 anni: serve il consenso di un genitore o tutore.
+            </p>
+            <div className="space-y-1.5">
+              <Label htmlFor="parentalEmail">Email del genitore/tutore</Label>
+              <Input
+                id="parentalEmail"
+                type="email"
+                value={parentalEmail}
+                onChange={(e) => setParentalEmail(e.target.value)}
+              />
+            </div>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={parentalConsent}
+                onChange={(e) => setParentalConsent(e.target.checked)}
+                className="mt-1 h-4 w-4 accent-[var(--accent)]"
+              />
+              <span className="text-text-muted">
+                Sono un genitore/tutore e acconsento alla creazione dell&apos;account
+                e al trattamento dei dati come da{" "}
+                <Link href="/privacy" className="underline underline-offset-2">
+                  informativa privacy
+                </Link>
+                .
+              </span>
+            </label>
+          </div>
+        )}
+
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Attendi…" : "Registrati"}
         </Button>

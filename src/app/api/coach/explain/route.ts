@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { streamExplainMove } from "@/lib/ai/coach";
 import { isCoachConfigured } from "@/lib/ai/client";
+import { limitCoach, clientIp, tooMany } from "@/lib/security/ratelimit";
 import { evalText, phaseFromFen, moverFromPly } from "@/lib/ai/format";
 import type { MoveFacts } from "@/lib/ai/types";
 import type { Classification } from "@/lib/games/types";
@@ -68,6 +69,10 @@ export async function POST(req: Request) {
       { headers: streamHeaders() },
     );
   }
+
+  // Da qui si genera davvero (non in cache): applica il rate limit (§6).
+  const rl = await limitCoach(user.id, clientIp(req));
+  if (!rl.ok) return tooMany(rl.retryAfter);
 
   const prevFen = ply > 1 ? rows?.find((r) => r.ply === ply - 1)?.fen ?? START_FEN : START_FEN;
 
