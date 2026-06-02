@@ -1,3 +1,4 @@
+import { Menu } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogoutButton } from "./logout-button";
@@ -5,14 +6,26 @@ import { LogoutButton } from "./logout-button";
 export function Topbar({
   displayName,
   avatarUrl,
+  onOpenMobile,
 }: {
   displayName?: string | null;
   avatarUrl?: string | null;
+  onOpenMobile?: () => void;
 }) {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-6">
-      <div className="text-sm text-text-muted">
-        {displayName ? `Ciao, ${displayName}` : " "}
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4 sm:px-6">
+      <div className="flex min-w-0 items-center gap-2">
+        <button
+          type="button"
+          onClick={onOpenMobile}
+          aria-label="Apri menu"
+          className="-ml-1 rounded-md p-1.5 text-text-muted hover:bg-surface-2 hover:text-text md:hidden"
+        >
+          <Menu className="h-5 w-5" aria-hidden />
+        </button>
+        <div className="truncate text-sm text-text-muted">
+          {displayName ? `Ciao, ${displayName}` : " "}
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
