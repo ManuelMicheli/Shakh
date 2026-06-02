@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/* ============================================================
+   DARK MODE — class strategy (Tailwind 4)
+   Il tema scuro è il default; .dark / .light vengono applicate
+   su <html> dal ThemeProvider per evitare FOUC.
+   ============================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   DESIGN TOKENS — valori di partenza (vedi prompt §5)
+   Identità bianco/nero monocromatica, niente bianco/nero puri.
+   ============================================================ */
+:root,
+.dark {
+  /* Tema scuro (default) */
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --surface-2: #1f1f1f;
+  --text: #fafafa;
+  --text-muted: #9a9a9a;
+  --border: #2a2a2a;
+
+  /* Accento neutro: azione per inversione (eredita text/bg) */
+  --accent: var(--text);
+  --accent-contrast: var(--bg);
+
+  /* Colori semantici analisi — UNICA eccezione al monocromatico.
+     Usare SOLO nel contesto valutazione mosse, mai nella UI generale. */
+  --eval-brilliant: #3aa6b9;
+  --eval-best: #5b9a5e;
+  --eval-good: #8a9a6b;
+  --eval-inaccuracy: #c9a24b;
+  --eval-mistake: #cf8a4a;
+  --eval-blunder: #c0564a;
+}
+
+.light {
+  --bg: #ffffff;
+  --surface: #f7f7f7;
+  --surface-2: #efefef;
+  --text: #0e0e0e;
+  --text-muted: #6b6b6b;
+  --border: #e2e2e2;
+
+  --accent: var(--text);
+  --accent-contrast: var(--bg);
+}
+
+/* ============================================================
+   MAPPATURA TOKEN → utilities Tailwind
+   Abilita bg-bg, text-text, border-border, ecc.
+   ============================================================ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+
+  --color-eval-brilliant: var(--eval-brilliant);
+  --color-eval-best: var(--eval-best);
+  --color-eval-good: var(--eval-good);
+  --color-eval-inaccuracy: var(--eval-inaccuracy);
+  --color-eval-mistake: var(--eval-mistake);
+  --color-eval-blunder: var(--eval-blunder);
+
+  /* Famiglie font (collegate alle CSS var iniettate da next/font) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Scala tipografica fluida per i titoli display (clamp) */
+  --text-display-sm: clamp(1.75rem, 1.2rem + 2.5vw, 2.75rem);
+  --text-display-md: clamp(2.25rem, 1.4rem + 4vw, 4rem);
+  --text-display-lg: clamp(3rem, 1.6rem + 6vw, 5.5rem);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  html.light {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Focus visibile e accessibile ovunque (vedi §9) */
+  :focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--text);
+    color: var(--bg);
+  }
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
