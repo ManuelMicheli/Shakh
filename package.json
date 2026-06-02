@@ -6,9 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "copy-engine": "node scripts/copy-engine.mjs",
+    "import-puzzles": "npx --yes tsx scripts/import-puzzles.ts",
+    "prebuild": "node scripts/copy-engine.mjs",
+    "predev": "node scripts/copy-engine.mjs",
+    "postinstall": "node scripts/copy-engine.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
+    "@mliebelt/pgn-parser": "^1.4.19",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.106.2",
     "chess.js": "^1.4.0",
@@ -21,6 +28,7 @@
     "next": "^15.5.19",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "stockfish": "^16.0.0",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {

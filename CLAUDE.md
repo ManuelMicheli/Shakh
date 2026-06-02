@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Shakh — chess learning platform. Takes a player from absolute beginner to strong club level (1800–2200). The differentiator is an **AI coach in Italian** that explains the *why* of moves, anchored to objective data (Stockfish engine + Lichess API stats).
 
-The product is built incrementally via numbered spec prompts `00`–`10` (Italian markdown files in the repo root, e.g. `00-fondamenta (1).md`, `01-scacchiera-core (1).md`). **Each prompt has hard scope boundaries — it explicitly forbids anticipating later prompts.** Read the relevant prompt file before building a module; it is the authoritative spec for that module's behavior, constraints, and deliverables. Current state: only prompt `00` (foundations) is built. Prompts `01`+ (chessboard, Stockfish, analysis, coach, tactics, theory, guided path) are not yet implemented.
+The product is built incrementally via numbered spec prompts `00`–`10` (Italian markdown files in the repo root, e.g. `00-fondamenta (1).md`, `01-scacchiera-core (1).md`). **Each prompt has hard scope boundaries — it explicitly forbids anticipating later prompts.** Read the relevant prompt file before building a module; it is the authoritative spec for that module's behavior, constraints, and deliverables. Current state: prompts `00`–`03` are built (foundations, chessboard core, Stockfish engine, game import + move-by-move analysis). Prompts `04`+ (coach AI, tactics, theory, guided path) are not yet implemented.
 
 ## Commands
 

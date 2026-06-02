@@ -26,5 +26,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# engine assets (copiati da node_modules/stockfish via scripts/copy-engine.mjs)
+/public/engine
+
 # typescript
 *.tsbuildinfo
+
+# dataset puzzle Lichess (283M, oltre limite 100MB GitHub)
+lichess_db_puzzle.csv.zst

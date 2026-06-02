@@ -122,3 +122,71 @@ html.lenis body {
 .lenis.lenis-stopped {
   overflow: hidden;
 }
+
+/* ============================================================
+   SCACCHIERA (chessground) — tema bianco/nero col design system.
+   Caselle in grigi neutri (surface / surface-2), nessun verde/marrone.
+   Gli asset dei pezzi (cburnett, SVG base64) sono importati dal componente.
+   ============================================================ */
+.cg-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+/* Pattern a scacchiera generato dai token: chiara = --surface, scura = --surface-2. */
+.cg-wrap cg-board {
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(45deg, var(--surface-2) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--surface-2) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--surface-2) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--surface-2) 75%);
+  background-size: 25% 25%;
+  background-position:
+    0 0,
+    0 12.5%,
+    12.5% -12.5%,
+    -12.5% 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+/* Coordinate a/h, 1/8 in monospace, colore attenuato. */
+.cg-wrap coords {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+}
+.cg-wrap coords coord {
+  color: var(--text-muted);
+}
+
+/* Evidenziazioni (monocromatiche, tinte sul testo del tema). */
+.cg-wrap cg-board square.last-move {
+  background: color-mix(in srgb, var(--text) 16%, transparent);
+}
+.cg-wrap cg-board square.selected {
+  background: color-mix(in srgb, var(--text) 26%, transparent);
+}
+.cg-wrap cg-board square.check {
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--text) 55%, transparent) 0%,
+    color-mix(in srgb, var(--text) 35%, transparent) 50%,
+    transparent 72%
+  );
+}
+/* Destinazioni legali: punto al centro; anello su casella occupata (cattura). */
+.cg-wrap cg-board square.move-dest {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--text) 28%, transparent) 22%,
+    transparent 24%
+  );
+}
+.cg-wrap cg-board square.oc.move-dest {
+  background: radial-gradient(
+    circle,
+    transparent 62%,
+    color-mix(in srgb, var(--text) 28%, transparent) 64%
+  );
+}

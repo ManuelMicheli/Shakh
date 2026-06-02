@@ -34,6 +34,18 @@ supabase db push          # oppure incolla 0001_init.sql nell'SQL editor
 
 Crea tabelle, enum, trigger (`profiles` auto al signup, `updated_at`) e policy RLS.
 
+## Motore (Stockfish WASM)
+
+Build **lite single-thread** (Stockfish 16, pacchetto npm `stockfish`): gira ovunque
+**senza** header COOP/COEP. I file (`.js` + `.wasm` + `.nnue`) sono serviti localmente da
+`/engine/`, copiati da `node_modules` via `scripts/copy-engine.mjs` (gira in `postinstall`
+e `prebuild`). La cartella `public/engine/` è git-ignored.
+
+Caricamento **lazy**: il WASM si carica solo alla prima analisi, in un web worker
+(`src/lib/engine/engine.ts`, singleton). Per passare alla **full multi-thread** in futuro:
+sostituire il file worker con `stockfish-nnue-16.js` + `.wasm` e abilitare gli header
+COOP/COEP in `next.config.ts` (vedi commento lì). Non farlo ora.
+
 ## Struttura
 
 - `src/app` — route (marketing, auth, shell `/app`)

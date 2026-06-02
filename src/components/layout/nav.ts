@@ -3,6 +3,7 @@ import {
   Swords,
   Target,
   BookOpen,
+  Library,
   Route,
   Bot,
   User,
@@ -24,10 +25,11 @@ export interface NavItem {
  */
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/app", icon: LayoutDashboard },
-  { label: "Le mie partite", href: "/app/partite", icon: Swords, comingSoon: true },
-  { label: "Tattiche", href: "/app/tattiche", icon: Target, comingSoon: true },
-  { label: "Teoria", href: "/app/teoria", icon: BookOpen, comingSoon: true },
+  { label: "Le mie partite", href: "/app/partite", icon: Swords },
+  { label: "Tattiche", href: "/app/tattiche", icon: Target },
+  { label: "Teoria", href: "/app/teoria", icon: BookOpen },
+  { label: "Repertorio", href: "/app/repertorio", icon: Library },
   { label: "Percorso", href: "/app/percorso", icon: Route, comingSoon: true },
-  { label: "Coach", href: "/app/coach", icon: Bot, comingSoon: true },
+  { label: "Coach", href: "/app/coach", icon: Bot },
   { label: "Profilo", href: "/app/profilo", icon: User, comingSoon: true },
 ];
