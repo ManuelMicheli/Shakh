@@ -16,6 +16,7 @@ import {
   Bot,
   Users,
   User,
+  Gamepad2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +38,7 @@ export const navItems: NavItem[] = [
   { label: "Impara", href: "/app/impara", icon: GraduationCap },
   { label: "Oggi", href: "/app/oggi", icon: CalendarCheck },
   { label: "Le mie partite", href: "/app/partite", icon: Swords },
+  { label: "Gioca con un amico", href: "/app/gioca", icon: Gamepad2 },
   { label: "Punti deboli", href: "/app/debolezze", icon: Crosshair },
   { label: "Ripara errori", href: "/app/ripara", icon: Wrench },
   { label: "Tattiche", href: "/app/tattiche", icon: Target },

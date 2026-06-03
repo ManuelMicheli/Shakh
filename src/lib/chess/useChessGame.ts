@@ -41,6 +41,8 @@ export interface ChessGame {
 
   /** Tenta una mossa. Ritorna true se legale. Tronca la storia se si muove dopo aver navigato indietro. */
   move: (from: Square, to: Square, promotion?: PieceSymbol) => boolean;
+  /** Annulla l'ultima mossa della linea (ritorna indietro di una mossa). */
+  takeback: () => void;
   goTo: (cursor: number) => void;
   next: () => void;
   prev: () => void;
@@ -132,6 +134,14 @@ export function useChessGame(initialFen: string = DEFAULT_FEN): ChessGame {
     [],
   );
 
+  const takeback = useCallback(() => {
+    setState((prev) => {
+      if (prev.moves.length === 0) return prev;
+      const moves = prev.moves.slice(0, -1);
+      return { ...prev, moves, cursor: moves.length - 1 };
+    });
+  }, []);
+
   const goTo = useCallback((next: number) => {
     setState((prev) => {
       const clamped = Math.max(-1, Math.min(next, prev.moves.length - 1));
@@ -201,6 +211,7 @@ export function useChessGame(initialFen: string = DEFAULT_FEN): ChessGame {
     lastMove,
     legalDests,
     move,
+    takeback,
     goTo,
     next,
     prev,

@@ -7,6 +7,7 @@ import { useChessGame } from "@/lib/chess/useChessGame";
 import { engine } from "@/lib/engine/engine";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmResignButton } from "@/components/play/ConfirmResignButton";
 import { cn } from "@/lib/utils";
 import { chooseEngineMove, strengthFor, STYLE_LABEL, type Style } from "@/lib/sparring/opponent";
 
@@ -180,11 +181,6 @@ export function SparringBoard() {
             {status ?? (thinking ? "L'avversario pensa…" : `Muovi tu (${userColor === "white" ? "Bianco" : "Nero"})`)}
           </span>
           <div className="flex gap-2">
-            {!status && (
-              <Button variant="ghost" size="sm" onClick={() => setResigned(true)}>
-                Abbandona
-              </Button>
-            )}
             {status && (
               <Button size="sm" onClick={start}>
                 Rivincita
@@ -199,6 +195,12 @@ export function SparringBoard() {
 
       <aside className="space-y-4">
         <Info label="Avversario" value={`${STYLE_LABEL[style]} · ${elo}`} />
+        {!status && (
+          <ConfirmResignButton
+            onConfirm={() => setResigned(true)}
+            className="w-full"
+          />
+        )}
         <MoveList history={game.history} />
       </aside>
     </div>
