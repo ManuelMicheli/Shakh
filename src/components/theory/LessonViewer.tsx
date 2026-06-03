@@ -164,10 +164,10 @@ export function LessonViewer({
         {lesson.intro && <p className="mt-2 max-w-2xl text-text-muted">{lesson.intro}</p>}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] 2xl:grid-cols-[auto_minmax(24rem,1fr)]">
         {/* Board + controlli + passi */}
         <div className="space-y-3">
-          <div className="mx-auto flex w-full max-w-xl gap-2 lg:max-w-none">
+          <div className="board-sized mx-auto flex w-full max-w-xl gap-2 lg:max-w-none">
             {engineOn && whiteEval && (
               <EvalBar score={whiteEval.value} scoreType={whiteEval.type} orientation={orientation} />
             )}

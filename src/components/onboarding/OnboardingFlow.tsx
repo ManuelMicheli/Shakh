@@ -7,11 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
   completeOnboarding,
   getDiagnosticPuzzles,
 } from "@/app/app/onboarding/actions";
+import { ExternalAccounts } from "@/components/profile/ExternalAccounts";
+import type { LinkedAccount } from "@/app/app/profilo/actions";
 import { baselineFromSelf, levelFromRating } from "@/lib/path/diagnostic";
 import type { MiniTestResult, SelfAssessment } from "@/lib/path/diagnostic";
 import type { Puzzle, SolveResult } from "@/lib/tactics/types";
@@ -21,7 +24,7 @@ const PuzzleSolver = dynamic(
   { ssr: false },
 );
 
-type Phase = "intro" | "self" | "test" | "extra" | "tour" | "saving";
+type Phase = "intro" | "self" | "connect" | "test" | "tour" | "done" | "saving";
 type Experience = SelfAssessment["experience"];
 
 /** Bottone-opzione monocromo (selezione per inversione). */
@@ -65,7 +68,14 @@ const TOUR = [
   },
 ];
 
-export function OnboardingFlow() {
+export interface OnboardingFlowProps {
+  /** Nome con cui salutare (display name o username), se disponibile. */
+  name?: string | null;
+  /** Account online già collegati al rientro nel flusso. */
+  initialAccounts?: LinkedAccount[];
+}
+
+export function OnboardingFlow({ name, initialAccounts = [] }: OnboardingFlowProps) {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("intro");
 
@@ -74,6 +84,15 @@ export function OnboardingFlow() {
   const [playsOnline, setPlaysOnline] = useState<boolean | null>(null);
   const [onlineRating, setOnlineRating] = useState("");
   const [experience, setExperience] = useState<Experience | null>(null);
+
+  // Account online: ci interessa sapere se almeno uno è verificato (rating reale
+  // più affidabile del mini-test → ne proponiamo il salto).
+  const [hasVerified, setHasVerified] = useState(
+    initialAccounts.some((a) => a.verified),
+  );
+  const onAccountsChange = useCallback((accs: LinkedAccount[]) => {
+    setHasVerified(accs.some((a) => a.verified));
+  }, []);
 
   // Mini-test
   const [puzzles, setPuzzles] = useState<Puzzle[] | null>(null);
@@ -106,13 +125,10 @@ export function OnboardingFlow() {
     };
   }, [phase, puzzles]);
 
-  const advanceTest = useCallback(
-    (rating: number, solved: boolean) => {
-      setResults((r) => [...r, { rating, solved }]);
-      setTestIdx((i) => i + 1);
-    },
-    [],
-  );
+  const advanceTest = useCallback((rating: number, solved: boolean) => {
+    setResults((r) => [...r, { rating, solved }]);
+    setTestIdx((i) => i + 1);
+  }, []);
 
   const onSolved = useCallback(
     (puzzle: Puzzle, res: SolveResult) => {
@@ -128,10 +144,10 @@ export function OnboardingFlow() {
     const out = await completeOnboarding({ self, results });
     if (!out.ok) {
       setError(out.error ?? "Errore imprevisto.");
-      setPhase("tour");
+      setPhase("done");
       return;
     }
-    router.push("/app/percorso");
+    router.push("/app");
     router.refresh();
   }, [self, results, router]);
 
@@ -151,14 +167,20 @@ export function OnboardingFlow() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Benvenuto in Shakh</CardTitle>
+          <CardTitle>{name ? `Benvenuto, ${name}` : "Benvenuto in Shakh"}</CardTitle>
           <CardDescription>
-            Un diagnostico breve per stimare il tuo livello e posizionarti nel
-            percorso. Tre minuti, niente di più.
+            Sono il tuo coach. Insieme partiamo dal tuo livello reale e costruiamo
+            un percorso su misura, dove ti spiego sempre il <em>perché</em> delle
+            mosse. Bastano un paio di minuti per cominciare bene.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button onClick={() => setPhase("self")}>Inizia</Button>
+        <CardContent className="space-y-4">
+          <ol className="space-y-1 text-sm text-text-muted">
+            <li>1 · Due domande veloci su di te</li>
+            <li>2 · Collega Lichess o Chess.com (se vuoi)</li>
+            <li>3 · Un mini-test per tararti, e si parte</li>
+          </ol>
+          <Button onClick={() => setPhase("self")}>Iniziamo</Button>
         </CardContent>
       </Card>
     );
@@ -228,7 +250,44 @@ export function OnboardingFlow() {
           </fieldset>
 
           <div className="flex justify-end">
-            <Button disabled={!canContinue} onClick={() => setPhase("test")}>
+            <Button disabled={!canContinue} onClick={() => setPhase("connect")}>
+              Continua
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (phase === "connect") {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Collega un account online</CardTitle>
+          <CardDescription>
+            Giochi su Lichess o Chess.com? Collegalo: dopo una rapida verifica
+            useremo il tuo rating reale per posizionarti con precisione e
+            importeremo le tue ultime partite. È facoltativo — puoi farlo anche
+            più tardi dal profilo.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <ExternalAccounts
+            bare
+            initial={initialAccounts}
+            onAccountsChange={onAccountsChange}
+          />
+          {hasVerified && (
+            <p className="flex items-center gap-2 text-sm text-text-muted">
+              <Badge variant="muted">fatto</Badge>
+              Account verificato: ti abbiamo già posizionato dal tuo rating reale.
+            </p>
+          )}
+          <div className="flex justify-between">
+            <Button variant="ghost" size="sm" onClick={() => setPhase("test")}>
+              {hasVerified ? "Salta il test, vai avanti" : "Salta, lo collego dopo"}
+            </Button>
+            <Button onClick={() => setPhase(hasVerified ? "tour" : "test")}>
               Continua
             </Button>
           </div>
@@ -254,7 +313,7 @@ export function OnboardingFlow() {
 
     const current = puzzles[testIdx];
     if (!current) {
-      // Test finito (o nessun puzzle disponibile): vai all'import opzionale.
+      // Test finito (o nessun puzzle disponibile): vai al tour.
       return (
         <Card>
           <CardHeader>
@@ -265,7 +324,7 @@ export function OnboardingFlow() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => setPhase("extra")}>Avanti</Button>
+            <Button onClick={() => setPhase("tour")}>Avanti</Button>
           </CardContent>
         </Card>
       );
@@ -285,6 +344,12 @@ export function OnboardingFlow() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {hasVerified && (
+            <p className="rounded-md border border-border bg-surface-2 px-3 py-2 text-xs text-text-muted">
+              Hai già un account verificato: il test non è necessario, ma se lo
+              fai affiniamo ancora la stima.
+            </p>
+          )}
           <PuzzleSolver
             key={current.id}
             puzzle={current}
@@ -294,30 +359,10 @@ export function OnboardingFlow() {
             <Button variant="ghost" size="sm" onClick={() => advanceTest(current.rating, false)}>
               Salta questo
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setPhase("extra")}>
+            <Button variant="ghost" size="sm" onClick={() => setPhase("tour")}>
               Salta il test
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (phase === "extra") {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Hai una partita da analizzare?</CardTitle>
-          <CardDescription>
-            Opzionale: importare una tua partita dà un segnale più preciso sul
-            tuo livello reale. Puoi farlo anche più tardi.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => setPhase("tour")}>
-            Più tardi
-          </Button>
-          <Button onClick={() => setPhase("tour")}>Capito, vai avanti</Button>
         </CardContent>
       </Card>
     );
@@ -338,7 +383,6 @@ export function OnboardingFlow() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm leading-relaxed text-text-muted">{t.body}</p>
-          {error && <p className="text-sm text-eval-blunder">{error}</p>}
           <div className="flex justify-between">
             <Button
               variant="ghost"
@@ -349,11 +393,29 @@ export function OnboardingFlow() {
               Indietro
             </Button>
             {last ? (
-              <Button onClick={finish}>Vai al percorso</Button>
+              <Button onClick={() => setPhase("done")}>Avanti</Button>
             ) : (
               <Button onClick={() => setTourIdx((i) => i + 1)}>Avanti</Button>
             )}
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (phase === "done") {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{name ? `Tutto pronto, ${name}` : "Tutto pronto"}</CardTitle>
+          <CardDescription>
+            Ti ho posizionato nel percorso e la dashboard è pronta. Da qui in poi
+            ti seguo passo dopo passo. In bocca al lupo e buon gioco!
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {error && <p className="text-sm text-eval-blunder">{error}</p>}
+          <Button onClick={finish}>Vai alla dashboard</Button>
         </CardContent>
       </Card>
     );

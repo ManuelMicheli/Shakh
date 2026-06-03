@@ -167,11 +167,11 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
         )}
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[auto_minmax(22rem,1fr)]">
         {/* Scacchiera + controlli: si auto-dimensiona per stare in pagina. */}
-        <div className="analysis-board flex min-h-0 flex-col gap-2">
+        <div className="board-sized analysis-board flex min-h-0 flex-col gap-2">
           {/* Controlli avanti/indietro in ALTO, sopra la scacchiera. */}
-          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 xl:max-w-[820px]">
+          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 xl:max-w-[820px] 2xl:max-w-[980px]">
             <BoardControls
               onFirst={chess.first}
               onPrev={chess.prev}
@@ -188,7 +188,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
           {/* Nome del giocatore in alto (avversario rispetto all'orientamento). */}
           <PlayerTag name={nameOf(topColor)} color={topColor} indented={Boolean(shownEval)} />
 
-          <div className="mx-auto flex w-full max-w-3xl gap-2 xl:max-w-[820px]">
+          <div className="mx-auto flex w-full max-w-3xl gap-2 xl:max-w-[820px] 2xl:max-w-[980px]">
             {shownEval && (
               <EvalBar
                 score={shownEval.value}
@@ -302,7 +302,7 @@ function PlayerTag({
   indented: boolean;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl items-center gap-2 xl:max-w-[820px]">
+    <div className="mx-auto flex w-full max-w-3xl items-center gap-2 xl:max-w-[820px] 2xl:max-w-[980px]">
       {/* Spaziatore largo come la barra di valutazione, così il nome si allinea alla board. */}
       {indented && <div className="w-6 shrink-0" aria-hidden="true" />}
       <span

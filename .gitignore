@@ -37,3 +37,7 @@ lichess_db_puzzle.csv.zst
 
 .vercel
 .env*.local
+
+# log di build locali
+build-full.log
+*.build.log

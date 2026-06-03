@@ -162,8 +162,8 @@ export function HotseatGame() {
   const atEnd = game.cursor >= game.history.length - 1;
 
   return (
-    <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-      <div className="lg:mx-auto lg:w-full lg:max-w-none">
+    <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] 2xl:grid-cols-[auto_minmax(20rem,1fr)]">
+      <div className="board-sized lg:mx-auto lg:w-full lg:max-w-none">
         {/* Mobile: board + mosse a destra. Desktop: solo board (orologi + controlli sotto). */}
         <div className="flex items-stretch gap-2 lg:block lg:space-y-3">
           <div className="min-w-0 flex-1 space-y-3 lg:flex-none">

@@ -89,6 +89,27 @@ export async function completeOnboarding(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
 
+  // Un account online VERIFICATO durante l'onboarding ha già posizionato l'utente
+  // (rating reale OTB → vedi seedFromVerifiedAccount): segnale ben più affidabile
+  // dell'autovalutazione. In quel caso non sovrascrivere stima/livello: assicura
+  // solo che l'onboarding risulti chiuso e ricalcola.
+  const { data: verified } = await supabase
+    .from("external_accounts")
+    .select("source")
+    .eq("user_id", user.id)
+    .eq("verified", true)
+    .limit(1);
+  if (verified && verified.length > 0) {
+    await supabase
+      .from("profiles")
+      .update({ onboarding_completed: true })
+      .eq("id", user.id);
+    await recomputePath(supabase, user.id);
+    revalidatePath("/app/percorso");
+    revalidatePath("/app");
+    return { ok: true };
+  }
+
   const dx = diagnose(input.self, input.results);
 
   // 1) Rating tattico iniziale (deviation più bassa: l'abbiamo misurato).

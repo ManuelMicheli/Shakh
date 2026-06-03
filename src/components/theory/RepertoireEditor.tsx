@@ -72,12 +72,12 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] 2xl:grid-cols-[auto_minmax(24rem,1fr)]">
         <div className="space-y-3">
           <div
             ref={boardWrapRef}
             tabIndex={0}
-            className="mx-auto w-full max-w-xl rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text lg:max-w-none"
+            className="board-sized mx-auto w-full max-w-xl rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text lg:max-w-none"
           >
             <ChessBoard
               fen={t.fen}

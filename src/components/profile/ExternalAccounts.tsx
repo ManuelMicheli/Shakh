@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,21 +31,43 @@ const VERIFY_HINT: Record<ExternalSource, string> = {
 
 export interface ExternalAccountsProps {
   initial: LinkedAccount[];
+  /** Senza cornice Card: per incorporare il blocco in un altro contenitore (es. onboarding). */
+  bare?: boolean;
+  /** Notifica al genitore ogni variazione degli account (collegamento/verifica/scollegamento). */
+  onAccountsChange?: (accounts: LinkedAccount[]) => void;
 }
 
 /**
  * Collega e verifica Lichess / Chess.com. Il rating online incide sul Rating
  * Shakh (dominio 'external') SOLO dopo la verifica di proprietà via bio-token.
  */
-export function ExternalAccounts({ initial }: ExternalAccountsProps) {
+export function ExternalAccounts({ initial, bare = false, onAccountsChange }: ExternalAccountsProps) {
   const { toast } = useToast();
   const [accounts, setAccounts] = useState<LinkedAccount[]>(initial);
   const bySource = (s: ExternalSource) => accounts.find((a) => a.source === s);
+
+  // Tiene il genitore in sincronia (l'onboarding decide se proporre il salto del mini-test).
+  useEffect(() => {
+    onAccountsChange?.(accounts);
+  }, [accounts, onAccountsChange]);
 
   const upsert = (acc: LinkedAccount) =>
     setAccounts((prev) => [...prev.filter((a) => a.source !== acc.source), acc]);
   const remove = (s: ExternalSource) =>
     setAccounts((prev) => prev.filter((a) => a.source !== s));
+
+  const rows = (["lichess", "chesscom"] as ExternalSource[]).map((source) => (
+    <SourceRow
+      key={source}
+      source={source}
+      account={bySource(source)}
+      onChanged={upsert}
+      onRemoved={() => remove(source)}
+      toast={toast}
+    />
+  ));
+
+  if (bare) return <div className="space-y-5">{rows}</div>;
 
   return (
     <Card>
@@ -56,18 +78,7 @@ export function ExternalAccounts({ initial }: ExternalAccountsProps) {
           Rating Shakh, riportato alla scala reale (OTB).
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5">
-        {(["lichess", "chesscom"] as ExternalSource[]).map((source) => (
-          <SourceRow
-            key={source}
-            source={source}
-            account={bySource(source)}
-            onChanged={upsert}
-            onRemoved={() => remove(source)}
-            toast={toast}
-          />
-        ))}
-      </CardContent>
+      <CardContent className="space-y-5">{rows}</CardContent>
     </Card>
   );
 }

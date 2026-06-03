@@ -191,7 +191,7 @@ export function PuzzleSolver({ puzzle, onSolved }: PuzzleSolverProps) {
 
   return (
     <div className="space-y-3">
-      <div className="relative mx-auto w-full max-w-xl lg:max-w-2xl xl:max-w-3xl">
+      <div className="relative mx-auto w-full max-w-xl lg:max-w-2xl xl:max-w-4xl">
         <ChessBoard
           fen={game.fen}
           orientation={solverColor}

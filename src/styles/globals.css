@@ -148,7 +148,7 @@ html.lenis body {
   /* Tetto su desktop E sull'altezza del viewport: essendo quadrata, limitare la
      larghezza con un'espressione in svh limita anche l'altezza, così board +
      controlli + eval bar restano nella schermata senza scroll. */
-  max-width: min(var(--board-max, 720px), max(280px, calc(100svh - 13rem)));
+  max-width: min(var(--board-max, 720px), max(280px, calc(100svh - 11rem)));
   aspect-ratio: 1 / 1;
   margin-inline: auto;
 }
@@ -173,13 +173,13 @@ html.lenis body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 5.6cqi;
-  height: 5.6cqi;
+  width: 4.8cqi;
+  height: 4.8cqi;
   border-radius: 9999px;
   /* Glifo come badge grafico (stile chess.com/Lichess): sans bold, non monospace. */
   font-family: var(--font-sans);
   font-weight: 800;
-  font-size: 3.4cqi;
+  font-size: 2.9cqi;
   line-height: 1;
   letter-spacing: -0.04em;
   color: #fff;
@@ -201,7 +201,7 @@ html.lenis body {
     "ranks board"
     "corner files";
   width: 100%;
-  max-width: min(var(--board-max, 720px), max(280px, calc(100svh - 13rem)));
+  max-width: min(var(--board-max, 720px), max(280px, calc(100svh - 11rem)));
   margin-inline: auto;
 }
 /* Su monitor desktop ampi la scacchiera può crescere un po' (sempre entro il tetto
@@ -209,7 +209,24 @@ html.lenis body {
 @media (min-width: 1280px) {
   .board-square,
   .board-frame {
-    --board-max: 820px;
+    --board-max: 880px;
+  }
+}
+/* Schermi grandi: la scacchiera cresce ancora (entro il tetto in altezza). */
+@media (min-width: 1536px) {
+  .board-square,
+  .board-frame {
+    --board-max: 980px;
+  }
+  /* Larghezza ESPLICITA su desktop ampio per la COLONNA che contiene la scacchiera
+     nei layout a due colonne: così la colonna si stringe sulla larghezza reale del
+     quadrato invece di galleggiare centrata in una colonna enorme, e il pannello
+     accanto prende lo spazio restante (vedi le griglie `2xl:[auto_minmax(...,1fr)]`).
+     Scoped a `.board-sized` di proposito: applicarlo a tutte le board romperebbe
+     quelle dentro wrapper stretti (overflow). La board interna riempie poi questa
+     larghezza via il suo `width:100%`/`max-width` (stessa espressione → coerente). */
+  .board-sized {
+    width: min(var(--board-max, 720px), max(280px, calc(100svh - 11rem)));
   }
 }
 /* Pagina di analisi: tetto in altezza più stretto perché sopra/sotto alla board
@@ -217,7 +234,7 @@ html.lenis body {
    board e tutti i comandi stanno in una sola schermata, senza scroll di pagina. */
 @media (min-width: 1024px) {
   .analysis-board .board-frame {
-    max-width: min(var(--board-max, 720px), calc(100dvh - 15rem));
+    max-width: min(var(--board-max, 720px), calc(100dvh - 13rem));
   }
 }
 .board-frame > .board-square {

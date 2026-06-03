@@ -164,8 +164,8 @@ export function SparringBoard() {
   const status = gameStatus(game, userColor, resigned);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
-      <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem] 2xl:grid-cols-[auto_minmax(16rem,1fr)]">
+      <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
         <ChessBoard
           fen={game.fen}
           orientation={userColor}

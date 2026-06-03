@@ -245,7 +245,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
 
   return (
     <Shell rating={rating}>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem] 2xl:grid-cols-[auto_minmax(16rem,1fr)]">
         <div className="space-y-3">
           {phase === "idle" && (
             <Card>
@@ -264,7 +264,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
           )}
 
           {phase === "preview" && (
-            <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
+            <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-text-muted">
                   Muove il {orientation === "white" ? "Bianco" : "Nero"} · {total} mosse da calcolare
@@ -279,7 +279,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
           )}
 
           {phase === "solve" && (
-            <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
+            <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-text-muted">
                   Muove il {orientation === "white" ? "Bianco" : "Nero"}
@@ -299,7 +299,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
           )}
 
           {phase === "result" && result && (
-            <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
+            <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <ChessBoard fen={revealFen} orientation={orientation} mode="view" />
               <Card>
                 <CardContent className="space-y-3 py-4">
@@ -350,7 +350,7 @@ function BlindGrid({
   const rankOrder = orientation === "white" ? ranks : [...ranks].reverse();
 
   return (
-    <div className="mx-auto grid aspect-square w-full max-w-xl grid-cols-8 overflow-hidden rounded-md border border-border lg:max-w-none">
+    <div className="board-sized mx-auto grid aspect-square w-full max-w-xl grid-cols-8 overflow-hidden rounded-md border border-border lg:max-w-none">
       {rankOrder.map((r, ri) =>
         fileOrder.map((f, fi) => {
           const sq = `${f}${r}` as Square;
@@ -379,7 +379,7 @@ function BlindGrid({
 
 function Shell({ rating, children }: { rating: number | null; children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-end justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Calcolo</h1>
         <div className="text-right">
