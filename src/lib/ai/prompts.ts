@@ -37,7 +37,14 @@ function levelHint(elo: number | null): string {
 export function explainSystemPrompt(elo: number | null): string {
   return `${COMMON_RULES}${levelHint(elo)}
 
-Spiegherai perché una mossa giocata è (o non è) un errore. Rispondi in 2–4 frasi: di' COSA otteneva la mossa migliore e PERCHÉ la mossa giocata peggiora (il piano mancato, la debolezza creata, la tattica non vista). Niente elenchi puntati, solo prosa.`;
+Spiegherai perché una mossa giocata è (o non è) un errore. Rispondi in 2–4 frasi, solo prosa, niente elenchi puntati.
+
+Quando la mossa è un errore (imprecisione, errore, occasione mancata o errore grave) e ti viene data una mossa migliore diversa da quella giocata, la spiegazione DEVE contenere tre cose:
+1. PERCHÉ la mossa giocata è sbagliata (il piano mancato, la debolezza creata, il pezzo lasciato in presa, la tattica non vista, il vantaggio buttato);
+2. QUAL È la mossa migliore, citandola esplicitamente in notazione SAN così com'è scritta nei dati;
+3. COSA otteneva quella mossa migliore (il vantaggio mantenuto, la minaccia parata, l'iniziativa).
+
+Quando invece la mossa è buona o la migliore, spiega brevemente perché funziona, senza inventare alternative.`;
 }
 
 export function explainUserMessage(facts: MoveFacts): string {
@@ -52,10 +59,25 @@ export function explainUserMessage(facts: MoveFacts): string {
     lines.push(
       `Valutazione (dal punto di vista del Bianco): da ${facts.evalBeforeText} a ${facts.evalAfterText} dopo la mossa giocata.`,
     );
-  lines.push(
-    "",
-    "Spiega in italiano, da allenatore, cosa è successo. Ricorda: i numeri sopra sono dati certi del motore.",
-  );
+
+  const isError =
+    facts.classification === "inaccuracy" ||
+    facts.classification === "mistake" ||
+    facts.classification === "miss" ||
+    facts.classification === "blunder";
+  const hasBetterMove =
+    Boolean(facts.bestMoveSan) && facts.bestMoveSan !== facts.playedSan;
+
+  lines.push("");
+  if (isError && hasBetterMove) {
+    lines.push(
+      `Spiega in italiano, da allenatore: perché ${facts.playedSan} è un errore, qual era la mossa migliore (cita ${facts.bestMoveSan} esplicitamente) e cosa otteneva. Ricorda: i numeri e la mossa migliore sopra sono dati certi del motore.`,
+    );
+  } else {
+    lines.push(
+      "Spiega in italiano, da allenatore, cosa è successo. Ricorda: i numeri sopra sono dati certi del motore.",
+    );
+  }
   return lines.join("\n");
 }
 
