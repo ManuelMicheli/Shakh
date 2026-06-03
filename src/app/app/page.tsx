@@ -92,7 +92,7 @@ export default async function DashboardPage() {
 function Header({ name }: { name: string }) {
   return (
     <div>
-      <h1 className="font-display text-3xl font-semibold tracking-tight">Ciao, {name}</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Ciao, {name}</h1>
       <p className="mt-2 text-text-muted">Il quadro dei tuoi progressi.</p>
     </div>
   );

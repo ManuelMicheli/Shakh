@@ -58,8 +58,8 @@ export default async function CoachPage() {
                 Su {metrics.games} partite, {metrics.userMoves} tue mosse esaminate.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <table className="w-full text-sm">
+            <CardContent className="overflow-x-auto">
+              <table className="w-full min-w-[26rem] text-sm">
                 <thead>
                   <tr className="text-text-muted">
                     <th className="text-left font-normal">Fase</th>

@@ -6,10 +6,13 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { randomUUID } from "crypto";
-import { ProviderError } from "@/lib/games/providers";
+import { ProviderError, lichessProvider, chesscomProvider } from "@/lib/games/providers";
+import { splitPgn, parseGame, detectUserColor, type ParsedGame } from "@/lib/games/pgn";
 import { fetchExternalRating, fetchProfileText } from "@/lib/rating/external";
 import type { ExternalSource } from "@/lib/rating/calibration";
 import { applyExternalRating, clearExternalRating } from "@/lib/rating/store";
+import { levelFromRating } from "@/lib/path/diagnostic";
+import { recomputePath, loadNodes } from "@/lib/path/recompute";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface UpdateProfileInput {
@@ -163,10 +166,20 @@ export interface LinkedAccount {
   fetchedAt: string;
 }
 
+/** Esito del seeding post-verifica (import partite + posizionamento nel percorso). */
+export interface SeedInfo {
+  /** Partite scaricate e salvate (pronte per l'analisi). */
+  importedGames: number;
+  /** Livello del percorso assegnato dal rating verificato, o null se non riposizionato. */
+  startingLevel: number | null;
+}
+
 export interface LinkResult {
   ok: boolean;
   error?: string;
   account?: LinkedAccount;
+  /** Presente solo dopo una verifica andata a buon fine. */
+  seed?: SeedInfo;
 }
 
 function isExternalSource(s: string): s is ExternalSource {
@@ -209,6 +222,156 @@ async function recomputeExternalDomain(
   } else {
     await clearExternalRating(supabase, userId);
   }
+}
+
+/** Partite recenti da scaricare al primo collegamento verificato. */
+const SEED_IMPORT_MAX = 40;
+
+/**
+ * Seeding post-verifica. Una volta provata la proprietà dell'account:
+ *  1. scarica le ultime partite pubbliche e le salva (dedup), pronte all'analisi;
+ *  2. se l'utente non ha ancora completato l'onboarding, usa il rating OTB
+ *     VERIFICATO — segnale ben più affidabile di un'autovalutazione — per stimare
+ *     l'Elo, posizionarlo nel percorso (i fondamentali sotto il livello risultano
+ *     già fatti) e inizializzare il rating tattico se assente.
+ *
+ * Tutto best-effort: un errore qui non deve far fallire la verifica. Chi non ha
+ * un account o non l'ha verificato prosegue normalmente e il rating si forma dal
+ * gioco sulla piattaforma.
+ */
+async function seedFromVerifiedAccount(
+  supabase: SupabaseClient,
+  userId: string,
+  source: ExternalSource,
+  username: string,
+  otb: number | null,
+): Promise<SeedInfo> {
+  const info: SeedInfo = { importedGames: 0, startingLevel: null };
+
+  // 1) Import partite recenti (best-effort).
+  try {
+    const provider = source === "lichess" ? lichessProvider : chesscomProvider;
+    const pgnText = await provider.fetchUserGamesPgn(username, SEED_IMPORT_MAX);
+    const games = splitPgn(pgnText)
+      .map(parseGame)
+      .filter((g): g is ParsedGame => g !== null);
+    info.importedGames = await insertGamesDedup(supabase, userId, games, source, username);
+  } catch {
+    // ignora: l'import è un di più, non blocca la verifica
+  }
+
+  // 2) Posizionamento nel percorso dal rating verificato, solo se non onboarded.
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", userId)
+      .maybeSingle<{ onboarding_completed: boolean }>();
+
+    if (otb != null && profile && !profile.onboarding_completed) {
+      const startingLevel = levelFromRating(otb);
+      const tacticSeed = Math.max(600, Math.min(2200, otb));
+
+      // Rating tattico iniziale solo se l'utente non ne ha già uno.
+      const { data: stats } = await supabase
+        .from("user_tactic_stats")
+        .select("user_id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (!stats) {
+        await supabase
+          .from("user_tactic_stats")
+          .upsert(
+            { user_id: userId, rating: tacticSeed, rating_deviation: 150 },
+            { onConflict: "user_id" },
+          );
+      }
+
+      await supabase
+        .from("profiles")
+        .update({
+          elo_estimate: otb,
+          current_level: startingLevel,
+          onboarding_completed: true,
+        })
+        .eq("id", userId);
+
+      // Fondamentali sotto il livello di partenza già completati (come l'onboarding).
+      if (startingLevel > 0) {
+        const nodes = await loadNodes(supabase);
+        const now = new Date().toISOString();
+        const skip = nodes
+          .filter((n) => n.level < startingLevel)
+          .map((n) => ({
+            user_id: userId,
+            node_id: n.id,
+            status: "completed" as const,
+            progress: 1,
+            completed_at: now,
+          }));
+        if (skip.length)
+          await supabase
+            .from("user_path_progress")
+            .upsert(skip, { onConflict: "user_id,node_id" });
+      }
+
+      await recomputePath(supabase, userId);
+      info.startingLevel = startingLevel;
+    }
+  } catch {
+    // ignora: il posizionamento è best-effort
+  }
+
+  return info;
+}
+
+/** Inserisce partite parsate deduplicando su (user_id, source, external_id). Ritorna gli inserimenti. */
+async function insertGamesDedup(
+  supabase: SupabaseClient,
+  userId: string,
+  games: ParsedGame[],
+  source: ExternalSource,
+  username: string,
+): Promise<number> {
+  if (games.length === 0) return 0;
+
+  const extIds = games.map((g) => g.externalId).filter((x): x is string => !!x);
+  const existing = new Set<string>();
+  if (extIds.length > 0) {
+    const { data } = await supabase
+      .from("games")
+      .select("external_id")
+      .eq("user_id", userId)
+      .eq("source", source)
+      .in("external_id", extIds);
+    data?.forEach((r) => r.external_id && existing.add(r.external_id as string));
+  }
+
+  const seen = new Set<string>();
+  const rows = [];
+  for (const g of games) {
+    if (g.externalId) {
+      if (existing.has(g.externalId) || seen.has(g.externalId)) continue;
+      seen.add(g.externalId);
+    }
+    rows.push({
+      user_id: userId,
+      source,
+      external_id: g.externalId,
+      pgn: g.pgn,
+      white: g.white,
+      black: g.black,
+      result: g.result,
+      eco_code: g.ecoCode,
+      user_color: detectUserColor(g, username),
+      played_at: g.playedAt,
+    });
+  }
+  if (rows.length === 0) return 0;
+
+  const { error } = await supabase.from("games").insert(rows);
+  if (error) return 0;
+  return rows.length;
 }
 
 /**
@@ -333,11 +496,24 @@ export async function verifyExternalAccount(source: string): Promise<LinkResult>
   if (error) return { ok: false, error: error.message };
 
   await recomputeExternalDomain(supabase, user.id);
+
+  // Account provato → scarica le partite e posiziona nel percorso dal rating verificato.
+  const seed = await seedFromVerifiedAccount(
+    supabase,
+    user.id,
+    source,
+    row.username,
+    row.rating_otb,
+  );
+
   revalidatePath("/app/profilo");
   revalidatePath("/app");
+  revalidatePath("/app/partite");
+  revalidatePath("/app/percorso");
 
   return {
     ok: true,
+    seed,
     account: {
       source,
       username: row.username,

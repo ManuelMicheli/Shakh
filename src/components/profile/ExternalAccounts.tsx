@@ -105,7 +105,11 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
         return;
       }
       onChanged(res.account);
-      toast({ title: `${SOURCE_LABEL[source]} verificato`, description: "Rating Shakh aggiornato." });
+      const parts = ["Rating Shakh aggiornato."];
+      if (res.seed?.importedGames) parts.push(`${res.seed.importedGames} partite scaricate.`);
+      if (res.seed?.startingLevel != null)
+        parts.push(`Percorso al livello ${res.seed.startingLevel}.`);
+      toast({ title: `${SOURCE_LABEL[source]} verificato`, description: parts.join(" ") });
     });
   };
 
