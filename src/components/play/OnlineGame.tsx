@@ -54,6 +54,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
   const claimedRef = useRef(false);
   const boardWrapRef = useRef<HTMLDivElement>(null);
   const latestStampRef = useRef<string>(initialGame.updated_at);
+  const statusRef = useRef<FriendGameRow["status"]>(initialGame.status);
 
   // Applica una riga ignorando stati più vecchi (poll o eventi fuori ordine):
   // evita che la scacchiera "torni indietro" per una lettura in ritardo.
@@ -67,6 +68,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     }
     latestStampRef.current = row.updated_at ?? latestStampRef.current;
     claimedRef.current = false;
+    statusRef.current = row.status;
     setGame(row);
   }, []);
 
@@ -139,7 +141,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     // Rete di sicurezza: poll leggero finché la partita è viva, nel caso il
     // websocket cada. Realtime resta il canale primario (istantaneo).
     const poll = setInterval(() => {
-      if (game.status !== "finished") refetch();
+      if (statusRef.current !== "finished") refetch();
     }, 4000);
 
     return () => {
@@ -148,7 +150,6 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       document.removeEventListener("visibilitychange", onVisible);
       if (channel) supabase.removeChannel(channel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialGame.id, applyRow]);
 
   useEffect(() => {
@@ -166,11 +167,10 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
         toast({ title: res.error, variant: "error" });
         return;
       }
-      claimedRef.current = false;
       setFollow(true);
-      setGame(res.data);
+      applyRow(res.data);
     },
-    [canMove, initialGame.id, toast],
+    [canMove, initialGame.id, toast, applyRow],
   );
 
   const onJoin = async () => {
@@ -179,20 +179,20 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       toast({ title: res.error, variant: "error" });
       return;
     }
-    setGame(res.data);
+    applyRow(res.data);
   };
 
   const onResign = async () => {
     const res = await resignOnlineGame(initialGame.id);
     if (!res.ok) toast({ title: res.error, variant: "error" });
-    else setGame(res.data);
+    else applyRow(res.data);
   };
 
   const onOfferDraw = async () => {
     const res = await offerDrawOnline(initialGame.id);
     if (!res.ok) toast({ title: res.error, variant: "error" });
     else {
-      setGame(res.data);
+      applyRow(res.data);
       toast({ title: "Patta proposta" });
     }
   };
@@ -200,16 +200,16 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
   const onRespondDraw = async (accept: boolean) => {
     const res = await respondDrawOnline(initialGame.id, accept);
     if (!res.ok) toast({ title: res.error, variant: "error" });
-    else setGame(res.data);
+    else applyRow(res.data);
   };
 
   const onFlag = useCallback(() => {
     if (claimedRef.current) return;
     claimedRef.current = true;
     claimTimeoutOnline(initialGame.id).then((res) => {
-      if (res.ok) setGame(res.data);
+      if (res.ok) applyRow(res.data);
     });
-  }, [initialGame.id]);
+  }, [initialGame.id, applyRow]);
 
   const copyLink = async () => {
     try {
