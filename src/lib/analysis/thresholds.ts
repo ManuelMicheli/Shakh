@@ -23,7 +23,7 @@ export const CLASSIFICATION_THRESHOLDS = {
 export const WINNING_THRESHOLD = 600;
 
 /** Profondità di default del motore per l'analisi (configurabile). */
-export const ANALYSIS_DEPTH = 15;
+export const ANALYSIS_DEPTH = 12;
 
 /**
  * Valore in cp usato per codificare un matto in un singolo numero.

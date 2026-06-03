@@ -203,7 +203,9 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
 
         {/* Pannello laterale */}
         <div className="space-y-4">
-          {!game.analyzed && <AnalyzeRunner gameId={game.id} pgn={game.pgn} />}
+          {!game.analyzed && (
+            <AnalyzeRunner gameId={game.id} pgn={game.pgn} title={title} />
+          )}
 
           <Card>
             <CardHeader>

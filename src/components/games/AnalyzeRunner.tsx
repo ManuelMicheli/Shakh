@@ -1,68 +1,44 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toast";
-import { useGameAnalysis } from "@/lib/analysis/useGameAnalysis";
 import { ANALYSIS_DEPTH } from "@/lib/analysis/thresholds";
-import {
-  saveAnalysisChunk,
-  finalizeGameAnalysis,
-} from "@/app/app/partite/actions";
+import { useAnalysisJob } from "@/components/analysis/AnalysisJobContext";
 
 const DEPTH_OPTIONS = [12, 15, 18];
 
 export interface AnalyzeRunnerProps {
   gameId: string;
   pgn: string;
+  /** Titolo mostrato nella mini-tab globale (es. "Bianco – Nero"). */
+  title?: string;
   /** Testo del pulsante (es. "Analizza" o "Rianalizza"). */
   label?: string;
 }
 
 /**
- * Avvia il job d'analisi nel worker Stockfish, mostra il progresso e salva
- * progressivamente su DB. A fine job marca la partita come analizzata.
+ * Avvia il job d'analisi nel provider globale (gira nel pool di worker e
+ * prosegue anche cambiando pagina). Qui rispecchia l'avanzamento se il job
+ * attivo è di QUESTA partita; se ne gira uno di un'altra, blocca l'avvio.
  */
-export function AnalyzeRunner({ gameId, pgn, label = "Analizza partita" }: AnalyzeRunnerProps) {
-  const router = useRouter();
-  const { toast } = useToast();
-  const { status, progress, error, run } = useGameAnalysis();
+export function AnalyzeRunner({ gameId, pgn, title, label = "Analizza partita" }: AnalyzeRunnerProps) {
+  const { job, start } = useAnalysisJob();
   const [depth, setDepth] = useState(ANALYSIS_DEPTH);
-  const [finalizing, setFinalizing] = useState(false);
 
-  const running = status === "running" || finalizing;
-  const pct = progress.total > 0 ? (progress.current / progress.total) * 100 : 0;
-
-  const start = async () => {
-    const rows = await run(pgn, {
-      depth,
-      onBatch: async (batch) => {
-        await saveAnalysisChunk(gameId, batch);
-      },
-    });
-    if (rows.length === 0) {
-      if (error) toast({ title: "Analisi non riuscita", description: error, variant: "error" });
-      return;
-    }
-    setFinalizing(true);
-    const res = await finalizeGameAnalysis(gameId);
-    setFinalizing(false);
-    if (!res.ok) {
-      toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
-      return;
-    }
-    toast({ title: "Analisi completata", variant: "success" });
-    router.refresh();
-  };
+  const thisJob = job && job.gameId === gameId ? job : null;
+  const running = thisJob?.status === "running";
+  const otherRunning = Boolean(job && job.gameId !== gameId && job.status === "running");
+  const pct = thisJob && thisJob.total > 0 ? (thisJob.current / thisJob.total) * 100 : 0;
+  const disabled = running || otherRunning;
 
   return (
     <div className="space-y-4 rounded-md border border-border bg-surface p-5">
       <div>
         <h2 className="font-display text-lg font-semibold">Analisi col motore</h2>
         <p className="mt-1 text-sm text-text-muted">
-          L&apos;analisi gira nel tuo browser: ogni mossa viene valutata e classificata.
+          L&apos;analisi gira in parallelo nel browser e prosegue anche se cambi
+          pagina: ogni mossa viene valutata e classificata.
         </p>
       </div>
 
@@ -73,7 +49,7 @@ export function AnalyzeRunner({ gameId, pgn, label = "Analizza partita" }: Analy
             <button
               key={d}
               type="button"
-              disabled={running}
+              disabled={disabled}
               onClick={() => setDepth(d)}
               aria-pressed={depth === d}
               className={
@@ -85,12 +61,22 @@ export function AnalyzeRunner({ gameId, pgn, label = "Analizza partita" }: Analy
             </button>
           ))}
         </div>
-        <Button onClick={start} disabled={running} className="ml-auto">
+        <Button
+          onClick={() => start(gameId, pgn, title ?? "Partita", { depth })}
+          disabled={disabled}
+          className="ml-auto"
+        >
           {running ? "Analisi in corso…" : label}
         </Button>
       </div>
 
-      {running && progress.total > 0 && (
+      {otherRunning && (
+        <p className="text-xs text-text-muted">
+          Analisi in corso su un&apos;altra partita: attendi che finisca.
+        </p>
+      )}
+
+      {running && thisJob && thisJob.total > 0 && (
         <div className="space-y-1.5">
           <div className="h-2 overflow-hidden rounded-full bg-surface-2">
             <motion.div
@@ -101,7 +87,7 @@ export function AnalyzeRunner({ gameId, pgn, label = "Analizza partita" }: Analy
             />
           </div>
           <p className="font-mono text-xs text-text-muted">
-            posizione {progress.current}/{progress.total}
+            posizione {thisJob.current}/{thisJob.total}
           </p>
         </div>
       )}

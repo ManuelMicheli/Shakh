@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
+import { AnalysisJobProvider } from "@/components/analysis/AnalysisJobContext";
+import { AnalysisMiniTab } from "@/components/analysis/AnalysisMiniTab";
 
 const COLLAPSE_KEY = "shakh:sidebar-collapsed";
 
@@ -45,23 +47,26 @@ export function AppShell({
   }
 
   return (
-    <div className="flex h-dvh overflow-hidden">
-      <Sidebar
-        collapsed={collapsed}
-        mobileOpen={mobileOpen}
-        onToggleCollapsed={toggleCollapsed}
-        onCloseMobile={() => setMobileOpen(false)}
-      />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <Topbar
-          displayName={displayName}
-          avatarUrl={avatarUrl}
-          onOpenMobile={() => setMobileOpen(true)}
+    <AnalysisJobProvider>
+      <div className="flex h-dvh overflow-hidden">
+        <Sidebar
+          collapsed={collapsed}
+          mobileOpen={mobileOpen}
+          onToggleCollapsed={toggleCollapsed}
+          onCloseMobile={() => setMobileOpen(false)}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <div className="mx-auto w-full max-w-[1536px]">{children}</div>
-        </main>
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <Topbar
+            displayName={displayName}
+            avatarUrl={avatarUrl}
+            onOpenMobile={() => setMobileOpen(true)}
+          />
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+            <div className="mx-auto w-full max-w-[1536px]">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+      <AnalysisMiniTab />
+    </AnalysisJobProvider>
   );
 }

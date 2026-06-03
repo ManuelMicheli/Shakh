@@ -2,12 +2,10 @@
  * Opening Explorer di Lichess — ANCORA la teoria ai dati reali: mostra cosa si
  * gioca davvero in una posizione, non solo cosa dice la lezione.
  *
- * API pubblica (nessun'altra terza parte), con RATE LIMIT: per questo le risposte
- * vengono memorizzate per FEN e le richieste in volo deduplicate. Fallback pulito
- * su errore/limite (l'UI mostra un messaggio, non si rompe).
- *
- *   GET https://explorer.lichess.ovh/masters?fen=…   (database dei maestri)
- *   GET https://explorer.lichess.ovh/lichess?fen=…   (partite online)
+ * Le richieste NON vanno più dirette a Lichess dal browser: passano dal proxy
+ * server `/api/explorer` (User-Agent descrittivo + cache condivisa + stale su
+ * disservizio). Lichess restituiva 401 ai client anonimi diretti. Qui resta la
+ * cache lato client per FEN e la dedup delle richieste in volo verso il proxy.
  */
 
 export type ExplorerDb = "masters" | "lichess";
@@ -35,38 +33,16 @@ export type ExplorerResult =
   | { ok: true; data: ExplorerData }
   | { ok: false; error: string; rateLimited?: boolean };
 
-const BASE = "https://explorer.lichess.ovh";
-
-/** Cache per chiave `db|fen` e dedup delle richieste in volo. */
+/** Cache per chiave `db|fen` e dedup delle richieste in volo (verso il proxy). */
 const cache = new Map<string, ExplorerData>();
 const inflight = new Map<string, Promise<ExplorerResult>>();
 
-function buildUrl(db: ExplorerDb, fen: string): string {
-  const params = new URLSearchParams({ fen, moves: "12", topGames: "0" });
-  if (db === "lichess") {
-    params.set("speeds", "blitz,rapid,classical");
-    params.set("ratings", "1600,1800,2000,2200");
-  }
-  return `${BASE}/${db}?${params.toString()}`;
+function proxyUrl(db: ExplorerDb, fen: string): string {
+  const params = new URLSearchParams({ db, fen });
+  return `/api/explorer?${params.toString()}`;
 }
 
-interface RawMove {
-  uci: string;
-  san: string;
-  white: number;
-  draws: number;
-  black: number;
-  averageRating?: number;
-}
-interface RawResponse {
-  white: number;
-  draws: number;
-  black: number;
-  moves: RawMove[];
-  opening?: { eco: string; name: string } | null;
-}
-
-/** Interroga l'explorer per la posizione data. Risultato cachato per FEN. */
+/** Interroga l'explorer (via proxy) per la posizione data. Cachato per FEN. */
 export async function fetchOpeningExplorer(
   fen: string,
   db: ExplorerDb = "masters",
@@ -81,40 +57,18 @@ export async function fetchOpeningExplorer(
   const promise: Promise<ExplorerResult> = (async () => {
     let res: Response;
     try {
-      res = await fetch(buildUrl(db, fen), {
-        headers: { Accept: "application/json" },
-      });
+      res = await fetch(proxyUrl(db, fen), { headers: { Accept: "application/json" } });
     } catch {
-      return { ok: false, error: "Errore di rete contattando Lichess." };
+      return { ok: false, error: "Errore di rete. Riprova tra poco." };
     }
-    if (res.status === 429) {
-      return { ok: false, error: "Troppe richieste all'explorer. Riprova tra poco.", rateLimited: true };
-    }
-    if (!res.ok) {
-      return { ok: false, error: `L'explorer ha risposto con stato ${res.status}.` };
-    }
-    let raw: RawResponse;
+    let body: ExplorerResult;
     try {
-      raw = (await res.json()) as RawResponse;
+      body = (await res.json()) as ExplorerResult;
     } catch {
-      return { ok: false, error: "Risposta dell'explorer non valida." };
+      return { ok: false, error: "Database aperture non disponibile al momento." };
     }
-    const data: ExplorerData = {
-      white: raw.white ?? 0,
-      draws: raw.draws ?? 0,
-      black: raw.black ?? 0,
-      moves: (raw.moves ?? []).map((m) => ({
-        uci: m.uci,
-        san: m.san,
-        white: m.white ?? 0,
-        draws: m.draws ?? 0,
-        black: m.black ?? 0,
-        averageRating: m.averageRating,
-      })),
-      opening: raw.opening ?? null,
-    };
-    cache.set(key, data);
-    return { ok: true, data };
+    if (body.ok) cache.set(key, body.data);
+    return body;
   })();
 
   inflight.set(key, promise);

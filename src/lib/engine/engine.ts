@@ -63,7 +63,7 @@ interface Job {
   superseded: boolean;
 }
 
-class EngineService {
+export class EngineService {
   private worker: Worker | null = null;
   private _state: EngineState = "idle";
   private initPromise: Promise<void> | null = null;

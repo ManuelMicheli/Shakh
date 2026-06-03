@@ -158,6 +158,17 @@ const VALID_CLASSIFICATIONS: ReadonlySet<string> = new Set<Classification>([
   "book",
 ]);
 
+/** Ply già analizzati di una partita (per saltarli alla ripresa). RLS-scoped. */
+export async function getSavedAnalysisPlies(gameId: string): Promise<number[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("game_analysis")
+    .select("ply")
+    .eq("game_id", gameId)
+    .order("ply", { ascending: true });
+  return (data ?? []).map((r) => r.ply as number);
+}
+
 /** Salva (upsert) un lotto di righe d'analisi. La RLS verifica la proprietà. */
 export async function saveAnalysisChunk(
   gameId: string,
