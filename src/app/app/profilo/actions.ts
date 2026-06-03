@@ -5,6 +5,11 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isLocale, LOCALE_COOKIE } from "@/i18n/config";
+import { ProviderError } from "@/lib/games/providers";
+import { fetchExternalRating } from "@/lib/rating/external";
+import type { ExternalSource } from "@/lib/rating/calibration";
+import { applyExternalRating, clearExternalRating } from "@/lib/rating/store";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface UpdateProfileInput {
   displayName: string;
@@ -69,6 +74,7 @@ const EXPORT_TABLES: { table: string; col: string }[] = [
   { table: "user_path_progress", col: "user_id" },
   { table: "content_completions", col: "user_id" },
   { table: "repertoires", col: "owner_user_id" },
+  { table: "external_accounts", col: "user_id" },
 ];
 
 export interface ExportResult {
@@ -136,5 +142,157 @@ export async function deleteMyAccount(): Promise<DeleteResult> {
 
   // Chiude la sessione locale (i cookie vengono invalidati).
   await supabase.auth.signOut();
+  return { ok: true };
+}
+
+// ============================================================
+// Account online collegati (Lichess / Chess.com) → dominio 'external'
+// ============================================================
+
+export interface LinkedAccount {
+  source: ExternalSource;
+  username: string;
+  ratingNative: number | null;
+  ratingOtb: number | null;
+  nGames: number;
+  fetchedAt: string;
+}
+
+export interface LinkResult {
+  ok: boolean;
+  error?: string;
+  account?: LinkedAccount;
+}
+
+function isExternalSource(s: string): s is ExternalSource {
+  return s === "lichess" || s === "chesscom";
+}
+
+/** Messaggio leggibile da un ProviderError (rete/non trovato/rate limit/insufficiente). */
+function providerMessage(e: unknown): string {
+  if (e instanceof ProviderError) return e.message;
+  return e instanceof Error ? e.message : "Errore imprevisto.";
+}
+
+/**
+ * Il dominio 'external' è UNO solo: se l'utente collega più piattaforme, lo
+ * alimenta l'account con più partite valutate (stima più affidabile). Se non
+ * resta alcun account collegato, azzera il contributo.
+ */
+async function recomputeExternalDomain(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<void> {
+  const { data } = await supabase
+    .from("external_accounts")
+    .select("rating_otb, n_games")
+    .eq("user_id", userId)
+    .order("n_games", { ascending: false })
+    .limit(1);
+  const best = (data as { rating_otb: number | null; n_games: number }[] | null)?.[0];
+  if (best && best.rating_otb != null) {
+    await applyExternalRating(supabase, userId, best.rating_otb, best.n_games);
+  } else {
+    await clearExternalRating(supabase, userId);
+  }
+}
+
+/**
+ * Collega (o ri-collega) un account online: legge il rating pubblico, lo salva e
+ * aggiorna il dominio 'external' del Rating Shakh. `username` è un dato pubblico.
+ */
+export async function linkExternalAccount(
+  source: string,
+  username: string,
+): Promise<LinkResult> {
+  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  const handle = username.trim();
+  if (!/^[a-zA-Z0-9_-]{2,30}$/.test(handle))
+    return { ok: false, error: "Username non valido (2–30 caratteri)." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+
+  let report;
+  try {
+    report = await fetchExternalRating(source, handle);
+  } catch (e) {
+    return { ok: false, error: providerMessage(e) };
+  }
+
+  const { error } = await supabase.from("external_accounts").upsert(
+    {
+      user_id: user.id,
+      source,
+      username: report.username,
+      rating_native: report.representative,
+      rating_otb: report.otb,
+      n_games: report.nGames,
+      controls: report.controls,
+      fetched_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id,source" },
+  );
+  if (error) return { ok: false, error: error.message };
+
+  await recomputeExternalDomain(supabase, user.id);
+  revalidatePath("/app/profilo");
+  revalidatePath("/app");
+
+  return {
+    ok: true,
+    account: {
+      source,
+      username: report.username,
+      ratingNative: report.representative,
+      ratingOtb: report.otb,
+      nGames: report.nGames,
+      fetchedAt: new Date().toISOString(),
+    },
+  };
+}
+
+/** Aggiorna il rating di un account già collegato (rilettura dall'API). */
+export async function refreshExternalAccount(source: string): Promise<LinkResult> {
+  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+
+  const { data: existing } = await supabase
+    .from("external_accounts")
+    .select("username")
+    .eq("user_id", user.id)
+    .eq("source", source)
+    .maybeSingle<{ username: string }>();
+  if (!existing) return { ok: false, error: "Account non collegato." };
+
+  return linkExternalAccount(source, existing.username);
+}
+
+/** Scollega un account online e azzera (o ricalcola) il dominio 'external'. */
+export async function unlinkExternalAccount(source: string): Promise<UpdateResult> {
+  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+
+  const { error } = await supabase
+    .from("external_accounts")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("source", source);
+  if (error) return { ok: false, error: error.message };
+
+  await recomputeExternalDomain(supabase, user.id);
+  revalidatePath("/app/profilo");
+  revalidatePath("/app");
   return { ok: true };
 }

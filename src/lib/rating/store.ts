@@ -19,6 +19,8 @@ import {
 } from "./glicko2";
 import {
   aggregateOverall,
+  externalRdFromGames,
+  EXTERNAL_MAX_SAMPLES,
   type DomainRating,
   type OverallRating,
   type RatingDomain,
@@ -39,6 +41,7 @@ const ALL_DOMAINS: RatingDomain[] = [
   "endgame",
   "calculation",
   "play_quality",
+  "external",
 ];
 
 interface RatingRow {
@@ -185,6 +188,54 @@ export async function recordDomainOutcomes(
   await logEvent(supabase, userId, domain, target.state.rating - before, reason, {
     count: outcomes.length,
   });
+}
+
+/**
+ * Semina/aggiorna il dominio 'external' dal rating di un account online collegato.
+ *
+ * A differenza degli altri domìni, il rating online è una MISURA esterna diretta:
+ * non lo facciamo convergere con esiti Glicko, ma fissiamo lo stato del dominio
+ * a `(otb, rd)` dove `rd` riflette quante partite valutate ci sono dietro. Con
+ * priore alto (`DOMAIN_PRIOR.external`) e RD bassa pesa MOLTO nell'aggregato, ma
+ * gli altri segnali (tattica, partite reali sulla piattaforma…) continuano a
+ * muovere il complessivo. Alza anche il tetto anti-inflazione (forza dimostrata).
+ *
+ * Idempotente: ri-chiamarla a ogni refresh sovrascrive lo stato external.
+ */
+export async function applyExternalRating(
+  supabase: DB,
+  userId: string,
+  otb: number,
+  nGames: number,
+): Promise<void> {
+  const domains = await loadDomainRatings(supabase, userId);
+  const ext = domains.find((d) => d.domain === "external")!;
+  const before = ext.samples > 0 ? ext.state.rating : otb;
+
+  ext.state = { rating: otb, rd: externalRdFromGames(nGames), vol: VOL_START };
+  ext.samples = Math.min(nGames, EXTERNAL_MAX_SAMPLES);
+
+  const ceiling = await recomputeCeiling(supabase, userId, domains);
+  const overall = aggregateOverall(domains, ceiling);
+  await persist(supabase, userId, domains, overall, { syncTactic: false });
+  await logEvent(supabase, userId, "external", otb - before, "account_link", {
+    otb,
+    nGames,
+  });
+}
+
+/** Azzera il contributo del dominio 'external' (account scollegato). */
+export async function clearExternalRating(supabase: DB, userId: string): Promise<void> {
+  const domains = await loadDomainRatings(supabase, userId);
+  const ext = domains.find((d) => d.domain === "external")!;
+  if (ext.samples === 0) return;
+  ext.state = initialState();
+  ext.samples = 0;
+
+  const ceiling = await recomputeCeiling(supabase, userId, domains);
+  const overall = aggregateOverall(domains, ceiling);
+  await persist(supabase, userId, domains, overall, { syncTactic: false });
+  await logEvent(supabase, userId, "external", 0, "account_unlink", {});
 }
 
 // ============================================================

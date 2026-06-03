@@ -26,7 +26,13 @@ import {
   type MatchOutcome,
 } from "./glicko2";
 
-export type RatingDomain = "tactic" | "games" | "endgame" | "calculation" | "play_quality";
+export type RatingDomain =
+  | "tactic"
+  | "games"
+  | "endgame"
+  | "calculation"
+  | "play_quality"
+  | "external";
 
 /** Stato di un dominio + numerosità del campione che lo ha prodotto. */
 export interface DomainRating {
@@ -35,8 +41,13 @@ export interface DomainRating {
   samples: number;
 }
 
-/** Priore per dominio: quanto direttamente misura la forza reale. */
+/**
+ * Priore per dominio: quanto direttamente misura la forza reale.
+ * `external` (account online collegato) è il segnale più diretto di forza reale
+ * a tavolino una volta deflazionato → priore alto: pesa MOLTO nell'aggregato.
+ */
 export const DOMAIN_PRIOR: Record<RatingDomain, number> = {
+  external: 1.6,
   tactic: 1.0,
   games: 1.0,
   play_quality: 0.8,
@@ -51,7 +62,29 @@ export const DOMAIN_LABEL: Record<RatingDomain, string> = {
   endgame: "Finali",
   calculation: "Calcolo",
   play_quality: "Qualità di gioco",
+  external: "Account online",
 };
+
+// ============================================================
+// Segnale account online (rating Lichess / Chess.com collegato)
+// ============================================================
+
+/**
+ * RD da attribuire al dominio 'external' in base al numero di partite valutate
+ * dietro al rating online: più partite → stima più certa → RD più bassa → pesa
+ * di più. Limitata fra un pavimento (un rating online resta una stima) e un
+ * tetto (pochi giochi = poca fiducia).
+ */
+export const EXTERNAL_RD_FLOOR = 45;
+export const EXTERNAL_RD_CEIL = 110;
+
+export function externalRdFromGames(nGames: number): number {
+  const rd = 600 / Math.sqrt(Math.max(1, nGames) + 10);
+  return Math.round(Math.max(EXTERNAL_RD_FLOOR, Math.min(EXTERNAL_RD_CEIL, rd)));
+}
+
+/** Campioni "equivalenti" attribuiti al dominio external (cap: non deve dominare i conteggi). */
+export const EXTERNAL_MAX_SAMPLES = 50;
 
 /** RD oltre la quale il rating complessivo è "non calibrato". */
 export const PROVISIONAL_RD_THRESHOLD = 110;
