@@ -181,7 +181,7 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
 
   return (
     <Shell mode={mode} theme={theme}>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] 2xl:grid-cols-[auto_minmax(18rem,1fr)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] 2xl:grid-cols-[auto_18rem] 2xl:justify-center">
         <div>
           <PuzzleSolver key={puzzle.id} puzzle={puzzle} onSolved={handleSolved} />
           <div className="mt-3 flex items-center justify-between gap-3">

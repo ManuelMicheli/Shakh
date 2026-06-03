@@ -53,6 +53,22 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const claimedRef = useRef(false);
   const boardWrapRef = useRef<HTMLDivElement>(null);
+  const latestStampRef = useRef<string>(initialGame.updated_at);
+
+  // Applica una riga ignorando stati più vecchi (poll o eventi fuori ordine):
+  // evita che la scacchiera "torni indietro" per una lettura in ritardo.
+  const applyRow = useCallback((row: FriendGameRow) => {
+    if (
+      row.updated_at &&
+      latestStampRef.current &&
+      row.updated_at < latestStampRef.current
+    ) {
+      return;
+    }
+    latestStampRef.current = row.updated_at ?? latestStampRef.current;
+    claimedRef.current = false;
+    setGame(row);
+  }, []);
 
   const myColor: "w" | "b" | null =
     game.white_user_id === currentUserId
@@ -71,37 +87,69 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
   // ---- Realtime: sincronizza la riga della partita ----
   useEffect(() => {
     const supabase = createClient();
-    // Riallinea subito (potrebbero esserci stati cambi tra render server e subscribe).
-    supabase
-      .from("friend_games")
-      .select("*")
-      .eq("id", initialGame.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setGame(data as FriendGameRow);
-      });
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    const channel = supabase
-      .channel(`friend_game:${initialGame.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "friend_games",
-          filter: `id=eq.${initialGame.id}`,
-        },
-        (payload) => {
-          claimedRef.current = false;
-          setGame(payload.new as FriendGameRow);
-        },
-      )
-      .subscribe();
+    const refetch = async () => {
+      const { data } = await supabase
+        .from("friend_games")
+        .select("*")
+        .eq("id", initialGame.id)
+        .maybeSingle();
+      if (data && !cancelled) applyRow(data as FriendGameRow);
+    };
+
+    (async () => {
+      // Il websocket Realtime DEVE avere il JWT utente: appena la partita passa
+      // da 'waiting' a 'ongoing', la RLS richiede auth.uid() per leggere la riga.
+      // Senza token il socket è anonimo → nessun evento (il bug del "ricarica").
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (session?.access_token) {
+        supabase.realtime.setAuth(session.access_token);
+      }
+
+      channel = supabase
+        .channel(`friend_game:${initialGame.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "friend_games",
+            filter: `id=eq.${initialGame.id}`,
+          },
+          (payload) => applyRow(payload.new as FriendGameRow),
+        )
+        .subscribe((status) => {
+          // Riallinea appena il canale è attivo (recupera i cambi avvenuti
+          // tra il render server e la sottoscrizione).
+          if (status === "SUBSCRIBED") refetch();
+        });
+    })();
+
+    // La tab tornata visibile può aver perso eventi mentre il socket dormiva.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refetch();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    // Rete di sicurezza: poll leggero finché la partita è viva, nel caso il
+    // websocket cada. Realtime resta il canale primario (istantaneo).
+    const poll = setInterval(() => {
+      if (game.status !== "finished") refetch();
+    }, 4000);
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      clearInterval(poll);
+      document.removeEventListener("visibilitychange", onVisible);
+      if (channel) supabase.removeChannel(channel);
     };
-  }, [initialGame.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialGame.id, applyRow]);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -292,7 +340,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
         </Card>
       )}
 
-      <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] 2xl:grid-cols-[auto_minmax(20rem,1fr)]">
+      <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] 2xl:grid-cols-[auto_20rem] 2xl:justify-center">
         <div className="board-sized lg:mx-auto lg:w-full lg:max-w-none">
           {/* Mobile: board + mosse a destra. Desktop: board con orologi e controlli. */}
           <div className="flex items-stretch gap-2 lg:block lg:space-y-3">

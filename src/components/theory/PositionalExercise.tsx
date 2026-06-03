@@ -189,7 +189,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
       <CardContent>
         <p className="mb-3 text-sm leading-relaxed">{exercise.prompt}</p>
 
-        <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_18rem] 2xl:grid-cols-[auto_minmax(18rem,1fr)]">
+        <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_18rem] 2xl:grid-cols-[auto_18rem] 2xl:justify-center">
           <div className="board-sized mx-auto w-full max-w-md md:max-w-none">
             <ChessBoard
               fen={fen}

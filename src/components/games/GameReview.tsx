@@ -167,7 +167,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
         )}
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[auto_minmax(22rem,1fr)]">
+      <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[auto_22rem] 2xl:justify-center">
         {/* Scacchiera + controlli: si auto-dimensiona per stare in pagina. */}
         <div className="board-sized analysis-board flex min-h-0 flex-col gap-2">
           {/* Controlli avanti/indietro in ALTO, sopra la scacchiera. */}
