@@ -13,12 +13,28 @@ import type { MoveFacts } from "@/lib/ai/types";
 import { computeGameSignals, gameOutcomes } from "@/lib/rating/aggregate";
 import { applyGameBatch } from "@/lib/rating/store";
 
+/** Partita pronta da accodare al job d'analisi lato client. */
+export interface AnalysisJobSeed {
+  gameId: string;
+  pgn: string;
+  title: string;
+}
+
 export interface ImportResult {
   ok: boolean;
   imported?: number;
   skipped?: number;
   error?: string;
+  /**
+   * Campione di partite appena importate da avviare subito in analisi (bootstrap
+   * dei punti deboli/diagnostica). Popolato solo per gli import da account
+   * collegato (Lichess/Chess.com), non per il PGN incollato.
+   */
+  analyzeQueue?: AnalysisJobSeed[];
 }
+
+/** Quante partite auto-analizzare dopo un import da account (deve stare ≤ MAX_BATCH_JOBS lato client). */
+const AUTO_ANALYZE_ON_IMPORT = 3;
 
 export interface ActionResult {
   ok: boolean;
@@ -79,11 +95,26 @@ async function importParsed(
 
   if (rows.length === 0) return { ok: true, imported: 0, skipped };
 
-  const { error } = await supabase.from("games").insert(rows);
+  const { data: inserted, error } = await supabase
+    .from("games")
+    .insert(rows)
+    .select("id, pgn, white, black");
   if (error) return { ok: false, error: error.message };
 
+  // Solo per gli import da account collegato: avvia subito l'analisi di un
+  // piccolo campione, così la diagnostica (punti deboli, rating) non resta vuota
+  // in attesa di un click manuale su ogni partita.
+  const analyzeQueue: AnalysisJobSeed[] =
+    source === "pgn"
+      ? []
+      : (inserted ?? []).slice(0, AUTO_ANALYZE_ON_IMPORT).map((g) => ({
+          gameId: g.id as string,
+          pgn: g.pgn as string,
+          title: `${g.white ?? "?"} – ${g.black ?? "?"}`,
+        }));
+
   revalidatePath("/app/partite");
-  return { ok: true, imported: rows.length, skipped };
+  return { ok: true, imported: rows.length, skipped, analyzeQueue };
 }
 
 /** Limiti d'import: fermano file/incolla abnormi prima del parsing (costo CPU). */
@@ -162,6 +193,31 @@ export async function getSavedAnalysisPlies(gameId: string): Promise<number[]> {
     .eq("game_id", gameId)
     .order("ply", { ascending: true });
   return (data ?? []).map((r) => r.ply as number);
+}
+
+/**
+ * Le partite ancora da analizzare (più recenti prima), pronte da accodare al job
+ * d'analisi lato client. Usata dalla CTA "Analizza" della pagina Punti deboli per
+ * sbloccare la diagnostica senza passare dalla lista partite. RLS-scoped.
+ */
+export async function getPendingAnalysisJobs(limit = 3): Promise<AnalysisJobSeed[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data } = await supabase
+    .from("games")
+    .select("id, pgn, white, black")
+    .eq("user_id", user.id)
+    .eq("analyzed", false)
+    .order("played_at", { ascending: false, nullsFirst: false })
+    .limit(Math.max(1, Math.min(3, Math.floor(limit) || 3)));
+  return (data ?? []).map((g) => ({
+    gameId: g.id as string,
+    pgn: g.pgn as string,
+    title: `${g.white ?? "?"} – ${g.black ?? "?"}`,
+  }));
 }
 
 /** Salva (upsert) un lotto di righe d'analisi. La RLS verifica la proprietà. */

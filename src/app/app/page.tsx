@@ -1,13 +1,16 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { NextStep } from "@/components/percorso/NextStep";
 import { DashboardView } from "@/components/progress";
 import { StudentAssignments } from "@/components/groups/StudentAssignments";
+import { AnalyzePendingButton } from "@/components/analysis/AnalyzePendingButton";
 import { loadPathViews, loadWeakest } from "@/lib/path/read";
 import { computeNextStep } from "@/lib/path/recommend";
 import { loadDashboard } from "@/lib/progress/aggregate";
 import { loadStudentAssignments } from "@/lib/groups/assignments";
+import { MIN_ANALYZED_GAMES } from "@/lib/weakness/engine";
 
 const PRIMARY_LINK =
   "inline-flex h-9 items-center rounded-md bg-text px-4 text-sm font-medium text-bg hover:opacity-90";
@@ -31,29 +34,34 @@ export default async function DashboardPage() {
 
   const name = profile?.display_name ?? profile?.username ?? "giocatore";
 
-  // Diagnostico non fatto: dashboard ridotta che invita all'onboarding.
-  if (!profile?.onboarding_completed) {
-    return (
-      <div className="space-y-6">
-        <Header name={name} />
-        <NextStep step={null} />
-      </div>
-    );
-  }
+  // Primo accesso: il diagnostico non è ancora stato fatto. Porta l'utente nel
+  // flusso di benvenuto (presentazione + collegamento account + mini-test).
+  if (!profile?.onboarding_completed) redirect("/app/onboarding");
 
-  const [nodes, weakest, data, assignments] = await Promise.all([
+  const [nodes, weakest, data, assignments, pendingRes] = await Promise.all([
     loadPathViews(supabase, user!.id),
     loadWeakest(supabase, user!.id),
     loadDashboard(supabase, user!.id),
     loadStudentAssignments(supabase, user!.id),
+    supabase
+      .from("games")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user!.id)
+      .eq("analyzed", false),
   ]);
   const step = computeNextStep(profile.current_level ?? 0, nodes, weakest);
+
+  // Partite importate ma non ancora analizzate: nudge a sbloccare la diagnostica,
+  // ma solo finché i dati analizzati sono sotto la soglia utile.
+  const pendingGames = pendingRes.count ?? 0;
+  const showNudge = pendingGames > 0 && data.game.analyzed < MIN_ANALYZED_GAMES;
 
   // Utente nuovo, nessun dato: stato vuoto pulito (no grafici vuoti).
   if (data.empty) {
     return (
       <div className="space-y-6">
         <Header name={name} />
+        {showNudge && <PendingAnalysisNudge pending={pendingGames} />}
         <NextStep step={step} />
         {assignments.length > 0 && <StudentAssignments items={assignments} />}
         <Card>
@@ -83,9 +91,30 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <Header name={name} />
+      {showNudge && <PendingAnalysisNudge pending={pendingGames} />}
       {assignments.length > 0 && <StudentAssignments items={assignments} />}
       <DashboardView data={data} middleSlot={<NextStep step={step} />} />
     </div>
+  );
+}
+
+/** Banner: invita ad analizzare le partite importate per popolare la diagnostica. */
+function PendingAnalysisNudge({ pending }: { pending: number }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Analizza le partite importate</CardTitle>
+        <CardDescription>
+          Hai {pending}{" "}
+          {pending === 1 ? "partita importata" : "partite importate"} ancora da
+          analizzare. Analizzale per sbloccare punti deboli, accuratezza e i
+          consigli del coach.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <AnalyzePendingButton pending={pending} />
+      </CardContent>
+    </Card>
   );
 }
 

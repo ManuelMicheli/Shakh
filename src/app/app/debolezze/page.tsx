@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { loadWeaknesses, MIN_ANALYZED_GAMES, type WeaknessPattern } from "@/lib/weakness/engine";
+import { AnalyzePendingButton } from "@/components/analysis/AnalyzePendingButton";
 
 export const metadata = { title: "Punti deboli — Shakh" };
 
@@ -14,6 +15,14 @@ export default async function DebolezzePage() {
   } = await supabase.auth.getUser();
 
   const { analyzedGames, patterns } = await loadWeaknesses(supabase, user!.id);
+
+  // Partite importate ma ancora da analizzare: alimentano la CTA di bootstrap.
+  const { count: pendingCount } = await supabase
+    .from("games")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user!.id)
+    .eq("analyzed", false);
+  const pendingGames = pendingCount ?? 0;
 
   return (
     <div className="space-y-8">
@@ -26,7 +35,7 @@ export default async function DebolezzePage() {
       </div>
 
       {analyzedGames < MIN_ANALYZED_GAMES ? (
-        <EmptyState analyzed={analyzedGames} />
+        <EmptyState analyzed={analyzedGames} pending={pendingGames} />
       ) : patterns.length === 0 ? (
         <NoPatterns />
       ) : (
@@ -87,17 +96,32 @@ function SeverityBar({ value }: { value: number }) {
   );
 }
 
-function EmptyState({ analyzed }: { analyzed: number }) {
+function EmptyState({ analyzed, pending }: { analyzed: number; pending: number }) {
   return (
     <Card>
       <CardContent className="space-y-3 py-6 text-center">
         <p className="text-text-muted">
           Servono almeno {MIN_ANALYZED_GAMES} partite analizzate per individuare pattern
-          affidabili. Ne hai {analyzed}.
+          affidabili. Ne hai {analyzed}
+          {pending > 0
+            ? `, ma ${pending} importate sono ancora in attesa di analisi.`
+            : "."}
         </p>
-        <Link href="/app/partite">
-          <Button>Importa e analizza partite</Button>
-        </Link>
+        {pending > 0 ? (
+          <div className="flex flex-col items-center gap-2">
+            <AnalyzePendingButton pending={pending} />
+            <Link
+              href="/app/partite"
+              className="text-xs text-text-muted underline-offset-2 hover:underline"
+            >
+              Gestisci tutte le partite
+            </Link>
+          </div>
+        ) : (
+          <Link href="/app/partite">
+            <Button>Importa e analizza partite</Button>
+          </Link>
+        )}
       </CardContent>
     </Card>
   );

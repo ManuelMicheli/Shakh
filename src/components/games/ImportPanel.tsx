@@ -15,11 +15,13 @@ import {
   importChesscom,
   type ImportResult,
 } from "@/app/app/partite/actions";
+import { useAnalysisJob } from "@/components/analysis/AnalysisJobContext";
 
-/** Notifica l'esito di un import e aggiorna la lista. */
+/** Notifica l'esito di un import, aggiorna la lista e avvia l'analisi del campione. */
 function useImportFeedback() {
   const { toast } = useToast();
   const router = useRouter();
+  const { startBatch } = useAnalysisJob();
   return (res: ImportResult) => {
     if (!res.ok) {
       toast({ title: "Import non riuscito", description: res.error, variant: "error" });
@@ -33,6 +35,22 @@ function useImportFeedback() {
       variant: "success",
     });
     router.refresh();
+
+    // Bootstrap diagnostica: avvia subito l'analisi di un piccolo campione delle
+    // partite appena importate (gira in background nel pool di worker).
+    const queue = res.analyzeQueue ?? [];
+    if (queue.length > 0) {
+      const n = startBatch(queue);
+      if (n > 0) {
+        toast({
+          title: "Analisi avviata",
+          description:
+            n > 1
+              ? `${n} partite in analisi in background per i tuoi punti deboli.`
+              : "1 partita in analisi in background per i tuoi punti deboli.",
+        });
+      }
+    }
   };
 }
 
