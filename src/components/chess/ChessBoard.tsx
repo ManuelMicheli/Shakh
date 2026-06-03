@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Config } from "chessground/config";
@@ -102,24 +102,6 @@ function pieceAt(fen: string, square: Square): { type: PieceSymbol; color: Color
     if (col > file) break;
   }
   return null;
-}
-
-/**
- * Parità visiva di un `<square>` di chessground dal suo `transform: translate(...)`.
- * Ritorna 0 = casella chiara (bianca), 1 = casella scura (grigia). null se illeggibile.
- * La casella in alto a sinistra (col 0, riga 0) è chiara (a8 con orient. bianco); la
- * parità visiva coincide con quella reale anche con board capovolta (rotazione 180°).
- */
-function squareParity(el: HTMLElement, step: number): 0 | 1 | null {
-  const t = el.style.transform || "";
-  const m = t.match(/translate\(\s*(-?[\d.]+)(px|%)?\s*,\s*(-?[\d.]+)(px|%)?/);
-  if (!m) return null;
-  const x = parseFloat(m[1]);
-  const y = parseFloat(m[3]);
-  const unit = m[2] || "px";
-  const col = unit === "%" ? Math.round(x / 12.5) : Math.round(x / step);
-  const row = unit === "%" ? Math.round(y / 12.5) : Math.round(y / step);
-  return ((col + row) & 1) as 0 | 1;
 }
 
 interface PendingPromotion {
@@ -230,51 +212,6 @@ export function ChessBoard({
     };
   }, []);
 
-  // Colora i punti di destinazione in base al colore della casella: dot grigio su
-  // casella bianca (.dest-light), dot bianco su casella grigia (.dest-dark). chessground
-  // non marca la parità delle caselle, quindi la calcoliamo dal transform del <square>.
-  const tagDests = useCallback(() => {
-    const cgBoard = wrapRef.current?.querySelector("cg-board");
-    if (!cgBoard) return;
-    const step = (cgBoard as HTMLElement).getBoundingClientRect().width / 8;
-    if (!step) return;
-    cgBoard.querySelectorAll<HTMLElement>("square.move-dest").forEach((sq) => {
-      const p = squareParity(sq, step);
-      if (p === null) return;
-      // toggle con force: se la classe è già corretta non tocca l'attributo (niente
-      // mutazione → l'observer non ricicla all'infinito).
-      sq.classList.toggle("dest-dark", p === 1);
-      sq.classList.toggle("dest-light", p === 0);
-    });
-  }, []);
-
-  // chessground ridisegna i .move-dest quando l'utente seleziona un pezzo (non passa
-  // dal nostro .set()), quindi osserviamo il sottoalbero e ri-taggiamo, con throttle rAF.
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap || typeof MutationObserver === "undefined") return;
-    let raf = 0;
-    const schedule = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        tagDests();
-      });
-    };
-    const observer = new MutationObserver(schedule);
-    observer.observe(wrap, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["class", "style"],
-    });
-    schedule();
-    return () => {
-      observer.disconnect();
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [tagDests]);
-
   // Sincronizzazione: a ogni cambio di props rilancia .set() (mai ricreare l'istanza).
   useEffect(() => {
     const api = apiRef.current;
@@ -298,7 +235,6 @@ export function ChessBoard({
       drawable: { enabled: true, shapes: shapes ?? [] },
     };
     api.set(config);
-    tagDests();
   }, [
     fen,
     orientation,
@@ -310,7 +246,6 @@ export function ChessBoard({
     shapes,
     coordinates,
     disableAnimation,
-    tagDests,
   ]);
 
   const choosePromotion = (role: PieceSymbol) => {

@@ -34,3 +34,6 @@ yarn-error.log*
 
 # dataset puzzle Lichess (283M, oltre limite 100MB GitHub)
 lichess_db_puzzle.csv.zst
+
+.vercel
+.env*.local

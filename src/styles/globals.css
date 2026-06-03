@@ -307,65 +307,25 @@ html.lenis body {
     transparent 72%
   );
 }
-/* Destinazioni legali. Caselle a colore fisso (bianco / grigio): il punto è a due
-   toni concentrici — core grigio scuro + anello bianco. Su casella bianca domina il
-   core grigio; su casella grigia domina l'anello bianco. Sempre ben visibile. */
+/* Destinazioni legali. Board a colore fisso (bianco / grigio), quindi un singolo
+   punto traslucido neutro legge bene su entrambe le caselle senza bisogno di
+   varianti per parità. Stile minimale: dot piccolo e sobrio (no flicker — nessuno
+   swap via JS). */
 .cg-wrap cg-board square.move-dest {
   background: radial-gradient(
     circle,
-    rgba(58, 58, 58, 0.92) 0%,
-    rgba(58, 58, 58, 0.92) 17%,
-    rgba(255, 255, 255, 0.95) 19%,
-    rgba(255, 255, 255, 0.95) 24%,
-    transparent 25%
+    rgba(24, 24, 24, 0.2) 0%,
+    rgba(24, 24, 24, 0.2) 20%,
+    transparent 21%
   );
 }
-/* Casella occupata (cattura): anello esterno a due toni attorno al pezzo. */
+/* Casella occupata (cattura): anello sottile attorno al pezzo. */
 .cg-wrap cg-board square.oc.move-dest {
   background: radial-gradient(
     circle,
-    transparent 60%,
-    rgba(58, 58, 58, 0.92) 62%,
-    rgba(58, 58, 58, 0.92) 69%,
-    rgba(255, 255, 255, 0.95) 71%,
-    rgba(255, 255, 255, 0.95) 78%,
-    transparent 79%
-  );
-}
-
-/* Swap esatto (taggato via JS in ChessBoard): casella bianca → dot grigio,
-   casella grigia → dot bianco. Override del fallback a due toni qui sopra. */
-.cg-wrap cg-board square.move-dest.dest-light {
-  background: radial-gradient(
-    circle,
-    rgba(74, 74, 74, 0.95) 0%,
-    rgba(74, 74, 74, 0.95) 22%,
-    transparent 23%
-  );
-}
-.cg-wrap cg-board square.move-dest.dest-dark {
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(255, 255, 255, 0.98) 22%,
-    transparent 23%
-  );
-}
-.cg-wrap cg-board square.oc.move-dest.dest-light {
-  background: radial-gradient(
-    circle,
-    transparent 60%,
-    rgba(74, 74, 74, 0.95) 62%,
-    rgba(74, 74, 74, 0.95) 78%,
-    transparent 79%
-  );
-}
-.cg-wrap cg-board square.oc.move-dest.dest-dark {
-  background: radial-gradient(
-    circle,
-    transparent 60%,
-    rgba(255, 255, 255, 0.98) 62%,
-    rgba(255, 255, 255, 0.98) 78%,
-    transparent 79%
+    transparent 78%,
+    rgba(24, 24, 24, 0.22) 79%,
+    rgba(24, 24, 24, 0.22) 90%,
+    transparent 91%
   );
 }
