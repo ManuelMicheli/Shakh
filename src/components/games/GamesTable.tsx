@@ -126,59 +126,63 @@ export function GamesTable({ games }: { games: GameRow[] }) {
           return (
             <li
               key={g.id}
-              className="flex flex-wrap items-center gap-3 bg-surface px-4 py-3 sm:flex-nowrap"
+              className="flex flex-col gap-3 bg-surface px-4 py-3 sm:flex-row sm:flex-nowrap sm:items-center"
             >
-              {!g.analyzed && (
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={() => toggle(g.id)}
-                  aria-label={`Seleziona ${gameTitle(g)} per l'analisi`}
-                  className="h-4 w-4 shrink-0 accent-[var(--accent)]"
-                />
-              )}
+              <div className="flex min-w-0 flex-1 items-start gap-3">
+                {!g.analyzed && (
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggle(g.id)}
+                    aria-label={`Seleziona ${gameTitle(g)} per l'analisi`}
+                    className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)] sm:mt-0"
+                  />
+                )}
 
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 font-mono text-sm text-text">
-                  <span className="truncate">{g.white ?? "?"}</span>
-                  <span className="text-text-muted">vs</span>
-                  <span className="truncate">{g.black ?? "?"}</span>
-                  {g.result && (
-                    <span className="text-text-muted">· {g.result}</span>
-                  )}
-                </div>
-                <div className="mt-1 flex items-center gap-2 text-xs text-text-muted">
-                  <span>{SOURCE_LABEL[g.source] ?? g.source}</span>
-                  <span>· {formatDate(g.played_at ?? g.created_at)}</span>
-                  {g.eco_code && <span className="font-mono">· {g.eco_code}</span>}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-sm text-text">
+                    <span className="break-words">{g.white ?? "?"}</span>
+                    <span className="text-text-muted">vs</span>
+                    <span className="break-words">{g.black ?? "?"}</span>
+                    {g.result && (
+                      <span className="text-text-muted">· {g.result}</span>
+                    )}
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-muted">
+                    <span>{SOURCE_LABEL[g.source] ?? g.source}</span>
+                    <span>· {formatDate(g.played_at ?? g.created_at)}</span>
+                    {g.eco_code && <span className="font-mono">· {g.eco_code}</span>}
+                  </div>
                 </div>
               </div>
 
-              <Badge variant={g.analyzed ? "default" : "muted"}>
-                {g.analyzed ? "analizzata" : "da analizzare"}
-              </Badge>
+              <div className="flex items-center justify-between gap-2 sm:justify-end">
+                <Badge variant={g.analyzed ? "default" : "muted"}>
+                  {g.analyzed ? "analizzata" : "da analizzare"}
+                </Badge>
 
-              <div className="flex items-center gap-1">
-                <Link
-                  href={`/app/partite/${g.id}`}
-                  className={
-                    "inline-flex h-8 items-center justify-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 " +
-                    (g.analyzed
-                      ? "border border-border bg-surface-2 text-text hover:bg-surface"
-                      : "bg-text text-bg hover:opacity-90")
-                  }
-                >
-                  {g.analyzed ? "Rivedi" : "Analizza"}
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Elimina partita"
-                  disabled={pending && deletingId === g.id}
-                  onClick={() => onDelete(g.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Link
+                    href={`/app/partite/${g.id}`}
+                    className={
+                      "inline-flex h-8 items-center justify-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 " +
+                      (g.analyzed
+                        ? "border border-border bg-surface-2 text-text hover:bg-surface"
+                        : "bg-text text-bg hover:opacity-90")
+                    }
+                  >
+                    {g.analyzed ? "Rivedi" : "Analizza"}
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Elimina partita"
+                    disabled={pending && deletingId === g.id}
+                    onClick={() => onDelete(g.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </li>
           );

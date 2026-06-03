@@ -4,21 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { X } from "lucide-react";
-import {
-  navGroups,
-  navFooter,
-  navMobileQuick,
-  isNavActive,
-  type NavItem,
-} from "./nav";
+import { navGroups, navFooter, isNavActive, type NavItem } from "./nav";
 import { Badge } from "@/components/ui/badge";
 import { BRAND_NAME } from "@/config/brand";
 import { cn } from "@/lib/utils";
 
 /**
- * Navigazione MOBILE (drawer a scomparsa). Struttura propria, divergente dalla
- * sidebar desktop: in cima riquadri di accesso rapido alle destinazioni piu
- * usate da telefono, sotto il menu completo a gruppi. Target tattili ampi.
+ * Navigazione MOBILE (drawer a scomparsa). Stesse macrocategorie della sidebar
+ * desktop (navGroups), con target tattili ampi.
  */
 function MobileRow({
   item,
@@ -123,37 +116,9 @@ export function MobileNav({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 pb-4">
-          {/* Accesso rapido: riquadri 2×2. */}
-          <p className="px-1 pb-2 pt-1 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-            Accesso rapido
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {navMobileQuick.map((item) => {
-              const Icon = item.icon;
-              const active = isNavActive(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "flex flex-col items-start gap-2 rounded-xl border border-border p-3 transition-colors",
-                    active
-                      ? "bg-surface-2 text-text"
-                      : "text-text-muted hover:bg-surface-2 hover:text-text",
-                  )}
-                >
-                  <Icon className="h-5 w-5" aria-hidden />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Menu completo a gruppi. */}
-          <nav className="mt-4 space-y-4" aria-label="Navigazione completa">
+        <div className="flex-1 overflow-y-auto px-3 pb-4 pt-2">
+          {/* Menu completo a gruppi (stesse macrocategorie del desktop). */}
+          <nav className="space-y-4" aria-label="Navigazione completa">
             {navGroups.map((group, gi) => (
               <div key={group.label ?? `group-${gi}`} className="space-y-1">
                 {group.label && (

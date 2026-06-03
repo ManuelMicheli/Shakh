@@ -89,15 +89,3 @@ export const navFooter: NavItem[] = [
   { label: "Gruppi", href: "/app/gruppi", icon: Users },
   { label: "Profilo", href: "/app/profilo", icon: User },
 ];
-
-/**
- * Accesso rapido mobile: le 4 destinazioni piu usate da telefono, mostrate
- * come riquadri in cima al drawer. Il menu completo (navGroups + navFooter)
- * resta sotto. "Allenati" punta alla home delle tattiche.
- */
-export const navMobileQuick: NavItem[] = [
-  { label: "Oggi", href: "/app/oggi", icon: CalendarCheck },
-  { label: "Impara", href: "/app/impara", icon: GraduationCap },
-  { label: "Allenati", href: "/app/tattiche", icon: Target },
-  { label: "Profilo", href: "/app/profilo", icon: User },
-];
