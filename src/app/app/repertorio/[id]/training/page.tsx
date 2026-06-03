@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { OpeningTrainer } from "@/components/theory/OpeningTrainer";
 import {
   rowsToTree,
@@ -19,9 +19,7 @@ export default async function TrainingPage({
   const reviewMode = review === "1" || review === "true";
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const { data: rep } = await supabase
     .from("repertoires")

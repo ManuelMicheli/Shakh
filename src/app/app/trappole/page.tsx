@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { TrapCatalog } from "@/components/traps/TrapCatalog";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
@@ -11,9 +11,7 @@ export const metadata = {
 
 export default async function TrappolePage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const [traps, dueCount] = await Promise.all([
     listTraps(supabase),

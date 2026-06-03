@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { OnlineGame } from "@/components/play/OnlineGame";
 import { Button } from "@/components/ui/button";
 import type { FriendGameRow } from "@/lib/play/types";
@@ -13,9 +13,7 @@ export default async function GiocaIdPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const { data } = await supabase
     .from("friend_games")

@@ -7,7 +7,7 @@ import {
   ChevronRight,
   type LucideIcon,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TacticsTrainer } from "@/components/tactics/TacticsTrainer";
@@ -36,9 +36,7 @@ export default async function TattichePage({
   const theme = typeof sp.theme === "string" && sp.theme ? sp.theme : null;
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const stats = await ensureStats(supabase, user!.id);
 
@@ -68,32 +66,34 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
     <div className="space-y-8">
       {/* ===== MOBILE: testata editoriale + rating hero + modalità a list-card ===== */}
       <div className="space-y-5 md:hidden">
-        <div className="relative">
-          <span
-            aria-hidden
-            className="pointer-events-none absolute right-0 top-1 select-none font-display text-[12rem] leading-[0.78] text-text opacity-[0.06]"
-          >
-            ♛
-          </span>
-          <div className="relative">
-            <p className="text-xs uppercase tracking-wider text-text-muted">
-              Visione tattica
-            </p>
-            <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-              Tattiche
-            </h1>
+        <div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-wider text-text-muted">
+                Visione tattica
+              </p>
+              <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
+                Tattiche
+              </h1>
+            </div>
+            <span
+              aria-hidden
+              className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
+            >
+              ♛
+            </span>
+          </div>
 
-            <p className="mt-6 text-xs uppercase tracking-wider text-text-muted">
-              Rating tattico
-            </p>
-            <div className="mt-1 font-mono text-5xl font-semibold tabular-nums tracking-tight">
-              {stats.rating}
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-x-3">
-              <Mini label="Serie" value={stats.currentStreak} />
-              <Mini label="Record" value={stats.bestStreak} />
-              <Mini label="Risolti" value={stats.puzzlesSolved} />
-            </div>
+          <p className="mt-5 text-xs uppercase tracking-wider text-text-muted">
+            Rating tattico
+          </p>
+          <div className="mt-1 font-mono text-5xl font-semibold tabular-nums tracking-tight">
+            {stats.rating}
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-x-3">
+            <Mini label="Serie" value={stats.currentStreak} />
+            <Mini label="Record" value={stats.bestStreak} />
+            <Mini label="Risolti" value={stats.puzzlesSolved} />
           </div>
         </div>
 

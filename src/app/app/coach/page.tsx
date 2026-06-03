@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { loadUserMetrics } from "@/lib/ai/userMetrics";
 import { phaseLabel } from "@/lib/ai/format";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,9 +10,7 @@ import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export default async function CoachPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
   if (!user) redirect("/login");
 
   const metrics = await loadUserMetrics(supabase, user.id);

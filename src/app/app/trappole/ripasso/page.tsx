@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { TrapReview, type ReviewItem } from "@/components/traps/TrapReview";
 import { listDueTraps, bodyAsLesson } from "@/lib/traps/query";
 import type { TrapMode } from "@/lib/traps/types";
@@ -9,9 +9,7 @@ export const metadata = {
 
 export default async function TrapReviewPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const due = user ? await listDueTraps(supabase, user.id) : [];
 

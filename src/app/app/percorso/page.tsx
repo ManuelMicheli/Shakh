@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { recomputePath } from "@/lib/path/recompute";
 import { loadWeakest } from "@/lib/path/read";
 import { computeNextStep } from "@/lib/path/recommend";
@@ -10,9 +10,7 @@ export const metadata = { title: "Percorso — Shakh" };
 
 export default async function PercorsoPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
   if (!user) redirect("/login");
 
   const { data: profile } = await supabase

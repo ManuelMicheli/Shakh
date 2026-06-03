@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AssignmentForm, type AssignmentFormData } from "@/components/groups/AssignmentForm";
 import { AssignmentMonitor, type MonitorItem } from "@/components/groups/AssignmentMonitor";
@@ -15,9 +15,7 @@ interface PageProps {
 export default async function AssegnazioniPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
   if (!user) redirect("/login");
 
   const role = await getMyGroupRole(supabase, id, user.id);

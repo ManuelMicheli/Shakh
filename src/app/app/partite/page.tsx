@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { ImportPanel } from "@/components/games/ImportPanel";
 import { GamesTable } from "@/components/games/GamesTable";
 import type { GameRow } from "@/lib/games/types";
@@ -7,9 +7,7 @@ export const metadata = { title: "Le mie partite — Shakh" };
 
 export default async function PartitePage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const { data: games } = await supabase
     .from("games")

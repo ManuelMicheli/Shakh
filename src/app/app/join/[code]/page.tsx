@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { JoinClickwrap } from "@/components/groups/JoinClickwrap";
 import { GROUP_TYPE_LABEL, GROUP_ROLE_LABEL, type GroupRole, type GroupType } from "@/lib/groups/types";
@@ -21,9 +21,7 @@ interface Preview {
 export default async function JoinPage({ params }: PageProps) {
   const { code } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
   if (!user) redirect("/login");
 
   const { data } = await supabase.rpc("invite_preview", { invite_code: code });

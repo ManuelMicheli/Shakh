@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { PlayHub } from "@/components/play/PlayHub";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { FriendGameRow } from "@/lib/play/types";
@@ -7,9 +7,7 @@ export const metadata = { title: "Gioca con un amico — Shakh" };
 
 export default async function GiocaPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const { data: games } = await supabase
     .from("friend_games")

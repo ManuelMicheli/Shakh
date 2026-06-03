@@ -15,6 +15,21 @@ export async function updateSession(
   const nextInit = requestHeaders ? { request: { headers: requestHeaders } } : { request };
   let supabaseResponse = NextResponse.next(nextInit);
 
+  const { pathname } = request.nextUrl;
+  const isAppRoute = pathname.startsWith("/app");
+  const isAuthRoute =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/reset-password");
+
+  // Le pagine pubbliche (landing, legali, ecc.) non hanno bisogno né di
+  // protezione né di redirect: saltiamo del tutto la validazione di rete del
+  // token (getUser) — il refresh sessione avviene alla prossima visita di /app.
+  // Resta solo l'header CSP, applicato a monte dal middleware.
+  if (!isAppRoute && !isAuthRoute) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -40,13 +55,6 @@ export async function updateSession(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-  const isAppRoute = pathname.startsWith("/app");
-  const isAuthRoute =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/signup") ||
-    pathname.startsWith("/reset-password");
 
   // Route protette: utente non loggato → /login
   if (isAppRoute && !user) {

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { CalculationTrainer } from "@/components/calc/CalculationTrainer";
 import { getCalcPuzzle } from "./actions";
 import { loadDomainRatings } from "@/lib/rating/store";
@@ -7,9 +7,7 @@ export const metadata = { title: "Calcolo — Shakh" };
 
 export default async function CalcoloPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const [puzzle, domains] = await Promise.all([
     getCalcPuzzle({ targetDepth: 2, excludeIds: [] }),

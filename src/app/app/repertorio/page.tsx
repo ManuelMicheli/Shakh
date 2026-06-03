@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { RepertoireList, type RepertoireItem } from "@/components/theory/RepertoireList";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { PieceColor } from "@/lib/theory/repertoire";
@@ -14,9 +14,7 @@ interface RepRow {
 
 export default async function RepertorioPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   // RLS limita ai propri repertori; il conteggio mosse arriva dalla relazione.
   const { data } = await supabase

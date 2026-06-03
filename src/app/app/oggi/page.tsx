@@ -9,7 +9,7 @@ import {
   Check,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buildDailyPlan, type PlanBlock, type BlockKind } from "@/lib/daily/plan";
@@ -40,9 +40,7 @@ function todayLabel(): string {
 
 export default async function OggiPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const plan = await buildDailyPlan(supabase, user!.id);
   const doneCount = plan.blocks.filter((b) => b.done >= b.target).length;
@@ -51,30 +49,32 @@ export default async function OggiPage() {
     <div className="space-y-8">
       {/* ===== MOBILE: testata editoriale + glifo pedone + blocchi in card ===== */}
       <div className="space-y-5 md:hidden">
-        <div className="relative">
-          <span
-            aria-hidden
-            className="pointer-events-none absolute right-1 top-0 select-none font-display text-[12rem] leading-[0.78] text-text opacity-[0.06]"
-          >
-            ♟
-          </span>
-          <div className="relative">
-            <p className="text-xs uppercase tracking-wider text-text-muted">
-              {todayLabel()}
-            </p>
-            <h1 className="mt-0.5 font-display text-2xl font-semibold tracking-tight">
-              Oggi
-            </h1>
-            <div className="mt-6 flex items-end gap-2">
-              <span className="font-mono text-5xl font-semibold tabular-nums tracking-tight">
-                ~{plan.totalMin}
-                <span className="text-3xl">′</span>
-              </span>
+        <div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-wider text-text-muted">
+                {todayLabel()}
+              </p>
+              <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
+                Oggi
+              </h1>
             </div>
-            <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
-              durata stimata · {doneCount}/{plan.blocks.length} completati
-            </p>
+            <span
+              aria-hidden
+              className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
+            >
+              ♟
+            </span>
           </div>
+          <div className="mt-5 flex items-end gap-2">
+            <span className="font-mono text-5xl font-semibold tabular-nums tracking-tight">
+              ~{plan.totalMin}
+              <span className="text-3xl">′</span>
+            </span>
+          </div>
+          <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
+            durata stimata · {doneCount}/{plan.blocks.length} completati
+          </p>
         </div>
 
         <div className="chess-rule h-1 w-full opacity-70" />
