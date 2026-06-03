@@ -9,6 +9,8 @@ import { explainMove } from "@/lib/ai/coach";
 import { isCoachConfigured } from "@/lib/ai/client";
 import { evalText, phaseFromFen, moverFromPly } from "@/lib/ai/format";
 import type { MoveFacts } from "@/lib/ai/types";
+import { computeGameSignals, gameOutcomes } from "@/lib/rating/aggregate";
+import { applyGameBatch } from "@/lib/rating/store";
 
 export interface ImportResult {
   ok: boolean;
@@ -196,7 +198,7 @@ export async function saveAnalysisChunk(
   return { ok: true };
 }
 
-/** Marca la partita come analizzata (fine job). */
+/** Marca la partita come analizzata (fine job) e alimenta il motore di rating. */
 export async function finalizeGameAnalysis(gameId: string): Promise<ActionResult> {
   const supabase = await createClient();
   const { error } = await supabase
@@ -204,9 +206,47 @@ export async function finalizeGameAnalysis(gameId: string): Promise<ActionResult
     .update({ analyzed: true })
     .eq("id", gameId);
   if (error) return { ok: false, error: error.message };
+
+  // Segnali di rating (domìni games + play_quality). Best-effort: un errore qui
+  // NON deve far fallire la finalizzazione dell'analisi.
+  await feedRatingFromGame(supabase, gameId).catch(() => {});
+
   revalidatePath("/app/partite");
   revalidatePath(`/app/partite/${gameId}`);
   return { ok: true };
+}
+
+/** Deriva ACPL + qualità di gioco dalle righe d'analisi e aggiorna il rating. */
+async function feedRatingFromGame(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  gameId: string,
+): Promise<void> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { data: game } = await supabase
+    .from("games")
+    .select("user_color")
+    .eq("id", gameId)
+    .maybeSingle<{ user_color: "white" | "black" | null }>();
+  if (!game?.user_color) return; // colore ignoto → non attribuibile
+
+  const { data: rows } = await supabase
+    .from("game_analysis")
+    .select("ply, eval_before, eval_after")
+    .eq("game_id", gameId);
+  if (!rows || rows.length === 0) return;
+
+  const signals = computeGameSignals(rows, game.user_color);
+  const outcomes = gameOutcomes(signals);
+  if (!outcomes) return; // troppe poche mosse dell'utente
+
+  await applyGameBatch(supabase, user.id, {
+    games: [outcomes.games],
+    playQuality: [outcomes.playQuality],
+  });
 }
 
 /** Cancella l'analisi esistente e riporta la partita a "da analizzare". */

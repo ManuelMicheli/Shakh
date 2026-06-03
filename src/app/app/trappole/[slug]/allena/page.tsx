@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TrapTrainer } from "@/components/traps/TrapTrainer";
@@ -25,14 +24,9 @@ export default async function TrapTrainPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">
-          {mode === "tendi" ? "Tendi" : "Evita"} · {trap.name}
-        </h1>
-        <Link href={`/app/trappole/${slug}`} className="text-sm text-text-muted hover:text-text">
-          ← Trappola
-        </Link>
-      </div>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">
+        {mode === "tendi" ? "Tendi" : "Evita"} · {trap.name}
+      </h1>
 
       <p className="text-text-muted">
         {mode === "tendi"

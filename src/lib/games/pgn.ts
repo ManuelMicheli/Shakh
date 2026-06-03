@@ -12,6 +12,8 @@ export interface ParsedGame {
   black: string | null;
   result: string | null;
   ecoCode: string | null;
+  /** Nome dell'apertura dall'header [Opening], se presente. */
+  opening: string | null;
   /** ISO timestamp se ricavabile dagli header, altrimenti null. */
   playedAt: string | null;
   /** Id esterno per dedup (es. id partita Lichess dal tag Site). */
@@ -72,6 +74,7 @@ export function parseGame(pgn: string): ParsedGame | null {
     black: clean(h.Black),
     result: clean(h.Result),
     ecoCode: clean(h.ECO),
+    opening: clean(h.Opening),
     playedAt: parsePlayedAt(h),
     // Chess.com mette solo "Chess.com" nel tag Site; l'URL con id è nel tag Link.
     externalId: extractExternalId(h.Site) ?? extractExternalId(h.Link),

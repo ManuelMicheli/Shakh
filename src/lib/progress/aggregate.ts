@@ -11,6 +11,8 @@ import { moverFromPly } from "@/lib/ai/format";
 import { themeLabel } from "@/lib/tactics/themes";
 import type { UserMetrics } from "@/lib/ai/types";
 import type { CoachSynthesis } from "@/lib/ai/types";
+import { loadOverallRating } from "@/lib/rating/store";
+import type { OverallRating } from "@/lib/rating/aggregate";
 
 type DB = SupabaseClient;
 
@@ -94,6 +96,8 @@ export interface DashboardData {
   game: GameStats;
   trends: Trends;
   tactic: TacticSummary;
+  /** Rating Shakh olistico (OTB, multi-segnale). null se nessun dato. */
+  shakhRating: OverallRating | null;
   path: PathProgress;
   synthesis: CoachSynthesis | null;
   recent: RecentItem[];
@@ -192,17 +196,27 @@ function weighted(rows: ProgressRow[]): { score: number | null; attempts: number
 // ============================================================
 
 export async function loadDashboard(supabase: DB, userId: string): Promise<DashboardData> {
-  const [progressRows, trapAgg, gameData, tactic, ratingHistory, pathAgg, synthesis, recent] =
-    await Promise.all([
-      loadProgressRows(supabase, userId),
-      loadTrapCompetence(supabase, userId),
-      loadGameStats(supabase, userId),
-      loadTacticSummary(supabase, userId),
-      loadRatingTrend(supabase, userId),
-      loadPathProgress(supabase, userId),
-      loadSynthesis(supabase, userId),
-      loadRecent(supabase, userId),
-    ]);
+  const [
+    progressRows,
+    trapAgg,
+    gameData,
+    tactic,
+    ratingHistory,
+    pathAgg,
+    synthesis,
+    recent,
+    shakhRating,
+  ] = await Promise.all([
+    loadProgressRows(supabase, userId),
+    loadTrapCompetence(supabase, userId),
+    loadGameStats(supabase, userId),
+    loadTacticSummary(supabase, userId),
+    loadRatingTrend(supabase, userId),
+    loadPathProgress(supabase, userId),
+    loadSynthesis(supabase, userId),
+    loadRecent(supabase, userId),
+    loadOverallRating(supabase, userId),
+  ]);
 
   // Competenza per area (4 da user_progress + trappole da user_trap_progress).
   const competence: AreaCompetence[] = (
@@ -240,6 +254,7 @@ export async function loadDashboard(supabase: DB, userId: string): Promise<Dashb
     game: gameData.stats,
     trends: { rating: ratingHistory, accuracy: gameData.accuracyTrend },
     tactic,
+    shakhRating,
     path: pathAgg,
     synthesis,
     recent,

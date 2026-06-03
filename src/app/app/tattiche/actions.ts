@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { ensureStats, selectNextPuzzle, type SelectParams } from "@/lib/tactics/query";
-import { kFactor, nextDeviation, updateRating } from "@/lib/tactics/rating";
+import { applyTacticOutcome } from "@/lib/rating/store";
+import { lichessPuzzleToOtb } from "@/lib/rating/calibration";
 import { scheduleNext, type SrsState } from "@/lib/tactics/srs";
 import type { AttemptInput, Puzzle, TacticStats } from "@/lib/tactics/types";
 
@@ -81,13 +82,18 @@ export async function recordAttempt(input: AttemptInput): Promise<RecordResult> 
   });
   if (insErr) return { ok: false, error: insErr.message };
 
-  // --- Rating / streak ---
+  // --- Rating (motore Glicko-2 OTB) / streak ---
   const stats = await ensureStats(supabase, user.id);
+  // Il motore possiede rating + rating_deviation: aggiorna `user_ratings`,
+  // ricalcola tetto e complessivo, e rispecchia il sotto-rating tattico in
+  // `user_tactic_stats` (preservando lo storico via trg_log_tactic_rating).
   let rating = stats.rating;
   let rd = stats.ratingDeviation;
   if (!input.hinted) {
-    rating = updateRating(stats.rating, input.puzzleRating, won, kFactor(rd));
-    rd = nextDeviation(rd);
+    const opponentOtb = lichessPuzzleToOtb(input.puzzleRating);
+    const next = await applyTacticOutcome(supabase, user.id, opponentOtb, won ? 1 : 0);
+    rating = Math.round(next.rating);
+    rd = Math.round(next.rd);
   }
   const current = fullSuccess ? stats.currentStreak + 1 : 0;
   const best = Math.max(stats.bestStreak, current);
@@ -100,11 +106,10 @@ export async function recordAttempt(input: AttemptInput): Promise<RecordResult> 
     bestStreak: best,
   };
 
+  // Solo i campi NON di rating: rating/rating_deviation sono già scritti dal motore.
   const { error: upErr } = await supabase
     .from("user_tactic_stats")
     .update({
-      rating: newStats.rating,
-      rating_deviation: newStats.ratingDeviation,
       puzzles_solved: newStats.puzzlesSolved,
       puzzles_failed: newStats.puzzlesFailed,
       current_streak: newStats.currentStreak,

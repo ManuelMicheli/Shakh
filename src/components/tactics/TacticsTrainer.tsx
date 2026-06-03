@@ -238,12 +238,7 @@ function Shell({
     mode === "theme" && theme ? `${MODE_TITLE.theme} · ${themeLabel(theme)}` : MODE_TITLE[mode];
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">{title}</h1>
-        <Link href="/app/tattiche" className="text-sm text-text-muted hover:text-text">
-          ← Tattiche
-        </Link>
-      </div>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">{title}</h1>
       {children}
     </div>
   );

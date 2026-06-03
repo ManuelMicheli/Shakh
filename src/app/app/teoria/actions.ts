@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { recomputePath } from "@/lib/path/recompute";
+import { recordDomainOutcomes } from "@/lib/rating/store";
+import { endgameDifficulty, ENDGAME_OPP_RD } from "@/lib/rating/aggregate";
 
 export interface ProgressResult {
   ok: boolean;
@@ -59,12 +61,40 @@ async function bumpProgress(
   return { ok: true, score };
 }
 
-/** Registra l'esito di una pratica di finale (dimensione `endgame`). */
+/** Registra l'esito di una pratica di finale (dimensione `endgame`) + segnale di rating. */
 export async function recordEndgameResult(
   progressKey: string,
   success: boolean,
 ): Promise<ProgressResult> {
-  return bumpProgress("endgame", progressKey, success);
+  const result = await bumpProgress("endgame", progressKey, success);
+  if (result.ok) {
+    // Segnale di rating (dominio 'endgame'): converti = batti la difficoltà OTB.
+    // Best-effort: non deve mai far fallire la registrazione del progresso.
+    try {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        await recordDomainOutcomes(
+          supabase,
+          user.id,
+          "endgame",
+          [
+            {
+              opponentRating: endgameDifficulty(progressKey),
+              opponentRd: ENDGAME_OPP_RD,
+              score: success ? 1 : 0,
+            },
+          ],
+          "endgame",
+        );
+      }
+    } catch {
+      /* ignora: il progresso è già salvato */
+    }
+  }
+  return result;
 }
 
 /** Registra un tentativo di esercizio posizionale (dimensione `middlegame_theme`). */

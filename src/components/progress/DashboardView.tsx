@@ -10,8 +10,56 @@ import { TrendLine } from "./TrendLine";
 import { Glossary } from "./Glossary";
 import { phaseLabel } from "@/lib/ai/format";
 import type { DashboardData } from "@/lib/progress/aggregate";
+import type { OverallRating } from "@/lib/rating/aggregate";
 
 const pct = (v: number | null): string => (v == null ? "—" : `${Math.round(v * 100)}%`);
+
+/** Card del Rating Shakh: numero complessivo (OTB) + scomposizione per dominio. */
+function ShakhRatingCard({ rating }: { rating: OverallRating }) {
+  const shown = rating.breakdown.filter((b) => b.rating != null);
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle>Rating Shakh</CardTitle>
+          {rating.provisional && <Badge variant="muted">non calibrato</Badge>}
+        </div>
+        <CardDescription>
+          Stima di forza su scala reale (OTB), da puzzle, partite, finali, calcolo e qualità di gioco.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-baseline gap-2">
+          <span className="font-display text-4xl font-semibold tabular-nums">
+            {rating.rating != null ? rating.rating : "—"}
+          </span>
+          <span className="font-mono text-xs text-text-muted">± {rating.rd}</span>
+        </div>
+        {shown.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {shown.map((b) => (
+              <div
+                key={b.domain}
+                className="rounded-md border border-border bg-surface-2 px-3 py-2"
+              >
+                <p className="text-xs text-text-muted">{b.label}</p>
+                <p className="mt-0.5 flex items-center gap-1.5 font-mono text-sm tabular-nums">
+                  {b.rating}
+                  {b.provisional && (
+                    <span
+                      className="inline-block h-1.5 w-1.5 rounded-full bg-text-muted"
+                      title="non calibrato"
+                    />
+                  )}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 function kindLabel(kind: "game" | "puzzle" | "lesson"): string {
   return kind === "game" ? "Partita" : kind === "puzzle" ? "Puzzle" : "Lezione";
@@ -37,6 +85,9 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
 
   return (
     <div className="space-y-8">
+      {/* 0. Rating Shakh olistico */}
+      {data.shakhRating && <ShakhRatingCard rating={data.shakhRating} />}
+
       {/* 1. Sintesi in alto */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatTile

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useChessGame } from "@/lib/chess/useChessGame";
 import { MoveList } from "@/components/chess/MoveList";
@@ -136,9 +137,16 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
           )}
         </div>
         {game.analyzed && (
-          <Button variant="secondary" size="sm" onClick={onReanalyze} disabled={resetting}>
-            {resetting ? "…" : "Rianalizza"}
-          </Button>
+          <div className="flex gap-2">
+            <Link href={`/app/reel/${game.id}`}>
+              <Button variant="secondary" size="sm">
+                Crea reel
+              </Button>
+            </Link>
+            <Button variant="secondary" size="sm" onClick={onReanalyze} disabled={resetting}>
+              {resetting ? "…" : "Rianalizza"}
+            </Button>
+          </div>
         )}
       </div>
 

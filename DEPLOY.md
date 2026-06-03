@@ -28,11 +28,18 @@ fare sull'account/infra.
       `Content-Type: application/wasm` e che il worker carichi (no COOP/COEP).
 
 ## Supabase
-- [ ] Applica le migration `supabase/migrations/0001`→`0012` in produzione
-      (`supabase db push` o SQL editor).
+- [ ] Applica le migration `supabase/migrations/0001`→`0014` in produzione
+      (`supabase db push` o SQL editor). `0014_rating_engine` crea `user_ratings`
+      + `rating_events` (motore di rating olistico) con backfill idempotente dai
+      dati esistenti.
 - [ ] Conferma **region UE**.
-- [ ] RLS attiva su tutte le tabelle con dati personali; verifica gli accessi
-      istruttore→allievo del `09` (`is_group_instructor_of`).
+- [ ] RLS attiva su tutte le tabelle con dati personali (incluse `user_ratings`,
+      `rating_events`); verifica gli accessi istruttore→allievo del `09`
+      (`is_group_instructor_of`).
+- Nota perf (non bloccante): gli advisor segnalano `auth_rls_initplan` e
+      `multiple_permissive_policies` su TUTTE le tabelle (pattern RLS storico
+      0001→0014). Ottimizzazione post-lancio a livello di progetto, non un difetto
+      delle nuove tabelle.
 
 ## Sicurezza / header
 - CSP con nonce per richiesta nel middleware (`src/lib/security/csp.ts`);
@@ -49,6 +56,8 @@ fare sull'account/infra.
 - [ ] Build pulita (`npm run build`).
 - [ ] Font tutti locali (`next/font`, nessuna chiamata a Google Fonts a runtime).
 - [ ] Pagine `/app` in `noindex`; `sitemap.xml` e `robots.txt` corretti.
+- [ ] Rotta pubblica `/reel` (reel condivisibili) è `noindex` e legge solo il
+      payload autocontenuto dell'URL (nessun dato di partita esposto).
 - [ ] Cookie banner: parità Accetta/Rifiuta, riapribile dal footer, nessuna
       preselezione delle categorie non necessarie.
 - [ ] Esportazione dati e cancellazione account funzionanti.

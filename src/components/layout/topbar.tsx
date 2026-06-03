@@ -2,6 +2,7 @@ import { Menu } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogoutButton } from "./logout-button";
+import { BackButton } from "./back-button";
 
 export function Topbar({
   displayName,
@@ -23,6 +24,7 @@ export function Topbar({
         >
           <Menu className="h-5 w-5" aria-hidden />
         </button>
+        <BackButton />
         <div className="truncate text-sm text-text-muted">
           {displayName ? `Ciao, ${displayName}` : " "}
         </div>

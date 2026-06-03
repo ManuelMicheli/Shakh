@@ -5,6 +5,7 @@
  * Supabase già autenticato (la RLS fa rispettare la proprietà dei dati).
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { otbToLichessPuzzle } from "@/lib/rating/calibration";
 import type { Puzzle, TacticMode, TacticStats } from "./types";
 
 type DB = SupabaseClient;
@@ -19,6 +20,9 @@ interface PuzzleRow {
 }
 
 const PUZZLE_COLS = "id,fen,moves,rating,themes,popularity";
+
+/** Punti OTB sotto al rating su cui centrare i puzzle adattivi (zona di flusso ~73%). */
+const FLOW_OFFSET = 150;
 
 const DEFAULT_STATS: TacticStats = {
   rating: 1200,
@@ -112,7 +116,15 @@ export async function selectNextPuzzle(
   }
 
   const stats = await ensureStats(supabase, userId);
-  const center = params.targetRating ?? stats.rating;
+  // Il rating utente è su scala OTB; la tabella `puzzles` è su scala Lichess.
+  // Converto il centro della finestra nella scala nativa dei puzzle.
+  // "Flow zone": in adattivo/per-tema abbasso il bersaglio di FLOW_OFFSET così
+  // l'utente risolve ~70-75% (zona di apprendimento ottimale), invece del 50%
+  // che si avrebbe centrando esattamente sul rating. Sfida a tempo (ramp) e
+  // ripasso (SRS) restano sui rispettivi bersagli.
+  const flow = params.mode === "adaptive" || params.mode === "theme" ? FLOW_OFFSET : 0;
+  const centerOtb = (params.targetRating ?? stats.rating) - flow;
+  const center = otbToLichessPuzzle(centerOtb);
   const theme = params.theme ?? null;
   const seen = new Set<string>([
     ...(params.excludeIds ?? []),

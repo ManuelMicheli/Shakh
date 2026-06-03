@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TrapReview, type ReviewItem } from "@/components/traps/TrapReview";
 import { listDueTraps, bodyAsLesson } from "@/lib/traps/query";
@@ -36,12 +35,7 @@ export default async function TrapReviewPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Ripasso trappole</h1>
-        <Link href="/app/trappole" className="text-sm text-text-muted hover:text-text">
-          ← Trappole
-        </Link>
-      </div>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">Ripasso trappole</h1>
       <TrapReview items={items} />
     </div>
   );
