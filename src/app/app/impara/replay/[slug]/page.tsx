@@ -15,7 +15,7 @@ export default async function ReplayPage({
   if (!game) notFound();
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">{game.title}</h1>
         <Link href="/app/impara" className="text-sm text-text-muted hover:text-text">

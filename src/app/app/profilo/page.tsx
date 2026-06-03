@@ -62,7 +62,7 @@ export default async function ProfiloPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           {profile?.display_name ?? profile?.username ?? "Profilo"}
