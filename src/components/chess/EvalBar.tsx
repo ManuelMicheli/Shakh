@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { formatEval, type ScoreType } from "@/lib/engine/score";
+import { evalVerdict } from "@/lib/engine/explain";
 import { cn } from "@/lib/utils";
 
 export interface EvalBarProps {
@@ -36,17 +37,19 @@ export function EvalBar({
 }: EvalBarProps) {
   const pct = whitePercent(score, scoreType);
   const label = formatEval(score, scoreType);
+  const verdict = evalVerdict(score, scoreType);
   const whiteAtBottom = orientation === "white";
   const whiteWinning = scoreType === "mate" ? score > 0 : score >= 0;
 
   return (
     <div
       className={cn(
-        "relative h-full w-6 overflow-hidden rounded border border-border bg-neutral-900",
+        "relative h-full w-6 cursor-help overflow-hidden rounded border border-border bg-neutral-900",
         className,
       )}
       role="img"
-      aria-label={`Valutazione ${label}`}
+      aria-label={`Valutazione ${label}: ${verdict.headline}`}
+      title={`${label} — ${verdict.headline}. ${verdict.detail}`}
     >
       {/* Sfondo = lato Nero. Riempimento animato = lato Bianco. */}
       <motion.div

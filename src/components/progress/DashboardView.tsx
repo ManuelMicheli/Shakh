@@ -7,6 +7,7 @@ import { DistributionBar } from "./DistributionBar";
 import { WeaknessRow } from "./WeaknessRow";
 import { CompetenceRadar } from "./CompetenceRadar";
 import { TrendLine } from "./TrendLine";
+import { Glossary } from "./Glossary";
 import { phaseLabel } from "@/lib/ai/format";
 import type { DashboardData } from "@/lib/progress/aggregate";
 
@@ -251,6 +252,9 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
           </CardContent>
         </Card>
       )}
+
+      {/* Legenda termini: riferimento per principianti (non nel drill-down istruttore). */}
+      {!readOnly && <Glossary />}
     </div>
   );
 }

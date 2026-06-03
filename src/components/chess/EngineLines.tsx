@@ -6,6 +6,8 @@ import {
   toWhiteRelative,
   formatEval,
 } from "@/lib/engine/score";
+import { evalVerdict, ENGINE_HELP } from "@/lib/engine/explain";
+import { Tooltip } from "@/components/ui/tooltip";
 import type { EngineLine } from "@/lib/engine/engine";
 import { cn } from "@/lib/utils";
 
@@ -68,14 +70,15 @@ export function EngineLines({
 
   const rendered = useMemo(
     () =>
-      lines.map((line) => ({
-        line,
-        evalLabel: formatEval(
-          toWhiteRelative(line.score, line.scoreType, turn),
-          line.scoreType,
-        ),
-        sans: pvToSan(fen, line.pv, maxPlies),
-      })),
+      lines.map((line) => {
+        const whiteRel = toWhiteRelative(line.score, line.scoreType, turn);
+        return {
+          line,
+          whiteRel,
+          evalLabel: formatEval(whiteRel, line.scoreType),
+          sans: pvToSan(fen, line.pv, maxPlies),
+        };
+      }),
     [lines, fen, turn, maxPlies],
   );
 
@@ -89,15 +92,50 @@ export function EngineLines({
 
   const moveNumberBase = startMoveNumber(fen);
   const whiteToMove = turn === "w";
+  const topVerdict = evalVerdict(rendered[0].whiteRel, rendered[0].line.scoreType);
 
   return (
-    <ul className={cn("space-y-1.5", className)}>
-      {rendered.map(({ line, evalLabel, sans }, lineIndex) => (
-        <li key={line.multipv} className="flex items-start gap-2 text-sm">
-          <span className="mt-0.5 min-w-[3.25rem] rounded bg-surface-2 px-1.5 py-0.5 text-center font-mono text-xs font-medium text-text">
-            {evalLabel}
+    <div className={cn("space-y-2", className)}>
+      {/* Verdetto in parole semplici sulla posizione (linea migliore). */}
+      <div className="rounded-md border border-border bg-surface px-2.5 py-2">
+        <p className="text-sm font-medium text-text">{topVerdict.headline}</p>
+        <p className="mt-0.5 text-xs leading-snug text-text-muted">{topVerdict.detail}</p>
+      </div>
+
+      <div className="flex items-center gap-1.5 text-xs text-text-muted">
+        <span>Migliori mosse del motore</span>
+        <Tooltip content={ENGINE_HELP.eval} className="max-w-xs whitespace-normal">
+          <span className="flex h-4 w-4 cursor-help items-center justify-center rounded-full border border-border text-[10px] font-medium">
+            ?
           </span>
-          <p className="flex flex-wrap gap-x-1.5 gap-y-0.5 font-mono leading-relaxed">
+        </Tooltip>
+      </div>
+
+      <ul className="space-y-1.5">
+        {rendered.map(({ line, evalLabel, sans }, lineIndex) => (
+          <li key={line.multipv} className="flex items-start gap-2 text-sm">
+            <Tooltip
+              content={lineIndex === 0 ? `Mossa migliore. ${ENGINE_HELP.eval}` : ENGINE_HELP.eval}
+              side="right"
+              className="max-w-xs whitespace-normal"
+            >
+              <span
+                className={cn(
+                  "mt-0.5 min-w-[3.25rem] cursor-help rounded px-1.5 py-0.5 text-center font-mono text-xs font-medium",
+                  lineIndex === 0
+                    ? "bg-text text-bg"
+                    : "bg-surface-2 text-text",
+                )}
+              >
+                {evalLabel}
+              </span>
+            </Tooltip>
+            <p className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 font-mono leading-relaxed">
+              {lineIndex === 0 && (
+                <span className="rounded bg-surface-2 px-1 text-[10px] font-sans font-medium uppercase tracking-wide text-text-muted">
+                  migliore
+                </span>
+              )}
             {sans.map((m, ply) => {
               const moveNumber = moveNumberBase + Math.floor((ply + (whiteToMove ? 0 : 1)) / 2);
               const isWhiteMove = whiteToMove ? ply % 2 === 0 : ply % 2 === 1;
@@ -124,9 +162,10 @@ export function EngineLines({
                 </button>
               );
             })}
-          </p>
-        </li>
-      ))}
-    </ul>
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

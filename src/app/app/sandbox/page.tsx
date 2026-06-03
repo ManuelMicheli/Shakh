@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip } from "@/components/ui/tooltip";
 import {
   Card,
   CardHeader,
@@ -20,6 +21,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast";
+import { ENGINE_HELP } from "@/lib/engine/explain";
 
 // chessground accede a `window`: il componente va caricato solo lato client.
 const ChessBoard = dynamic(
@@ -171,7 +173,11 @@ export default function SandboxPage() {
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <span className="text-text-muted">Linee</span>
+                  <Tooltip content={ENGINE_HELP.lines} side="bottom" className="max-w-xs whitespace-normal">
+                    <span className="cursor-help text-text-muted underline decoration-dotted underline-offset-2">
+                      Linee
+                    </span>
+                  </Tooltip>
                   {[1, 2, 3].map((n) => (
                     <button
                       key={n}
@@ -189,16 +195,19 @@ export default function SandboxPage() {
                     </button>
                   ))}
                 </span>
-                <span className="font-mono text-xs text-text-muted">
-                  prof. {depth} · {engineLabel[engineState]}
-                </span>
+                <Tooltip content={ENGINE_HELP.depth} side="bottom" className="max-w-xs whitespace-normal">
+                  <span className="cursor-help font-mono text-xs text-text-muted">
+                    profondità {depth} · {engineLabel[engineState]}
+                  </span>
+                </Tooltip>
               </div>
 
               {engineOn ? (
                 <EngineLines fen={game.fen} lines={evaluation?.lines ?? []} />
               ) : (
                 <p className="text-sm text-text-muted">
-                  Analisi spenta. Accendi per valutare la posizione corrente.
+                  Analisi spenta. Accendi per far valutare la posizione al motore:
+                  ti dirà chi sta meglio e qual è la mossa migliore.
                 </p>
               )}
             </CardContent>

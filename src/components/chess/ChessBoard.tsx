@@ -137,7 +137,9 @@ export function ChessBoard({
     apiRef.current = Chessground(wrapRef.current, {
       fen,
       orientation,
-      coordinates,
+      // Coordinate disegnate da noi FUORI dalla scacchiera (vedi render): quelle
+      // interne di chessground si confondono coi pezzi e con le caselle.
+      coordinates: false,
       movable: { free: false, showDests: true, events: { after: handleAfter } },
       drawable: { enabled: true },
     });
@@ -177,7 +179,7 @@ export function ChessBoard({
     const config: Config = {
       fen,
       orientation,
-      coordinates,
+      coordinates: false,
       check: check ?? false,
       lastMove: lastMove ? [lastMove[0] as Key, lastMove[1] as Key] : undefined,
       turnColor: turnFromFen(fen),
@@ -218,7 +220,7 @@ export function ChessBoard({
     setPending(null);
   };
 
-  return (
+  const board = (
     <div className={cn("board-square relative select-none", className)}>
       <div ref={wrapRef} />
 
@@ -248,6 +250,33 @@ export function ChessBoard({
           </div>
         </div>
       )}
+    </div>
+  );
+
+  if (!coordinates) return board;
+
+  // Coordinate FUORI dalla scacchiera: numeri (traverse) a sinistra, lettere
+  // (colonne) sotto. L'ordine segue l'orientamento della board.
+  const ranks = orientation === "white"
+    ? [8, 7, 6, 5, 4, 3, 2, 1]
+    : [1, 2, 3, 4, 5, 6, 7, 8];
+  const files = orientation === "white"
+    ? ["a", "b", "c", "d", "e", "f", "g", "h"]
+    : ["h", "g", "f", "e", "d", "c", "b", "a"];
+
+  return (
+    <div className="board-frame">
+      <div className="board-ranks" aria-hidden="true">
+        {ranks.map((r) => (
+          <span key={r}>{r}</span>
+        ))}
+      </div>
+      {board}
+      <div className="board-files" aria-hidden="true">
+        {files.map((f) => (
+          <span key={f}>{f}</span>
+        ))}
+      </div>
     </div>
   );
 }

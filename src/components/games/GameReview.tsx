@@ -13,8 +13,10 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { AnalyzeRunner } from "./AnalyzeRunner";
 import { CoachPanel } from "@/components/coach/CoachPanel";
+import { Tooltip } from "@/components/ui/tooltip";
 import { decodeEval, toWhiteCpClamped, type PovEval } from "@/lib/analysis/evalScore";
 import { formatEval } from "@/lib/engine/score";
+import { evalVerdict } from "@/lib/engine/explain";
 import { CLASSIFICATION_META } from "@/lib/analysis/labels";
 import { summarizeGame, type SideSummary } from "@/lib/analysis/accuracy";
 import { resetGameAnalysis } from "@/app/app/partite/actions";
@@ -231,18 +233,21 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
           />
 
           {game.analyzed && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Riepilogo</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <SummaryTable white={summary.white} black={summary.black} />
-                <p className="text-xs text-text-muted">
-                  L&apos;accuratezza % è una stima basata sulla perdita media in
-                  centipawn, non lo standard ufficiale di Lichess/Chess.com.
-                </p>
-              </CardContent>
-            </Card>
+            <>
+              <AnalysisLegend />
+              <Card>
+                <CardHeader>
+                  <CardTitle>Riepilogo</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <SummaryTable white={summary.white} black={summary.black} />
+                  <p className="text-xs text-text-muted">
+                    L&apos;accuratezza % è una stima basata sulla perdita media in
+                    centipawn, non lo standard ufficiale di Lichess/Chess.com.
+                  </p>
+                </CardContent>
+              </Card>
+            </>
           )}
         </div>
       </div>
@@ -253,22 +258,65 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
 /** Etichetta della mossa mostrata: classificazione + miglior mossa + valutazione. */
 function CurrentMoveInfo({ row }: { row: AnalysisRow }) {
   const meta = row.classification ? CLASSIFICATION_META[row.classification] : null;
-  const evalLabel =
-    row.eval_after != null
-      ? (() => {
-          const e = decodeEval(row.eval_after);
-          return formatEval(e.value, e.type);
-        })()
-      : null;
+  const decoded = row.eval_after != null ? decodeEval(row.eval_after) : null;
+  const evalLabel = decoded ? formatEval(decoded.value, decoded.type) : null;
+  const verdict = decoded ? evalVerdict(decoded.value, decoded.type) : null;
   return (
     <div className="flex items-center gap-3 text-sm">
       {meta && (
-        <span className="font-medium" style={{ color: meta.color }}>
-          {meta.glyph} {meta.label}
-        </span>
+        <Tooltip content={meta.description} className="max-w-xs whitespace-normal">
+          <span className="cursor-help font-medium" style={{ color: meta.color }}>
+            {meta.glyph} {meta.label}
+          </span>
+        </Tooltip>
       )}
-      {evalLabel && <span className="font-mono text-text-muted">{evalLabel}</span>}
+      {evalLabel && verdict && (
+        <Tooltip
+          content={`${verdict.headline}. ${verdict.detail}`}
+          className="max-w-xs whitespace-normal"
+        >
+          <span className="cursor-help font-mono text-text-muted">{evalLabel}</span>
+        </Tooltip>
+      )}
     </div>
+  );
+}
+
+/** Mini-guida pieghevole su come leggere i simboli dell'analisi. */
+function AnalysisLegend() {
+  return (
+    <details className="rounded-md border border-border bg-surface px-3 py-2 text-sm">
+      <summary className="cursor-pointer font-medium text-text">
+        Come leggere l&apos;analisi
+      </summary>
+      <div className="mt-3 space-y-2.5">
+        <p className="text-xs leading-snug text-text-muted">
+          La <span className="font-medium text-text">barra</span> e il numero in pedoni
+          dicono chi sta meglio: valori col <span className="font-mono">+</span> favoriscono
+          il Bianco, col <span className="font-mono">−</span> il Nero. Ogni mossa è
+          etichettata così:
+        </p>
+        <ul className="space-y-1.5">
+          {(
+            ["brilliant", "best", "good", "inaccuracy", "mistake", "blunder", "book"] as const
+          ).map((k) => {
+            const m = CLASSIFICATION_META[k];
+            return (
+              <li key={k} className="flex items-baseline gap-2 text-xs">
+                <span
+                  className="min-w-[5.5rem] shrink-0 font-medium"
+                  style={{ color: m.color }}
+                >
+                  {m.glyph && <span className="font-mono">{m.glyph} </span>}
+                  {m.label}
+                </span>
+                <span className="text-text-muted">{m.description}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </details>
   );
 }
 

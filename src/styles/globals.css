@@ -146,6 +146,44 @@ html.lenis body {
   height: 100%;
 }
 
+/* Coordinate ESTERNE alla scacchiera: numeri (traverse) a sinistra, lettere
+   (colonne) sotto. La frame porta il max-width/centratura; la board riempie la
+   cella. Le etichette sono distribuite per allinearsi a righe e colonne. */
+.board-frame {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 1.1rem;
+  grid-template-areas:
+    "ranks board"
+    "corner files";
+  width: 100%;
+  max-width: var(--board-max, 640px);
+  margin-inline: auto;
+}
+.board-frame > .board-square {
+  grid-area: board;
+  max-width: none;
+  margin: 0;
+}
+.board-ranks,
+.board-files {
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.board-ranks {
+  grid-area: ranks;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+.board-files {
+  grid-area: files;
+  justify-content: space-around;
+  align-items: center;
+}
+
 /* Layout responsivo delle pagine board + EvalBar + pannelli:
    colonna su mobile, affiancato su desktop. */
 .board-layout {
