@@ -119,6 +119,60 @@
   }
 }
 
+/* ============================================================
+   TEXTURE SCACCHI — ornamenti editoriali condivisi (mobile redesign).
+   Damier sottile come "bordo da torneo", glifo pezzo come watermark,
+   cornice a doppio filo come il telaio di una scacchiera.
+   Monocromatici: tinti sul testo del tema, nessun colore decorativo.
+   ============================================================ */
+
+/* Striscia damier orizzontale: 8 caselle per riga, sottile, da usare come
+   regola/separatore "da tabellone". Altezza controllata da chi la usa. */
+.chess-rule {
+  background-image: conic-gradient(
+    color-mix(in srgb, var(--text) 12%, transparent) 90deg,
+    transparent 90deg 180deg,
+    color-mix(in srgb, var(--text) 12%, transparent) 180deg 270deg,
+    transparent 270deg
+  );
+  background-size: 1rem 1rem;
+  background-repeat: repeat;
+}
+
+/* Cornice a doppio filo: telaio sottile come bordo scacchiera di pregio. */
+.chess-frame {
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 0 0 3px var(--bg),
+    0 0 0 4px color-mix(in srgb, var(--text) 14%, transparent);
+}
+
+/* Tacche d'angolo (corner ticks) come i riferimenti di un diagramma stampato. */
+.chess-corners {
+  position: relative;
+}
+.chess-corners::before,
+.chess-corners::after {
+  content: "";
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-color: color-mix(in srgb, var(--text) 30%, transparent);
+  pointer-events: none;
+}
+.chess-corners::before {
+  top: 0.5rem;
+  left: 0.5rem;
+  border-top: 1.5px solid;
+  border-left: 1.5px solid;
+}
+.chess-corners::after {
+  bottom: 0.5rem;
+  right: 0.5rem;
+  border-bottom: 1.5px solid;
+  border-right: 1.5px solid;
+}
+
 /* Lenis smooth scroll */
 html.lenis,
 html.lenis body {

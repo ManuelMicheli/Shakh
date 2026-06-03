@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { loadWeaknesses, MIN_ANALYZED_GAMES, type WeaknessPattern } from "@/lib/weakness/engine";
 import { AnalyzePendingButton } from "@/components/analysis/AnalyzePendingButton";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export const metadata = { title: "Punti deboli — Shakh" };
 
@@ -26,7 +27,13 @@ export default async function DebolezzePage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow="Pattern ricorrenti"
+        title="Punti deboli"
+        desc="Le perdite che si ripetono, raggruppate e ordinate per gravità."
+        glyph="♜"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Punti deboli</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
           Non i singoli errori, ma le perdite che si <em>ripetono</em> fra le tue partite.

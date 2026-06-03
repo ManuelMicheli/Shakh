@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { decodeEval, toMoverCp } from "@/lib/analysis/evalScore";
 import { moverFromPly } from "@/lib/ai/format";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export const metadata = { title: "Ripara i tuoi errori — Shakh" };
 
@@ -91,7 +92,13 @@ export default async function RiparaPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow="Dai tuoi sbagli"
+        title="Ripara errori"
+        desc="3 puzzle mirati per ogni errore grave: sbagli, alleni, ritesti."
+        glyph="♜"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           Ripara i tuoi errori
         </h1>

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { PlayHub } from "@/components/play/PlayHub";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { FriendGameRow } from "@/lib/play/types";
 
 export const metadata = { title: "Gioca con un amico — Shakh" };
@@ -19,7 +20,13 @@ export default async function GiocaPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow="Con un amico"
+        title="Gioca"
+        desc="Stesso dispositivo o online in differita con un link condivisibile."
+        glyph="♟"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           Gioca con un amico
         </h1>

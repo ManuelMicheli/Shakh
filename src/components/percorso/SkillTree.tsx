@@ -89,6 +89,72 @@ function NodeCard({ node }: { node: PathNodeView }) {
   );
 }
 
+/** Tappa della timeline mobile: marker di stato sulla spina + scheda a fianco. */
+function NodeRow({ node }: { node: PathNodeView }) {
+  const { Icon, label } = STATUS_META[node.status];
+  const locked = node.status === "locked";
+  const completed = node.status === "completed";
+
+  return (
+    <div className="relative flex gap-3">
+      <span
+        className={cn(
+          "relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full border",
+          completed
+            ? "border-text bg-text text-bg"
+            : "border-border bg-bg text-text-muted",
+        )}
+      >
+        <Icon className="h-[1.05rem] w-[1.05rem]" />
+      </span>
+
+      <div
+        className={cn(
+          "min-w-0 flex-1 rounded-xl border border-border bg-surface p-3",
+          locked && "opacity-60",
+        )}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="min-w-0 font-display font-medium leading-tight">
+            {node.title}
+          </h3>
+          <span className="shrink-0 text-[10px] uppercase tracking-wide text-text-muted">
+            {label}
+          </span>
+        </div>
+        {node.description && (
+          <p className="mt-1 text-sm text-text-muted">{node.description}</p>
+        )}
+
+        {node.status === "in_progress" && (
+          <div className="mt-2 flex items-center gap-2">
+            <ProgressBar value={node.progress} />
+            <span className="font-mono text-xs text-text-muted">
+              {Math.round(node.progress * 100)}%
+            </span>
+          </div>
+        )}
+
+        {!locked && node.activities.length > 0 && (
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            {node.activities.map((a) => (
+              <Link key={a.href + a.label} href={a.href} className={ACTIVITY_LINK}>
+                {a.label}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {locked && node.prerequisites.length > 0 && (
+          <p className="mt-2 text-xs text-text-muted">
+            Sblocca completando i passi precedenti.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /** Skill tree: nodi raggruppati per livello, con stato e sblocco progressivo. */
 export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
   const levels = Array.from(new Set(nodes.map((n) => n.level))).sort((a, b) => a - b);
@@ -100,17 +166,38 @@ export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
           .filter((n) => n.level === level)
           .sort((a, b) => a.order_index - b.order_index);
         const done = ofLevel.filter((n) => n.status === "completed").length;
+        const title = LEVEL_TITLES[level] ?? `Livello ${level}`;
         return (
           <section key={level} className="space-y-3">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-display text-lg font-semibold">
-                {LEVEL_TITLES[level] ?? `Livello ${level}`}
-              </h2>
+            {/* MOBILE: intestazione con regola damier. */}
+            <div className="flex items-center gap-3 md:hidden">
+              <h2 className="font-display text-base font-semibold">{title}</h2>
+              <div className="chess-rule h-1 flex-1 opacity-60" />
               <span className="font-mono text-xs text-text-muted">
                 {done}/{ofLevel.length}
               </span>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            {/* DESKTOP: intestazione classica. */}
+            <div className="hidden items-baseline justify-between md:flex">
+              <h2 className="font-display text-lg font-semibold">{title}</h2>
+              <span className="font-mono text-xs text-text-muted">
+                {done}/{ofLevel.length}
+              </span>
+            </div>
+
+            {/* MOBILE: timeline verticale a tappe. */}
+            <div className="relative space-y-3 md:hidden">
+              <span
+                aria-hidden
+                className="absolute bottom-4 left-[17px] top-4 w-px bg-border"
+              />
+              {ofLevel.map((n) => (
+                <NodeRow key={n.id} node={n} />
+              ))}
+            </div>
+
+            {/* DESKTOP: griglia di schede. */}
+            <div className="hidden gap-3 md:grid md:grid-cols-2">
               {ofLevel.map((n) => (
                 <NodeCard key={n.id} node={n} />
               ))}

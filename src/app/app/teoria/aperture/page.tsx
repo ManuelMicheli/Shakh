@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { OpeningTree, type OpeningNode } from "@/components/theory/OpeningTree";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export const metadata = { title: "Aperture — Shakh" };
 
@@ -36,7 +37,13 @@ export default async function AperturePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
+      <MobilePageHeader
+        eyebrow="Albero ECO"
+        title="Aperture"
+        desc="Famiglie, aperture e varianti. Apri una lezione per studiarla."
+        glyph="♝"
+      />
+      <div className="hidden items-center justify-between gap-3 md:flex">
         <div>
           <h1 className="font-display text-3xl font-semibold tracking-tight">Aperture</h1>
           <p className="mt-2 text-text-muted">

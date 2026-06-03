@@ -28,7 +28,27 @@ export default async function PartitePage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      {/* MOBILE: testata editoriale con glifo torre (non coperto dal testo). */}
+      <div className="flex items-start justify-between gap-2 md:hidden">
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-wider text-text-muted">Archivio</p>
+          <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
+            Le mie partite
+          </h1>
+          <p className="mt-2 text-sm text-text-muted">
+            Importa, analizza, rivedi mossa per mossa.
+          </p>
+        </div>
+        <span
+          aria-hidden
+          className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
+        >
+          ♜
+        </span>
+      </div>
+
+      {/* DESKTOP: testata classica. */}
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           Le mie partite
         </h1>

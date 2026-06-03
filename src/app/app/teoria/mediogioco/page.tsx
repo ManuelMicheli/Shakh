@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export const metadata = { title: "Mediogioco — Teoria — Shakh" };
 
@@ -26,7 +27,13 @@ export default async function MediogiocoPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow="Temi strategici"
+        title="Mediogioco"
+        desc="Piani per entrambi i lati ed esercizi “trova il piano”."
+        glyph="♞"
+      />
+      <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">
           ← Teoria
         </Link>

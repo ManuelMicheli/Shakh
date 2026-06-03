@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { hasPractice } from "@/lib/theory/endgame";
 import { loadDomainRatings } from "@/lib/rating/store";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export const metadata = { title: "Finali — Teoria — Shakh" };
 
@@ -77,7 +78,13 @@ export default async function FinaliPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow={endgameRating != null ? `Rating finali · ${endgameRating}` : "Tecnica esatta"}
+        title="Finali"
+        desc="Converti l'esito contro la difesa perfetta della tablebase."
+        glyph="♚"
+      />
+      <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">
           ← Teoria
         </Link>

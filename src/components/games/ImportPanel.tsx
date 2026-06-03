@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
 import {
   importPgnText,
   importLichess,
@@ -55,6 +56,32 @@ function useImportFeedback() {
   };
 }
 
+/** Avviso: verifica account per far contare le partite nel profilo. */
+function VerifyNotice() {
+  return (
+    <div className="flex items-start gap-3 rounded-md border border-border bg-surface-2 p-3 text-sm">
+      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-text-muted" />
+      <div className="space-y-0.5">
+        <p className="text-text">
+          Verifica il tuo account per far contare le partite nel profilo.
+        </p>
+        <p className="text-text-muted">
+          Solo le partite del tuo account verificato alimentano punti deboli,
+          Rating Shakh e statistiche. Puoi comunque importare partite di altri
+          giocatori: restano consultabili e analizzabili, ma non toccano il tuo
+          profilo.{" "}
+          <Link
+            href="/app/profilo"
+            className="font-medium text-text underline underline-offset-2 hover:no-underline"
+          >
+            Verifica account →
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function ImportPanel({
   hasVerifiedAccount = false,
 }: {
@@ -68,6 +95,9 @@ export function ImportPanel({
   const [ccMax, setCcMax] = useState(10);
   const [pending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
+  // Tab della mini-tab mobile (md-): Chess.com → Lichess → Importa (PGN/file).
+  const [mtab, setMtab] = useState<"chesscom" | "lichess" | "import">("chesscom");
+  const mFileRef = useRef<HTMLInputElement>(null);
   const feedback = useImportFeedback();
   const { toast } = useToast();
 
@@ -93,31 +123,116 @@ export function ImportPanel({
   };
 
   return (
-    <Card>
-      <CardContent className="space-y-4 pt-6">
-        {!hasVerifiedAccount && (
-          <div className="flex items-start gap-3 rounded-md border border-border bg-surface-2 p-3 text-sm">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-text-muted" />
-            <div className="space-y-0.5">
-              <p className="text-text">
-                Verifica il tuo account per far contare le partite nel profilo.
-              </p>
-              <p className="text-text-muted">
-                Solo le partite del tuo account verificato alimentano punti deboli,
-                Rating Shakh e statistiche. Puoi comunque importare partite di altri
-                giocatori: restano consultabili e analizzabili, ma non toccano il tuo
-                profilo.{" "}
-                <Link
-                  href="/app/profilo"
-                  className="font-medium text-text underline underline-offset-2 hover:no-underline"
-                >
-                  Verifica account →
-                </Link>
-              </p>
-            </div>
+    <>
+      {/* MOBILE: mini-tab compatta — Chess.com → Lichess → Importa — + barra input. */}
+      <div className="space-y-3 md:hidden">
+        {!hasVerifiedAccount && <VerifyNotice />}
+        <div className="space-y-3 rounded-xl border border-border bg-surface p-3">
+          <div className="flex gap-1 rounded-lg bg-surface-2 p-1">
+            {(
+              [
+                ["chesscom", "Chess.com"],
+                ["lichess", "Lichess"],
+                ["import", "Importa"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setMtab(id)}
+                className={cn(
+                  "flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
+                  mtab === id ? "bg-text text-bg" : "text-text-muted hover:text-text",
+                )}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-        )}
-        <Tabs defaultValue="chesscom">
+
+          {mtab === "chesscom" && (
+            <div className="flex items-center gap-2">
+              <Input
+                value={ccUser}
+                onChange={(e) => setCcUser(e.target.value)}
+                placeholder="Username Chess.com"
+                className="min-w-0 flex-1"
+              />
+              <Button
+                onClick={submitChesscom}
+                disabled={pending || !ccUser.trim()}
+                className="shrink-0"
+              >
+                {pending ? "…" : "Importa"}
+              </Button>
+            </div>
+          )}
+
+          {mtab === "lichess" && (
+            <div className="flex items-center gap-2">
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username Lichess"
+                className="min-w-0 flex-1"
+              />
+              <Button
+                onClick={submitLichess}
+                disabled={pending || !username.trim()}
+                className="shrink-0"
+              >
+                {pending ? "…" : "Importa"}
+              </Button>
+            </div>
+          )}
+
+          {mtab === "import" && (
+            <div className="space-y-2">
+              <textarea
+                value={pgn}
+                onChange={(e) => setPgn(e.target.value)}
+                rows={5}
+                placeholder={`[Event "..."]\n1. e4 e5 2. Nf3 ...`}
+                className="w-full rounded-lg border border-border bg-surface-2 p-2 font-mono text-xs text-text focus-visible:outline-2 focus-visible:outline-offset-2"
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => submitPgn(pgn)}
+                  disabled={pending || !pgn.trim()}
+                  className="flex-1"
+                >
+                  {pending ? "…" : "Importa PGN"}
+                </Button>
+                <input
+                  ref={mFileRef}
+                  type="file"
+                  accept=".pgn,application/x-chess-pgn,text/plain"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) onFile(f);
+                    e.target.value = "";
+                  }}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={() => mFileRef.current?.click()}
+                  disabled={pending}
+                  className="shrink-0"
+                >
+                  <Upload className="h-4 w-4" /> File
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* DESKTOP: pannello completo a quattro schede. */}
+      <Card className="hidden md:block">
+        <CardContent className="space-y-4 pt-6">
+          {!hasVerifiedAccount && <VerifyNotice />}
+          <Tabs defaultValue="chesscom">
           <TabsList className="flex flex-wrap">
             <TabsTrigger value="chesscom">Chess.com</TabsTrigger>
             <TabsTrigger value="lichess">Lichess</TabsTrigger>
@@ -241,7 +356,8 @@ export function ImportPanel({
             </p>
           </TabsContent>
         </Tabs>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 }

@@ -8,11 +8,14 @@ import {
   Check,
   Copy,
   Handshake,
+  ChevronsLeft,
   ChevronLeft,
   ChevronRight,
+  ChevronsRight,
   MoreVertical,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { legalDestsForFen } from "@/lib/chess/legal";
 import type { FriendGameRow } from "@/lib/play/types";
 import type { HistoryMove } from "@/lib/chess/useChessGame";
@@ -342,71 +345,82 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
 
       <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] 2xl:grid-cols-[auto_20rem] 2xl:justify-center">
         <div className="board-sized lg:mx-auto lg:w-full lg:max-w-none">
-          {/* Mobile: board + mosse a destra. Desktop: board con orologi e controlli. */}
-          <div className="flex items-stretch gap-2 lg:block lg:space-y-3">
-            <div className="min-w-0 flex-1 space-y-3 lg:flex-none">
-              <GameClock
-                name={nameOf(topColor)}
-                ms={msOf(topColor)}
-                running={clockRunning(topColor)}
-                sinceTs={sinceTs}
-                active={game.status === "ongoing" && game.turn === topColor}
-                onFlag={onFlag}
+          {/* Board piena su mobile (orologi sopra/sotto). Desktop: stessa colonna. */}
+          <div className="space-y-3">
+            <GameClock
+              name={nameOf(topColor)}
+              ms={msOf(topColor)}
+              running={clockRunning(topColor)}
+              sinceTs={sinceTs}
+              active={game.status === "ongoing" && game.turn === topColor}
+              onFlag={onFlag}
+            />
+            <div
+              ref={boardWrapRef}
+              tabIndex={0}
+              className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+            >
+              <ChessBoard
+                fen={viewFen}
+                orientation={orientation}
+                mode={canMove ? "play" : "view"}
+                movableColor={myColor === "b" ? "black" : "white"}
+                dests={canMove ? legalDestsForFen(game.fen) : new Map()}
+                lastMove={lastMove}
+                check={viewInCheck}
+                onMove={onMove}
               />
-              <div
-                ref={boardWrapRef}
-                tabIndex={0}
-                className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
-              >
-                <ChessBoard
-                  fen={viewFen}
-                  orientation={orientation}
-                  mode={canMove ? "play" : "view"}
-                  movableColor={myColor === "b" ? "black" : "white"}
-                  dests={canMove ? legalDestsForFen(game.fen) : new Map()}
-                  lastMove={lastMove}
-                  check={viewInCheck}
-                  onMove={onMove}
-                />
-              </div>
-              <GameClock
-                name={nameOf(bottomColor)}
-                ms={msOf(bottomColor)}
-                running={clockRunning(bottomColor)}
-                sinceTs={sinceTs}
-                active={game.status === "ongoing" && game.turn === bottomColor}
-                onFlag={onFlag}
-              />
-
-              {/* Desktop: controlli completi + stato. */}
-              <div className="hidden items-center justify-between gap-3 lg:flex">
-                <BoardControls
-                  onFirst={first}
-                  onPrev={prev}
-                  onNext={next}
-                  onLast={last}
-                  onFlip={() => {}}
-                  atStart={cursor < 0}
-                  atEnd={atLive}
-                  keyboardTarget={boardWrapRef}
-                />
-                <span className="font-mono text-sm text-text-muted">
-                  {statusText(game)}
-                </span>
-              </div>
             </div>
+            <GameClock
+              name={nameOf(bottomColor)}
+              ms={msOf(bottomColor)}
+              running={clockRunning(bottomColor)}
+              sinceTs={sinceTs}
+              active={game.status === "ongoing" && game.turn === bottomColor}
+              onFlag={onFlag}
+            />
 
-            {/* Mobile: colonna mosse a destra della scacchiera. */}
-            <div className="flex w-[4.75rem] shrink-0 flex-col overflow-y-auto rounded-md border border-border bg-surface p-1 lg:hidden">
-              <MoveList compact history={history} cursor={cursor} onSelect={goTo} />
+            {/* Desktop: controlli completi + stato. */}
+            <div className="hidden items-center justify-between gap-3 lg:flex">
+              <BoardControls
+                onFirst={first}
+                onPrev={prev}
+                onNext={next}
+                onLast={last}
+                onFlip={() => {}}
+                atStart={cursor < 0}
+                atEnd={atLive}
+                keyboardTarget={boardWrapRef}
+              />
+              <span className="font-mono text-sm text-text-muted">
+                {statusText(game)}
+              </span>
             </div>
           </div>
 
-          {/* Mobile: indietro / avanti + menu compatto azioni. */}
-          <div className="relative mt-2 flex items-center justify-center gap-3 lg:hidden">
+          {/* Mobile: striscia mosse orizzontale sotto la scacchiera. */}
+          {history.length > 0 && (
+            <div className="mt-2 lg:hidden">
+              <MoveStripH history={history} cursor={cursor} onSelect={goTo} />
+            </div>
+          )}
+
+          {/* Mobile: barra controlli — inizio / indietro / avanti / fine + menu. */}
+          <div className="relative mt-2 flex items-center gap-2 lg:hidden">
             <Button
               variant="secondary"
               size="icon"
+              className="flex-1"
+              onClick={first}
+              disabled={cursor < 0}
+              aria-label="Prima mossa"
+            >
+              <ChevronsLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="flex-1"
               onClick={prev}
               disabled={cursor < 0}
               aria-label="Mossa precedente"
@@ -416,11 +430,22 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
             <Button
               variant="secondary"
               size="icon"
+              className="flex-1"
               onClick={next}
               disabled={atLive}
               aria-label="Mossa successiva"
             >
               <ChevronRight className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="flex-1"
+              onClick={last}
+              disabled={atLive}
+              aria-label="Ultima mossa"
+            >
+              <ChevronsRight className="h-5 w-5" />
             </Button>
 
             {game.status === "ongoing" && isPlayer && (
@@ -503,6 +528,67 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
           </Card>
         </aside>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Striscia mosse orizzontale per mobile: coppie numerate in monospace,
+ * scorrimento laterale, mossa corrente evidenziata e tenuta in vista.
+ */
+function MoveStripH({
+  history,
+  cursor,
+  onSelect,
+}: {
+  history: HistoryMove[];
+  cursor: number;
+  onSelect: (i: number) => void;
+}) {
+  const activeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ inline: "nearest", block: "nearest" });
+  }, [cursor]);
+
+  const pairCount = Math.ceil(history.length / 2);
+
+  return (
+    <div className="flex gap-1 overflow-x-auto rounded-md border border-border bg-surface px-2 py-1.5">
+      {Array.from({ length: pairCount }).map((_, p) => {
+        const wi = p * 2;
+        const bi = p * 2 + 1;
+        return (
+          <div key={p} className="flex shrink-0 items-center gap-1">
+            <span className="select-none font-mono text-[11px] tabular-nums text-text-muted/60">
+              {p + 1}.
+            </span>
+            <button
+              ref={cursor === wi ? activeRef : undefined}
+              type="button"
+              onClick={() => onSelect(wi)}
+              className={cn(
+                "rounded px-1.5 py-0.5 font-mono text-xs tabular-nums transition-colors",
+                cursor === wi ? "bg-text text-bg" : "text-text hover:bg-surface-2",
+              )}
+            >
+              {history[wi].san}
+            </button>
+            {history[bi] && (
+              <button
+                ref={cursor === bi ? activeRef : undefined}
+                type="button"
+                onClick={() => onSelect(bi)}
+                className={cn(
+                  "rounded px-1.5 py-0.5 font-mono text-xs tabular-nums transition-colors",
+                  cursor === bi ? "bg-text text-bg" : "text-text hover:bg-surface-2",
+                )}
+              >
+                {history[bi].san}
+              </button>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CompetenceRadar, TrendLine } from "@/components/progress";
 import { ProfileSettings } from "@/components/profile/ProfileSettings";
 import { ExternalAccounts } from "@/components/profile/ExternalAccounts";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { LinkedAccount } from "@/app/app/profilo/actions";
 import type { ExternalSource } from "@/lib/rating/calibration";
 import { loadDashboard } from "@/lib/progress/aggregate";
@@ -63,7 +64,13 @@ export default async function ProfiloPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <MobilePageHeader
+        eyebrow="Il tuo profilo"
+        title={profile?.display_name ?? profile?.username ?? "Profilo"}
+        desc={`${user.email}${profile?.elo_estimate != null ? ` · Elo ${profile.elo_estimate}` : ""} · livello ${profile?.current_level ?? 0}`}
+        glyph="♚"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           {profile?.display_name ?? profile?.username ?? "Profilo"}
         </h1>

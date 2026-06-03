@@ -13,6 +13,7 @@ import {
   type GroupSummary,
 } from "@/lib/groups/types";
 import { isInstructorRole } from "@/lib/groups/access";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export const metadata = { title: "Gruppi — Shakh" };
 
@@ -61,7 +62,13 @@ export default async function GruppiPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow="Circoli e classi"
+        title="Gruppi"
+        desc="Segui gli allievi e assegna attività, o unisciti con un codice."
+        glyph="♟"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Circoli e gruppi</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
           Crea un circolo o una classe per seguire i progressi dei tuoi allievi e

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronRight, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,10 +7,34 @@ import type { TheoryType } from "@/lib/theory/types";
 
 export const metadata = { title: "Teoria — Shakh" };
 
-const RAMI: { type: TheoryType; title: string; desc: string }[] = [
-  { type: "opening", title: "Aperture", desc: "Idee e piani delle aperture, ancorati a cosa si gioca davvero." },
-  { type: "middlegame", title: "Mediogioco", desc: "Temi strategici: struttura di pedoni, pezzi forti, piani." },
-  { type: "endgame", title: "Finali", desc: "Tecnica dei finali, con la verità esatta della tablebase." },
+const RAMI: {
+  type: TheoryType;
+  title: string;
+  desc: string;
+  browseHref: string;
+  browseLabel: string;
+}[] = [
+  {
+    type: "opening",
+    title: "Aperture",
+    desc: "Idee e piani delle aperture, ancorati a cosa si gioca davvero.",
+    browseHref: "/app/teoria/aperture",
+    browseLabel: "Sfoglia l'albero ECO",
+  },
+  {
+    type: "middlegame",
+    title: "Mediogioco",
+    desc: "Temi strategici: struttura di pedoni, pezzi forti, piani.",
+    browseHref: "/app/teoria/mediogioco",
+    browseLabel: "Sfoglia i temi",
+  },
+  {
+    type: "endgame",
+    title: "Finali",
+    desc: "Tecnica dei finali, con la verità esatta della tablebase.",
+    browseHref: "/app/teoria/finali",
+    browseLabel: "Sfoglia tutti i finali",
+  },
 ];
 
 interface LessonRow {
@@ -35,7 +60,29 @@ export default async function TeoriaPage() {
 
   return (
     <div className="space-y-10">
-      <div>
+      {/* MOBILE: testata editoriale con glifo alfiere (non coperto dal testo). */}
+      <div className="flex items-start justify-between gap-2 md:hidden">
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-wider text-text-muted">
+            Studio guidato
+          </p>
+          <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
+            Teoria
+          </h1>
+          <p className="mt-2 text-sm text-text-muted">
+            Capisci il <em>perché</em> delle mosse, coi dati reali.
+          </p>
+        </div>
+        <span
+          aria-hidden
+          className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
+        >
+          ♝
+        </span>
+      </div>
+
+      {/* DESKTOP: testata classica. */}
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Teoria</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
           Lezioni guidate sopra la scacchiera: capisci il <em>perché</em> delle mosse,
@@ -47,23 +94,23 @@ export default async function TeoriaPage() {
         const items = byType(ramo.type);
         return (
           <section key={ramo.type} className="space-y-4">
-            <div className="flex items-baseline justify-between gap-3">
+            {/* MOBILE: intestazione ramo evidenziata + regola damier. */}
+            <div className="flex items-center gap-3 md:hidden">
+              <h2 className="font-display text-xl font-semibold tracking-tight">
+                {ramo.title}
+              </h2>
+              <div className="chess-rule h-1 flex-1 opacity-60" />
+            </div>
+
+            {/* DESKTOP: intestazione con link "sfoglia". */}
+            <div className="hidden items-baseline justify-between gap-3 md:flex">
               <h2 className="font-display text-xl font-semibold tracking-tight">{ramo.title}</h2>
-              {ramo.type === "opening" ? (
-                <Link href="/app/teoria/aperture" className="text-sm text-text-muted hover:text-text">
-                  Sfoglia l&apos;albero ECO →
-                </Link>
-              ) : ramo.type === "endgame" ? (
-                <Link href="/app/teoria/finali" className="text-sm text-text-muted hover:text-text">
-                  Sfoglia tutti i finali →
-                </Link>
-              ) : ramo.type === "middlegame" ? (
-                <Link href="/app/teoria/mediogioco" className="text-sm text-text-muted hover:text-text">
-                  Sfoglia i temi →
-                </Link>
-              ) : (
-                <span className="text-sm text-text-muted">{ramo.desc}</span>
-              )}
+              <Link
+                href={ramo.browseHref}
+                className="text-sm text-text-muted hover:text-text"
+              >
+                {ramo.browseLabel} →
+              </Link>
             </div>
 
             {items.length === 0 ? (
@@ -73,23 +120,61 @@ export default async function TeoriaPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {items.map((l) => (
-                  <Link key={l.slug} href={`/app/teoria/${l.slug}`} className="group">
-                    <Card className="h-full transition-colors group-hover:border-text">
-                      <CardHeader>
-                        <div className="flex items-center justify-between gap-2">
-                          <CardTitle>{l.title}</CardTitle>
+              <>
+                {/* MOBILE: lezioni a list-card + sfoglia tutto. */}
+                <div className="space-y-2 md:hidden">
+                  {items.map((l) => (
+                    <Link
+                      key={l.slug}
+                      href={`/app/teoria/${l.slug}`}
+                      className="flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-3 transition-colors hover:bg-surface-2"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-2">
+                          <span className="truncate text-sm font-medium">{l.title}</span>
                           {l.eco_code && (
-                            <span className="font-mono text-xs text-text-muted">{l.eco_code}</span>
+                            <span className="shrink-0 font-mono text-xs text-text-muted">
+                              {l.eco_code}
+                            </span>
                           )}
-                        </div>
-                        {l.summary && <CardDescription>{l.summary}</CardDescription>}
-                      </CardHeader>
-                    </Card>
+                        </span>
+                        {l.summary && (
+                          <span className="mt-0.5 block truncate text-xs text-text-muted">
+                            {l.summary}
+                          </span>
+                        )}
+                      </span>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" aria-hidden />
+                    </Link>
+                  ))}
+                  <Link
+                    href={ramo.browseHref}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-surface px-3 py-2.5 text-sm font-medium text-text-muted transition-colors hover:bg-surface-2 hover:text-text"
+                  >
+                    {ramo.browseLabel}
+                    <ArrowRight className="h-4 w-4" aria-hidden />
                   </Link>
-                ))}
-              </div>
+                </div>
+
+                {/* DESKTOP: griglia di schede. */}
+                <div className="hidden gap-3 md:grid md:grid-cols-2">
+                  {items.map((l) => (
+                    <Link key={l.slug} href={`/app/teoria/${l.slug}`} className="group">
+                      <Card className="h-full transition-colors group-hover:border-text">
+                        <CardHeader>
+                          <div className="flex items-center justify-between gap-2">
+                            <CardTitle>{l.title}</CardTitle>
+                            {l.eco_code && (
+                              <span className="font-mono text-xs text-text-muted">{l.eco_code}</span>
+                            )}
+                          </div>
+                          {l.summary && <CardDescription>{l.summary}</CardDescription>}
+                        </CardHeader>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </>
             )}
           </section>
         );

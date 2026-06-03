@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatTile } from "./StatTile";
@@ -93,25 +94,47 @@ export interface DashboardViewProps {
   readOnly?: boolean;
   /** Slot inserito fra i punti deboli e le statistiche di gioco (es. NextStep). */
   middleSlot?: ReactNode;
+  /**
+   * Su telefono i blocchi di sintesi in alto (glossario, Rating Shakh, le quattro
+   * tessere, lo slot prossimo passo) sono già resi dalla `MobileDashboardHero`:
+   * con questo flag vengono nascosti sotto `md` per non duplicarli, restando
+   * visibili da `md` in su.
+   */
+  heroOnMobile?: boolean;
 }
 
 /**
  * Corpo della dashboard dei progressi (prompt 08), riusabile sia per la propria
  * dashboard sia per il drill-down dell'istruttore su un allievo (prompt 09 §4).
  */
-export function DashboardView({ data, readOnly = false, middleSlot }: DashboardViewProps) {
+export function DashboardView({
+  data,
+  readOnly = false,
+  middleSlot,
+  heroOnMobile = false,
+}: DashboardViewProps) {
   const radarAreas = data.competence.map((c) => ({ label: c.label, value: c.score }));
+  // Sintesi in alto duplicata dall'hero mobile: nascosta sotto md quando attivo.
+  const topHidden = heroOnMobile ? "hidden md:block" : undefined;
 
   return (
     <div className="space-y-8">
       {/* Legenda termini in alto: riferimento per principianti (non nel drill-down istruttore). */}
-      {!readOnly && <Glossary />}
+      {!readOnly && (
+        <div className={topHidden}>
+          <Glossary />
+        </div>
+      )}
 
       {/* 0. Rating Shakh olistico */}
-      {data.shakhRating && <ShakhRatingCard rating={data.shakhRating} />}
+      {data.shakhRating && (
+        <div className={topHidden}>
+          <ShakhRatingCard rating={data.shakhRating} />
+        </div>
+      )}
 
       {/* 1. Sintesi in alto */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className={cn("grid grid-cols-2 gap-3 sm:grid-cols-4", topHidden)}>
         <StatTile
           label="Livello percorso"
           value={String(data.path.currentLevel)}
@@ -216,7 +239,7 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
         </Card>
       </div>
 
-      {middleSlot}
+      {middleSlot && <div className={topHidden}>{middleSlot}</div>}
 
       {/* 5. Statistiche di gioco */}
       <Card>

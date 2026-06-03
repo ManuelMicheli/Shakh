@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { deleteGame } from "@/app/app/partite/actions";
 import { useAnalysisJob, MAX_BATCH_JOBS } from "@/components/analysis/AnalysisJobContext";
+import { cn } from "@/lib/utils";
 import type { GameRow } from "@/lib/games/types";
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -27,6 +28,73 @@ function formatDate(iso: string | null): string {
 function gameTitle(g: GameRow): string {
   return `${g.white ?? "?"} – ${g.black ?? "?"}`;
 }
+
+/** Risultato grezzo → notazione leggibile (½–½, 1–0). */
+function formatResult(r: string | null): string {
+  if (!r) return "—";
+  if (r === "1/2-1/2") return "½–½";
+  return r.replace("-", "–");
+}
+
+type Outcome = "win" | "draw" | "loss" | "unknown";
+
+/** Esito dal punto di vista dell'utente (richiede `result` + `user_color`). */
+function outcomeOf(g: GameRow): Outcome {
+  if (!g.result || !g.user_color) return "unknown";
+  if (g.result === "1/2-1/2") return "draw";
+  const whiteWon = g.result === "1-0";
+  const blackWon = g.result === "0-1";
+  if (!whiteWon && !blackWon) return "unknown";
+  const userWhite = g.user_color === "white";
+  if (whiteWon) return userWhite ? "win" : "loss";
+  return userWhite ? "loss" : "win";
+}
+
+/** Avversario (lato non giocato dall'utente). */
+function opponentOf(g: GameRow): string {
+  if (g.user_color === "white") return g.black ?? "?";
+  if (g.user_color === "black") return g.white ?? "?";
+  return gameTitle(g);
+}
+
+/**
+ * Stile del tile esito. Il risultato eredita un colore a contrasto pieno con lo
+ * sfondo del tile: su V (sfondo chiaro/invertito) testo scuro; su S (sfondo
+ * neutro) testo a piena tinta — così è sempre leggibile.
+ */
+const OUTCOME_META: Record<
+  Outcome,
+  { letter: string; label: string; tile: string; letterCls: string; resultCls: string }
+> = {
+  win: {
+    letter: "V",
+    label: "Vittoria",
+    tile: "bg-text",
+    letterCls: "text-bg",
+    resultCls: "text-bg",
+  },
+  draw: {
+    letter: "½",
+    label: "Patta",
+    tile: "border border-border bg-surface",
+    letterCls: "text-text",
+    resultCls: "text-text-muted",
+  },
+  loss: {
+    letter: "S",
+    label: "Sconfitta",
+    tile: "bg-surface-2",
+    letterCls: "text-text",
+    resultCls: "text-text",
+  },
+  unknown: {
+    letter: "–",
+    label: "Esito ignoto",
+    tile: "bg-surface-2",
+    letterCls: "text-text-muted",
+    resultCls: "text-text-muted",
+  },
+};
 
 export function GamesTable({ games }: { games: GameRow[] }) {
   const router = useRouter();
@@ -120,7 +188,80 @@ export function GamesTable({ games }: { games: GameRow[] }) {
         </div>
       )}
 
-      <ul className="divide-y divide-border overflow-hidden rounded-md border border-border">
+      {/* MOBILE: card partita con tile esito (V/½/S) e risultato a contrasto. */}
+      <div className="space-y-2 md:hidden">
+        {games.map((g) => {
+          const o = OUTCOME_META[outcomeOf(g)];
+          const youColor =
+            g.user_color === "white"
+              ? "Bianco"
+              : g.user_color === "black"
+                ? "Nero"
+                : "—";
+          return (
+            <div
+              key={g.id}
+              className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3"
+            >
+              <span
+                className={cn(
+                  "flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg leading-none",
+                  o.tile,
+                )}
+                title={o.label}
+              >
+                <span className={cn("font-mono text-base font-semibold", o.letterCls)}>
+                  {o.letter}
+                </span>
+                <span
+                  className={cn(
+                    "mt-0.5 font-mono text-[10px] tabular-nums",
+                    o.resultCls,
+                  )}
+                >
+                  {formatResult(g.result)}
+                </span>
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">
+                  vs {opponentOf(g)}
+                </p>
+                <p className="mt-0.5 truncate text-xs text-text-muted">
+                  {youColor} · {SOURCE_LABEL[g.source] ?? g.source} ·{" "}
+                  {formatDate(g.played_at ?? g.created_at)}
+                  {g.eco_code && <span className="font-mono"> · {g.eco_code}</span>}
+                </p>
+              </div>
+
+              <Link
+                href={`/app/partite/${g.id}`}
+                className={cn(
+                  "inline-flex h-9 shrink-0 items-center rounded-lg px-4 text-sm font-medium",
+                  g.analyzed
+                    ? "border border-border bg-surface-2 text-text"
+                    : "bg-text text-bg",
+                )}
+              >
+                {g.analyzed ? "Rivedi" : "Analizza"}
+              </Link>
+
+              <button
+                type="button"
+                aria-label="Elimina partita"
+                disabled={pending && deletingId === g.id}
+                onClick={() => onDelete(g.id)}
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-text-muted hover:bg-surface-2 disabled:opacity-50"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* DESKTOP: lista densa con selezione batch. */}
+      <ul className="hidden divide-y divide-border overflow-hidden rounded-md border border-border md:block">
         {games.map((g) => {
           const isSelected = selected.has(g.id);
           return (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { TrapCatalog } from "@/components/traps/TrapCatalog";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import { listTraps, countDueTraps } from "@/lib/traps/query";
 
 export const metadata = {
@@ -21,7 +22,21 @@ export default async function TrappolePage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <MobilePageHeader
+        eyebrow="L'esca e lo scatto"
+        title="Trappole"
+        desc="Tendi la trappola o impara a non caderci."
+        glyph="♞"
+      />
+      {dueCount > 0 && (
+        <Link
+          href="/app/trappole/ripasso"
+          className="flex items-center justify-center gap-2 rounded-xl border border-text bg-text px-4 py-3 text-sm font-medium text-bg md:hidden"
+        >
+          Ripassa <Badge variant="muted">{dueCount} in scadenza</Badge>
+        </Link>
+      )}
+      <div className="hidden flex-wrap items-end justify-between gap-3 md:flex">
         <div>
           <h1 className="font-display text-3xl font-semibold tracking-tight">Trappole</h1>
           <p className="mt-2 max-w-2xl text-text-muted">

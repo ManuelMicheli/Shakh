@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { NextStep } from "@/components/percorso/NextStep";
 import { DashboardView } from "@/components/progress";
+import { MobileDashboardHero } from "@/components/progress/MobileDashboardHero";
 import { StudentAssignments } from "@/components/groups/StudentAssignments";
 import { AnalyzePendingButton } from "@/components/analysis/AnalyzePendingButton";
 import { loadPathViews, loadWeakest } from "@/lib/path/read";
@@ -60,9 +61,18 @@ export default async function DashboardPage() {
   if (data.empty) {
     return (
       <div className="space-y-6">
-        <Header name={name} />
+        <MobileDashboardHero
+          name={name}
+          rating={data.shakhRating ?? null}
+          step={step}
+        />
+        <div className="hidden md:block">
+          <Header name={name} />
+        </div>
         {showNudge && <PendingAnalysisNudge pending={pendingGames} />}
-        <NextStep step={step} />
+        <div className="hidden md:block">
+          <NextStep step={step} />
+        </div>
         {assignments.length > 0 && <StudentAssignments items={assignments} />}
         <Card>
           <CardHeader>
@@ -90,10 +100,21 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <Header name={name} />
+      <MobileDashboardHero
+        name={name}
+        rating={data.shakhRating ?? null}
+        step={step}
+      />
+      <div className="hidden md:block">
+        <Header name={name} />
+      </div>
       {showNudge && <PendingAnalysisNudge pending={pendingGames} />}
       {assignments.length > 0 && <StudentAssignments items={assignments} />}
-      <DashboardView data={data} middleSlot={<NextStep step={step} />} />
+      <DashboardView
+        data={data}
+        middleSlot={<NextStep step={step} />}
+        heroOnMobile
+      />
     </div>
   );
 }

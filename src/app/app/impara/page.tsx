@@ -6,6 +6,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { Badge } from "@/components/ui/badge";
 import { CONCEPTS } from "@/lib/learn/concepts";
 import { GUIDED_GAMES } from "@/lib/learn/guided";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 const STORE_KEY = "shakh:learn:concepts";
 
@@ -25,7 +26,13 @@ export default function ImparaPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow="Un concetto alla volta"
+        title="Impara"
+        desc="Capisci l'idea, riconoscila, sfruttala. Poi partite spiegate."
+        glyph="♟"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Impara</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
           I fondamentali, un concetto alla volta. Prima capisci l&apos;idea, poi la riconosci

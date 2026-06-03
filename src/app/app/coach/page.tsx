@@ -6,6 +6,7 @@ import { phaseLabel } from "@/lib/ai/format";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PatternSynthesis } from "@/components/coach/PatternSynthesis";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
 export default async function CoachPage() {
   const supabase = await createClient();
@@ -20,7 +21,13 @@ export default async function CoachPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+      <MobilePageHeader
+        eyebrow="Il tuo allenatore"
+        title="Coach"
+        desc="Sintesi dei tuoi punti deboli ricorrenti dai dati delle partite."
+        glyph="♚"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Coach</h1>
         <p className="mt-2 text-text-muted">
           Il coach analizza i dati delle tue partite (calcolati dal motore) e sintetizza i tuoi

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { RepertoireList, type RepertoireItem } from "@/components/theory/RepertoireList";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { PieceColor } from "@/lib/theory/repertoire";
 
 export const metadata = { title: "Repertorio — Shakh" };
@@ -33,7 +34,13 @@ export default async function RepertorioPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <MobilePageHeader
+        eyebrow="Le tue linee"
+        title="Repertorio"
+        desc="Costruisci le linee per colore, poi allenale con la ripetizione spaziata."
+        glyph="♝"
+      />
+      <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Il mio repertorio</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
           Costruisci le tue linee per colore, poi allenale con la ripetizione spaziata.
