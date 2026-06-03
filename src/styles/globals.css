@@ -137,7 +137,7 @@ html.lenis body {
    quadrato a larghezza fluida con un tetto su desktop. È il fix centrale del layout. */
 .board-square {
   width: 100%;
-  max-width: var(--board-max, 640px);
+  max-width: var(--board-max, 720px);
   aspect-ratio: 1 / 1;
   margin-inline: auto;
 }
@@ -157,8 +157,15 @@ html.lenis body {
     "ranks board"
     "corner files";
   width: 100%;
-  max-width: var(--board-max, 640px);
+  max-width: var(--board-max, 720px);
   margin-inline: auto;
+}
+/* Su monitor desktop ampi la scacchiera può crescere ancora. */
+@media (min-width: 1280px) {
+  .board-square,
+  .board-frame {
+    --board-max: 780px;
+  }
 }
 .board-frame > .board-square {
   grid-area: board;

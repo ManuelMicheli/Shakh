@@ -145,7 +145,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         {/* Scacchiera + controlli */}
         <div className="space-y-3">
-          <div className="mx-auto flex w-full max-w-xl gap-2">
+          <div className="mx-auto flex w-full max-w-3xl gap-2 xl:max-w-[820px]">
             {shownEval && (
               <EvalBar
                 score={shownEval.value}
