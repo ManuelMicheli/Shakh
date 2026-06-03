@@ -47,6 +47,8 @@ export interface GameRow {
   user_color: PieceColor | null;
   played_at: string | null;
   analyzed: boolean;
+  /** true solo se la partita è del proprio account verificato (incide sul profilo). */
+  counts_for_profile: boolean;
   created_at: string;
 }
 

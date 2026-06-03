@@ -2,7 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Upload } from "lucide-react";
+import Link from "next/link";
+import { Upload, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,7 +55,12 @@ function useImportFeedback() {
   };
 }
 
-export function ImportPanel() {
+export function ImportPanel({
+  hasVerifiedAccount = false,
+}: {
+  /** Se l'utente ha un account online verificato; in caso contrario, invita a verificarlo. */
+  hasVerifiedAccount?: boolean;
+}) {
   const [pgn, setPgn] = useState("");
   const [username, setUsername] = useState("");
   const [max, setMax] = useState(10);
@@ -88,9 +94,31 @@ export function ImportPanel() {
 
   return (
     <Card>
-      <CardContent className="pt-6">
+      <CardContent className="space-y-4 pt-6">
+        {!hasVerifiedAccount && (
+          <div className="flex items-start gap-3 rounded-md border border-border bg-surface-2 p-3 text-sm">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-text-muted" />
+            <div className="space-y-0.5">
+              <p className="text-text">
+                Verifica il tuo account per far contare le partite nel profilo.
+              </p>
+              <p className="text-text-muted">
+                Solo le partite del tuo account verificato alimentano punti deboli,
+                Rating Shakh e statistiche. Puoi comunque importare partite di altri
+                giocatori: restano consultabili e analizzabili, ma non toccano il tuo
+                profilo.{" "}
+                <Link
+                  href="/app/profilo"
+                  className="font-medium text-text underline underline-offset-2 hover:no-underline"
+                >
+                  Verifica account →
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
         <Tabs defaultValue="chesscom">
-          <TabsList>
+          <TabsList className="flex flex-wrap">
             <TabsTrigger value="chesscom">Chess.com</TabsTrigger>
             <TabsTrigger value="lichess">Lichess</TabsTrigger>
             <TabsTrigger value="file">File .pgn</TabsTrigger>

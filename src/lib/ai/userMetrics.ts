@@ -17,7 +17,8 @@ export async function loadUserMetrics(
     .from("games")
     .select("id, user_color")
     .eq("user_id", userId)
-    .eq("analyzed", true);
+    .eq("analyzed", true)
+    .eq("counts_for_profile", true); // solo partite del proprio account verificato
 
   const gameList = (games ?? []) as MetricGame[];
   if (gameList.length === 0) return computeMetrics([], []);

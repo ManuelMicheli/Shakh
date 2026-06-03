@@ -305,6 +305,7 @@ async function loadGameStats(
     .select("id, user_color, played_at, created_at")
     .eq("user_id", userId)
     .eq("analyzed", true)
+    .eq("counts_for_profile", true) // solo partite del proprio account verificato
     .order("played_at", { ascending: true, nullsFirst: true });
   const games = (gamesData as GameRowLite[] | null) ?? [];
 

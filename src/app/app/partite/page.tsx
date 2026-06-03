@@ -17,6 +17,15 @@ export default async function PartitePage() {
     .eq("user_id", user!.id)
     .order("created_at", { ascending: false });
 
+  // Un account verificato è la condizione perché le partite importate incidano
+  // sul profilo: se manca, l'import invita (in modo opzionale) a verificarlo.
+  const { count: verifiedCount } = await supabase
+    .from("external_accounts")
+    .select("user_id", { count: "exact", head: true })
+    .eq("user_id", user!.id)
+    .eq("verified", true);
+  const hasVerifiedAccount = (verifiedCount ?? 0) > 0;
+
   return (
     <div className="space-y-8">
       <div>
@@ -28,7 +37,7 @@ export default async function PartitePage() {
         </p>
       </div>
 
-      <ImportPanel />
+      <ImportPanel hasVerifiedAccount={hasVerifiedAccount} />
 
       <GamesTable games={(games as GameRow[] | null) ?? []} />
     </div>

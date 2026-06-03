@@ -41,6 +41,30 @@ export interface ActionResult {
   error?: string;
 }
 
+/**
+ * Vero solo se lo username importato corrisponde a un account online VERIFICATO
+ * dell'utente (stessa fonte). Solo in quel caso le partite sono "sue" e incidono
+ * sul profilo; altrimenti sono partite di giocatori esterni, da consultare ma non
+ * conteggiare. Il PGN incollato non è verificabile → mai conteggiato.
+ */
+async function isVerifiedOwner(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  source: GameSource,
+  username: string | null,
+): Promise<boolean> {
+  if (!username || source === "pgn") return false;
+  const { data } = await supabase
+    .from("external_accounts")
+    .select("username")
+    .eq("user_id", userId)
+    .eq("source", source)
+    .eq("verified", true)
+    .maybeSingle<{ username: string }>();
+  if (!data?.username) return false;
+  return data.username.trim().toLowerCase() === username.trim().toLowerCase();
+}
+
 /** Inserisce le partite parsate, deduplicando su (user_id, source, external_id). */
 async function importParsed(
   games: ParsedGame[],
@@ -54,6 +78,9 @@ async function importParsed(
   if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
   if (games.length === 0)
     return { ok: false, error: "Nessuna partita valida trovata nel PGN." };
+
+  // Le partite incidono sul profilo solo se sono del proprio account verificato.
+  const countsForProfile = await isVerifiedOwner(supabase, user.id, source, username);
 
   // Dedup contro le partite già presenti (solo per external_id noto).
   const extIds = games.map((g) => g.externalId).filter((x): x is string => !!x);
@@ -90,6 +117,7 @@ async function importParsed(
       eco_code: g.ecoCode,
       user_color: detectUserColor(g, username),
       played_at: g.playedAt,
+      counts_for_profile: countsForProfile,
     });
   }
 
@@ -277,10 +305,11 @@ async function feedRatingFromGame(
 
   const { data: game } = await supabase
     .from("games")
-    .select("user_color")
+    .select("user_color, counts_for_profile")
     .eq("id", gameId)
-    .maybeSingle<{ user_color: "white" | "black" | null }>();
+    .maybeSingle<{ user_color: "white" | "black" | null; counts_for_profile: boolean }>();
   if (!game?.user_color) return; // colore ignoto → non attribuibile
+  if (!game.counts_for_profile) return; // giocatore esterno → non incide sul rating
 
   const { data: rows } = await supabase
     .from("game_analysis")

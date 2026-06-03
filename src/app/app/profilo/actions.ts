@@ -365,6 +365,7 @@ async function insertGamesDedup(
       eco_code: g.ecoCode,
       user_color: detectUserColor(g, username),
       played_at: g.playedAt,
+      counts_for_profile: true, // seeding da account appena verificato → partite proprie
     });
   }
   if (rows.length === 0) return 0;

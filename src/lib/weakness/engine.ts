@@ -90,6 +90,7 @@ export async function loadWeaknesses(
     .select("id, user_color, eco_code")
     .eq("user_id", userId)
     .eq("analyzed", true)
+    .eq("counts_for_profile", true) // solo partite del proprio account verificato
     .order("played_at", { ascending: false, nullsFirst: false })
     .limit(MAX_GAMES);
   const games = (gamesData as GameLite[] | null) ?? [];
