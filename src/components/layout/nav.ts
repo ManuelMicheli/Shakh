@@ -28,6 +28,12 @@ export interface NavItem {
   comingSoon?: boolean;
 }
 
+/** Attiva la voce su match esatto per la dashboard, per prefisso altrove. */
+export function isNavActive(pathname: string, href: string): boolean {
+  if (href === "/app") return pathname === "/app";
+  return pathname === href || pathname.startsWith(href + "/");
+}
+
 export interface NavGroup {
   /** Etichetta della sezione. Assente = ancore principali senza intestazione. */
   label?: string;
@@ -81,5 +87,17 @@ export const navGroups: NavGroup[] = [
 /** Voci ancorate in fondo alla sidebar: gestione e account. */
 export const navFooter: NavItem[] = [
   { label: "Gruppi", href: "/app/gruppi", icon: Users },
+  { label: "Profilo", href: "/app/profilo", icon: User },
+];
+
+/**
+ * Accesso rapido mobile: le 4 destinazioni piu usate da telefono, mostrate
+ * come riquadri in cima al drawer. Il menu completo (navGroups + navFooter)
+ * resta sotto. "Allenati" punta alla home delle tattiche.
+ */
+export const navMobileQuick: NavItem[] = [
+  { label: "Oggi", href: "/app/oggi", icon: CalendarCheck },
+  { label: "Impara", href: "/app/impara", icon: GraduationCap },
+  { label: "Allenati", href: "/app/tattiche", icon: Target },
   { label: "Profilo", href: "/app/profilo", icon: User },
 ];

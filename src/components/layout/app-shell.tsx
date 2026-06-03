@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Sidebar } from "./sidebar";
+import { MobileNav } from "./mobile-nav";
 import { Topbar } from "./topbar";
 import { AnalysisJobProvider } from "@/components/analysis/AnalysisJobContext";
 import { AnalysisMiniTab } from "@/components/analysis/AnalysisMiniTab";
@@ -9,9 +10,10 @@ import { AnalysisMiniTab } from "@/components/analysis/AnalysisMiniTab";
 const COLLAPSE_KEY = "shakh:sidebar-collapsed";
 
 /**
- * Shell autenticata: sidebar a sinistra, topbar in alto, contenuto al centro.
- * Su desktop la sidebar è riducibile (rail con sole icone); su mobile diventa
- * un drawer a scomparsa con overlay, aperto dal pulsante nella topbar.
+ * Shell autenticata, con chrome divergente per piattaforma:
+ * - desktop: sidebar rail riducibile a sinistra (`Sidebar`, md+);
+ * - mobile: drawer a scomparsa con struttura propria (`MobileNav`).
+ * Il contenuto (`children`) è montato una sola volta e condiviso fra i due.
  */
 export function AppShell({
   displayName,
@@ -49,12 +51,8 @@ export function AppShell({
   return (
     <AnalysisJobProvider>
       <div className="flex h-dvh overflow-hidden">
-        <Sidebar
-          collapsed={collapsed}
-          mobileOpen={mobileOpen}
-          onToggleCollapsed={toggleCollapsed}
-          onCloseMobile={() => setMobileOpen(false)}
-        />
+        <Sidebar collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
+        <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <Topbar
             displayName={displayName}
