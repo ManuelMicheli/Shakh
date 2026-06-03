@@ -229,7 +229,8 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
               {game.analyzed && <TabsTrigger value="summary">Riepilogo</TabsTrigger>}
             </TabsList>
 
-            <TabsContent value="moves" className="min-h-0 flex-1 overflow-y-auto">
+            <TabsContent value="moves" className="min-h-0 flex-1 space-y-3 overflow-y-auto">
+              {game.analyzed && currentRow && <MoveAnalysisDetails row={currentRow} />}
               <MoveList
                 history={chess.history}
                 cursor={chess.cursor}
@@ -332,6 +333,65 @@ function CurrentMoveInfo({ row }: { row: AnalysisRow }) {
     >
       <span className="cursor-help font-mono text-sm text-text-muted">{evalLabel}</span>
     </Tooltip>
+  );
+}
+
+/**
+ * Scheda d'analisi della mossa mostrata: SOLO fatti del motore (deterministici,
+ * prompt 03) — classificazione, valutazione prima→dopo, mossa migliore. La
+ * spiegazione in linguaggio naturale del *perché* resta al coach (prompt 04).
+ */
+function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
+  const meta = row.classification ? CLASSIFICATION_META[row.classification] : null;
+
+  const before = row.eval_before != null ? decodeEval(row.eval_before) : null;
+  const after = row.eval_after != null ? decodeEval(row.eval_after) : null;
+  const beforeLabel = before ? formatEval(before.value, before.type) : null;
+  const afterLabel = after ? formatEval(after.value, after.type) : null;
+
+  // La mossa giocata era già la migliore? Allora non ripetere la "mossa migliore".
+  const playedWasTop =
+    row.best_move_san != null && row.best_move_san === row.san;
+  const showBest = row.best_move_san != null && !playedWasTop;
+
+  return (
+    <div className="space-y-2 rounded-md border border-border bg-surface p-3">
+      <div className="flex items-center gap-2">
+        <span className="text-sm">
+          Mossa <span className="font-mono">{row.san}</span>
+        </span>
+        {meta && row.classification && (
+          <span className="inline-flex items-center gap-1 font-medium">
+            <MoveBadge classification={row.classification} size={15} />
+            <span style={{ color: meta.color }}>{meta.label}</span>
+          </span>
+        )}
+      </div>
+
+      {beforeLabel && afterLabel && (
+        <div className="flex items-center gap-1.5 text-sm">
+          <span className="text-text-muted">Valutazione</span>
+          <span className="font-mono">{beforeLabel}</span>
+          <span aria-hidden="true" className="text-text-muted">
+            →
+          </span>
+          <span className="font-mono">{afterLabel}</span>
+        </div>
+      )}
+
+      {showBest && (
+        <div className="flex items-center gap-1.5 text-sm">
+          <span className="text-text-muted">Mossa migliore</span>
+          <span className="font-mono" style={{ color: "var(--eval-best)" }}>
+            {row.best_move_san}
+          </span>
+        </div>
+      )}
+
+      {meta && (
+        <p className="text-xs leading-snug text-text-muted">{meta.description}</p>
+      )}
+    </div>
   );
 }
 
