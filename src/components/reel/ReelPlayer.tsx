@@ -14,10 +14,11 @@ const ChessBoard = dynamic(
 
 const STEP_MS = 1100;
 
-const LABEL_TEXT: Record<string, string> = {
-  brilliant: "Mossa brillante",
-  best: "Mossa migliore",
-  good: "Bella mossa",
+// Glifo NAG in stile motore, mostrato sulla casella di destinazione.
+const LABEL_GLYPH: Record<string, string> = {
+  brilliant: "!!",
+  best: "✓",
+  good: "!",
 };
 
 function labelColor(label: string): string {
@@ -57,17 +58,16 @@ export function ReelPlayer({ data }: { data: ReelData }) {
           coordinates={false}
           lastMove={lastMove}
           shapes={shapes}
+          moveGlyph={
+            atEnd
+              ? {
+                  square: data.to as Square,
+                  glyph: LABEL_GLYPH[data.label] ?? "!",
+                  color: labelColor(data.label),
+                }
+              : null
+          }
         />
-        {atEnd && (
-          <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2">
-            <span
-              className="rounded-full px-3 py-1 text-sm font-medium text-bg shadow-lg"
-              style={{ backgroundColor: labelColor(data.label) }}
-            >
-              {LABEL_TEXT[data.label] ?? "Bella mossa"}
-            </span>
-          </div>
-        )}
       </div>
 
       <div className="flex items-center justify-between gap-3">

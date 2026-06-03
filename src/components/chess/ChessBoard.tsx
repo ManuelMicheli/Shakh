@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Chessground } from "chessground";
 import type { Api } from "chessground/api";
 import type { Config } from "chessground/config";
@@ -38,7 +38,30 @@ export interface ChessBoardProps {
   onMove?: (from: Square, to: Square, promotion?: PieceSymbol) => void;
   coordinates?: boolean;
   disableAnimation?: boolean;
+  /**
+   * Glifo di qualità mossa (stile motore): un piccolo badge ancorato all'angolo
+   * della casella di destinazione, invece di una scritta sopra la scacchiera.
+   */
+  moveGlyph?: MoveGlyph | null;
   className?: string;
+}
+
+export interface MoveGlyph {
+  /** Casella su cui ancorare il badge (di norma la destinazione della mossa). */
+  square: Square;
+  /** Simbolo NAG: "!!", "!", "✓", "?!", "?", "??". */
+  glyph: string;
+  /** Colore di sfondo (token semantico `--eval-*`). */
+  color: string;
+}
+
+/** Posizione (in % della board) dell'angolo in alto a destra di una casella. */
+function glyphCorner(square: Square, orientation: BoardOrientation): { left: number; top: number } {
+  const file = square.charCodeAt(0) - 97; // a..h → 0..7
+  const rank = Number(square[1]); // 1..8
+  const col = orientation === "white" ? file : 7 - file;
+  const row = orientation === "white" ? 8 - rank : rank - 1;
+  return { left: (col + 1) * 12.5, top: row * 12.5 };
 }
 
 const PROMOTION_PIECES: { role: PieceSymbol; label: string }[] = [
@@ -81,6 +104,24 @@ function pieceAt(fen: string, square: Square): { type: PieceSymbol; color: Color
   return null;
 }
 
+/**
+ * Parità visiva di un `<square>` di chessground dal suo `transform: translate(...)`.
+ * Ritorna 0 = casella chiara (bianca), 1 = casella scura (grigia). null se illeggibile.
+ * La casella in alto a sinistra (col 0, riga 0) è chiara (a8 con orient. bianco); la
+ * parità visiva coincide con quella reale anche con board capovolta (rotazione 180°).
+ */
+function squareParity(el: HTMLElement, step: number): 0 | 1 | null {
+  const t = el.style.transform || "";
+  const m = t.match(/translate\(\s*(-?[\d.]+)(px|%)?\s*,\s*(-?[\d.]+)(px|%)?/);
+  if (!m) return null;
+  const x = parseFloat(m[1]);
+  const y = parseFloat(m[3]);
+  const unit = m[2] || "px";
+  const col = unit === "%" ? Math.round(x / 12.5) : Math.round(x / step);
+  const row = unit === "%" ? Math.round(y / 12.5) : Math.round(y / step);
+  return ((col + row) & 1) as 0 | 1;
+}
+
 interface PendingPromotion {
   from: Square;
   to: Square;
@@ -101,6 +142,7 @@ export function ChessBoard({
   onMove,
   coordinates = true,
   disableAnimation = false,
+  moveGlyph,
   className,
 }: ChessBoardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -171,6 +213,51 @@ export function ChessBoard({
     };
   }, []);
 
+  // Colora i punti di destinazione in base al colore della casella: dot grigio su
+  // casella bianca (.dest-light), dot bianco su casella grigia (.dest-dark). chessground
+  // non marca la parità delle caselle, quindi la calcoliamo dal transform del <square>.
+  const tagDests = useCallback(() => {
+    const cgBoard = wrapRef.current?.querySelector("cg-board");
+    if (!cgBoard) return;
+    const step = (cgBoard as HTMLElement).getBoundingClientRect().width / 8;
+    if (!step) return;
+    cgBoard.querySelectorAll<HTMLElement>("square.move-dest").forEach((sq) => {
+      const p = squareParity(sq, step);
+      if (p === null) return;
+      // toggle con force: se la classe è già corretta non tocca l'attributo (niente
+      // mutazione → l'observer non ricicla all'infinito).
+      sq.classList.toggle("dest-dark", p === 1);
+      sq.classList.toggle("dest-light", p === 0);
+    });
+  }, []);
+
+  // chessground ridisegna i .move-dest quando l'utente seleziona un pezzo (non passa
+  // dal nostro .set()), quindi osserviamo il sottoalbero e ri-taggiamo, con throttle rAF.
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || typeof MutationObserver === "undefined") return;
+    let raf = 0;
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        tagDests();
+      });
+    };
+    const observer = new MutationObserver(schedule);
+    observer.observe(wrap, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "style"],
+    });
+    schedule();
+    return () => {
+      observer.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [tagDests]);
+
   // Sincronizzazione: a ogni cambio di props rilancia .set() (mai ricreare l'istanza).
   useEffect(() => {
     const api = apiRef.current;
@@ -194,6 +281,7 @@ export function ChessBoard({
       drawable: { enabled: true, shapes: shapes ?? [] },
     };
     api.set(config);
+    tagDests();
   }, [
     fen,
     orientation,
@@ -205,6 +293,7 @@ export function ChessBoard({
     shapes,
     coordinates,
     disableAnimation,
+    tagDests,
   ]);
 
   const choosePromotion = (role: PieceSymbol) => {
@@ -223,6 +312,22 @@ export function ChessBoard({
   const board = (
     <div className={cn("board-square relative select-none", className)}>
       <div ref={wrapRef} />
+
+      {moveGlyph && moveGlyph.glyph && (
+        <div className="board-glyph-layer" aria-hidden="true">
+          {(() => {
+            const { left, top } = glyphCorner(moveGlyph.square, orientation);
+            return (
+              <span
+                className="board-glyph"
+                style={{ left: `${left}%`, top: `${top}%`, backgroundColor: moveGlyph.color }}
+              >
+                {moveGlyph.glyph}
+              </span>
+            );
+          })()}
+        </div>
+      )}
 
       {pending && (
         <div

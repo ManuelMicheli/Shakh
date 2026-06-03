@@ -70,6 +70,39 @@ export function AnalyzeRunner({ gameId, pgn, title, label = "Analizza partita" }
         </Button>
       </div>
 
+      <details className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm">
+        <summary className="cursor-pointer font-medium text-text">
+          Cos&apos;è la profondità?
+        </summary>
+        <div className="mt-2 space-y-2 text-xs leading-snug text-text-muted">
+          <p>
+            È quante <span className="text-text">mezze mosse avanti</span> il
+            motore calcola da ogni posizione prima di dare il giudizio. Più alta
+            = analisi più affidabile, ma più lenta (il tempo cresce in modo quasi
+            esponenziale, non lineare).
+          </p>
+          <ul className="space-y-1">
+            <li>
+              <span className="font-mono text-text">12</span> — veloce, per un
+              ripasso rapido o partite blitz.
+            </li>
+            <li>
+              <span className="font-mono text-text">15</span> — equilibrio tra
+              precisione e tempo (consigliata).
+            </li>
+            <li>
+              <span className="font-mono text-text">18</span> — più precisa (coglie
+              tattiche e sacrifici profondi), ma può richiedere 3–5× il tempo di 12.
+            </li>
+          </ul>
+          <p>
+            Sotto i ~2000 Elo, 15 e 18 raramente cambiano il verdetto sugli errori
+            grossi: tieni 15 di norma, sali a 18 solo per partite importanti da
+            studiare a fondo.
+          </p>
+        </div>
+      </details>
+
       {otherRunning && (
         <p className="text-xs text-text-muted">
           Analisi in corso su un&apos;altra partita: attendi che finisca.

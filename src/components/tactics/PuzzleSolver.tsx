@@ -202,22 +202,14 @@ export function PuzzleSolver({ puzzle, onSolved }: PuzzleSolverProps) {
           check={game.isCheck}
           shapes={shapes}
           onMove={handleUserMove}
+          // Esito mostrato in stile motore: ✓ sulla casella di destinazione quando la
+          // mossa è corretta; gli errori restano segnalati dai cerchi rossi (shapes).
+          moveGlyph={
+            feedback === "right" && game.lastMove
+              ? { square: game.lastMove[1], glyph: "✓", color: "var(--eval-best)" }
+              : null
+          }
         />
-
-        {/* Banner d'esito: usa i colori semantici --eval-* (eccezione funzionale). */}
-        {feedback && (
-          <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2">
-            <span
-              className="rounded-full px-3 py-1 text-sm font-medium text-bg shadow-lg"
-              style={{
-                backgroundColor:
-                  feedback === "right" ? "var(--eval-best)" : "var(--eval-blunder)",
-              }}
-            >
-              {feedback === "right" ? "Corretta" : "Riprova"}
-            </span>
-          </div>
-        )}
       </div>
 
       <div className="flex items-center justify-between gap-3">

@@ -12,7 +12,7 @@ import { useAnalysisJob } from "./AnalysisJobContext";
  * partita analizzata. Renderizzata dall'AppShell, sopra i toast.
  */
 export function AnalysisMiniTab() {
-  const { job, cancel, dismiss } = useAnalysisJob();
+  const { job, queueLength, cancel, dismiss } = useAnalysisJob();
 
   const pct =
     job && job.total > 0 ? Math.round((job.current / job.total) * 100) : 0;
@@ -51,6 +51,12 @@ export function AnalysisMiniTab() {
           <p className="mt-0.5 truncate text-xs text-text-muted" title={job.title}>
             {job.title}
           </p>
+
+          {queueLength > 0 && (
+            <p className="mt-0.5 font-mono text-xs text-text-muted">
+              ancora {queueLength} in coda
+            </p>
+          )}
 
           {job.status === "running" && (
             <div className="mt-3 space-y-1.5">

@@ -71,12 +71,12 @@ export function ImportPanel() {
   return (
     <Card>
       <CardContent className="pt-6">
-        <Tabs defaultValue="pgn">
+        <Tabs defaultValue="chesscom">
           <TabsList>
-            <TabsTrigger value="pgn">Incolla PGN</TabsTrigger>
-            <TabsTrigger value="file">File .pgn</TabsTrigger>
-            <TabsTrigger value="lichess">Lichess</TabsTrigger>
             <TabsTrigger value="chesscom">Chess.com</TabsTrigger>
+            <TabsTrigger value="lichess">Lichess</TabsTrigger>
+            <TabsTrigger value="file">File .pgn</TabsTrigger>
+            <TabsTrigger value="pgn">Incolla PGN</TabsTrigger>
           </TabsList>
 
           {/* Incolla PGN */}

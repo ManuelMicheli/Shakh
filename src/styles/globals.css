@@ -137,13 +137,43 @@ html.lenis body {
    quadrato a larghezza fluida con un tetto su desktop. È il fix centrale del layout. */
 .board-square {
   width: 100%;
-  max-width: var(--board-max, 720px);
+  /* Tetto su desktop E sull'altezza del viewport: essendo quadrata, limitare la
+     larghezza con un'espressione in svh limita anche l'altezza, così board +
+     controlli + eval bar restano nella schermata senza scroll. */
+  max-width: min(var(--board-max, 680px), max(280px, calc(100svh - 13rem)));
   aspect-ratio: 1 / 1;
   margin-inline: auto;
 }
 .board-square > .cg-wrap {
   width: 100%;
   height: 100%;
+}
+
+/* Glifo di qualità mossa (stile motore): badge sull'angolo della casella di
+   destinazione. Il layer porta il container query così la dimensione scala con la
+   board (cqi = % della larghezza della board), non con il viewport. */
+.board-glyph-layer {
+  position: absolute;
+  inset: 0;
+  container-type: inline-size;
+  pointer-events: none;
+  z-index: 10;
+}
+.board-glyph {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 9.5cqi;
+  height: 9.5cqi;
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 5cqi;
+  line-height: 1;
+  color: var(--bg);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
 }
 
 /* Coordinate ESTERNE alla scacchiera: numeri (traverse) a sinistra, lettere
@@ -157,14 +187,15 @@ html.lenis body {
     "ranks board"
     "corner files";
   width: 100%;
-  max-width: var(--board-max, 720px);
+  max-width: min(var(--board-max, 680px), max(280px, calc(100svh - 13rem)));
   margin-inline: auto;
 }
-/* Su monitor desktop ampi la scacchiera può crescere ancora. */
+/* Su monitor desktop ampi la scacchiera può crescere un po' (sempre entro il tetto
+   in altezza qui sopra). */
 @media (min-width: 1280px) {
   .board-square,
   .board-frame {
-    --board-max: 780px;
+    --board-max: 720px;
   }
 }
 .board-frame > .board-square {
@@ -262,18 +293,65 @@ html.lenis body {
     transparent 72%
   );
 }
-/* Destinazioni legali: punto al centro; anello su casella occupata (cattura). */
+/* Destinazioni legali. Caselle a colore fisso (bianco / grigio): il punto è a due
+   toni concentrici — core grigio scuro + anello bianco. Su casella bianca domina il
+   core grigio; su casella grigia domina l'anello bianco. Sempre ben visibile. */
 .cg-wrap cg-board square.move-dest {
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--text) 28%, transparent) 22%,
-    transparent 24%
+    rgba(58, 58, 58, 0.92) 0%,
+    rgba(58, 58, 58, 0.92) 17%,
+    rgba(255, 255, 255, 0.95) 19%,
+    rgba(255, 255, 255, 0.95) 24%,
+    transparent 25%
   );
 }
+/* Casella occupata (cattura): anello esterno a due toni attorno al pezzo. */
 .cg-wrap cg-board square.oc.move-dest {
   background: radial-gradient(
     circle,
-    transparent 62%,
-    color-mix(in srgb, var(--text) 28%, transparent) 64%
+    transparent 60%,
+    rgba(58, 58, 58, 0.92) 62%,
+    rgba(58, 58, 58, 0.92) 69%,
+    rgba(255, 255, 255, 0.95) 71%,
+    rgba(255, 255, 255, 0.95) 78%,
+    transparent 79%
+  );
+}
+
+/* Swap esatto (taggato via JS in ChessBoard): casella bianca → dot grigio,
+   casella grigia → dot bianco. Override del fallback a due toni qui sopra. */
+.cg-wrap cg-board square.move-dest.dest-light {
+  background: radial-gradient(
+    circle,
+    rgba(74, 74, 74, 0.95) 0%,
+    rgba(74, 74, 74, 0.95) 22%,
+    transparent 23%
+  );
+}
+.cg-wrap cg-board square.move-dest.dest-dark {
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.98) 22%,
+    transparent 23%
+  );
+}
+.cg-wrap cg-board square.oc.move-dest.dest-light {
+  background: radial-gradient(
+    circle,
+    transparent 60%,
+    rgba(74, 74, 74, 0.95) 62%,
+    rgba(74, 74, 74, 0.95) 78%,
+    transparent 79%
+  );
+}
+.cg-wrap cg-board square.oc.move-dest.dest-dark {
+  background: radial-gradient(
+    circle,
+    transparent 60%,
+    rgba(255, 255, 255, 0.98) 62%,
+    rgba(255, 255, 255, 0.98) 78%,
+    transparent 79%
   );
 }
