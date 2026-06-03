@@ -62,7 +62,7 @@ export default async function OnboardingPage() {
   const name = profile?.display_name ?? profile?.username ?? null;
 
   return (
-    <div className="mx-auto max-w-2xl py-6">
+    <div className="py-6">
       <OnboardingFlow name={name} initialAccounts={linkedAccounts} />
     </div>
   );
