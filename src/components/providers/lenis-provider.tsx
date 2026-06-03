@@ -1,13 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 /**
- * Smooth scroll globale via Lenis. Rispetta prefers-reduced-motion.
+ * Smooth scroll Lenis sulla sola superficie pubblica. Rispetta
+ * prefers-reduced-motion. NON deve girare sotto /app: lì la shell blocca lo
+ * scroll della finestra (h-dvh overflow-hidden) e scrolla dentro <main>, quindi
+ * Lenis (che pilota lo scroll della finestra) mangerebbe gli eventi wheel e lo
+ * scroll risulterebbe morto.
  */
 export function LenisProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isApp = pathname?.startsWith("/app");
+
   useEffect(() => {
+    if (isApp) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
 
@@ -23,7 +32,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       cancelAnimationFrame(raf);
       lenis.destroy();
     };
-  }, []);
+  }, [isApp]);
 
   return <>{children}</>;
 }

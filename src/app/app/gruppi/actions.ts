@@ -116,7 +116,20 @@ export async function createInvite(
 
 export async function revokeInvite(groupId: string, inviteId: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const { error } = await supabase.from("group_invites").delete().eq("id", inviteId);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: AUTH_ERR };
+
+  const role = await getMyGroupRole(supabase, groupId, user.id);
+  if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
+
+  // Scope esplicito al gruppo (oltre alla RLS): evita revoche cross-gruppo.
+  const { error } = await supabase
+    .from("group_invites")
+    .delete()
+    .eq("id", inviteId)
+    .eq("group_id", groupId);
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/app/gruppi/${groupId}`);
   return { ok: true };
@@ -245,8 +258,14 @@ export async function createAssignment(input: CreateAssignmentInput): Promise<Ac
   const role = await getMyGroupRole(supabase, input.groupId, user.id);
   if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
 
-  if (input.targetType === "user" && !input.targetUserId)
-    return { ok: false, error: "Scegli un allievo." };
+  if (input.targetType === "user") {
+    if (!input.targetUserId) return { ok: false, error: "Scegli un allievo." };
+    // L'allievo deve far parte del gruppo: la RLS su assignments controlla solo
+    // assigned_by, non il target, quindi senza questo check un istruttore
+    // potrebbe assegnare a un utente qualsiasi della piattaforma.
+    const targetRole = await getMyGroupRole(supabase, input.groupId, input.targetUserId);
+    if (!targetRole) return { ok: false, error: "L'allievo non fa parte di questo gruppo." };
+  }
 
   const { error } = await supabase.from("assignments").insert({
     assigned_by: user.id,

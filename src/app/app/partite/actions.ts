@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { splitPgn, parseGame, detectUserColor, type ParsedGame } from "@/lib/games/pgn";
-import { lichessProvider, ProviderError } from "@/lib/games/providers";
+import { lichessProvider, chesscomProvider, ProviderError } from "@/lib/games/providers";
 import type { AnalysisRowInput, Classification, GameSource } from "@/lib/games/types";
 import { explainMove } from "@/lib/ai/coach";
 import { isCoachConfigured } from "@/lib/ai/client";
@@ -83,10 +83,20 @@ async function importParsed(
   return { ok: true, imported: rows.length, skipped };
 }
 
+/** Limiti d'import: fermano file/incolla abnormi prima del parsing (costo CPU). */
+const MAX_PGN_CHARS = 512_000; // ~500KB
+const MAX_GAMES_PER_IMPORT = 200;
+
 /** Import da PGN incollato o da file (.pgn letto come testo). */
 export async function importPgnText(text: string): Promise<ImportResult> {
   if (!text.trim()) return { ok: false, error: "Incolla un PGN." };
+  if (text.length > MAX_PGN_CHARS)
+    return {
+      ok: false,
+      error: "PGN troppo grande (max ~500KB). Importa meno partite per volta.",
+    };
   const games = splitPgn(text)
+    .slice(0, MAX_GAMES_PER_IMPORT)
     .map(parseGame)
     .filter((g): g is ParsedGame => g !== null);
   return importParsed(games, "pgn", null);
@@ -115,6 +125,39 @@ export async function importLichess(
   return importParsed(games, "lichess", u);
 }
 
+/** Import delle ultime `max` partite pubbliche di un utente Chess.com. */
+export async function importChesscom(
+  username: string,
+  max: number,
+): Promise<ImportResult> {
+  const u = username.trim();
+  if (!u) return { ok: false, error: "Inserisci uno username Chess.com." };
+  const n = Math.max(1, Math.min(100, Math.floor(max) || 10));
+
+  let pgnText: string;
+  try {
+    pgnText = await chesscomProvider.fetchUserGamesPgn(u, n);
+  } catch (e) {
+    if (e instanceof ProviderError) return { ok: false, error: e.message };
+    return { ok: false, error: "Errore imprevisto durante l'import da Chess.com." };
+  }
+
+  const games = splitPgn(pgnText)
+    .map(parseGame)
+    .filter((g): g is ParsedGame => g !== null);
+  return importParsed(games, "chesscom", u);
+}
+
+const VALID_CLASSIFICATIONS: ReadonlySet<string> = new Set<Classification>([
+  "brilliant",
+  "best",
+  "good",
+  "inaccuracy",
+  "mistake",
+  "blunder",
+  "book",
+]);
+
 /** Salva (upsert) un lotto di righe d'analisi. La RLS verifica la proprietà. */
 export async function saveAnalysisChunk(
   gameId: string,
@@ -122,15 +165,18 @@ export async function saveAnalysisChunk(
 ): Promise<ActionResult> {
   if (rows.length === 0) return { ok: true };
   const supabase = await createClient();
+  // Sanifica i valori dal client: classification entro l'enum, stringhe limitate.
   const payload = rows.map((r) => ({
     game_id: gameId,
     ply: r.ply,
-    san: r.san,
-    fen: r.fen,
+    san: typeof r.san === "string" ? r.san.slice(0, 16) : r.san,
+    fen: typeof r.fen === "string" ? r.fen.slice(0, 100) : r.fen,
     eval_before: r.eval_before,
     eval_after: r.eval_after,
-    best_move_san: r.best_move_san,
-    classification: r.classification,
+    best_move_san:
+      typeof r.best_move_san === "string" ? r.best_move_san.slice(0, 16) : r.best_move_san,
+    classification:
+      r.classification && VALID_CLASSIFICATIONS.has(r.classification) ? r.classification : null,
   }));
   const { error } = await supabase
     .from("game_analysis")

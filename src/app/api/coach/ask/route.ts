@@ -66,11 +66,13 @@ export async function POST(req: Request) {
     askedMove: body.askedMove,
   };
 
-  // Memoria breve: ultime 6 battute.
+  // Memoria breve: ultime 6 battute, contenuto di ogni turno limitato per non
+  // gonfiare il prompt (e quindi il costo) con payload arbitrari dal client.
   const history: ChatTurn[] = Array.isArray(body.history)
     ? body.history
         .filter((t) => (t.role === "user" || t.role === "assistant") && typeof t.content === "string")
         .slice(-6)
+        .map((t) => ({ role: t.role, content: t.content.slice(0, 2000) }))
     : [];
 
   const encoder = new TextEncoder();

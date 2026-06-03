@@ -47,7 +47,7 @@ function parsePlayedAt(h: Record<string, string | null>): string | null {
   return Number.isNaN(ms) ? null : new Date(ms).toISOString();
 }
 
-/** Estrae l'id partita dal tag Site (lichess.org/<id> o chess.com/.../<id>). */
+/** Estrae l'id partita da un URL (lichess.org/<id> o chess.com/.../<id>). */
 function extractExternalId(site: string | null): string | null {
   const s = clean(site);
   if (!s) return null;
@@ -73,7 +73,8 @@ export function parseGame(pgn: string): ParsedGame | null {
     result: clean(h.Result),
     ecoCode: clean(h.ECO),
     playedAt: parsePlayedAt(h),
-    externalId: extractExternalId(h.Site),
+    // Chess.com mette solo "Chess.com" nel tag Site; l'URL con id è nel tag Link.
+    externalId: extractExternalId(h.Site) ?? extractExternalId(h.Link),
   };
 }
 

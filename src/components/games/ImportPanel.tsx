@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/toast";
 import {
   importPgnText,
   importLichess,
+  importChesscom,
   type ImportResult,
 } from "@/app/app/partite/actions";
 
@@ -39,6 +40,8 @@ export function ImportPanel() {
   const [pgn, setPgn] = useState("");
   const [username, setUsername] = useState("");
   const [max, setMax] = useState(10);
+  const [ccUser, setCcUser] = useState("");
+  const [ccMax, setCcMax] = useState(10);
   const [pending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
   const feedback = useImportFeedback();
@@ -61,6 +64,10 @@ export function ImportPanel() {
     startTransition(async () => feedback(await importLichess(username, max)));
   };
 
+  const submitChesscom = () => {
+    startTransition(async () => feedback(await importChesscom(ccUser, ccMax)));
+  };
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -69,6 +76,7 @@ export function ImportPanel() {
             <TabsTrigger value="pgn">Incolla PGN</TabsTrigger>
             <TabsTrigger value="file">File .pgn</TabsTrigger>
             <TabsTrigger value="lichess">Lichess</TabsTrigger>
+            <TabsTrigger value="chesscom">Chess.com</TabsTrigger>
           </TabsList>
 
           {/* Incolla PGN */}
@@ -147,6 +155,43 @@ export function ImportPanel() {
             </div>
             <p className="text-xs text-text-muted">
               Scarica le ultime partite pubbliche dell&apos;utente tramite l&apos;API di Lichess.
+            </p>
+          </TabsContent>
+
+          {/* Chess.com */}
+          <TabsContent value="chesscom" className="space-y-3">
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="cc-user">Username Chess.com</Label>
+                <Input
+                  id="cc-user"
+                  value={ccUser}
+                  onChange={(e) => setCcUser(e.target.value)}
+                  placeholder="es. MagnusCarlsen"
+                  className="w-56"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cc-max">Quante</Label>
+                <Input
+                  id="cc-max"
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={ccMax}
+                  onChange={(e) => setCcMax(Number(e.target.value))}
+                  className="w-24"
+                />
+              </div>
+              <Button
+                onClick={submitChesscom}
+                disabled={pending || !ccUser.trim()}
+              >
+                {pending ? "Scaricamento…" : "Importa da Chess.com"}
+              </Button>
+            </div>
+            <p className="text-xs text-text-muted">
+              Scarica le partite pubbliche più recenti dell&apos;utente tramite l&apos;API di Chess.com.
             </p>
           </TabsContent>
         </Tabs>
