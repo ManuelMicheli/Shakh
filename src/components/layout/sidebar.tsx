@@ -2,8 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { navGroups, navFooter, isNavActive, type NavItem } from "./nav";
+import { useState } from "react";
+import { PanelLeftClose, PanelLeftOpen, ChevronDown } from "lucide-react";
+import {
+  navGroups,
+  navFooter,
+  isNavActive,
+  type NavItem,
+  type NavGroup,
+} from "./nav";
 import { Badge } from "@/components/ui/badge";
 import { BRAND_NAME } from "@/config/brand";
 import { cn } from "@/lib/utils";
@@ -64,6 +71,59 @@ function NavRow({
   );
 }
 
+/**
+ * Sezione maggiore collassabile (Studia / Allenati / Gioca e analizza):
+ * intestazione in evidenza che, premuta, rivela le sottovoci. Si apre
+ * automaticamente se contiene la voce attiva.
+ */
+function CollapsibleGroup({
+  group,
+  pathname,
+}: {
+  group: NavGroup;
+  pathname: string;
+}) {
+  const hasActive = group.items.some((item) =>
+    isNavActive(pathname, item.href),
+  );
+  const [open, setOpen] = useState(hasActive);
+
+  return (
+    <div className="space-y-1">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={cn(
+          "flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-semibold tracking-tight transition-colors",
+          "text-text hover:bg-surface-2",
+        )}
+      >
+        <span>{group.label}</span>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 shrink-0 text-text-muted transition-transform duration-200",
+            open && "rotate-180",
+          )}
+          aria-hidden
+        />
+      </button>
+      {open && (
+        <div className="space-y-1 pl-2">
+          {group.items.map((item) => (
+            <NavRow
+              key={item.href}
+              item={item}
+              active={isNavActive(pathname, item.href)}
+              collapsed={false}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Sidebar({
   collapsed,
   onToggleCollapsed,
@@ -100,26 +160,47 @@ export function Sidebar({
         className="flex-1 space-y-4 overflow-y-auto px-3 py-2"
         aria-label="Navigazione principale"
       >
-        {navGroups.map((group, gi) => (
-          <div key={group.label ?? `group-${gi}`} className="space-y-1">
-            {group.label &&
-              (collapsed ? (
-                <div aria-hidden className="mx-2 border-t border-border" />
-              ) : (
-                <p className="px-3 pb-1 pt-1 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-                  {group.label}
-                </p>
-              ))}
-            {group.items.map((item) => (
-              <NavRow
-                key={item.href}
-                item={item}
-                active={isNavActive(pathname, item.href)}
-                collapsed={collapsed}
-              />
-            ))}
-          </div>
-        ))}
+        {navGroups.map((group, gi) => {
+          // Rail ridotto: niente accordion, voci piatte come icone (divider tra gruppi).
+          if (collapsed) {
+            return (
+              <div key={group.label ?? `group-${gi}`} className="space-y-1">
+                {group.label && (
+                  <div aria-hidden className="mx-2 border-t border-border" />
+                )}
+                {group.items.map((item) => (
+                  <NavRow
+                    key={item.href}
+                    item={item}
+                    active={isNavActive(pathname, item.href)}
+                    collapsed
+                  />
+                ))}
+              </div>
+            );
+          }
+
+          // Ancore senza etichetta: sempre piatte e visibili.
+          if (!group.label) {
+            return (
+              <div key={`group-${gi}`} className="space-y-1">
+                {group.items.map((item) => (
+                  <NavRow
+                    key={item.href}
+                    item={item}
+                    active={isNavActive(pathname, item.href)}
+                    collapsed={false}
+                  />
+                ))}
+              </div>
+            );
+          }
+
+          // Sezioni maggiori: in evidenza e collassabili.
+          return (
+            <CollapsibleGroup key={group.label} group={group} pathname={pathname} />
+          );
+        })}
       </nav>
 
       {/* Footer: gestione e account, separati dal flusso del percorso. */}
