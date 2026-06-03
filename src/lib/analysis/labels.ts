@@ -29,7 +29,7 @@ export const CLASSIFICATION_META: Record<Classification, ClassificationMeta> = {
   best: {
     label: "Migliore",
     color: "var(--eval-best)",
-    glyph: "✓",
+    glyph: "!",
     marked: true,
     description: "La mossa migliore possibile secondo il motore.",
   },

@@ -85,6 +85,9 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
 
   return (
     <div className="space-y-8">
+      {/* Legenda termini in alto: riferimento per principianti (non nel drill-down istruttore). */}
+      {!readOnly && <Glossary />}
+
       {/* 0. Rating Shakh olistico */}
       {data.shakhRating && <ShakhRatingCard rating={data.shakhRating} />}
 
@@ -303,9 +306,6 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
           </CardContent>
         </Card>
       )}
-
-      {/* Legenda termini: riferimento per principianti (non nel drill-down istruttore). */}
-      {!readOnly && <Glossary />}
     </div>
   );
 }

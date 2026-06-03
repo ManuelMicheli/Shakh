@@ -165,15 +165,21 @@ html.lenis body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 9.5cqi;
-  height: 9.5cqi;
+  width: 5.6cqi;
+  height: 5.6cqi;
   border-radius: 9999px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 5cqi;
+  /* Glifo come badge grafico (stile chess.com/Lichess): sans bold, non monospace. */
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 3.4cqi;
   line-height: 1;
-  color: var(--bg);
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  letter-spacing: -0.04em;
+  color: #fff;
+  /* Anello sottile scuro per staccare il badge sia su casella chiara sia scura,
+     più un'ombra contenuta. Niente alone bianco (le caselle qui sono bianche/grigie). */
+  box-shadow:
+    0 0 0 0.5cqi rgba(0, 0, 0, 0.22),
+    0 0.6cqi 1.2cqi rgba(0, 0, 0, 0.35);
 }
 
 /* Coordinate ESTERNE alla scacchiera: numeri (traverse) a sinistra, lettere
@@ -196,6 +202,14 @@ html.lenis body {
   .board-square,
   .board-frame {
     --board-max: 720px;
+  }
+}
+/* Pagina di analisi: tetto in altezza più stretto perché sopra/sotto alla board
+   ci sono controlli, nomi giocatori e (di fianco) il pannello a schede. Così la
+   board e tutti i comandi stanno in una sola schermata, senza scroll di pagina. */
+@media (min-width: 1024px) {
+  .analysis-board .board-frame {
+    max-width: min(var(--board-max, 680px), calc(100dvh - 15rem));
   }
 }
 .board-frame > .board-square {

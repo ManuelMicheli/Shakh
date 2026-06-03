@@ -186,7 +186,24 @@ export function ChessBoard({
       drawable: { enabled: true },
     });
 
+    // Ricalcolo forzato dopo il primo layout: se chessground monta prima che il
+    // quadrato abbia una dimensione misurata (CSS del chunk dinamico non ancora
+    // applicato, container non ancora dimensionato), memoizza bounds 0×0 e i pezzi
+    // si accatastano in alto a sinistra (translate 0,0). Senza un resize non si
+    // correggono da soli: forziamo il ridisegno su più tick (doppio rAF + timeout).
+    let raf1 = 0;
+    let raf2 = 0;
+    const redraw = () => apiRef.current?.redrawAll();
+    raf1 = requestAnimationFrame(() => {
+      redraw();
+      raf2 = requestAnimationFrame(redraw);
+    });
+    const tid = setTimeout(redraw, 150);
+
     return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      clearTimeout(tid);
       apiRef.current?.destroy();
       apiRef.current = null;
     };
@@ -311,7 +328,10 @@ export function ChessBoard({
 
   const board = (
     <div className={cn("board-square relative select-none", className)}>
-      <div ref={wrapRef} />
+      {/* Host di chessground: riempie esplicitamente il quadrato. Senza dimensione
+          esplicita, .cg-wrap{height:100%} si risolve su un'altezza auto e collassa
+          → bounds 0×0 → pezzi accatastati in alto a sinistra (translate 0,0). */}
+      <div ref={wrapRef} className="absolute inset-0" />
 
       {moveGlyph && moveGlyph.glyph && (
         <div className="board-glyph-layer" aria-hidden="true">

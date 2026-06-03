@@ -11,6 +11,7 @@ import { EvalBar } from "@/components/chess/EvalBar";
 import { EvalGraph, type EvalPoint } from "@/components/chess/EvalGraph";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/toast";
 import { AnalyzeRunner } from "./AnalyzeRunner";
 import { CoachPanel } from "@/components/coach/CoachPanel";
@@ -114,6 +115,15 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
   // Info sulla mossa attualmente mostrata (se analizzata).
   const currentRow = chess.cursor >= 0 ? byPly.get(chess.cursor + 1) : null;
 
+  // Badge di qualità (solo il simbolo NAG) ancorato all'angolo in alto a destra
+  // della casella di destinazione della mossa mostrata.
+  const moveGlyph = useMemo(() => {
+    if (!game.analyzed || !currentRow?.classification || !chess.lastMove) return null;
+    const meta = CLASSIFICATION_META[currentRow.classification];
+    if (!meta.glyph) return null;
+    return { square: chess.lastMove[1], glyph: meta.glyph, color: meta.color };
+  }, [game.analyzed, currentRow, chess.lastMove]);
+
   const onReanalyze = () => {
     startReset(async () => {
       const res = await resetGameAnalysis(game.id);
@@ -127,13 +137,19 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
 
   const title = `${game.white ?? "?"} – ${game.black ?? "?"}`;
 
+  // Chi sta in basso = colore dell'orientamento della board; in alto l'avversario.
+  const bottomColor = orientation;
+  const topColor: "white" | "black" = orientation === "white" ? "black" : "white";
+  const nameOf = (c: "white" | "black") => (c === "white" ? game.white : game.black);
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight">{title}</h1>
+    <div className="flex flex-col gap-3 lg:h-[calc(100dvh-6.5rem)] lg:overflow-hidden">
+      {/* Header compatto (non scrolla). */}
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
+        <div className="flex items-baseline gap-3">
+          <h1 className="font-display text-xl font-semibold tracking-tight">Analisi partita</h1>
           {game.result && (
-            <p className="mt-1 font-mono text-sm text-text-muted">{game.result}</p>
+            <span className="font-mono text-xs text-text-muted">{game.result}</span>
           )}
         </div>
         {game.analyzed && (
@@ -150,9 +166,27 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
         )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        {/* Scacchiera + controlli */}
-        <div className="space-y-3">
+      <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        {/* Scacchiera + controlli: si auto-dimensiona per stare in pagina. */}
+        <div className="analysis-board flex min-h-0 flex-col gap-2">
+          {/* Controlli avanti/indietro in ALTO, sopra la scacchiera. */}
+          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 xl:max-w-[820px]">
+            <BoardControls
+              onFirst={chess.first}
+              onPrev={chess.prev}
+              onNext={chess.next}
+              onLast={chess.last}
+              onFlip={() => setOrientation((o) => (o === "white" ? "black" : "white"))}
+              atStart={chess.cursor < 0}
+              atEnd={chess.cursor >= chess.history.length - 1}
+              keyboardTarget={boardWrapRef}
+            />
+            {currentRow && <CurrentMoveInfo row={currentRow} />}
+          </div>
+
+          {/* Nome del giocatore in alto (avversario rispetto all'orientamento). */}
+          <PlayerTag name={nameOf(topColor)} color={topColor} indented={Boolean(shownEval)} />
+
           <div className="mx-auto flex w-full max-w-3xl gap-2 xl:max-w-[820px]">
             {shownEval && (
               <EvalBar
@@ -164,7 +198,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
             <div
               ref={boardWrapRef}
               tabIndex={0}
-              className="flex-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+              className="min-w-0 flex-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
             >
               <ChessBoard
                 fen={chess.fen}
@@ -172,123 +206,131 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
                 mode="view"
                 lastMove={chess.lastMove}
                 check={chess.isCheck}
+                moveGlyph={moveGlyph}
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <BoardControls
-              onFirst={chess.first}
-              onPrev={chess.prev}
-              onNext={chess.next}
-              onLast={chess.last}
-              onFlip={() => setOrientation((o) => (o === "white" ? "black" : "white"))}
-              atStart={chess.cursor < 0}
-              atEnd={chess.cursor >= chess.history.length - 1}
-              keyboardTarget={boardWrapRef}
-            />
-            {currentRow && (
-              <CurrentMoveInfo row={currentRow} />
-            )}
-          </div>
-
-          {game.analyzed && graphPoints.length > 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Andamento</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <EvalGraph
-                  points={graphPoints}
-                  cursor={chess.cursor}
-                  onSelect={chess.goTo}
-                  cap={EVAL_CAP}
-                />
-              </CardContent>
-            </Card>
-          )}
+          {/* Nome del giocatore in basso (lato dell'orientamento). */}
+          <PlayerTag name={nameOf(bottomColor)} color={bottomColor} indented={Boolean(shownEval)} />
         </div>
 
-        {/* Pannello laterale */}
-        <div className="space-y-4">
+        {/* Pannello laterale a schede: tutto raggiungibile senza scrollare la pagina. */}
+        <div className="flex min-h-0 flex-col gap-3 lg:overflow-hidden">
           {!game.analyzed && (
             <AnalyzeRunner gameId={game.id} pgn={game.pgn} title={title} />
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Mosse</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Tabs defaultValue="moves" className="flex min-h-0 flex-1 flex-col">
+            <TabsList className="shrink-0 self-start">
+              <TabsTrigger value="moves">Mosse</TabsTrigger>
+              <TabsTrigger value="coach">Coach</TabsTrigger>
+              {game.analyzed && <TabsTrigger value="summary">Riepilogo</TabsTrigger>}
+            </TabsList>
+
+            <TabsContent value="moves" className="min-h-0 flex-1 overflow-y-auto">
               <MoveList
                 history={chess.history}
                 cursor={chess.cursor}
                 onSelect={chess.goTo}
                 classifications={game.analyzed ? classifications : undefined}
-                className="max-h-72"
               />
-            </CardContent>
-          </Card>
+            </TabsContent>
 
-          <CoachPanel
-            gameId={game.id}
-            analyzed={game.analyzed}
-            coachConfigured={coachConfigured}
-            analysis={analysis}
-            currentPly={chess.cursor >= 0 ? chess.cursor + 1 : null}
-            currentSan={currentRow?.san ?? null}
-            currentClassification={currentRow?.classification ?? null}
-            fen={chess.fen}
-            turn={chess.turn}
-          />
+            <TabsContent value="coach" className="min-h-0 flex-1 overflow-y-auto">
+              <CoachPanel
+                gameId={game.id}
+                analyzed={game.analyzed}
+                coachConfigured={coachConfigured}
+                analysis={analysis}
+                currentPly={chess.cursor >= 0 ? chess.cursor + 1 : null}
+                currentSan={currentRow?.san ?? null}
+                currentClassification={currentRow?.classification ?? null}
+                fen={chess.fen}
+                turn={chess.turn}
+              />
+            </TabsContent>
 
-          {game.analyzed && (
-            <>
-              <AnalysisLegend />
-              <Card>
-                <CardHeader>
-                  <CardTitle>Riepilogo</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <SummaryTable white={summary.white} black={summary.black} />
-                  <p className="text-xs text-text-muted">
-                    L&apos;accuratezza % è una stima basata sulla perdita media in
-                    centipawn, non lo standard ufficiale di Lichess/Chess.com.
-                  </p>
-                </CardContent>
-              </Card>
-            </>
-          )}
+            {game.analyzed && (
+              <TabsContent value="summary" className="min-h-0 flex-1 space-y-4 overflow-y-auto">
+                {graphPoints.length > 1 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Andamento</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <EvalGraph
+                        points={graphPoints}
+                        cursor={chess.cursor}
+                        onSelect={chess.goTo}
+                        cap={EVAL_CAP}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+                <AnalysisLegend />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Riepilogo</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <SummaryTable white={summary.white} black={summary.black} />
+                    <p className="text-xs text-text-muted">
+                      L&apos;accuratezza % è una stima basata sulla perdita media in
+                      centipawn, non lo standard ufficiale di Lichess/Chess.com.
+                    </p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+          </Tabs>
         </div>
       </div>
     </div>
   );
 }
 
-/** Etichetta della mossa mostrata: classificazione + miglior mossa + valutazione. */
+/** Targhetta compatta col nome del giocatore + pallino del suo colore. */
+function PlayerTag({
+  name,
+  color,
+  indented,
+}: {
+  name: string | null;
+  color: "white" | "black";
+  indented: boolean;
+}) {
+  return (
+    <div className="mx-auto flex w-full max-w-3xl items-center gap-2 xl:max-w-[820px]">
+      {/* Spaziatore largo come la barra di valutazione, così il nome si allinea alla board. */}
+      {indented && <div className="w-6 shrink-0" aria-hidden="true" />}
+      <span
+        className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full border border-border ${
+          color === "white" ? "bg-neutral-50" : "bg-neutral-900"
+        }`}
+        aria-hidden="true"
+      />
+      <span className="truncate text-sm font-medium text-text">{name ?? "?"}</span>
+    </div>
+  );
+}
+
+/**
+ * Valutazione della mossa mostrata. Il simbolo di qualità (!,!!,?! …) NON è qui:
+ * vive come badge sull'angolo del pezzo mosso (vedi `moveGlyph` su ChessBoard).
+ */
 function CurrentMoveInfo({ row }: { row: AnalysisRow }) {
-  const meta = row.classification ? CLASSIFICATION_META[row.classification] : null;
   const decoded = row.eval_after != null ? decodeEval(row.eval_after) : null;
   const evalLabel = decoded ? formatEval(decoded.value, decoded.type) : null;
   const verdict = decoded ? evalVerdict(decoded.value, decoded.type) : null;
+  if (!evalLabel || !verdict) return null;
   return (
-    <div className="flex items-center gap-3 text-sm">
-      {meta && (
-        <Tooltip content={meta.description} className="max-w-xs whitespace-normal">
-          <span className="cursor-help font-medium" style={{ color: meta.color }}>
-            {meta.glyph} {meta.label}
-          </span>
-        </Tooltip>
-      )}
-      {evalLabel && verdict && (
-        <Tooltip
-          content={`${verdict.headline}. ${verdict.detail}`}
-          className="max-w-xs whitespace-normal"
-        >
-          <span className="cursor-help font-mono text-text-muted">{evalLabel}</span>
-        </Tooltip>
-      )}
-    </div>
+    <Tooltip
+      content={`${verdict.headline}. ${verdict.detail}`}
+      className="max-w-xs whitespace-normal"
+    >
+      <span className="cursor-help font-mono text-sm text-text-muted">{evalLabel}</span>
+    </Tooltip>
   );
 }
 
