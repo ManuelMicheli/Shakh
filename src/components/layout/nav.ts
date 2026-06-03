@@ -28,28 +28,58 @@ export interface NavItem {
   comingSoon?: boolean;
 }
 
+export interface NavGroup {
+  /** Etichetta della sezione. Assente = ancore principali senza intestazione. */
+  label?: string;
+  items: NavItem[];
+}
+
 /**
- * Navigazione della shell autenticata. Le voci sono già tutte presenti per
- * mostrare la struttura; quelle dei moduli futuri (prompt 01–10) sono
- * disabilitate con badge "presto".
+ * Navigazione della shell autenticata, organizzata per fasi del percorso di
+ * apprendimento: ancore fisse (dove sono / cosa faccio ora), poi Studia →
+ * Allenati → Gioca e analizza. Profilo e Gruppi vivono nel footer.
  */
-export const navItems: NavItem[] = [
-  { label: "Dashboard", href: "/app", icon: LayoutDashboard },
-  { label: "Impara", href: "/app/impara", icon: GraduationCap },
-  { label: "Oggi", href: "/app/oggi", icon: CalendarCheck },
-  { label: "Le mie partite", href: "/app/partite", icon: Swords },
-  { label: "Gioca con un amico", href: "/app/gioca", icon: Gamepad2 },
-  { label: "Punti deboli", href: "/app/debolezze", icon: Crosshair },
-  { label: "Ripara errori", href: "/app/ripara", icon: Wrench },
-  { label: "Tattiche", href: "/app/tattiche", icon: Target },
-  { label: "Calcolo", href: "/app/calcolo", icon: Brain },
-  { label: "Sparring", href: "/app/sparring", icon: Cpu },
-  { label: "Trappole", href: "/app/trappole", icon: Zap },
-  { label: "Teoria", href: "/app/teoria", icon: BookOpen },
-  { label: "Repertorio", href: "/app/repertorio", icon: Library },
-  { label: "Preparazione", href: "/app/preparazione", icon: Radar },
-  { label: "Percorso", href: "/app/percorso", icon: Route },
-  { label: "Coach", href: "/app/coach", icon: Bot },
+export const navGroups: NavGroup[] = [
+  {
+    // Ancore: orientamento e guida quotidiana. Il percorso è la spina dorsale.
+    items: [
+      { label: "Dashboard", href: "/app", icon: LayoutDashboard },
+      { label: "Oggi", href: "/app/oggi", icon: CalendarCheck },
+      { label: "Percorso", href: "/app/percorso", icon: Route },
+      { label: "Coach", href: "/app/coach", icon: Bot },
+    ],
+  },
+  {
+    label: "Studia",
+    items: [
+      { label: "Impara", href: "/app/impara", icon: GraduationCap },
+      { label: "Teoria", href: "/app/teoria", icon: BookOpen },
+      { label: "Repertorio", href: "/app/repertorio", icon: Library },
+      { label: "Preparazione", href: "/app/preparazione", icon: Radar },
+    ],
+  },
+  {
+    label: "Allenati",
+    items: [
+      { label: "Tattiche", href: "/app/tattiche", icon: Target },
+      { label: "Calcolo", href: "/app/calcolo", icon: Brain },
+      { label: "Trappole", href: "/app/trappole", icon: Zap },
+      { label: "Sparring", href: "/app/sparring", icon: Cpu },
+    ],
+  },
+  {
+    label: "Gioca e analizza",
+    items: [
+      { label: "Gioca con un amico", href: "/app/gioca", icon: Gamepad2 },
+      { label: "Le mie partite", href: "/app/partite", icon: Swords },
+      { label: "Punti deboli", href: "/app/debolezze", icon: Crosshair },
+      { label: "Ripara errori", href: "/app/ripara", icon: Wrench },
+    ],
+  },
+];
+
+/** Voci ancorate in fondo alla sidebar: gestione e account. */
+export const navFooter: NavItem[] = [
   { label: "Gruppi", href: "/app/gruppi", icon: Users },
   { label: "Profilo", href: "/app/profilo", icon: User },
 ];
