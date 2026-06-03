@@ -10,13 +10,17 @@ import { TrendLine } from "./TrendLine";
 import { Glossary } from "./Glossary";
 import { phaseLabel } from "@/lib/ai/format";
 import type { DashboardData } from "@/lib/progress/aggregate";
-import type { OverallRating } from "@/lib/rating/aggregate";
+import { MIN_TOTAL_SAMPLES, type OverallRating } from "@/lib/rating/aggregate";
 
 const pct = (v: number | null): string => (v == null ? "—" : `${Math.round(v * 100)}%`);
 
 /** Card del Rating Shakh: numero complessivo (OTB) + scomposizione per dominio. */
 function ShakhRatingCard({ rating }: { rating: OverallRating }) {
   const shown = rating.breakdown.filter((b) => b.rating != null);
+  // Dati raccolti finora = somma dei campioni per dominio (coerente con la soglia
+  // che decide `provisional` in aggregateOverall). Gap = quanti ancora ne mancano.
+  const collected = rating.breakdown.reduce((s, b) => s + b.samples, 0);
+  const missing = Math.max(0, MIN_TOTAL_SAMPLES - collected);
   return (
     <Card>
       <CardHeader>
@@ -36,6 +40,20 @@ function ShakhRatingCard({ rating }: { rating: OverallRating }) {
           </span>
           <span className="font-mono text-xs text-text-muted">± {rating.rd}</span>
         </div>
+        {rating.provisional && (
+          <p className="text-xs leading-relaxed text-text-muted">
+            {missing > 0 ? (
+              <>
+                Stima non ancora calibrata: <span className="font-mono">{collected}</span>/
+                <span className="font-mono">{MIN_TOTAL_SAMPLES}</span> dati raccolti, ne mancano{" "}
+                <span className="font-mono">{missing}</span>. Ogni puzzle risolto, partita analizzata
+                o finale giocato conta.
+              </>
+            ) : (
+              "Stima in affinamento: hai abbastanza dati, continua ad allenarti e il margine d'errore (±) calerà."
+            )}
+          </p>
+        )}
         {shown.length > 0 && (
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {shown.map((b) => (
@@ -166,7 +184,9 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
           <CardContent>
             {data.weaknesses.length === 0 ? (
               <p className="py-6 text-sm text-text-muted">
-                Nessun punto debole marcato: servono più dati.
+                {data.weaknessCoverage.attempts === 0
+                  ? `Nessun dato ancora: servono almeno ${data.weaknessCoverage.minAttempts} tentativi su uno stesso tema perché venga valutato.`
+                  : `Nessun punto debole marcato: finora ${data.weaknessCoverage.attempts} tentativi su ${data.weaknessCoverage.trackedThemes} ${data.weaknessCoverage.trackedThemes === 1 ? "tema" : "temi"}, ma ne servono almeno ${data.weaknessCoverage.minAttempts} per tema per segnalarne uno.`}
               </p>
             ) : readOnly ? (
               <div className="divide-y divide-border">
@@ -255,7 +275,10 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
             <CardDescription>Andamento nel tempo.</CardDescription>
           </CardHeader>
           <CardContent>
-            <TrendLine points={data.trends.rating} />
+            <TrendLine
+              points={data.trends.rating}
+              dataNoun={{ one: "puzzle risolto", many: "puzzle risolti" }}
+            />
           </CardContent>
         </Card>
         <Card>
@@ -264,7 +287,11 @@ export function DashboardView({ data, readOnly = false, middleSlot }: DashboardV
             <CardDescription>Una percentuale per partita.</CardDescription>
           </CardHeader>
           <CardContent>
-            <TrendLine points={data.trends.accuracy} suffix="%" />
+            <TrendLine
+              points={data.trends.accuracy}
+              suffix="%"
+              dataNoun={{ one: "partita analizzata", many: "partite analizzate" }}
+            />
           </CardContent>
         </Card>
       </div>

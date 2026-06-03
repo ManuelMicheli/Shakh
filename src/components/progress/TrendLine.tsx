@@ -13,6 +13,11 @@ export interface TrendLineProps {
   points: TrendPoint[];
   /** Suffisso del valore nei tooltip (es. "%"). */
   suffix?: string;
+  /**
+   * Nome del dato dietro un punto (singolare/plurale), per lo stato vuoto:
+   * "Serve ancora 1 partita…" / "Servono ancora 2 puzzle…".
+   */
+  dataNoun?: { one: string; many: string };
   className?: string;
 }
 
@@ -24,7 +29,12 @@ const PAD = 16;
  * Grafico a linee — SVG inline, niente librerie di charting. Monocromo:
  * andamento di rating o accuratezza nel tempo, con punti e tooltip nativi.
  */
-export function TrendLine({ points, suffix = "", className }: TrendLineProps) {
+export function TrendLine({
+  points,
+  suffix = "",
+  dataNoun = { one: "dato", many: "dati" },
+  className,
+}: TrendLineProps) {
   const geom = useMemo(() => {
     const n = points.length;
     const values = points.map((p) => p.value);
@@ -41,9 +51,12 @@ export function TrendLine({ points, suffix = "", className }: TrendLineProps) {
   }, [points]);
 
   if (points.length < 2) {
+    const missing = 2 - points.length;
     return (
       <p className={cn("py-8 text-center text-sm text-text-muted", className)}>
-        Servono più dati per disegnare l&apos;andamento.
+        {missing === 1
+          ? `Serve ancora 1 ${dataNoun.one} per disegnare l'andamento.`
+          : `Servono ancora ${missing} ${dataNoun.many} per disegnare l'andamento.`}
       </p>
     );
   }

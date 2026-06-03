@@ -101,6 +101,11 @@ export interface DashboardData {
   path: PathProgress;
   synthesis: CoachSynthesis | null;
   recent: RecentItem[];
+  /**
+   * Copertura dei dati allenabili: spiega lo stato vuoto dei punti deboli con
+   * numeri concreti (quanti temi praticati, quanti tentativi, soglia minima).
+   */
+  weaknessCoverage: { trackedThemes: number; attempts: number; minAttempts: number };
   /** True se l'utente non ha ancora dati sufficienti per i grafici. */
   empty: boolean;
 }
@@ -242,6 +247,15 @@ export async function loadDashboard(supabase: DB, userId: string): Promise<Dashb
     .sort((a, b) => a.score - b.score)
     .slice(0, 5);
 
+  // Copertura per spiegare lo stato vuoto con numeri concreti: solo le dimensioni
+  // allenabili (quelle mappate da describeWeakness / AREA_OF_DIMENSION).
+  const trackableRows = progressRows.filter((r) => AREA_OF_DIMENSION[r.dimension] != null);
+  const weaknessCoverage = {
+    trackedThemes: trackableRows.filter((r) => r.attempts > 0).length,
+    attempts: trackableRows.reduce((s, r) => s + r.attempts, 0),
+    minAttempts: MIN_ATTEMPTS,
+  };
+
   const empty =
     gameData.stats.analyzed === 0 &&
     progressRows.length === 0 &&
@@ -258,6 +272,7 @@ export async function loadDashboard(supabase: DB, userId: string): Promise<Dashb
     path: pathAgg,
     synthesis,
     recent,
+    weaknessCoverage,
     empty,
   };
 }
