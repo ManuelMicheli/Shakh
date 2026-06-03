@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast";
 import { CLASSIFICATION_META } from "@/lib/analysis/labels";
+import { MoveBadge } from "@/components/analysis/MoveBadge";
 import { generateKeyErrorComments } from "@/app/app/partite/actions";
 import type { AnalysisRow, Classification } from "@/lib/games/types";
 import { PositionChat } from "./PositionChat";
@@ -185,9 +186,10 @@ function MoveExplain({
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm">
           Mossa <span className="font-mono">{currentSan ?? "—"}</span>
-          {meta && (
-            <span className="ml-2 font-medium" style={{ color: meta.color }}>
-              {meta.glyph} {meta.label}
+          {meta && currentClassification && (
+            <span className="ml-2 inline-flex items-center gap-1 align-middle font-medium">
+              <MoveBadge classification={currentClassification} size={15} />
+              <span style={{ color: meta.color }}>{meta.label}</span>
             </span>
           )}
         </span>

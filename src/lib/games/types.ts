@@ -6,15 +6,32 @@
 export type GameSource = "pgn" | "lichess" | "chesscom";
 export type PieceColor = "white" | "black";
 
-/** Enum `move_classification` del DB. `brilliant`/`book` esistono ma non sono popolati in questo prompt. */
+/** Enum `move_classification` del DB. `brilliant` resta popolato altrove (sacrifici). */
 export type Classification =
   | "brilliant"
+  | "great"
   | "best"
+  | "excellent"
   | "good"
   | "inaccuracy"
   | "mistake"
+  | "miss"
   | "blunder"
   | "book";
+
+/** Ordine canonico di visualizzazione (legenda, riepilogo) — come la scheda di riferimento. */
+export const CLASSIFICATION_ORDER = [
+  "brilliant",
+  "great",
+  "book",
+  "best",
+  "excellent",
+  "good",
+  "inaccuracy",
+  "mistake",
+  "miss",
+  "blunder",
+] as const satisfies readonly Classification[];
 
 /** Riga della tabella `games`. */
 export interface GameRow {

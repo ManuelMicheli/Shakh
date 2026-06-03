@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { HistoryMove } from "@/lib/chess/useChessGame";
 import type { Classification } from "@/lib/games/types";
 import { CLASSIFICATION_META } from "@/lib/analysis/labels";
+import { MoveBadge } from "@/components/analysis/MoveBadge";
 import { cn } from "@/lib/utils";
 
 export interface MoveListProps {
@@ -16,6 +17,11 @@ export interface MoveListProps {
    * Quando presente, accanto alla mossa appare un marcatore col colore semantico.
    */
   classifications?: Map<number, Classification>;
+  /**
+   * Layout a colonna singola (una semimossa per riga: `1. e4`, `1… e5`), per
+   * pannelli stretti — es. la colonna mosse accanto alla board su mobile.
+   */
+  compact?: boolean;
   className?: string;
 }
 
@@ -43,6 +49,7 @@ export function MoveList({
   cursor,
   onSelect,
   classifications,
+  compact = false,
   className,
 }: MoveListProps) {
   const pairs = toPairs(history);
@@ -77,19 +84,47 @@ export function MoveList({
         )}
       >
         <span>{move.san}</span>
-        {meta?.marked && meta.glyph && (
-          <span
-            aria-label={meta.label}
-            title={meta.label}
-            className="text-xs font-bold leading-none"
-            style={{ color: active ? undefined : meta.color }}
-          >
-            {meta.glyph}
-          </span>
-        )}
+        {meta?.marked && cls && <MoveBadge classification={cls} size={15} />}
       </button>
     );
   };
+
+  if (compact) {
+    return (
+      <ol
+        className={cn(
+          "flex flex-col gap-0.5 overflow-y-auto font-mono text-xs",
+          className,
+        )}
+      >
+        {history.map((m, i) => {
+          const active = i === cursor;
+          const prefix = i % 2 === 0 ? `${Math.floor(i / 2) + 1}.` : "…";
+          const cls = classifications?.get(i);
+          const meta = cls ? CLASSIFICATION_META[cls] : null;
+          return (
+            <li key={i}>
+              <button
+                ref={active ? activeRef : undefined}
+                type="button"
+                onClick={() => onSelect(i)}
+                className={cn(
+                  "flex w-full items-center gap-1 rounded px-1.5 py-1 text-left transition-colors hover:bg-surface-2",
+                  active && "bg-text text-bg hover:bg-text",
+                )}
+              >
+                <span className="select-none text-text-muted tabular-nums">
+                  {prefix}
+                </span>
+                <span>{m.san}</span>
+                {meta?.marked && cls && <MoveBadge classification={cls} size={15} />}
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    );
+  }
 
   return (
     <ol

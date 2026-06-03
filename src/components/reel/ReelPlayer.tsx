@@ -6,6 +6,7 @@ import type { Square } from "chess.js";
 import type { DrawShape } from "chessground/draw";
 import { Button } from "@/components/ui/button";
 import type { ReelData } from "@/lib/reel/payload";
+import { CLASSIFICATION_ORDER, type Classification } from "@/lib/games/types";
 
 const ChessBoard = dynamic(
   () => import("@/components/chess/ChessBoard").then((m) => m.ChessBoard),
@@ -14,17 +15,12 @@ const ChessBoard = dynamic(
 
 const STEP_MS = 1100;
 
-// Glifo NAG in stile motore, mostrato sulla casella di destinazione.
-const LABEL_GLYPH: Record<string, string> = {
-  brilliant: "!!",
-  best: "✓",
-  good: "!",
-};
-
-function labelColor(label: string): string {
-  if (label === "brilliant") return "var(--eval-brilliant)";
-  if (label === "best") return "var(--eval-best)";
-  return "var(--eval-good)";
+// L'etichetta della mossa chiave è una classificazione del motore: la valido,
+// con fallback su "good" se arriva una stringa inattesa.
+function toClassification(label: string): Classification {
+  return (CLASSIFICATION_ORDER as readonly string[]).includes(label)
+    ? (label as Classification)
+    : "good";
 }
 
 export function ReelPlayer({ data }: { data: ReelData }) {
@@ -47,7 +43,7 @@ export function ReelPlayer({ data }: { data: ReelData }) {
     : null;
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-3">
+    <div className="mx-auto w-full max-w-md space-y-3 lg:max-w-xl">
       {data.title && <p className="text-center text-sm text-text-muted">{data.title}</p>}
 
       <div className="relative">
@@ -60,11 +56,7 @@ export function ReelPlayer({ data }: { data: ReelData }) {
           shapes={shapes}
           moveGlyph={
             atEnd
-              ? {
-                  square: data.to as Square,
-                  glyph: LABEL_GLYPH[data.label] ?? "!",
-                  color: labelColor(data.label),
-                }
+              ? { square: data.to as Square, classification: toClassification(data.label) }
               : null
           }
         />

@@ -46,7 +46,7 @@ export function GuidedReplay({ title, intro, pgn, comments }: GuidedReplayProps)
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
-      <div className="mx-auto w-full max-w-xl space-y-3">
+      <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
         <ChessBoard
           fen={game.fen}
           orientation="white"

@@ -167,7 +167,7 @@ export function LessonViewer({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         {/* Board + controlli + passi */}
         <div className="space-y-3">
-          <div className="mx-auto flex w-full max-w-xl gap-2">
+          <div className="mx-auto flex w-full max-w-xl gap-2 lg:max-w-none">
             {engineOn && whiteEval && (
               <EvalBar score={whiteEval.value} scoreType={whiteEval.type} orientation={orientation} />
             )}

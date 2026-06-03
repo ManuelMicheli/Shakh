@@ -121,7 +121,7 @@ export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunn
           {index + 1} / {total}
         </span>
       </div>
-      <div className="mx-auto w-full max-w-xl">
+      <div className="mx-auto w-full max-w-xl lg:max-w-2xl xl:max-w-3xl">
         <PuzzleSolver key={current.id} puzzle={current} onSolved={handleSolved} />
       </div>
     </div>

@@ -8,6 +8,9 @@ import type { Color, Key } from "chessground/types";
 import type { DrawShape } from "chessground/draw";
 import type { Square, PieceSymbol } from "chess.js";
 import type { LegalDests } from "@/lib/chess/useChessGame";
+import type { Classification } from "@/lib/games/types";
+import { CLASSIFICATION_META } from "@/lib/analysis/labels";
+import { BadgeGlyph } from "@/components/analysis/MoveBadge";
 import { cn } from "@/lib/utils";
 
 import "chessground/assets/chessground.base.css";
@@ -49,10 +52,8 @@ export interface ChessBoardProps {
 export interface MoveGlyph {
   /** Casella su cui ancorare il badge (di norma la destinazione della mossa). */
   square: Square;
-  /** Simbolo NAG: "!!", "!", "✓", "?!", "?", "??". */
-  glyph: string;
-  /** Colore di sfondo (token semantico `--eval-*`). */
-  color: string;
+  /** Classificazione: determina simbolo/icona e colore del badge. */
+  classification: Classification;
 }
 
 /** Posizione (in % della board) dell'angolo in alto a destra di una casella. */
@@ -268,16 +269,17 @@ export function ChessBoard({
           → bounds 0×0 → pezzi accatastati in alto a sinistra (translate 0,0). */}
       <div ref={wrapRef} className="absolute inset-0" />
 
-      {moveGlyph && moveGlyph.glyph && (
+      {moveGlyph && (
         <div className="board-glyph-layer" aria-hidden="true">
           {(() => {
             const { left, top } = glyphCorner(moveGlyph.square, orientation);
+            const meta = CLASSIFICATION_META[moveGlyph.classification];
             return (
               <span
                 className="board-glyph"
-                style={{ left: `${left}%`, top: `${top}%`, backgroundColor: moveGlyph.color }}
+                style={{ left: `${left}%`, top: `${top}%`, backgroundColor: meta.color }}
               >
-                {moveGlyph.glyph}
+                {meta.icon ? <BadgeGlyph icon={meta.icon} /> : meta.glyph}
               </span>
             );
           })()}

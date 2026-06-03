@@ -20,9 +20,10 @@ import { decodeEval, toWhiteCpClamped, type PovEval } from "@/lib/analysis/evalS
 import { formatEval } from "@/lib/engine/score";
 import { evalVerdict } from "@/lib/engine/explain";
 import { CLASSIFICATION_META } from "@/lib/analysis/labels";
+import { MoveBadge } from "@/components/analysis/MoveBadge";
 import { summarizeGame, type SideSummary } from "@/lib/analysis/accuracy";
 import { resetGameAnalysis } from "@/app/app/partite/actions";
-import type { AnalysisRow, Classification, PieceColor } from "@/lib/games/types";
+import { CLASSIFICATION_ORDER, type AnalysisRow, type Classification, type PieceColor } from "@/lib/games/types";
 
 const ChessBoard = dynamic(
   () => import("@/components/chess/ChessBoard").then((m) => m.ChessBoard),
@@ -120,8 +121,8 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
   const moveGlyph = useMemo(() => {
     if (!game.analyzed || !currentRow?.classification || !chess.lastMove) return null;
     const meta = CLASSIFICATION_META[currentRow.classification];
-    if (!meta.glyph) return null;
-    return { square: chess.lastMove[1], glyph: meta.glyph, color: meta.color };
+    if (!meta.marked) return null;
+    return { square: chess.lastMove[1], classification: currentRow.classification };
   }, [game.analyzed, currentRow, chess.lastMove]);
 
   const onReanalyze = () => {
@@ -349,18 +350,13 @@ function AnalysisLegend() {
           etichettata così:
         </p>
         <ul className="space-y-1.5">
-          {(
-            ["brilliant", "best", "good", "inaccuracy", "mistake", "blunder", "book"] as const
-          ).map((k) => {
+          {CLASSIFICATION_ORDER.map((k) => {
             const m = CLASSIFICATION_META[k];
             return (
               <li key={k} className="flex items-baseline gap-2 text-xs">
-                <span
-                  className="min-w-[5.5rem] shrink-0 font-medium"
-                  style={{ color: m.color }}
-                >
-                  {m.glyph && <span className="font-mono">{m.glyph} </span>}
-                  {m.label}
+                <span className="flex min-w-[6.5rem] shrink-0 items-center gap-1.5 font-medium">
+                  <MoveBadge classification={k} size={15} />
+                  <span style={{ color: m.color }}>{m.label}</span>
                 </span>
                 <span className="text-text-muted">{m.description}</span>
               </li>
@@ -377,7 +373,8 @@ function SummaryTable({ white, black }: { white: SideSummary; black: SideSummary
     { label: "Accuratezza", w: `${white.accuracy}%`, b: `${black.accuracy}%` },
     { label: "Imprecisioni", w: white.inaccuracy, b: black.inaccuracy },
     { label: "Errori", w: white.mistake, b: black.mistake },
-    { label: "Gravi errori", w: white.blunder, b: black.blunder },
+    { label: "Mosse mancate", w: white.miss, b: black.miss },
+    { label: "Errori gravi", w: white.blunder, b: black.blunder },
   ];
   return (
     <table className="w-full text-sm">

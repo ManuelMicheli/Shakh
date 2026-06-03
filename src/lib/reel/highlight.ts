@@ -1,6 +1,6 @@
 /**
  * Sceglie il "momento migliore" di una partita per il reel: la mossa più bella
- * dell'utente (brilliant → best → good), a parità la più forte per valutazione.
+ * dell'utente (brilliant → great → best → excellent → good), a parità la più forte per valutazione.
  *
  * Deterministico. Riusa i decoder di `evalScore.ts`, `evalText`/`moverFromPly`
  * di `ai/format.ts` e `chess.js` per ricavare origine/destinazione dal SAN.
@@ -18,7 +18,13 @@ export interface HighlightRow {
   classification: string | null;
 }
 
-const SCORE: Record<string, number> = { brilliant: 3, best: 2, good: 1 };
+const SCORE: Record<string, number> = {
+  brilliant: 5,
+  great: 4,
+  best: 3,
+  excellent: 2,
+  good: 1,
+};
 const START_FEN = new Chess().fen();
 
 /** Ritorna i dati del reel (senza `title`) o null se non c'è un momento adatto. */

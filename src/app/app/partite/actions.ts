@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { splitPgn, parseGame, detectUserColor, type ParsedGame } from "@/lib/games/pgn";
 import { lichessProvider, chesscomProvider, ProviderError } from "@/lib/games/providers";
+import { CLASSIFICATION_ORDER } from "@/lib/games/types";
 import type { AnalysisRowInput, Classification, GameSource } from "@/lib/games/types";
 import { explainMove } from "@/lib/ai/coach";
 import { isCoachConfigured } from "@/lib/ai/client";
@@ -150,15 +151,7 @@ export async function importChesscom(
   return importParsed(games, "chesscom", u);
 }
 
-const VALID_CLASSIFICATIONS: ReadonlySet<string> = new Set<Classification>([
-  "brilliant",
-  "best",
-  "good",
-  "inaccuracy",
-  "mistake",
-  "blunder",
-  "book",
-]);
+const VALID_CLASSIFICATIONS: ReadonlySet<string> = new Set<string>(CLASSIFICATION_ORDER);
 
 /** Ply già analizzati di una partita (per saltarli alla ripresa). RLS-scoped. */
 export async function getSavedAnalysisPlies(gameId: string): Promise<number[]> {
@@ -314,7 +307,9 @@ export async function generateKeyErrorComments(
   const targets = rows
     .filter(
       (r) =>
-        (r.classification === "blunder" || r.classification === "mistake") &&
+        (r.classification === "blunder" ||
+          r.classification === "miss" ||
+          r.classification === "mistake") &&
         !(typeof r.ai_comment === "string" && r.ai_comment.trim()),
     )
     .slice(0, MAX_BATCH_COMMENTS);

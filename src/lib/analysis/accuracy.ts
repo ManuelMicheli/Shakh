@@ -13,6 +13,7 @@ export interface SideSummary {
   moves: number;
   inaccuracy: number;
   mistake: number;
+  miss: number;
   blunder: number;
   /** Perdita media in centipawn. */
   avgLoss: number;
@@ -32,7 +33,7 @@ function accuracyFromAvgLoss(avgLossCp: number): number {
 }
 
 function emptyAcc() {
-  return { moves: 0, inaccuracy: 0, mistake: 0, blunder: 0, totalLoss: 0 };
+  return { moves: 0, inaccuracy: 0, mistake: 0, miss: 0, blunder: 0, totalLoss: 0 };
 }
 
 export function summarizeGame(rows: AnalysisRow[]): GameSummary {
@@ -43,6 +44,7 @@ export function summarizeGame(rows: AnalysisRow[]): GameSummary {
     side.moves += 1;
     if (row.classification === "inaccuracy") side.inaccuracy += 1;
     else if (row.classification === "mistake") side.mistake += 1;
+    else if (row.classification === "miss") side.miss += 1;
     else if (row.classification === "blunder") side.blunder += 1;
 
     if (row.eval_before != null && row.eval_after != null) {
@@ -60,6 +62,7 @@ export function summarizeGame(rows: AnalysisRow[]): GameSummary {
       moves: s.moves,
       inaccuracy: s.inaccuracy,
       mistake: s.mistake,
+      miss: s.miss,
       blunder: s.blunder,
       avgLoss: Math.round(avgLoss),
       accuracy: accuracyFromAvgLoss(avgLoss),

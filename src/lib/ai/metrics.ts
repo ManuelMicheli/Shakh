@@ -51,7 +51,8 @@ export function computeMetrics(games: MetricGame[], rows: MetricRow[]): UserMetr
     if (r.classification === "inaccuracy") {
       s.inaccuracies++;
       inaccuracies++;
-    } else if (r.classification === "mistake") {
+    } else if (r.classification === "mistake" || r.classification === "miss") {
+      // "miss" (occasione vincente mancata): pesa come errore.
       s.mistakes++;
       mistakes++;
     } else if (r.classification === "blunder") {

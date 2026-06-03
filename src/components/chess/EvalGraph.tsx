@@ -108,11 +108,12 @@ export function EvalGraph({
         />
       )}
 
-      {/* Punti d'errore (blunder/mistake/inaccuracy) + bersagli cliccabili ovunque. */}
+      {/* Punti d'errore (blunder/miss/mistake/inaccuracy) + bersagli cliccabili ovunque. */}
       {geom.coords.map((c, i) => {
         const meta = c.classification ? CLASSIFICATION_META[c.classification] : null;
         const showDot =
           c.classification === "blunder" ||
+          c.classification === "miss" ||
           c.classification === "mistake" ||
           c.classification === "inaccuracy";
         return (

@@ -77,7 +77,7 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
           <div
             ref={boardWrapRef}
             tabIndex={0}
-            className="mx-auto w-full max-w-xl rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+            className="mx-auto w-full max-w-xl rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text lg:max-w-none"
           >
             <ChessBoard
               fen={t.fen}

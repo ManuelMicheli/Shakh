@@ -373,6 +373,7 @@ async function loadGameStats(
       if (
         r.classification === "inaccuracy" ||
         r.classification === "mistake" ||
+        r.classification === "miss" ||
         r.classification === "blunder"
       )
         errors++;

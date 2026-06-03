@@ -12,7 +12,23 @@ export const CLASSIFICATION_THRESHOLDS = {
   mistake: 150,
   /** 50 ≤ loss < 150 → inaccuracy */
   inaccuracy: 50,
+  /** 20 ≤ loss < 50 → good; loss < 20 (non migliore) → excellent */
+  excellent: 20,
 } as const;
+
+/**
+ * Guadagno minimo (cp, lato di chi muove) perché la mossa MIGLIORE valga come
+ * "great" (Grande): non basta coincidere col motore, deve aver attivamente
+ * migliorato la posizione di molto (tattica trovata), non in posizione già vinta.
+ */
+export const GREAT_GAIN = 150;
+
+/**
+ * Vantaggio (cp, lato di chi muove) che la mossa MIGLIORE metteva a
+ * disposizione: se chi muove lo butta via con una perdita da errore, la mossa
+ * è una "miss" (Mossa mancata) anziché un semplice errore/grave errore.
+ */
+export const MISS_WIN_THRESHOLD = 200;
 
 /**
  * Vantaggio (cp, lato di chi muove) oltre il quale la posizione è considerata

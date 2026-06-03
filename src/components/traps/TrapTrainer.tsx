@@ -213,7 +213,7 @@ function EvitaTrainer({
 
   return (
     <div className="space-y-4">
-      <div className="relative mx-auto w-full max-w-xl">
+      <div className="relative mx-auto w-full max-w-xl lg:max-w-2xl xl:max-w-3xl">
         <ChessBoard
           fen={triggerFen}
           orientation={victim}

@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CLASSIFICATION_META } from "@/lib/analysis/labels";
+import { MoveBadge } from "@/components/analysis/MoveBadge";
+import { CLASSIFICATION_ORDER } from "@/lib/games/types";
 
 interface Term {
   term: string;
@@ -130,18 +132,13 @@ export function Glossary() {
             Qualità delle mosse
           </summary>
           <ul className="mt-3 space-y-1.5">
-            {(
-              ["brilliant", "best", "good", "inaccuracy", "mistake", "blunder", "book"] as const
-            ).map((k) => {
+            {CLASSIFICATION_ORDER.map((k) => {
               const m = CLASSIFICATION_META[k];
               return (
                 <li key={k} className="flex items-baseline gap-2 text-xs">
-                  <span
-                    className="min-w-[5.5rem] shrink-0 font-medium"
-                    style={{ color: m.color }}
-                  >
-                    {m.glyph && <span className="font-mono">{m.glyph} </span>}
-                    {m.label}
+                  <span className="flex min-w-[6.5rem] shrink-0 items-center gap-1.5 font-medium">
+                    <MoveBadge classification={k} size={15} />
+                    <span style={{ color: m.color }}>{m.label}</span>
                   </span>
                   <span className="text-text-muted">{m.description}</span>
                 </li>

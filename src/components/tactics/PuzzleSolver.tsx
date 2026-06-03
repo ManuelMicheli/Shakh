@@ -191,7 +191,7 @@ export function PuzzleSolver({ puzzle, onSolved }: PuzzleSolverProps) {
 
   return (
     <div className="space-y-3">
-      <div className="relative mx-auto w-full max-w-xl">
+      <div className="relative mx-auto w-full max-w-xl lg:max-w-2xl xl:max-w-3xl">
         <ChessBoard
           fen={game.fen}
           orientation={solverColor}
@@ -206,7 +206,7 @@ export function PuzzleSolver({ puzzle, onSolved }: PuzzleSolverProps) {
           // mossa è corretta; gli errori restano segnalati dai cerchi rossi (shapes).
           moveGlyph={
             feedback === "right" && game.lastMove
-              ? { square: game.lastMove[1], glyph: "✓", color: "var(--eval-best)" }
+              ? { square: game.lastMove[1], classification: "good" }
               : null
           }
         />

@@ -27,7 +27,7 @@ const MAX_GAMES = 40;
 /** Perdita massima attribuita a una singola mossa (cp). */
 const MAX_LOSS = 1000;
 
-const ERROR_CLASSES: ReadonlySet<string> = new Set(["inaccuracy", "mistake", "blunder"]);
+const ERROR_CLASSES: ReadonlySet<string> = new Set(["inaccuracy", "mistake", "miss", "blunder"]);
 
 export interface WeaknessExample {
   gameId: string;

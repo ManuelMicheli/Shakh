@@ -264,7 +264,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
           )}
 
           {phase === "preview" && (
-            <div className="mx-auto w-full max-w-xl space-y-3">
+            <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-text-muted">
                   Muove il {orientation === "white" ? "Bianco" : "Nero"} · {total} mosse da calcolare
@@ -279,7 +279,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
           )}
 
           {phase === "solve" && (
-            <div className="mx-auto w-full max-w-xl space-y-3">
+            <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-text-muted">
                   Muove il {orientation === "white" ? "Bianco" : "Nero"}
@@ -299,7 +299,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
           )}
 
           {phase === "result" && result && (
-            <div className="mx-auto w-full max-w-xl space-y-3">
+            <div className="mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <ChessBoard fen={revealFen} orientation={orientation} mode="view" />
               <Card>
                 <CardContent className="space-y-3 py-4">
@@ -350,7 +350,7 @@ function BlindGrid({
   const rankOrder = orientation === "white" ? ranks : [...ranks].reverse();
 
   return (
-    <div className="mx-auto grid aspect-square w-full max-w-xl grid-cols-8 overflow-hidden rounded-md border border-border">
+    <div className="mx-auto grid aspect-square w-full max-w-xl grid-cols-8 overflow-hidden rounded-md border border-border lg:max-w-none">
       {rankOrder.map((r, ri) =>
         fileOrder.map((f, fi) => {
           const sq = `${f}${r}` as Square;

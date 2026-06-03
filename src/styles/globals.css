@@ -27,12 +27,16 @@
 
   /* Colori semantici analisi — UNICA eccezione al monocromatico.
      Usare SOLO nel contesto valutazione mosse, mai nella UI generale. */
-  --eval-brilliant: #3aa6b9;
-  --eval-best: #5b9a5e;
-  --eval-good: #8a9a6b;
-  --eval-inaccuracy: #c9a24b;
-  --eval-mistake: #cf8a4a;
-  --eval-blunder: #c0564a;
+  --eval-brilliant: #3aa6b9; /* Geniale — !! ciano/teal */
+  --eval-great: #5b8bb0; /* Grande — ! blu */
+  --eval-book: #a88865; /* Libro — tonalità legno/marrone */
+  --eval-best: #5b9a5e; /* Migliore — ★ verde */
+  --eval-excellent: #7aa757; /* Ottima — verde chiaro */
+  --eval-good: #8a9a6b; /* Buona — ✓ verde oliva */
+  --eval-inaccuracy: #c9a24b; /* Imprecisione — ?! giallo */
+  --eval-mistake: #cf8a4a; /* Errore — ? arancio */
+  --eval-miss: #d76b4d; /* Mossa mancata — ✕ arancio-rosso */
+  --eval-blunder: #c0564a; /* Errore grave — ?? rosso */
 }
 
 .light {
@@ -62,10 +66,14 @@
   --color-accent-contrast: var(--accent-contrast);
 
   --color-eval-brilliant: var(--eval-brilliant);
+  --color-eval-great: var(--eval-great);
+  --color-eval-book: var(--eval-book);
   --color-eval-best: var(--eval-best);
+  --color-eval-excellent: var(--eval-excellent);
   --color-eval-good: var(--eval-good);
   --color-eval-inaccuracy: var(--eval-inaccuracy);
   --color-eval-mistake: var(--eval-mistake);
+  --color-eval-miss: var(--eval-miss);
   --color-eval-blunder: var(--eval-blunder);
 
   /* Famiglie font (collegate alle CSS var iniettate da next/font) */
@@ -140,7 +148,7 @@ html.lenis body {
   /* Tetto su desktop E sull'altezza del viewport: essendo quadrata, limitare la
      larghezza con un'espressione in svh limita anche l'altezza, così board +
      controlli + eval bar restano nella schermata senza scroll. */
-  max-width: min(var(--board-max, 680px), max(280px, calc(100svh - 13rem)));
+  max-width: min(var(--board-max, 720px), max(280px, calc(100svh - 13rem)));
   aspect-ratio: 1 / 1;
   margin-inline: auto;
 }
@@ -193,7 +201,7 @@ html.lenis body {
     "ranks board"
     "corner files";
   width: 100%;
-  max-width: min(var(--board-max, 680px), max(280px, calc(100svh - 13rem)));
+  max-width: min(var(--board-max, 720px), max(280px, calc(100svh - 13rem)));
   margin-inline: auto;
 }
 /* Su monitor desktop ampi la scacchiera può crescere un po' (sempre entro il tetto
@@ -201,7 +209,7 @@ html.lenis body {
 @media (min-width: 1280px) {
   .board-square,
   .board-frame {
-    --board-max: 720px;
+    --board-max: 820px;
   }
 }
 /* Pagina di analisi: tetto in altezza più stretto perché sopra/sotto alla board
@@ -209,7 +217,7 @@ html.lenis body {
    board e tutti i comandi stanno in una sola schermata, senza scroll di pagina. */
 @media (min-width: 1024px) {
   .analysis-board .board-frame {
-    max-width: min(var(--board-max, 680px), calc(100dvh - 15rem));
+    max-width: min(var(--board-max, 720px), calc(100dvh - 15rem));
   }
 }
 .board-frame > .board-square {

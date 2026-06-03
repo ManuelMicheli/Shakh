@@ -300,7 +300,7 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
       </CardHeader>
       <CardContent>
         <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_18rem]">
-          <div className="mx-auto w-full max-w-md">
+          <div className="mx-auto w-full max-w-md md:max-w-none">
             <ChessBoard
               fen={current}
               orientation={practice.userColor}
