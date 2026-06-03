@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { Square, PieceSymbol } from "chess.js";
-import { Undo2, RotateCcw } from "lucide-react";
+import { Undo2, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useChessGame } from "@/lib/chess/useChessGame";
 import { findTimeControl } from "@/lib/play/time-controls";
 import { BoardControls } from "@/components/chess/BoardControls";
@@ -159,61 +159,101 @@ export function HotseatGame() {
   const msOf = (c: "w" | "b") => (c === "w" ? whiteMs : blackMs);
   const nameOf = (c: "w" | "b") => (c === "w" ? "Bianco" : "Nero");
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-      <div className="mx-auto w-full max-w-xl space-y-3">
-        <GameClock
-          name={nameOf(topColor)}
-          ms={msOf(topColor)}
-          active={!over && game.turn === topColor && atLive}
-        />
-        <div
-          ref={boardWrapRef}
-          tabIndex={0}
-          className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
-        >
-          <ChessBoard
-            fen={game.fen}
-            orientation={orientation}
-            mode={over ? "view" : "play"}
-            movableColor={game.turn === "w" ? "white" : "black"}
-            dests={!over && atLive ? game.legalDests : new Map()}
-            lastMove={game.lastMove}
-            check={game.isCheck}
-            onMove={onMove}
-          />
-        </div>
-        <GameClock
-          name={nameOf(bottomColor)}
-          ms={msOf(bottomColor)}
-          active={!over && game.turn === bottomColor && atLive}
-        />
+  const atEnd = game.cursor >= game.history.length - 1;
 
-        <div className="flex items-center justify-between gap-3">
-          <BoardControls
-            onFirst={game.first}
-            onPrev={game.prev}
-            onNext={game.next}
-            onLast={game.last}
-            onFlip={() =>
-              setOrientation((o) => (o === "white" ? "black" : "white"))
-            }
-            atStart={game.cursor < 0}
-            atEnd={game.cursor >= game.history.length - 1}
-            keyboardTarget={boardWrapRef}
-          />
-          <span
-            className={cn(
-              "font-mono text-sm",
-              over ? "text-text" : "text-text-muted",
-            )}
+  return (
+    <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="lg:mx-auto lg:w-full lg:max-w-none">
+        {/* Mobile: board + mosse a destra. Desktop: solo board (orologi + controlli sotto). */}
+        <div className="flex items-stretch gap-2 lg:block lg:space-y-3">
+          <div className="min-w-0 flex-1 space-y-3 lg:flex-none">
+            <GameClock
+              name={nameOf(topColor)}
+              ms={msOf(topColor)}
+              active={!over && game.turn === topColor && atLive}
+            />
+            <div
+              ref={boardWrapRef}
+              tabIndex={0}
+              className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+            >
+              <ChessBoard
+                fen={game.fen}
+                orientation={orientation}
+                mode={over ? "view" : "play"}
+                movableColor={game.turn === "w" ? "white" : "black"}
+                dests={!over && atLive ? game.legalDests : new Map()}
+                lastMove={game.lastMove}
+                check={game.isCheck}
+                onMove={onMove}
+              />
+            </div>
+            <GameClock
+              name={nameOf(bottomColor)}
+              ms={msOf(bottomColor)}
+              active={!over && game.turn === bottomColor && atLive}
+            />
+
+            {/* Desktop: controlli completi + stato. */}
+            <div className="hidden items-center justify-between gap-3 lg:flex">
+              <BoardControls
+                onFirst={game.first}
+                onPrev={game.prev}
+                onNext={game.next}
+                onLast={game.last}
+                onFlip={() =>
+                  setOrientation((o) => (o === "white" ? "black" : "white"))
+                }
+                atStart={game.cursor < 0}
+                atEnd={atEnd}
+                keyboardTarget={boardWrapRef}
+              />
+              <span
+                className={cn(
+                  "font-mono text-sm",
+                  over ? "text-text" : "text-text-muted",
+                )}
+              >
+                {status}
+              </span>
+            </div>
+          </div>
+
+          {/* Mobile: colonna mosse a destra della scacchiera. */}
+          <div className="flex w-[4.75rem] shrink-0 flex-col overflow-y-auto rounded-md border border-border bg-surface p-1 lg:hidden">
+            <MoveList
+              compact
+              history={game.history}
+              cursor={game.cursor}
+              onSelect={game.goTo}
+            />
+          </div>
+        </div>
+
+        {/* Mobile: solo indietro / avanti. */}
+        <div className="mt-2 flex items-center justify-center gap-3 lg:hidden">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={game.prev}
+            disabled={game.cursor < 0}
+            aria-label="Mossa precedente"
           >
-            {status}
-          </span>
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={game.next}
+            disabled={atEnd}
+            aria-label="Mossa successiva"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
-      <aside className="space-y-4">
+      <aside className="hidden space-y-4 lg:block">
         <div className="flex flex-wrap gap-2">
           <Button
             variant="secondary"

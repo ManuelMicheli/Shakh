@@ -64,14 +64,14 @@ export function GameClock({
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-3 rounded-md border px-3 py-2",
+        "flex items-center justify-between gap-3 rounded-md border px-2 py-1 lg:px-3 lg:py-2",
         active ? "border-text bg-surface-2" : "border-border bg-surface",
       )}
     >
-      <span className="truncate text-sm text-text-muted">{name}</span>
+      <span className="truncate text-xs text-text-muted lg:text-sm">{name}</span>
       <span
         className={cn(
-          "font-mono text-xl tabular-nums",
+          "font-mono text-base tabular-nums lg:text-xl",
           low ? "text-eval-blunder" : "text-text",
         )}
       >
