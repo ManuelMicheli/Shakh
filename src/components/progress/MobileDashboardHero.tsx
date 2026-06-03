@@ -58,23 +58,26 @@ export function MobileDashboardHero({
 
   return (
     <div className="space-y-5 md:hidden">
-      {/* Testata + rating: una scena unica, glifo cavallo in watermark. */}
-      <div className="relative">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute right-0 top-1 select-none font-display text-[13rem] leading-[0.78] text-text opacity-[0.06]"
-        >
-          ♞
-        </span>
+      {/* Testata: testo a sinistra, glifo cavallo come emblema a destra. */}
+      <div>
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-xs uppercase tracking-wider text-text-muted first-letter:uppercase">
+              {todayLabel()}
+            </p>
+            <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
+              Ciao, {name}
+            </h1>
+          </div>
+          <span
+            aria-hidden
+            className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
+          >
+            ♞
+          </span>
+        </div>
 
-        <div className="relative">
-          <p className="text-xs uppercase tracking-wider text-text-muted first-letter:uppercase">
-            {todayLabel()}
-          </p>
-          <h1 className="mt-0.5 font-display text-2xl font-semibold tracking-tight">
-            Ciao, {name}
-          </h1>
-
+        <div>
           {rating?.rating != null ? (
             <>
               <div className="mt-6 flex items-center gap-2">

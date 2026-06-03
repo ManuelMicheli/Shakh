@@ -3,11 +3,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { Square, PieceSymbol } from "chess.js";
-import { Undo2, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Undo2,
+  RotateCcw,
+  RefreshCw,
+  ChevronsLeft,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsRight,
+  MoreVertical,
+} from "lucide-react";
 import { useChessGame } from "@/lib/chess/useChessGame";
 import { findTimeControl } from "@/lib/play/time-controls";
 import { BoardControls } from "@/components/chess/BoardControls";
 import { MoveList } from "@/components/chess/MoveList";
+import { MoveStripH } from "@/components/chess/MoveStripH";
 import { GameClock } from "./GameClock";
 import { TimeControlPicker } from "./TimeControlPicker";
 import { Button } from "@/components/ui/button";
@@ -32,6 +42,7 @@ export function HotseatGame() {
   const [whiteMs, setWhiteMs] = useState<number | null>(null);
   const [blackMs, setBlackMs] = useState<number | null>(null);
   const [flagged, setFlagged] = useState<null | "w" | "b">(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const lastTick = useRef(0);
   const prevLen = useRef(0);
@@ -164,77 +175,87 @@ export function HotseatGame() {
   return (
     <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] 2xl:grid-cols-[auto_20rem] 2xl:justify-center">
       <div className="board-sized lg:mx-auto lg:w-full lg:max-w-none">
-        {/* Mobile: board + mosse a destra. Desktop: solo board (orologi + controlli sotto). */}
-        <div className="flex items-stretch gap-2 lg:block lg:space-y-3">
-          <div className="min-w-0 flex-1 space-y-3 lg:flex-none">
-            <GameClock
-              name={nameOf(topColor)}
-              ms={msOf(topColor)}
-              active={!over && game.turn === topColor && atLive}
+        {/* Board piena su mobile (orologi sopra/sotto). Desktop: stessa colonna. */}
+        <div className="space-y-3">
+          <GameClock
+            name={nameOf(topColor)}
+            ms={msOf(topColor)}
+            active={!over && game.turn === topColor && atLive}
+          />
+          <div
+            ref={boardWrapRef}
+            tabIndex={0}
+            className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+          >
+            <ChessBoard
+              fen={game.fen}
+              orientation={orientation}
+              mode={over ? "view" : "play"}
+              movableColor={game.turn === "w" ? "white" : "black"}
+              dests={!over && atLive ? game.legalDests : new Map()}
+              lastMove={game.lastMove}
+              check={game.isCheck}
+              onMove={onMove}
             />
-            <div
-              ref={boardWrapRef}
-              tabIndex={0}
-              className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
-            >
-              <ChessBoard
-                fen={game.fen}
-                orientation={orientation}
-                mode={over ? "view" : "play"}
-                movableColor={game.turn === "w" ? "white" : "black"}
-                dests={!over && atLive ? game.legalDests : new Map()}
-                lastMove={game.lastMove}
-                check={game.isCheck}
-                onMove={onMove}
-              />
-            </div>
-            <GameClock
-              name={nameOf(bottomColor)}
-              ms={msOf(bottomColor)}
-              active={!over && game.turn === bottomColor && atLive}
-            />
-
-            {/* Desktop: controlli completi + stato. */}
-            <div className="hidden items-center justify-between gap-3 lg:flex">
-              <BoardControls
-                onFirst={game.first}
-                onPrev={game.prev}
-                onNext={game.next}
-                onLast={game.last}
-                onFlip={() =>
-                  setOrientation((o) => (o === "white" ? "black" : "white"))
-                }
-                atStart={game.cursor < 0}
-                atEnd={atEnd}
-                keyboardTarget={boardWrapRef}
-              />
-              <span
-                className={cn(
-                  "font-mono text-sm",
-                  over ? "text-text" : "text-text-muted",
-                )}
-              >
-                {status}
-              </span>
-            </div>
           </div>
+          <GameClock
+            name={nameOf(bottomColor)}
+            ms={msOf(bottomColor)}
+            active={!over && game.turn === bottomColor && atLive}
+          />
 
-          {/* Mobile: colonna mosse a destra della scacchiera. */}
-          <div className="flex w-[4.75rem] shrink-0 flex-col overflow-y-auto rounded-md border border-border bg-surface p-1 lg:hidden">
-            <MoveList
-              compact
+          {/* Desktop: controlli completi + stato. */}
+          <div className="hidden items-center justify-between gap-3 lg:flex">
+            <BoardControls
+              onFirst={game.first}
+              onPrev={game.prev}
+              onNext={game.next}
+              onLast={game.last}
+              onFlip={() =>
+                setOrientation((o) => (o === "white" ? "black" : "white"))
+              }
+              atStart={game.cursor < 0}
+              atEnd={atEnd}
+              keyboardTarget={boardWrapRef}
+            />
+            <span
+              className={cn(
+                "font-mono text-sm",
+                over ? "text-text" : "text-text-muted",
+              )}
+            >
+              {status}
+            </span>
+          </div>
+        </div>
+
+        {/* Mobile: striscia mosse orizzontale sotto la scacchiera. */}
+        {game.history.length > 0 && (
+          <div className="mt-2 lg:hidden">
+            <MoveStripH
               history={game.history}
               cursor={game.cursor}
               onSelect={game.goTo}
             />
           </div>
-        </div>
+        )}
 
-        {/* Mobile: solo indietro / avanti. */}
-        <div className="mt-2 flex items-center justify-center gap-3 lg:hidden">
+        {/* Mobile: barra controlli — inizio / indietro / avanti / fine + menu. */}
+        <div className="relative mt-2 flex items-center gap-2 lg:hidden">
           <Button
             variant="secondary"
             size="icon"
+            className="flex-1"
+            onClick={game.first}
+            disabled={game.cursor < 0}
+            aria-label="Prima mossa"
+          >
+            <ChevronsLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="flex-1"
             onClick={game.prev}
             disabled={game.cursor < 0}
             aria-label="Mossa precedente"
@@ -244,12 +265,80 @@ export function HotseatGame() {
           <Button
             variant="secondary"
             size="icon"
+            className="flex-1"
             onClick={game.next}
             disabled={atEnd}
             aria-label="Mossa successiva"
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="flex-1"
+            onClick={game.last}
+            disabled={atEnd}
+            aria-label="Ultima mossa"
+          >
+            <ChevronsRight className="h-5 w-5" />
+          </Button>
+
+          <div className="relative">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Azioni partita"
+              aria-expanded={menuOpen}
+            >
+              <MoreVertical className="h-5 w-5" />
+            </Button>
+            {menuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  aria-hidden
+                  onClick={() => setMenuOpen(false)}
+                />
+                <div className="absolute bottom-full right-0 z-50 mb-2 w-48 space-y-1 rounded-md border border-border bg-surface p-1 shadow-lg">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setOrientation((o) => (o === "white" ? "black" : "white"));
+                    }}
+                    className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm hover:bg-surface-2"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Gira scacchiera
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      takeback();
+                    }}
+                    disabled={game.history.length === 0}
+                    className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm hover:bg-surface-2 disabled:opacity-50"
+                  >
+                    <Undo2 className="h-4 w-4" />
+                    Annulla mossa
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setPhase("setup");
+                    }}
+                    className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm hover:bg-surface-2"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Nuova partita
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
