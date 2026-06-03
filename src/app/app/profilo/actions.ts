@@ -5,8 +5,9 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isLocale, LOCALE_COOKIE } from "@/i18n/config";
+import { randomUUID } from "crypto";
 import { ProviderError } from "@/lib/games/providers";
-import { fetchExternalRating } from "@/lib/rating/external";
+import { fetchExternalRating, fetchProfileText } from "@/lib/rating/external";
 import type { ExternalSource } from "@/lib/rating/calibration";
 import { applyExternalRating, clearExternalRating } from "@/lib/rating/store";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -155,6 +156,10 @@ export interface LinkedAccount {
   ratingNative: number | null;
   ratingOtb: number | null;
   nGames: number;
+  /** True solo dopo verifica della proprietà via bio-token: solo allora incide sul rating. */
+  verified: boolean;
+  /** Token da inserire nella bio/profilo della piattaforma (presente solo se in attesa di verifica). */
+  verifyToken: string | null;
   fetchedAt: string;
 }
 
@@ -174,10 +179,18 @@ function providerMessage(e: unknown): string {
   return e instanceof Error ? e.message : "Errore imprevisto.";
 }
 
+/** Validità del token di verifica (minuti). */
+const VERIFY_TTL_MIN = 30;
+
+/** Genera un token di verifica usa-e-getta, facile da incollare nella bio. */
+function makeVerifyToken(): string {
+  return `shakh-verify-${randomUUID().slice(0, 8)}`;
+}
+
 /**
- * Il dominio 'external' è UNO solo: se l'utente collega più piattaforme, lo
- * alimenta l'account con più partite valutate (stima più affidabile). Se non
- * resta alcun account collegato, azzera il contributo.
+ * Il dominio 'external' è UNO solo ed è alimentato SOLO da account VERIFICATI:
+ * fra questi, vince quello con più partite valutate (stima più affidabile). Se
+ * nessun account verificato resta, azzera il contributo.
  */
 async function recomputeExternalDomain(
   supabase: SupabaseClient,
@@ -187,6 +200,7 @@ async function recomputeExternalDomain(
     .from("external_accounts")
     .select("rating_otb, n_games")
     .eq("user_id", userId)
+    .eq("verified", true)
     .order("n_games", { ascending: false })
     .limit(1);
   const best = (data as { rating_otb: number | null; n_games: number }[] | null)?.[0];
@@ -198,10 +212,12 @@ async function recomputeExternalDomain(
 }
 
 /**
- * Collega (o ri-collega) un account online: legge il rating pubblico, lo salva e
- * aggiorna il dominio 'external' del Rating Shakh. `username` è un dato pubblico.
+ * Passo 1 del collegamento: valida l'utente, legge il rating pubblico e registra
+ * l'account come NON verificato con un token di verifica. NON tocca ancora il
+ * Rating Shakh: serve prima la verifica di proprietà (`verifyExternalAccount`).
+ * `username` è un dato pubblico.
  */
-export async function linkExternalAccount(
+export async function beginLinkExternalAccount(
   source: string,
   username: string,
 ): Promise<LinkResult> {
@@ -223,6 +239,10 @@ export async function linkExternalAccount(
     return { ok: false, error: providerMessage(e) };
   }
 
+  const token = makeVerifyToken();
+  const now = new Date();
+  const expires = new Date(now.getTime() + VERIFY_TTL_MIN * 60_000);
+
   const { error } = await supabase.from("external_accounts").upsert(
     {
       user_id: user.id,
@@ -232,10 +252,142 @@ export async function linkExternalAccount(
       rating_otb: report.otb,
       n_games: report.nGames,
       controls: report.controls,
-      fetched_at: new Date().toISOString(),
+      verified: false,
+      verify_token: token,
+      verify_expires_at: expires.toISOString(),
+      fetched_at: now.toISOString(),
     },
     { onConflict: "user_id,source" },
   );
+  if (error) return { ok: false, error: error.message };
+
+  // Un account ri-collegato non deve più contare finché non è ri-verificato.
+  await recomputeExternalDomain(supabase, user.id);
+  revalidatePath("/app/profilo");
+  revalidatePath("/app");
+
+  return {
+    ok: true,
+    account: {
+      source,
+      username: report.username,
+      ratingNative: report.representative,
+      ratingOtb: report.otb,
+      nGames: report.nGames,
+      verified: false,
+      verifyToken: token,
+      fetchedAt: now.toISOString(),
+    },
+  };
+}
+
+/**
+ * Passo 2: legge il profilo pubblico della piattaforma e verifica che contenga
+ * il token. Se sì, marca l'account come verificato e alimenta il Rating Shakh.
+ */
+export async function verifyExternalAccount(source: string): Promise<LinkResult> {
+  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+
+  const { data: row } = await supabase
+    .from("external_accounts")
+    .select("username, verify_token, verify_expires_at, rating_native, rating_otb, n_games")
+    .eq("user_id", user.id)
+    .eq("source", source)
+    .maybeSingle<{
+      username: string;
+      verify_token: string | null;
+      verify_expires_at: string | null;
+      rating_native: number | null;
+      rating_otb: number | null;
+      n_games: number;
+    }>();
+  if (!row) return { ok: false, error: "Account non collegato." };
+  if (!row.verify_token) return { ok: false, error: "Nessuna verifica in corso." };
+  if (row.verify_expires_at && new Date(row.verify_expires_at) < new Date())
+    return { ok: false, error: "Token scaduto. Ricollega l'account per generarne uno nuovo." };
+
+  let profileText: string;
+  try {
+    profileText = await fetchProfileText(source, row.username);
+  } catch (e) {
+    return { ok: false, error: providerMessage(e) };
+  }
+
+  if (!profileText.includes(row.verify_token)) {
+    return {
+      ok: false,
+      error: "Token non trovato nel profilo. Salva il token e attendi qualche secondo, poi riprova.",
+    };
+  }
+
+  const { error } = await supabase
+    .from("external_accounts")
+    .update({ verified: true, verify_token: null, verify_expires_at: null })
+    .eq("user_id", user.id)
+    .eq("source", source);
+  if (error) return { ok: false, error: error.message };
+
+  await recomputeExternalDomain(supabase, user.id);
+  revalidatePath("/app/profilo");
+  revalidatePath("/app");
+
+  return {
+    ok: true,
+    account: {
+      source,
+      username: row.username,
+      ratingNative: row.rating_native,
+      ratingOtb: row.rating_otb,
+      nGames: row.n_games,
+      verified: true,
+      verifyToken: null,
+      fetchedAt: new Date().toISOString(),
+    },
+  };
+}
+
+/** Aggiorna il rating di un account già VERIFICATO (rilettura dall'API). */
+export async function refreshExternalAccount(source: string): Promise<LinkResult> {
+  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+
+  const { data: existing } = await supabase
+    .from("external_accounts")
+    .select("username, verified")
+    .eq("user_id", user.id)
+    .eq("source", source)
+    .maybeSingle<{ username: string; verified: boolean }>();
+  if (!existing) return { ok: false, error: "Account non collegato." };
+  if (!existing.verified) return { ok: false, error: "Verifica prima l'account." };
+
+  let report;
+  try {
+    report = await fetchExternalRating(source, existing.username);
+  } catch (e) {
+    return { ok: false, error: providerMessage(e) };
+  }
+
+  const now = new Date();
+  const { error } = await supabase
+    .from("external_accounts")
+    .update({
+      rating_native: report.representative,
+      rating_otb: report.otb,
+      n_games: report.nGames,
+      controls: report.controls,
+      fetched_at: now.toISOString(),
+    })
+    .eq("user_id", user.id)
+    .eq("source", source);
   if (error) return { ok: false, error: error.message };
 
   await recomputeExternalDomain(supabase, user.id);
@@ -250,29 +402,11 @@ export async function linkExternalAccount(
       ratingNative: report.representative,
       ratingOtb: report.otb,
       nGames: report.nGames,
-      fetchedAt: new Date().toISOString(),
+      verified: true,
+      verifyToken: null,
+      fetchedAt: now.toISOString(),
     },
   };
-}
-
-/** Aggiorna il rating di un account già collegato (rilettura dall'API). */
-export async function refreshExternalAccount(source: string): Promise<LinkResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
-
-  const { data: existing } = await supabase
-    .from("external_accounts")
-    .select("username")
-    .eq("user_id", user.id)
-    .eq("source", source)
-    .maybeSingle<{ username: string }>();
-  if (!existing) return { ok: false, error: "Account non collegato." };
-
-  return linkExternalAccount(source, existing.username);
 }
 
 /** Scollega un account online e azzera (o ricalcola) il dominio 'external'. */

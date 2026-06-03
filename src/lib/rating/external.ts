@@ -90,6 +90,7 @@ interface LichessUser {
   username?: string;
   disabled?: boolean;
   perfs?: Record<string, LichessPerf>;
+  profile?: { bio?: string; links?: string; realName?: string };
 }
 
 const LICHESS_CONTROLS = ["bullet", "blitz", "rapid", "classical", "correspondence"] as const;
@@ -160,6 +161,53 @@ async function fetchChesscomStats(username: string): Promise<ChesscomStats> {
     throw new ProviderError("network", `Chess.com ha risposto con stato ${res.status}.`);
   }
   return (await res.json()) as ChesscomStats;
+}
+
+interface ChesscomPlayer {
+  name?: string;
+  location?: string;
+}
+
+async function fetchChesscomPlayer(username: string): Promise<ChesscomPlayer> {
+  const user = encodeURIComponent(username.toLowerCase());
+  let res: Response;
+  try {
+    res = await fetch(`https://api.chess.com/pub/player/${user}`, {
+      headers: { "User-Agent": CHESSCOM_UA, Accept: "application/json" },
+      signal: AbortSignal.timeout(15_000),
+    });
+  } catch {
+    throw new ProviderError("network", "Errore di rete o timeout contattando Chess.com.");
+  }
+  if (res.status === 404) {
+    throw new ProviderError("not_found", `Utente Chess.com "${username}" non trovato.`);
+  }
+  if (res.status === 429) {
+    throw new ProviderError("rate_limit", "Troppe richieste a Chess.com. Riprova fra poco.");
+  }
+  if (!res.ok) {
+    throw new ProviderError("network", `Chess.com ha risposto con stato ${res.status}.`);
+  }
+  return (await res.json()) as ChesscomPlayer;
+}
+
+/**
+ * Legge il testo pubblico del profilo dove l'utente può inserire il token di
+ * verifica: su Lichess la bio (+ links + realName); su Chess.com i campi liberi
+ * `name` e `location` (l'API pubblica non espone la sezione "about"). Restituisce
+ * il testo concatenato in cui cercare il token.
+ */
+export async function fetchProfileText(
+  source: ExternalSource,
+  username: string,
+): Promise<string> {
+  if (source === "lichess") {
+    const u = await fetchLichessUser(username.trim());
+    const p = u.profile ?? {};
+    return [p.bio, p.links, p.realName].filter(Boolean).join(" \n ");
+  }
+  const p = await fetchChesscomPlayer(username.trim());
+  return [p.name, p.location].filter(Boolean).join(" \n ");
 }
 
 // ============================================================

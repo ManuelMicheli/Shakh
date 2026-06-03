@@ -25,7 +25,8 @@ function ShakhRatingCard({ rating }: { rating: OverallRating }) {
           {rating.provisional && <Badge variant="muted">non calibrato</Badge>}
         </div>
         <CardDescription>
-          Stima di forza su scala reale (OTB), da puzzle, partite, finali, calcolo e qualità di gioco.
+          Stima di forza su scala reale (OTB), da puzzle, partite, finali, calcolo, qualità di gioco
+          e — se collegato — dal rating del tuo account online.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

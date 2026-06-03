@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CompetenceRadar, TrendLine } from "@/components/progress";
 import { ProfileSettings } from "@/components/profile/ProfileSettings";
+import { ExternalAccounts } from "@/components/profile/ExternalAccounts";
+import type { LinkedAccount } from "@/app/app/profilo/actions";
+import type { ExternalSource } from "@/lib/rating/calibration";
 import { loadDashboard } from "@/lib/progress/aggregate";
 
 export const metadata = { title: "Profilo — Shakh" };
@@ -29,6 +32,34 @@ export default async function ProfiloPage() {
 
   const data = await loadDashboard(supabase, user.id);
   const radarAreas = data.competence.map((c) => ({ label: c.label, value: c.score }));
+
+  const { data: extRows } = await supabase
+    .from("external_accounts")
+    .select("source, username, rating_native, rating_otb, n_games, verified, verify_token, fetched_at")
+    .eq("user_id", user.id);
+  const linkedAccounts: LinkedAccount[] = (
+    (extRows as
+      | {
+          source: ExternalSource;
+          username: string;
+          rating_native: number | null;
+          rating_otb: number | null;
+          n_games: number;
+          verified: boolean;
+          verify_token: string | null;
+          fetched_at: string;
+        }[]
+      | null) ?? []
+  ).map((r) => ({
+    source: r.source,
+    username: r.username,
+    ratingNative: r.rating_native,
+    ratingOtb: r.rating_otb,
+    nGames: r.n_games,
+    verified: r.verified,
+    verifyToken: r.verify_token,
+    fetchedAt: r.fetched_at,
+  }));
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -92,13 +123,16 @@ export default async function ProfiloPage() {
         </TabsContent>
 
         <TabsContent value="settings">
-          <ProfileSettings
-            initial={{
-              displayName: profile?.display_name ?? "",
-              username: profile?.username ?? "",
-              locale: profile?.locale ?? "it",
-            }}
-          />
+          <div className="space-y-6">
+            <ExternalAccounts initial={linkedAccounts} />
+            <ProfileSettings
+              initial={{
+                displayName: profile?.display_name ?? "",
+                username: profile?.username ?? "",
+                locale: profile?.locale ?? "it",
+              }}
+            />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
