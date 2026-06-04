@@ -13,7 +13,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buildDailyPlan, type PlanBlock, type BlockKind } from "@/lib/daily/plan";
-import { PieceGlyph, PIECE_WATERMARK } from "@/components/chess/PieceGlyph";
+import { GlyphWatermark } from "@/components/layout/GlyphWatermark";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Allenamento di oggi — Shakh" };
@@ -51,7 +51,7 @@ export default async function OggiPage() {
       {/* ===== MOBILE: testata editoriale + glifo pedone + blocchi in card ===== */}
       <div className="space-y-5 md:hidden">
         <div className="relative">
-          <PieceGlyph piece="pawn" className={PIECE_WATERMARK} />
+          <GlyphWatermark glyph="♟" />
           <div className="relative">
             <p className="text-xs uppercase tracking-wider text-text-muted">
               {todayLabel()}

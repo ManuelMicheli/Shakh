@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PieceGlyph } from "@/components/chess/PieceGlyph";
+import { GlyphWatermark } from "@/components/layout/GlyphWatermark";
 
 /**
  * SHOWCASE (dev-only): redesign mobile della pagina "Oggi", stessa direzione
@@ -99,10 +99,7 @@ export default function OggiShowcasePage() {
             <div className="space-y-5 p-4 pb-10">
               {/* Testata editoriale con glifo pedone watermark */}
               <div className="relative">
-                <PieceGlyph
-                  piece="pawn"
-                  className="absolute right-0 top-0 h-48 w-48 opacity-[0.08]"
-                />
+                <GlyphWatermark glyph="♟" />
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
                     {PLAN.date}

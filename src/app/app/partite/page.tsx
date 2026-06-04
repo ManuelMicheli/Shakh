@@ -31,7 +31,7 @@ export default async function PartitePage() {
         eyebrow="Archivio"
         title="Le mie partite"
         desc="Importa, analizza, rivedi mossa per mossa."
-        piece="rook"
+        glyph="♜"
       />
 
       {/* DESKTOP: testata classica. */}

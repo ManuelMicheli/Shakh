@@ -65,7 +65,7 @@ export default async function TeoriaPage() {
         eyebrow="Studio guidato"
         title="Teoria"
         desc="Capisci il perché delle mosse, coi dati reali."
-        piece="bishop"
+        glyph="♝"
       />
 
       {/* DESKTOP: testata classica. */}

@@ -22,7 +22,7 @@ export default async function GiocaPage() {
         eyebrow="Con un amico"
         title="Gioca"
         desc="Stesso dispositivo o online in differita con un link condivisibile."
-        piece="pawn"
+        glyph="♟"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
