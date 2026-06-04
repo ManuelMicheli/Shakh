@@ -30,7 +30,6 @@ export default function ImparaPage() {
         eyebrow="Un concetto alla volta"
         title="Impara"
         desc="Capisci l'idea, riconoscila, sfruttala. Poi partite spiegate."
-        piece="pawn"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Impara</h1>

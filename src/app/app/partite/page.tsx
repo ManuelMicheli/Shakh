@@ -1,7 +1,7 @@
 import { createClient, getUser } from "@/lib/supabase/server";
 import { ImportPanel } from "@/components/games/ImportPanel";
 import { GamesTable } from "@/components/games/GamesTable";
-import { PieceGlyph } from "@/components/chess/PieceGlyph";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { GameRow } from "@/lib/games/types";
 
 export const metadata = { title: "Le mie partite — Shakh" };
@@ -27,19 +27,12 @@ export default async function PartitePage() {
 
   return (
     <div className="space-y-8">
-      {/* MOBILE: testata editoriale con glifo torre (non coperto dal testo). */}
-      <div className="flex items-start justify-between gap-2 md:hidden">
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wider text-text-muted">Archivio</p>
-          <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-            Le mie partite
-          </h1>
-          <p className="mt-2 text-sm text-text-muted">
-            Importa, analizza, rivedi mossa per mossa.
-          </p>
-        </div>
-        <PieceGlyph piece="rook" className="-mt-1 h-24 w-24 shrink-0 opacity-25" />
-      </div>
+      <MobilePageHeader
+        eyebrow="Archivio"
+        title="Le mie partite"
+        desc="Importa, analizza, rivedi mossa per mossa."
+        piece="rook"
+      />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">

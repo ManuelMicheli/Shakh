@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Menu, Bell, Upload, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PieceGlyph } from "@/components/chess/PieceGlyph";
+import { PieceGlyph, PIECE_WATERMARK } from "@/components/chess/PieceGlyph";
 
 /**
  * SHOWCASE (dev-only): redesign mobile di "Le mie partite". Direzione editoriale
@@ -89,8 +89,9 @@ export default function PartiteShowcasePage() {
           <div className="flex-1 overflow-y-auto bg-bg">
             <div className="space-y-5 p-4 pb-10">
               {/* Testata: testo a sinistra, glifo torre libero a destra (non coperto) */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
+              <div className="relative">
+                <PieceGlyph piece="rook" className={PIECE_WATERMARK} />
+                <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
                     Archivio
                   </p>
@@ -101,10 +102,6 @@ export default function PartiteShowcasePage() {
                     Importa, analizza, rivedi mossa per mossa.
                   </p>
                 </div>
-                <PieceGlyph
-                  piece="rook"
-                  className="-mt-1 h-24 w-24 shrink-0 opacity-25"
-                />
               </div>
 
               {/* Import: mini-tab + barra input */}

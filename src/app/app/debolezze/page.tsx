@@ -29,7 +29,6 @@ export default async function DebolezzePage() {
         eyebrow="Pattern ricorrenti"
         title="Punti deboli"
         desc="Le perdite che si ripetono, raggruppate e ordinate per gravità."
-        piece="rook"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Punti deboli</h1>

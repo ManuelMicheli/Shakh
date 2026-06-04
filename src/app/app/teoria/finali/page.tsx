@@ -80,7 +80,6 @@ export default async function FinaliPage() {
         eyebrow={endgameRating != null ? `Rating finali · ${endgameRating}` : "Tecnica esatta"}
         title="Finali"
         desc="Converti l'esito contro la difesa perfetta della tablebase."
-        piece="king"
       />
       <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">

@@ -24,7 +24,6 @@ export default async function TrappolePage() {
         eyebrow="L'esca e lo scatto"
         title="Trappole"
         desc="Tendi la trappola o impara a non caderci."
-        piece="knight"
       />
       {dueCount > 0 && (
         <Link

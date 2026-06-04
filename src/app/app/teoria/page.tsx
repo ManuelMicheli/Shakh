@@ -3,7 +3,7 @@ import { ChevronRight, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PieceGlyph } from "@/components/chess/PieceGlyph";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { TheoryType } from "@/lib/theory/types";
 
 export const metadata = { title: "Teoria — Shakh" };
@@ -61,21 +61,12 @@ export default async function TeoriaPage() {
 
   return (
     <div className="space-y-10">
-      {/* MOBILE: testata editoriale con glifo alfiere (non coperto dal testo). */}
-      <div className="flex items-start justify-between gap-2 md:hidden">
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wider text-text-muted">
-            Studio guidato
-          </p>
-          <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-            Teoria
-          </h1>
-          <p className="mt-2 text-sm text-text-muted">
-            Capisci il <em>perché</em> delle mosse, coi dati reali.
-          </p>
-        </div>
-        <PieceGlyph piece="bishop" className="-mt-1 h-24 w-24 shrink-0 opacity-25" />
-      </div>
+      <MobilePageHeader
+        eyebrow="Studio guidato"
+        title="Teoria"
+        desc="Capisci il perché delle mosse, coi dati reali."
+        piece="bishop"
+      />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">

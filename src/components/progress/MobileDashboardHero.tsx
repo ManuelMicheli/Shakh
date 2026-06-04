@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Target, Crosshair, Wrench, ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { NextStep } from "@/components/percorso/NextStep";
-import { PieceGlyph } from "@/components/chess/PieceGlyph";
+import { PieceGlyph, PIECE_WATERMARK } from "@/components/chess/PieceGlyph";
 import type { NextStep as NextStepData } from "@/lib/path/recommend";
 import type { OverallRating } from "@/lib/rating/aggregate";
 
@@ -61,10 +61,7 @@ export function MobileDashboardHero({
     <div className="space-y-5 md:hidden">
       {/* Testata: pezzo cavallo grande come watermark dietro al testo. */}
       <div className="relative">
-        <PieceGlyph
-          piece="knight"
-          className="absolute -right-2 top-0 h-52 w-52 opacity-[0.08]"
-        />
+        <PieceGlyph piece="knight" className={PIECE_WATERMARK} />
         <div className="relative">
           <p className="text-xs uppercase tracking-wider text-text-muted first-letter:uppercase">
             {todayLabel()}

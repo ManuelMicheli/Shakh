@@ -11,7 +11,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TacticsTrainer } from "@/components/tactics/TacticsTrainer";
-import { PieceGlyph } from "@/components/chess/PieceGlyph";
+import { PieceGlyph, PIECE_WATERMARK } from "@/components/chess/PieceGlyph";
 import { ensureStats, selectNextPuzzle, dueReviewCount } from "@/lib/tactics/query";
 import { TACTIC_THEMES, themeLabel } from "@/lib/tactics/themes";
 import type { TacticMode, TacticStats } from "@/lib/tactics/types";
@@ -68,10 +68,7 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
       {/* ===== MOBILE: testata editoriale + rating hero + modalità a list-card ===== */}
       <div className="space-y-5 md:hidden">
         <div className="relative">
-          <PieceGlyph
-            piece="queen"
-            className="absolute right-0 top-0 h-48 w-48 opacity-[0.08]"
-          />
+          <PieceGlyph piece="queen" className={PIECE_WATERMARK} />
           <div className="relative">
             <p className="text-xs uppercase tracking-wider text-text-muted">
               Visione tattica
