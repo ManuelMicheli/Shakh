@@ -10,23 +10,54 @@
  * Modulo NON "use server": riceve un client Supabase già autenticato.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { activeLocale, pickLocale } from "@/lib/i18n/content";
 import { evaluateNode } from "./requirements";
-import type { PathNodeRow, PathNodeStatus, PathNodeView } from "./types";
+import type { PathActivity, PathNodeRow, PathNodeStatus, PathNodeView } from "./types";
 
 type DB = SupabaseClient;
 
+// Si leggono le colonne bilingui (0021) per title/description/activities; il
+// resto della riga è invariato.
 const NODE_COLS =
-  "id, level, slug, title, description, order_index, prerequisites, requirements, activities, published";
+  "id, level, slug, title_it, title_en, description_it, description_en, order_index, prerequisites, requirements, activities_it, activities_en, published";
+
+// Forma grezza dal DB con le colonne localizzate, prima della risoluzione.
+type PathNodeDbRow = Omit<PathNodeRow, "title" | "description" | "activities"> & {
+  title_it: string | null;
+  title_en: string | null;
+  description_it: string | null;
+  description_en: string | null;
+  activities_it: PathActivity[] | null;
+  activities_en: PathActivity[] | null;
+};
 
 /** Carica i nodi published ordinati per livello/ordine. */
 export async function loadNodes(supabase: DB): Promise<PathNodeRow[]> {
+  const locale = await activeLocale();
   const { data } = await supabase
     .from("path_nodes")
     .select(NODE_COLS)
     .eq("published", true)
     .order("level", { ascending: true })
     .order("order_index", { ascending: true });
-  return (data as PathNodeRow[] | null) ?? [];
+  // Risolve title/description/activities alla lingua attiva, mantenendo la forma di PathNodeRow.
+  return ((data as PathNodeDbRow[] | null) ?? []).map((r) => {
+    const {
+      title_it,
+      title_en,
+      description_it,
+      description_en,
+      activities_it,
+      activities_en,
+      ...rest
+    } = r;
+    return {
+      ...rest,
+      title: pickLocale(title_it, title_en, locale) ?? "",
+      description: pickLocale(description_it, description_en, locale),
+      activities: pickLocale(activities_it, activities_en, locale) ?? [],
+    };
+  });
 }
 
 /** Primo livello (in ordine crescente) non interamente completato; +1 se tutti completi. */

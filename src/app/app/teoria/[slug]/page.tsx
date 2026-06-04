@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { activeLocale, pickLocale } from "@/lib/i18n/content";
 import { LessonViewer } from "@/components/theory/LessonViewer";
 import { EndgamePractice } from "@/components/theory/EndgamePractice";
 import { PositionalExercise } from "@/components/theory/PositionalExercise";
@@ -14,16 +15,32 @@ export default async function LessonPage({
 }) {
   const { slug } = await params;
   const supabase = await createClient();
+  const locale = await activeLocale();
 
-  // RLS: lettura pubblica solo dei contenuti published.
-  const { data } = await supabase
+  // RLS: lettura pubblica solo dei contenuti published. Si leggono le colonne
+  // bilingui (0021) per title/summary; il `body` resta unico (solo italiano).
+  const { data: raw } = await supabase
     .from("content_items")
-    .select("id, type, parent_id, eco_code, title, slug, summary, body, start_fen, line_pgn, level, order_index, published")
+    .select("id, type, parent_id, eco_code, title_it, title_en, slug, summary_it, summary_en, body, start_fen, line_pgn, level, order_index, published")
     .eq("slug", slug)
     .eq("published", true)
-    .maybeSingle<ContentItemRow>();
+    .maybeSingle<
+      Omit<ContentItemRow, "title" | "summary"> & {
+        title_it: string | null;
+        title_en: string | null;
+        summary_it: string | null;
+        summary_en: string | null;
+      }
+    >();
 
-  if (!data) notFound();
+  if (!raw) notFound();
+
+  // Risolve title/summary alla lingua attiva, riportando la stessa forma di ContentItemRow.
+  const data: ContentItemRow = {
+    ...raw,
+    title: pickLocale(raw.title_it, raw.title_en, locale) ?? "",
+    summary: pickLocale(raw.summary_it, raw.summary_en, locale),
+  };
   if (!isLesson(data.body)) {
     // Contenuto pubblicato ma senza lezione strutturata.
     return (

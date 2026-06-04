@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { activeLocale, pickLocale } from "@/lib/i18n/content";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
@@ -47,16 +48,37 @@ interface LessonRow {
   order_index: number;
 }
 
+// Riga grezza dal DB con le colonne bilingui (schema 0021).
+interface LessonDbRow {
+  slug: string;
+  title_it: string | null;
+  title_en: string | null;
+  summary_it: string | null;
+  summary_en: string | null;
+  type: TheoryType;
+  eco_code: string | null;
+  order_index: number;
+}
+
 export default async function TeoriaPage() {
   const supabase = await createClient();
+  const locale = await activeLocale();
   // Solo le lezioni pubblicate (RLS: lettura pubblica dei contenuti published).
   const { data } = await supabase
     .from("content_items")
-    .select("slug, title, summary, type, eco_code, order_index")
+    .select("slug, title_it, title_en, summary_it, summary_en, type, eco_code, order_index")
     .eq("published", true)
     .order("order_index", { ascending: true });
 
-  const lessons = (data as LessonRow[] | null) ?? [];
+  // Risolve title/summary alla lingua attiva, mantenendo la stessa forma di output.
+  const lessons: LessonRow[] = ((data as LessonDbRow[] | null) ?? []).map((r) => ({
+    slug: r.slug,
+    title: pickLocale(r.title_it, r.title_en, locale) ?? "",
+    summary: pickLocale(r.summary_it, r.summary_en, locale),
+    type: r.type,
+    eco_code: r.eco_code,
+    order_index: r.order_index,
+  }));
   const byType = (t: TheoryType) => lessons.filter((l) => l.type === t);
 
   return (

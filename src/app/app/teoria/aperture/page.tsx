@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { activeLocale, pickLocale } from "@/lib/i18n/content";
 import { Card, CardContent } from "@/components/ui/card";
 import { OpeningTree, type OpeningNode } from "@/components/theory/OpeningTree";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
@@ -10,28 +11,32 @@ interface Row {
   id: string;
   parent_id: string | null;
   slug: string;
-  title: string;
+  title_it: string | null;
+  title_en: string | null;
   eco_code: string | null;
-  summary: string | null;
+  summary_it: string | null;
+  summary_en: string | null;
   body: unknown | null;
 }
 
 export default async function AperturePage() {
   const supabase = await createClient();
+  const locale = await activeLocale();
   const { data } = await supabase
     .from("content_items")
-    .select("id, parent_id, slug, title, eco_code, summary, body")
+    .select("id, parent_id, slug, title_it, title_en, eco_code, summary_it, summary_en, body")
     .eq("type", "opening")
     .eq("published", true)
     .order("order_index", { ascending: true });
 
+  // Title/summary risolti alla lingua attiva; il resto della forma resta invariato.
   const nodes: OpeningNode[] = ((data as Row[] | null) ?? []).map((r) => ({
     id: r.id,
     parentId: r.parent_id,
     slug: r.slug,
-    title: r.title,
+    title: pickLocale(r.title_it, r.title_en, locale) ?? "",
     eco: r.eco_code,
-    summary: r.summary,
+    summary: pickLocale(r.summary_it, r.summary_en, locale),
     hasLesson: r.body !== null,
   }));
 
