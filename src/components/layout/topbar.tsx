@@ -1,7 +1,6 @@
 import { Menu } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LocaleToggle } from "./locale-toggle";
 import { LogoutButton } from "./logout-button";
 import { BackButton } from "./back-button";
 
@@ -37,7 +36,6 @@ export function Topbar({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <LocaleToggle />
           <ThemeToggle />
           <Avatar name={displayName} src={avatarUrl} size={32} />
           <LogoutButton />

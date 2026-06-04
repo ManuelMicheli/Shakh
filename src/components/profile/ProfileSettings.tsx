@@ -89,6 +89,9 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
         return;
       }
       toast({ title: "Profile updated" });
+      // Ricarica i Server Component così la lingua scelta si applica subito
+      // (messaggi e formati seguono il cookie NEXT_LOCALE appena impostato).
+      router.refresh();
     });
   };
 

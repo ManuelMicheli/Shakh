@@ -44,7 +44,11 @@ export async function setLocalePreference(locale: string): Promise<void> {
     data: { user },
   } = await supabase.auth.getUser();
   if (user) {
-    await supabase.from("profiles").update({ locale }).eq("id", user.id);
+    // Segna la lingua come scelta: non riproporre il prompt di primo accesso.
+    await supabase
+      .from("profiles")
+      .update({ locale, locale_chosen: true })
+      .eq("id", user.id);
   }
 }
 
@@ -67,6 +71,7 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdateRe
       display_name: displayName || null,
       username: username || null,
       locale: input.locale,
+      locale_chosen: true,
       theme_preference: input.themePreference,
     })
     .eq("id", user.id);
