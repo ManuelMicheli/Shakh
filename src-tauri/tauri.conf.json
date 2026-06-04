@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "app.shakh.desktop",
   "build": {
-    "frontendDist": "https://shakh.vercel.app"
+    "frontendDist": "https://shakh.vercel.app/login"
   },
   "app": {
     "windows": [
