@@ -39,6 +39,16 @@ export interface ChessBoardProps {
   shapes?: DrawShape[];
   /** Chiamata quando l'utente completa una mossa legale (con il pezzo di promozione se serve). */
   onMove?: (from: Square, to: Square, promotion?: PieceSymbol) => void;
+  /**
+   * Abilita la "pre-mossa": mentre tocca all'avversario l'utente può già trascinare
+   * un proprio pezzo; chessground la trattiene e ne mostra l'evidenza. La gestione
+   * (memorizzazione + applicazione al cambio turno) sta a chi usa il componente.
+   */
+  premovable?: boolean;
+  /** Chiamata quando l'utente imposta una pre-mossa (origine → destinazione). */
+  onPremove?: (from: Square, to: Square) => void;
+  /** Chiamata quando la pre-mossa viene annullata (dall'utente o perché non più valida). */
+  onPremoveCancel?: () => void;
   coordinates?: boolean;
   disableAnimation?: boolean;
   /**
@@ -123,6 +133,9 @@ export function ChessBoard({
   check,
   shapes,
   onMove,
+  premovable = false,
+  onPremove,
+  onPremoveCancel,
   coordinates = true,
   disableAnimation = false,
   moveGlyph,
@@ -134,9 +147,13 @@ export function ChessBoard({
 
   // Ref ai valori più recenti, così i gestori di chessground non si chiudono su stati vecchi.
   const onMoveRef = useRef(onMove);
+  const onPremoveRef = useRef(onPremove);
+  const onPremoveCancelRef = useRef(onPremoveCancel);
   const fenRef = useRef(fen);
   const orientationRef = useRef(orientation);
   onMoveRef.current = onMove;
+  onPremoveRef.current = onPremove;
+  onPremoveCancelRef.current = onPremoveCancel;
   fenRef.current = fen;
   orientationRef.current = orientation;
 
@@ -166,6 +183,14 @@ export function ChessBoard({
       // interne di chessground si confondono coi pezzi e con le caselle.
       coordinates: false,
       movable: { free: false, showDests: true, events: { after: handleAfter } },
+      premovable: {
+        enabled: false,
+        showDests: true,
+        events: {
+          set: (orig, dest) => onPremoveRef.current?.(orig as Square, dest as Square),
+          unset: () => onPremoveCancelRef.current?.(),
+        },
+      },
       drawable: { enabled: true },
     });
 
@@ -233,6 +258,7 @@ export function ChessBoard({
         dests: (dests as Map<Key, Key[]>) ?? new Map(),
         showDests: true,
       },
+      premovable: { enabled: premovable && !viewOnly, showDests: true },
       drawable: { enabled: true, shapes: shapes ?? [] },
     };
     api.set(config);
@@ -245,6 +271,7 @@ export function ChessBoard({
     lastMove,
     check,
     shapes,
+    premovable,
     coordinates,
     disableAnimation,
   ]);
