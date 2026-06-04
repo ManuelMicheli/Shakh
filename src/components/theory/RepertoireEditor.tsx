@@ -72,7 +72,7 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] 2xl:grid-cols-[auto_24rem] 2xl:justify-center">
+      <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] 2xl:grid-cols-[auto_24rem] 2xl:justify-center">
         <div className="space-y-3">
           <div
             ref={boardWrapRef}

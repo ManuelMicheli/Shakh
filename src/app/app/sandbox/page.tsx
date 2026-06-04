@@ -106,7 +106,7 @@ export default function SandboxPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         {/* Board + controlli */}
         <div className="space-y-3">
           <div className="mx-auto flex w-full max-w-3xl gap-2 xl:max-w-[820px]">

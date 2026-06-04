@@ -240,7 +240,7 @@ export function OpeningTrainer({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] 2xl:grid-cols-[auto_22rem] 2xl:justify-center">
+      <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] 2xl:grid-cols-[auto_22rem] 2xl:justify-center">
         <div className="space-y-3">
           {currentTrap && (
             <div className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm">
