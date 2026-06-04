@@ -7,6 +7,13 @@
   },
   "landing": {
     "navCta": "Inizia ora",
+    "downloadCta": "Download",
+    "installDoneTitle": "App installata",
+    "installDoneBody": "Trovi Shakh tra le tue app, si apre a tutto schermo.",
+    "installIosTitle": "Installa su iPhone/iPad",
+    "installIosBody": "Tocca Condividi e poi «Aggiungi a schermata Home».",
+    "installHintTitle": "Installa Shakh",
+    "installHintBody": "Apri il menu del browser e scegli «Installa app» / «Aggiungi a schermata Home».",
     "heroKicker": "Scacchi, capiti davvero",
     "heroTitle": "Dal primo movimento al gioco di club.",
     "heroSub": "Shakh ti porta da principiante a giocatore di club forte. Un coach AI in italiano spiega il <em>perché</em> di ogni mossa, ancorato ai dati del motore e alle statistiche reali.",

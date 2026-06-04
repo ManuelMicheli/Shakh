@@ -7,6 +7,13 @@
   },
   "landing": {
     "navCta": "Get started",
+    "downloadCta": "Download",
+    "installDoneTitle": "App installed",
+    "installDoneBody": "Find Shakh among your apps — it opens full screen.",
+    "installIosTitle": "Install on iPhone/iPad",
+    "installIosBody": "Tap Share, then “Add to Home Screen”.",
+    "installHintTitle": "Install Shakh",
+    "installHintBody": "Open your browser menu and pick “Install app” / “Add to Home Screen”.",
     "heroKicker": "Chess, actually understood",
     "heroTitle": "From your first move to club-level play.",
     "heroSub": "Shakh takes you from beginner to a strong club player. An AI coach explains the <em>why</em> behind every move, anchored to engine data and real statistics.",

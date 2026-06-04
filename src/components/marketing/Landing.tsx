@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { BRAND_NAME } from "@/config/brand";
 import { BrandMark } from "@/components/layout/BrandMark";
+import { InstallButton } from "@/components/pwa/InstallButton";
 
 const reveal = {
   hidden: { opacity: 0, y: 24 },
@@ -57,6 +58,7 @@ export function Landing() {
         </span>
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <InstallButton className="hidden h-9 px-3 text-sm sm:inline-flex" />
           <Link
             href="/login"
             className="inline-flex h-9 items-center rounded-md px-3 text-sm font-medium text-text-muted transition-colors hover:text-text"
@@ -107,6 +109,7 @@ export function Landing() {
               >
                 {t("heroCtaSecondary")}
               </Link>
+              <InstallButton className="h-12 px-7 text-base" />
             </div>
           </Reveal>
         </div>
