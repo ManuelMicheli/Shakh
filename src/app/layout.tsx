@@ -14,6 +14,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { ConsentProvider } from "@/components/consent/ConsentProvider";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { PWA_BG } from "@/lib/pwa/render-icon";
+import { installCaptureScript } from "@/lib/pwa/install-capture";
 
 export const viewport: Viewport = {
   themeColor: PWA_BG,
@@ -71,6 +72,11 @@ export default async function RootLayout({
         <script
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
+        {/* Cattura beforeinstallprompt prima dell'idratazione (PWA install). */}
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{ __html: installCaptureScript }}
         />
       </head>
       <body>

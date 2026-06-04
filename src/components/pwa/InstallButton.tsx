@@ -12,6 +12,15 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+/** L'evento è parcheggiato qui dallo script in <head> (install-capture.ts). */
+function stashedPrompt(): BeforeInstallPromptEvent | null {
+  if (typeof window === "undefined") return null;
+  return (
+    (window as Window & { __bipEvent?: BeforeInstallPromptEvent }).__bipEvent ??
+    null
+  );
+}
+
 function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   return (
@@ -44,10 +53,11 @@ export function InstallButton({ className }: { className?: string }) {
       setInstalled(true);
       return;
     }
-    const onPrompt = (e: Event) => {
-      e.preventDefault(); // impedisce il mini-infobar, lo lanciamo noi al click
-      setDeferred(e as BeforeInstallPromptEvent);
-    };
+    // L'evento può essere già scattato (catturato in <head>): leggilo subito.
+    setDeferred(stashedPrompt());
+
+    // Scatto tardivo o ricattura: lo script in <head> rilancia 'bip:ready'.
+    const onReady = () => setDeferred(stashedPrompt());
     const onInstalled = () => {
       setInstalled(true);
       setDeferred(null);
@@ -57,11 +67,11 @@ export function InstallButton({ className }: { className?: string }) {
         variant: "success",
       });
     };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    window.addEventListener("appinstalled", onInstalled);
+    window.addEventListener("bip:ready", onReady);
+    window.addEventListener("bip:installed", onInstalled);
     return () => {
-      window.removeEventListener("beforeinstallprompt", onPrompt);
-      window.removeEventListener("appinstalled", onInstalled);
+      window.removeEventListener("bip:ready", onReady);
+      window.removeEventListener("bip:installed", onInstalled);
     };
   }, [t, toast]);
 
@@ -71,7 +81,9 @@ export function InstallButton({ className }: { className?: string }) {
     if (deferred) {
       await deferred.prompt();
       await deferred.userChoice;
-      setDeferred(null); // l'evento è monouso
+      // L'evento è monouso: scarta sia lo stato sia la copia parcheggiata.
+      (window as Window & { __bipEvent?: unknown }).__bipEvent = null;
+      setDeferred(null);
       return;
     }
     // Nessun prompt nativo disponibile: istruzioni manuali.
