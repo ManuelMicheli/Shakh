@@ -4,7 +4,10 @@ import { PlayHub } from "@/components/play/PlayHub";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { FriendGameRow } from "@/lib/play/types";
 
-export const metadata = { title: "Play a friend — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("playFriend") };
+}
 
 export default async function GiocaPage() {
   const supabase = await createClient();

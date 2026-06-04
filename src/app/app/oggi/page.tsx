@@ -15,8 +15,12 @@ import { Badge } from "@/components/ui/badge";
 import { buildDailyPlan, type PlanBlock, type BlockKind } from "@/lib/daily/plan";
 import { activeLocale } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "Today's training — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("today") };
+}
 
 /** Icona per tipo di blocco (testata card su mobile). */
 const BLOCK_ICON: Record<BlockKind, LucideIcon> = {

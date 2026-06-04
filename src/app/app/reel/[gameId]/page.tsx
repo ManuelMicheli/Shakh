@@ -6,8 +6,12 @@ import { ReelPlayer } from "@/components/reel/ReelPlayer";
 import { ShareReel } from "@/components/reel/ShareReel";
 import { pickHighlight, type HighlightRow } from "@/lib/reel/highlight";
 import { encodeReel, type ReelData } from "@/lib/reel/payload";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "Reel — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("reel") };
+}
 
 export default async function ReelGeneratePage({
   params,

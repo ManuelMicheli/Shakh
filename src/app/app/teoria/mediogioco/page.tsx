@@ -4,7 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Middlegame — Theory — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("middlegame") };
+}
 
 interface Row {
   slug: string;

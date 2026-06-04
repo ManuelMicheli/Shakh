@@ -1434,5 +1434,24 @@
       "moreConcepts": "Altri concetti",
       "keepTraining": "Continua ad allenarti"
     }
+  },
+  "metadata": {
+    "joinGroup": "Unisciti a un gruppo — Shakh",
+    "explainedGame": "Partita spiegata — Impara — Shakh",
+    "reel": "Reel — Shakh",
+    "preparation": "Preparazione avversario — Shakh",
+    "sparring": "Sparring — Shakh",
+    "concept": "Concetto — Impara — Shakh",
+    "fixMistake": "Correggi l'errore — Shakh",
+    "today": "Allenamento di oggi — Shakh",
+    "theory": "Teoria — Shakh",
+    "middlegame": "Mediogioco — Teoria — Shakh",
+    "endgames": "Finali — Teoria — Shakh",
+    "openings": "Aperture — Shakh",
+    "traps": "Trappole · Shakh",
+    "trapReview": "Ripasso trappole · Shakh",
+    "playFriend": "Gioca con un amico — Shakh",
+    "game": "Partita — Shakh",
+    "fixMistakes": "Correggi i tuoi errori — Shakh"
   }
 }

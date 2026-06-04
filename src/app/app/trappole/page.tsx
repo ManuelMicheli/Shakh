@@ -4,10 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { TrapCatalog } from "@/components/traps/TrapCatalog";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import { listTraps, countDueTraps } from "@/lib/traps/query";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = {
-  title: "Traps · Shakh",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("traps") };
+}
 
 export default async function TrappolePage() {
   const supabase = await createClient();

@@ -7,7 +7,10 @@ import { hasPractice } from "@/lib/theory/endgame";
 import { loadDomainRatings } from "@/lib/rating/store";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Endgames — Theory — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("endgames") };
+}
 
 interface Row {
   slug: string;

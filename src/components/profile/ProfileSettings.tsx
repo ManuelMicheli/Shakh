@@ -71,7 +71,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
 
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [username, setUsername] = useState(initial.username);
-  const [locale, setLocale] = useState(initial.locale || "en");
+  const [locale, setLocale] = useState(initial.locale || "it");
   const [savingProfile, startSave] = useTransition();
 
   const [password, setPassword] = useState("");

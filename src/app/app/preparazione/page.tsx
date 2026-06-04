@@ -1,7 +1,11 @@
+import { getTranslations } from "next-intl/server";
 import { PrepLab } from "@/components/prep/PrepLab";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Opponent preparation — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("preparation") };
+}
 
 export default function PreparazionePage() {
   return (

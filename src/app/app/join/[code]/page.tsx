@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { JoinClickwrap } from "@/components/groups/JoinClickwrap";
 import { GROUP_TYPE_LABEL, GROUP_ROLE_LABEL, type GroupRole, type GroupType } from "@/lib/groups/types";
 
-export const metadata = { title: "Join a group — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("joinGroup") };
+}
 
 interface PageProps {
   params: Promise<{ code: string }>;

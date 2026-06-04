@@ -5,7 +5,10 @@ import { ConceptRunner } from "@/components/learn/ConceptRunner";
 import { findConcept } from "@/lib/learn/concepts";
 import { getLadderPuzzles } from "../../actions";
 
-export const metadata = { title: "Concept — Learn — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("concept") };
+}
 
 export default async function ConceptPage({
   params,

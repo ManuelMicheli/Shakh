@@ -2,10 +2,12 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { TrapReview, type ReviewItem } from "@/components/traps/TrapReview";
 import { listDueTraps, bodyAsLesson } from "@/lib/traps/query";
 import type { TrapMode } from "@/lib/traps/types";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = {
-  title: "Trap review · Shakh",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("trapReview") };
+}
 
 export default async function TrapReviewPage() {
   const supabase = await createClient();

@@ -139,7 +139,7 @@ export default async function ProfiloPage() {
               initial={{
                 displayName: profile?.display_name ?? "",
                 username: profile?.username ?? "",
-                locale: profile?.locale ?? "en",
+                locale: profile?.locale ?? "it",
               }}
             />
           </div>

@@ -1434,5 +1434,24 @@
       "moreConcepts": "More concepts",
       "keepTraining": "Keep training"
     }
+  },
+  "metadata": {
+    "joinGroup": "Join a group — Shakh",
+    "explainedGame": "Explained game — Learn — Shakh",
+    "reel": "Reel — Shakh",
+    "preparation": "Opponent preparation — Shakh",
+    "sparring": "Sparring — Shakh",
+    "concept": "Concept — Learn — Shakh",
+    "fixMistake": "Fix mistake — Shakh",
+    "today": "Today's training — Shakh",
+    "theory": "Theory — Shakh",
+    "middlegame": "Middlegame — Theory — Shakh",
+    "endgames": "Endgames — Theory — Shakh",
+    "openings": "Openings — Shakh",
+    "traps": "Traps · Shakh",
+    "trapReview": "Trap review · Shakh",
+    "playFriend": "Play a friend — Shakh",
+    "game": "Game — Shakh",
+    "fixMistakes": "Fix your mistakes — Shakh"
   }
 }

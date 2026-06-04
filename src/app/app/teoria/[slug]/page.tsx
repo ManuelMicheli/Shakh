@@ -20,10 +20,11 @@ export default async function LessonPage({
   const t = await getTranslations("theory");
 
   // RLS: lettura pubblica solo dei contenuti published. Si leggono le colonne
-  // bilingui (0021) per title/summary; il `body` resta unico (solo italiano).
+  // bilingui (0021/0022) per title/summary/body; `body` (italiano) è il fallback
+  // quando manca `body_en`.
   const { data: raw } = await supabase
     .from("content_items")
-    .select("id, type, parent_id, eco_code, title_it, title_en, slug, summary_it, summary_en, body, start_fen, line_pgn, level, order_index, published")
+    .select("id, type, parent_id, eco_code, title_it, title_en, slug, summary_it, summary_en, body, body_en, start_fen, line_pgn, level, order_index, published")
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle<
@@ -32,16 +33,19 @@ export default async function LessonPage({
         title_en: string | null;
         summary_it: string | null;
         summary_en: string | null;
+        body_en: ContentItemRow["body"] | null;
       }
     >();
 
   if (!raw) notFound();
 
-  // Risolve title/summary alla lingua attiva, riportando la stessa forma di ContentItemRow.
+  // Risolve title/summary/body alla lingua attiva, riportando la forma di ContentItemRow.
+  const { body_en, ...rest } = raw;
   const data: ContentItemRow = {
-    ...raw,
+    ...rest,
     title: pickLocale(raw.title_it, raw.title_en, locale) ?? "",
     summary: pickLocale(raw.summary_it, raw.summary_en, locale),
+    body: pickLocale(raw.body, body_en, locale) ?? raw.body,
   };
   if (!isLesson(data.body)) {
     // Contenuto pubblicato ma senza lezione strutturata.

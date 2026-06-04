@@ -11,11 +11,11 @@ import type { TrapRow, TrapSummary } from "./types";
 
 type DB = SupabaseClient;
 
-// Si leggono le colonne bilingui (0021) per name/opening_name; il `body` resta
-// unico (solo italiano). Le altre colonne sono invariate.
+// Si leggono le colonne bilingui (0021/0022) per name/opening_name/body; il
+// `body` (italiano) è il fallback quando manca `body_en`.
 const SUMMARY_COLS =
   "id,slug,name_it,name_en,category,fame,eco_code,opening_name_it,opening_name_en,side,motif,level";
-const FULL_COLS = `${SUMMARY_COLS},trigger_fen,line_pgn,body,published`;
+const FULL_COLS = `${SUMMARY_COLS},trigger_fen,line_pgn,body,body_en,published`;
 
 // Forma grezza dal DB con le colonne localizzate, prima della risoluzione.
 type LocalizedNames = {
@@ -24,6 +24,22 @@ type LocalizedNames = {
   opening_name_it: string | null;
   opening_name_en: string | null;
 };
+
+// Forma grezza completa: nomi localizzati + body bilingue.
+type LocalizedFull = Omit<TrapRow, "name" | "opening_name"> &
+  LocalizedNames & { body_en: TrapRow["body"] | null };
+
+/** Risolve nomi e body di una riga grezza alla lingua attiva. */
+function resolveTrap(row: LocalizedFull, locale: "it" | "en"): TrapRow {
+  const { name_it, name_en, opening_name_it, opening_name_en, body_en, ...rest } = row;
+  return {
+    ...rest,
+    name: pickLocale(name_it, name_en, locale) ?? "",
+    opening_name: pickLocale(opening_name_it, opening_name_en, locale),
+    body: pickLocale(row.body, body_en, locale) ?? row.body,
+    motif: row.motif ?? [],
+  };
+}
 
 /** Tutte le trappole pubblicate (proiezione leggera per il catalogo). */
 export async function listTraps(supabase: DB): Promise<TrapSummary[]> {
@@ -58,16 +74,9 @@ export async function getTrapBySlug(
     .select(FULL_COLS)
     .eq("slug", slug)
     .eq("published", true)
-    .maybeSingle<Omit<TrapRow, "name" | "opening_name"> & LocalizedNames>();
+    .maybeSingle<LocalizedFull>();
   if (!data) return null;
-  const { name_it, name_en, opening_name_it, opening_name_en, ...rest } = data;
-  return {
-    ...rest,
-    // name/opening_name localizzati; `body` resta unico (italiano).
-    name: pickLocale(name_it, name_en, locale) ?? "",
-    opening_name: pickLocale(opening_name_it, opening_name_en, locale),
-    motif: data.motif ?? [],
-  };
+  return resolveTrap(data, locale);
 }
 
 /** Quante trappole sono in scadenza (SRS) per l'utente. */
@@ -101,18 +110,7 @@ export async function listDueTraps(supabase: DB, userId: string): Promise<TrapRo
     .eq("published", true)
     .in("id", ids);
 
-  const rows = (
-    (data as (Omit<TrapRow, "name" | "opening_name"> & LocalizedNames)[] | null) ?? []
-  ).map((t) => {
-    const { name_it, name_en, opening_name_it, opening_name_en, ...rest } = t;
-    return {
-      ...rest,
-      // name/opening_name localizzati; `body` resta unico (italiano).
-      name: pickLocale(name_it, name_en, locale) ?? "",
-      opening_name: pickLocale(opening_name_it, opening_name_en, locale),
-      motif: t.motif ?? [],
-    };
-  });
+  const rows = ((data as LocalizedFull[] | null) ?? []).map((t) => resolveTrap(t, locale));
   // Rispetta l'ordine di scadenza.
   const order = new Map(ids.map((id, i) => [id, i]));
   rows.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));

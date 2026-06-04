@@ -2,9 +2,13 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RepairSession } from "@/components/repair/RepairSession";
+import { getTranslations } from "next-intl/server";
 import { getRepairPuzzles, type RepairData } from "../../actions";
 
-export const metadata = { title: "Fix mistake — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("fixMistake") };
+}
 
 export default async function RiparaDrillPage({
   params,

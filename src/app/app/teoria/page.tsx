@@ -8,7 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { TheoryType } from "@/lib/theory/types";
 
-export const metadata = { title: "Theory — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("theory") };
+}
 
 interface LessonRow {
   slug: string;

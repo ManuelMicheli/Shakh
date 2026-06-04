@@ -6,7 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { OpeningTree, type OpeningNode } from "@/components/theory/OpeningTree";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Openings — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("openings") };
+}
 
 interface Row {
   id: string;

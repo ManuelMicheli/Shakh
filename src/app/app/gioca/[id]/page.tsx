@@ -5,7 +5,10 @@ import { OnlineGame } from "@/components/play/OnlineGame";
 import { Button } from "@/components/ui/button";
 import type { FriendGameRow } from "@/lib/play/types";
 
-export const metadata = { title: "Game — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("game") };
+}
 
 export default async function GiocaIdPage({
   params,

@@ -1,6 +1,10 @@
+import { getTranslations } from "next-intl/server";
 import { SparringBoard } from "@/components/sparring/SparringBoard";
 
-export const metadata = { title: "Sparring — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("sparring") };
+}
 
 export default function SparringPage() {
   return (

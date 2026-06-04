@@ -4,7 +4,10 @@ import { getTranslations } from "next-intl/server";
 import { GuidedReplay } from "@/components/learn/GuidedReplay";
 import { findGuided } from "@/lib/learn/guided";
 
-export const metadata = { title: "Explained game — Learn — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("explainedGame") };
+}
 
 export default async function ReplayPage({
   params,

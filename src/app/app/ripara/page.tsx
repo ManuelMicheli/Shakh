@@ -6,8 +6,12 @@ import { Button } from "@/components/ui/button";
 import { decodeEval, toMoverCp } from "@/lib/analysis/evalScore";
 import { moverFromPly } from "@/lib/ai/format";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = { title: "Fix your mistakes — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("metadata");
+  return { title: t("fixMistakes") };
+}
 
 interface GameRow {
   id: string;
