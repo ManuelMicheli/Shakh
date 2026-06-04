@@ -98,7 +98,10 @@ export function MobileNav({
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex h-14 shrink-0 items-center px-5">
+        <div
+          className="flex h-14 shrink-0 items-center px-5"
+          style={{ marginTop: "env(safe-area-inset-top)" }}
+        >
           <Link
             href="/app"
             onClick={onClose}
@@ -142,7 +145,10 @@ export function MobileNav({
         </div>
 
         {/* Footer: gestione e account. */}
-        <div className="space-y-1 border-t border-border px-3 py-2">
+        <div
+          className="space-y-1 border-t border-border px-3 py-2"
+          style={{ paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom))" }}
+        >
           {navFooter.map((item) => (
             <MobileRow
               key={item.href}
