@@ -104,6 +104,11 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Nessun overflow orizzontale di pagina: su mobile innescherebbe lo zoom-out
+       automatico per far rientrare la larghezza. `clip` (non `hidden`) non crea un
+       contenitore di scroll, quindi non rompe `position: sticky`. La scroll verticale
+       resta gestita da AppShell (app) o da Lenis/body (pagine pubbliche). */
+    overflow-x: clip;
   }
 
   /* Focus visibile e accessibile ovunque (vedi §9) */

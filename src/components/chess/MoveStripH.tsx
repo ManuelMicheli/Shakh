@@ -18,16 +18,29 @@ export function MoveStripH({
   cursor: number;
   onSelect: (i: number) => void;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    activeRef.current?.scrollIntoView({ inline: "nearest", block: "nearest" });
+    const c = containerRef.current;
+    const a = activeRef.current;
+    if (!c || !a) return;
+    // Scorri SOLO la striscia, mai la pagina: `scrollIntoView` risalirebbe gli
+    // antenati scrollabili (fino al viewport), causando lo zoom/spostamento su
+    // mobile. Centriamo la mossa attiva agendo unicamente su questo contenitore.
+    const cr = c.getBoundingClientRect();
+    const ar = a.getBoundingClientRect();
+    const delta = ar.left - cr.left - c.clientWidth / 2 + ar.width / 2;
+    c.scrollBy({ left: delta, behavior: "smooth" });
   }, [cursor]);
 
   if (history.length === 0) return null;
   const pairCount = Math.ceil(history.length / 2);
 
   return (
-    <div className="flex gap-1 overflow-x-auto rounded-md border border-border bg-surface px-2 py-1.5">
+    <div
+      ref={containerRef}
+      className="flex min-w-0 max-w-full gap-1 overflow-x-auto overscroll-x-contain rounded-md border border-border bg-surface px-2 py-1.5 [touch-action:pan-x]"
+    >
       {Array.from({ length: pairCount }).map((_, p) => {
         const wi = p * 2;
         const bi = p * 2 + 1;
