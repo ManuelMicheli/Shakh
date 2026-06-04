@@ -41,3 +41,6 @@ lichess_db_puzzle.csv.zst
 # log di build locali
 build-full.log
 *.build.log
+
+# build logs
+build*.log
