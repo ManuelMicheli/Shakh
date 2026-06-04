@@ -35,11 +35,31 @@ function isIOS(): boolean {
   return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
+function isWindows(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  // Windows desktop (esclude i mobile che a volte contengono "Windows").
+  return /windows nt/i.test(ua) && !/windows phone|android|iphone|ipad/i.test(ua);
+}
+
+/** Installer Windows servito da public/download (build Tauri). */
+const WINDOWS_INSTALLER_URL = "/download/Shakh-Setup.exe";
+
+function triggerDownload(url: string) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 /**
- * Bottone "Download": avvia l'installazione PWA.
- * - Chromium (desktop/Android): usa l'evento `beforeinstallprompt` → prompt nativo.
- * - iOS Safari: nessuna API, mostra le istruzioni «Aggiungi a Home».
- * - Altrove / prompt non ancora pronto: suggerisce il menu del browser.
+ * Bottone "Download".
+ * - Windows desktop: scarica l'installer .exe (app desktop Tauri).
+ * - Android / Chromium che lo supporta: prompt nativo PWA (beforeinstallprompt).
+ * - iOS Safari: istruzioni «Aggiungi a Home».
+ * - Altri desktop / browser senza prompt: istruzioni dal menu del browser.
  * Si nasconde se l'app è già installata (display standalone).
  */
 export function InstallButton({ className }: { className?: string }) {
@@ -78,6 +98,15 @@ export function InstallButton({ className }: { className?: string }) {
   if (installed) return null;
 
   const handleClick = async () => {
+    // Windows desktop: scarica direttamente l'installer .exe.
+    if (isWindows()) {
+      triggerDownload(WINDOWS_INSTALLER_URL);
+      toast({
+        title: t("downloadStartedTitle"),
+        description: t("downloadStartedBody"),
+      });
+      return;
+    }
     if (deferred) {
       await deferred.prompt();
       await deferred.userChoice;

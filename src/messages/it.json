@@ -8,6 +8,8 @@
   "landing": {
     "navCta": "Inizia ora",
     "downloadCta": "Download",
+    "downloadStartedTitle": "Download avviato",
+    "downloadStartedBody": "Apri Shakh-Setup.exe per installare l'app. Windows può mostrare un avviso: «Ulteriori informazioni» → «Esegui comunque».",
     "installDoneTitle": "App installata",
     "installDoneBody": "Trovi Shakh tra le tue app, si apre a tutto schermo.",
     "installIosTitle": "Installa su iPhone/iPad",
