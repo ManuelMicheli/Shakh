@@ -5,6 +5,8 @@
  * in modo uniforme in sparring, hotseat e partita online (tutte espongono la FEN).
  */
 
+import type { Locale } from "@/i18n/config";
+
 /** Valore convenzionale dei pezzi (re escluso). */
 const VALUE: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9 };
 
@@ -52,9 +54,12 @@ export function formatDuration(ms: number): string {
  * sostituite dal riepilogo qualità e il materiale è mostrato a bordo scacchiera
  * durante la partita: qui resta solo il totale catture.
  */
-export function gameStatsFromFen(fen: string): { label: string; value: string }[] {
+export function gameStatsFromFen(
+  fen: string,
+  locale: Locale = "en",
+): { label: string; value: string }[] {
   const s = summaryFromFen(fen);
-  return [{ label: "Captures", value: String(s.captures) }];
+  return [{ label: locale === "it" ? "Catture" : "Captures", value: String(s.captures) }];
 }
 
 /** Tipi di pezzo (re escluso), ordinati per valore crescente. */

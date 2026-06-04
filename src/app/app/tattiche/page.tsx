@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   Infinity as InfinityIcon,
   Target,
@@ -15,13 +16,16 @@ import { ensureStats, selectNextPuzzle, dueReviewCount } from "@/lib/tactics/que
 import { TACTIC_THEMES, themeLabel } from "@/lib/tactics/themes";
 import type { TacticMode, TacticStats } from "@/lib/tactics/types";
 
-export const metadata = { title: "Tactics — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("tactics");
+  return { title: t("metaTitle") };
+}
 
-const MODES: { mode: TacticMode; title: string; desc: string; icon: LucideIcon }[] = [
-  { mode: "adaptive", title: "Adaptive", desc: "A continuous flow of puzzles at your level. Updates rating and streak.", icon: InfinityIcon },
-  { mode: "theme", title: "By theme", desc: "Train a specific motif: fork, pin, endgames…", icon: Target },
-  { mode: "review", title: "Review", desc: "Revisit due missed puzzles (spaced repetition).", icon: RotateCcw },
-  { mode: "timed", title: "Timed challenge", desc: "3 minutes, rising difficulty: how many can you solve?", icon: Timer },
+const MODES: { mode: TacticMode; icon: LucideIcon }[] = [
+  { mode: "adaptive", icon: InfinityIcon },
+  { mode: "theme", icon: Target },
+  { mode: "review", icon: RotateCcw },
+  { mode: "timed", icon: Timer },
 ];
 
 const VALID_MODES: TacticMode[] = ["adaptive", "theme", "review", "timed"];
@@ -61,7 +65,8 @@ export default async function TattichePage({
   return <Hub stats={stats} reviewCount={reviewCount} />;
 }
 
-function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }) {
+async function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }) {
+  const t = await getTranslations("tactics");
   return (
     <div className="space-y-8">
       {/* ===== MOBILE: testata editoriale + rating hero + modalità a list-card ===== */}
@@ -69,22 +74,22 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
         <div className="relative">
           <div className="relative">
             <p className="text-xs uppercase tracking-wider text-text-muted">
-              Tactical vision
+              {t("tacticalVision")}
             </p>
             <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-              Tactics
+              {t("title")}
             </h1>
 
             <p className="mt-6 text-xs uppercase tracking-wider text-text-muted">
-              Tactical rating
+              {t("tacticalRating")}
             </p>
             <div className="mt-1 font-mono text-5xl font-semibold tabular-nums tracking-tight">
               {stats.rating}
             </div>
             <div className="mt-4 grid grid-cols-3 gap-x-3">
-              <Mini label="Streak" value={stats.currentStreak} />
-              <Mini label="Best" value={stats.bestStreak} />
-              <Mini label="Solved" value={stats.puzzlesSolved} />
+              <Mini label={t("streak")} value={stats.currentStreak} />
+              <Mini label={t("best")} value={stats.bestStreak} />
+              <Mini label={t("solved")} value={stats.puzzlesSolved} />
             </div>
           </div>
         </div>
@@ -93,7 +98,7 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
 
         <section className="space-y-2">
           <p className="px-0.5 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-            Train
+            {t("train")}
           </p>
           <div className="space-y-2">
             {MODES.map((m) => {
@@ -109,15 +114,15 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{m.title}</span>
+                      <span className="text-sm font-medium">{t(`modes.${m.mode}.title`)}</span>
                       {m.mode === "review" && reviewCount > 0 && (
                         <span className="shrink-0 rounded-full bg-text px-2 py-0.5 text-[10px] font-medium text-bg">
-                          {reviewCount} due
+                          {t("due", { count: reviewCount })}
                         </span>
                       )}
                     </span>
                     <span className="mt-0.5 block truncate text-xs text-text-muted">
-                      {m.desc}
+                      {t(`modes.${m.mode}.desc`)}
                     </span>
                   </span>
                   <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" aria-hidden />
@@ -131,18 +136,17 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
       {/* ===== DESKTOP: layout esistente ===== */}
       <div className="hidden space-y-8 md:block">
         <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Tactics</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">{t("title")}</h1>
           <p className="mt-2 text-text-muted">
-            Train your tactical vision with puzzles. The rating adapts to you and missed
-            puzzles come back for review.
+            {t("hubIntro")}
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label="Tactical rating" value={stats.rating} />
-          <Stat label="Current streak" value={stats.currentStreak} />
-          <Stat label="Best streak" value={stats.bestStreak} />
-          <Stat label="Solved" value={stats.puzzlesSolved} />
+          <Stat label={t("tacticalRating")} value={stats.rating} />
+          <Stat label={t("currentStreak")} value={stats.currentStreak} />
+          <Stat label={t("bestStreak")} value={stats.bestStreak} />
+          <Stat label={t("solved")} value={stats.puzzlesSolved} />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -151,12 +155,12 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
               <Card className="h-full transition-colors group-hover:border-text">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{m.title}</CardTitle>
+                    <CardTitle>{t(`modes.${m.mode}.title`)}</CardTitle>
                     {m.mode === "review" && reviewCount > 0 && (
-                      <Badge>{reviewCount} due</Badge>
+                      <Badge>{t("due", { count: reviewCount })}</Badge>
                     )}
                   </div>
-                  <CardDescription>{m.desc}</CardDescription>
+                  <CardDescription>{t(`modes.${m.mode}.desc`)}</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
@@ -176,15 +180,16 @@ function Mini({ label, value }: { label: string; value: number }) {
   );
 }
 
-function ThemePicker() {
+async function ThemePicker() {
+  const t = await getTranslations("tactics");
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          By theme — pick a motif
+          {t("themePickerTitle")}
         </h1>
         <Link href="/app/tattiche" className="text-sm text-text-muted hover:text-text">
-          ← Tactics
+          {t("backToTacticsArrow")}
         </Link>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

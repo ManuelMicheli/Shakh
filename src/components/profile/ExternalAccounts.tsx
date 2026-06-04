@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,12 +22,10 @@ const SOURCE_LABEL: Record<ExternalSource, string> = {
   chesscom: "Chess.com",
 };
 
-/** Dove incollare il token su ciascuna piattaforma. */
-const VERIFY_HINT: Record<ExternalSource, string> = {
-  lichess:
-    "Paste the token into your Lichess bio (Preferences → Edit profile → Biography), save, then press Verify.",
-  chesscom:
-    "Paste the token into the Name or Location field of your Chess.com profile (Settings → Profile), save, then press Verify.",
+/** Chiave i18n con le istruzioni per incollare il token su ciascuna piattaforma. */
+const VERIFY_HINT_KEY: Record<ExternalSource, string> = {
+  lichess: "verifyHintLichess",
+  chesscom: "verifyHintChesscom",
 };
 
 export interface ExternalAccountsProps {
@@ -42,6 +41,7 @@ export interface ExternalAccountsProps {
  * Shakh (dominio 'external') SOLO dopo la verifica di proprietà via bio-token.
  */
 export function ExternalAccounts({ initial, bare = false, onAccountsChange }: ExternalAccountsProps) {
+  const t = useTranslations("profile");
   const { toast } = useToast();
   const [accounts, setAccounts] = useState<LinkedAccount[]>(initial);
   const bySource = (s: ExternalSource) => accounts.find((a) => a.source === s);
@@ -72,10 +72,9 @@ export function ExternalAccounts({ initial, bare = false, onAccountsChange }: Ex
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Online accounts</CardTitle>
+        <CardTitle>{t("externalTitle")}</CardTitle>
         <CardDescription>
-          Link Lichess or Chess.com: after verification, your online rating
-          weighs heavily on your Shakh Rating, mapped to the real-world (OTB) scale.
+          {t("externalDesc")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">{rows}</CardContent>
@@ -92,6 +91,7 @@ interface SourceRowProps {
 }
 
 function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowProps) {
+  const t = useTranslations("profile");
   const [username, setUsername] = useState("");
   const [pending, start] = useTransition();
 
@@ -99,12 +99,12 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await beginLinkExternalAccount(source, username);
       if (!res.ok || !res.account) {
-        toast({ title: "Linking failed", description: res.error, variant: "error" });
+        toast({ title: t("linkingFailed"), description: res.error, variant: "error" });
         return;
       }
       onChanged(res.account);
       setUsername("");
-      toast({ title: "Token generated", description: "Add it to your profile, then verify." });
+      toast({ title: t("tokenGenerated"), description: t("tokenGeneratedDesc") });
     });
   };
 
@@ -112,15 +112,15 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await verifyExternalAccount(source);
       if (!res.ok || !res.account) {
-        toast({ title: "Verification failed", description: res.error, variant: "error" });
+        toast({ title: t("verificationFailed"), description: res.error, variant: "error" });
         return;
       }
       onChanged(res.account);
-      const parts = ["Shakh Rating updated."];
-      if (res.seed?.importedGames) parts.push(`${res.seed.importedGames} games imported.`);
+      const parts = [t("ratingUpdatedShakh")];
+      if (res.seed?.importedGames) parts.push(t("gamesImported", { count: res.seed.importedGames }));
       if (res.seed?.startingLevel != null)
-        parts.push(`Path at level ${res.seed.startingLevel}.`);
-      toast({ title: `${SOURCE_LABEL[source]} verified`, description: parts.join(" ") });
+        parts.push(t("pathAtLevel", { level: res.seed.startingLevel }));
+      toast({ title: t("sourceVerified", { source: SOURCE_LABEL[source] }), description: parts.join(" ") });
     });
   };
 
@@ -128,11 +128,11 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await refreshExternalAccount(source);
       if (!res.ok || !res.account) {
-        toast({ title: "Update failed", description: res.error, variant: "error" });
+        toast({ title: t("updateFailed"), description: res.error, variant: "error" });
         return;
       }
       onChanged(res.account);
-      toast({ title: "Rating updated" });
+      toast({ title: t("ratingUpdated") });
     });
   };
 
@@ -140,17 +140,17 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await unlinkExternalAccount(source);
       if (!res.ok) {
-        toast({ title: "Unlinking failed", description: res.error, variant: "error" });
+        toast({ title: t("unlinkingFailed"), description: res.error, variant: "error" });
         return;
       }
       onRemoved();
-      toast({ title: `${SOURCE_LABEL[source]} unlinked` });
+      toast({ title: t("sourceUnlinked", { source: SOURCE_LABEL[source] }) });
     });
   };
 
   const onCopy = (token: string) => {
     void navigator.clipboard?.writeText(token);
-    toast({ title: "Token copied" });
+    toast({ title: t("tokenCopied") });
   };
 
   // Stato 3: account verificato.
@@ -162,20 +162,20 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
             <p className="flex items-center gap-2 text-sm font-medium">
               {SOURCE_LABEL[source]}
               <span className="font-mono text-text-muted">@{account.username}</span>
-              <Badge variant="muted">verified</Badge>
+              <Badge variant="muted">{t("badgeVerified")}</Badge>
             </p>
             <p className="mt-1 font-mono text-xs text-text-muted">
-              {account.ratingNative != null && `${account.ratingNative} online`}
-              {account.ratingOtb != null && ` · ${account.ratingOtb} OTB`}
-              {` · ${account.nGames} games`}
+              {account.ratingNative != null && t("onlineSuffix", { rating: account.ratingNative })}
+              {account.ratingOtb != null && ` · ${t("otbSuffix", { rating: account.ratingOtb })}`}
+              {` · ${t("gamesCount", { count: account.nGames })}`}
             </p>
           </div>
           <div className="flex shrink-0 gap-2">
             <Button variant="secondary" size="sm" onClick={onRefresh} disabled={pending}>
-              {pending ? "…" : "Refresh"}
+              {pending ? "…" : t("refresh")}
             </Button>
             <Button variant="ghost" size="sm" onClick={onUnlink} disabled={pending}>
-              Unlink
+              {t("unlink")}
             </Button>
           </div>
         </div>
@@ -190,23 +190,23 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
         <p className="flex items-center gap-2 text-sm font-medium">
           {SOURCE_LABEL[source]}
           <span className="font-mono text-text-muted">@{account.username}</span>
-          <Badge variant="muted">to verify</Badge>
+          <Badge variant="muted">{t("badgeToVerify")}</Badge>
         </p>
         <div className="flex items-center gap-2">
           <code className="flex-1 rounded-md border border-border bg-surface px-3 py-2 font-mono text-sm">
             {account.verifyToken}
           </code>
           <Button variant="secondary" size="sm" onClick={() => onCopy(account.verifyToken!)}>
-            Copy
+            {t("copy")}
           </Button>
         </div>
-        <p className="text-xs text-text-muted">{VERIFY_HINT[source]}</p>
+        <p className="text-xs text-text-muted">{t(VERIFY_HINT_KEY[source])}</p>
         <div className="flex gap-2">
           <Button size="sm" onClick={onVerify} disabled={pending}>
-            {pending ? "Verifying…" : "Verify"}
+            {pending ? t("verifying") : t("verify")}
           </Button>
           <Button variant="ghost" size="sm" onClick={onUnlink} disabled={pending}>
-            Cancel
+            {t("cancel")}
           </Button>
         </div>
       </div>
@@ -218,20 +218,20 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     <div className="space-y-2">
       <Label htmlFor={`ext-${source}`} className="flex items-center gap-2">
         {SOURCE_LABEL[source]}
-        <Badge variant="muted">not linked</Badge>
+        <Badge variant="muted">{t("badgeNotLinked")}</Badge>
       </Label>
       <div className="flex gap-2">
         <Input
           id={`ext-${source}`}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder={source === "lichess" ? "Lichess username" : "Chess.com username"}
+          placeholder={source === "lichess" ? t("placeholderLichess") : t("placeholderChesscom")}
           onKeyDown={(e) => {
             if (e.key === "Enter" && username.trim()) onBegin();
           }}
         />
         <Button onClick={onBegin} disabled={pending || !username.trim()}>
-          {pending ? "…" : "Link"}
+          {pending ? "…" : t("link")}
         </Button>
       </div>
     </div>

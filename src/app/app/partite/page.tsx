@@ -1,12 +1,17 @@
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { ImportPanel } from "@/components/games/ImportPanel";
 import { GamesTable } from "@/components/games/GamesTable";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { GameRow } from "@/lib/games/types";
 
-export const metadata = { title: "My games — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("games");
+  return { title: t("metaTitle") };
+}
 
 export default async function PartitePage() {
+  const t = await getTranslations("games");
   const supabase = await createClient();
   const user = await getUser();
 
@@ -28,18 +33,18 @@ export default async function PartitePage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Archive"
-        title="My games"
-        desc="Import, analyze, review move by move."
+        eyebrow={t("headerEyebrow")}
+        title={t("headerTitle")}
+        desc={t("headerDesc")}
       />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          My games
+          {t("headerTitle")}
         </h1>
         <p className="mt-2 text-text-muted">
-          Import your games, analyze them with the engine, and review them move by move.
+          {t("pageIntro")}
         </p>
       </div>
 

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { activeLocale, pickLocale } from "@/lib/i18n/content";
 import { LessonViewer } from "@/components/theory/LessonViewer";
@@ -16,6 +17,7 @@ export default async function LessonPage({
   const { slug } = await params;
   const supabase = await createClient();
   const locale = await activeLocale();
+  const t = await getTranslations("theory");
 
   // RLS: lettura pubblica solo dei contenuti published. Si leggono le colonne
   // bilingui (0021) per title/summary; il `body` resta unico (solo italiano).
@@ -46,7 +48,7 @@ export default async function LessonPage({
     return (
       <div className="mx-auto max-w-2xl py-12 text-center">
         <h1 className="font-display text-2xl font-semibold">{data.title}</h1>
-        <p className="mt-2 text-text-muted">This lesson isn&apos;t available yet.</p>
+        <p className="mt-2 text-text-muted">{t("lesson.notAvailable")}</p>
       </div>
     );
   }

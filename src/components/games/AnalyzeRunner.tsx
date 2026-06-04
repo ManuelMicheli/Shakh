@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ANALYSIS_DEPTH } from "@/lib/analysis/thresholds";
 import { useAnalysisJob } from "@/components/analysis/AnalysisJobContext";
@@ -28,11 +29,15 @@ export function AnalyzeRunner({
   gameId,
   pgn,
   title,
-  label = "Analyze game",
+  label,
   autoStart = false,
 }: AnalyzeRunnerProps) {
+  const t = useTranslations("games");
   const { job, start } = useAnalysisJob();
   const [depth, setDepth] = useState(ANALYSIS_DEPTH);
+  // Etichetta del pulsante (default tradotto) e titolo di fallback per la mini-tab.
+  const buttonLabel = label ?? t("analyzeGame");
+  const jobTitle = title ?? t("defaultGameTitle");
 
   const thisJob = job && job.gameId === gameId ? job : null;
   const running = thisJob?.status === "running";
@@ -48,22 +53,21 @@ export function AnalyzeRunner({
     // partita). Un job concluso/in errore non deve bloccare l'auto-avvio.
     if (autoStart && !autoStarted.current && !running && !otherRunning && !thisJob) {
       autoStarted.current = true;
-      start(gameId, pgn, title ?? "Game", { depth });
+      start(gameId, pgn, jobTitle, { depth });
     }
-  }, [autoStart, running, otherRunning, thisJob, gameId, pgn, title, depth, start]);
+  }, [autoStart, running, otherRunning, thisJob, gameId, pgn, jobTitle, depth, start]);
 
   return (
     <div className="space-y-4 rounded-md border border-border bg-surface p-5">
       <div>
-        <h2 className="font-display text-lg font-semibold">Engine analysis</h2>
+        <h2 className="font-display text-lg font-semibold">{t("engineAnalysis")}</h2>
         <p className="mt-1 text-sm text-text-muted">
-          The analysis runs in parallel in your browser and keeps going even if you
-          switch pages: every move is evaluated and classified.
+          {t("engineAnalysisDesc")}
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm text-text-muted">Depth</span>
+        <span className="text-sm text-text-muted">{t("depth")}</span>
         <div className="flex items-center gap-1">
           {DEPTH_OPTIONS.map((d) => (
             <button
@@ -82,50 +86,50 @@ export function AnalyzeRunner({
           ))}
         </div>
         <Button
-          onClick={() => start(gameId, pgn, title ?? "Game", { depth })}
+          onClick={() => start(gameId, pgn, jobTitle, { depth })}
           disabled={disabled}
           className="ml-auto"
         >
-          {running ? "Analyzing…" : label}
+          {running ? t("analyzing") : buttonLabel}
         </Button>
       </div>
 
       <details className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm">
         <summary className="cursor-pointer font-medium text-text">
-          What is depth?
+          {t("whatIsDepth")}
         </summary>
         <div className="mt-2 space-y-2 text-xs leading-snug text-text-muted">
           <p>
-            It&apos;s how many <span className="text-text">half-moves ahead</span> the
-            engine calculates from each position before judging it. Higher =
-            more reliable analysis, but slower (the time grows almost
-            exponentially, not linearly).
+            {t.rich("depthExplain", {
+              strong: (chunks) => <span className="text-text">{chunks}</span>,
+            })}
           </p>
           <ul className="space-y-1">
             <li>
-              <span className="font-mono text-text">12</span> — fast, for a quick
-              review or blitz games.
+              {t.rich("depth12", {
+                code: (chunks) => <span className="font-mono text-text">{chunks}</span>,
+              })}
             </li>
             <li>
-              <span className="font-mono text-text">15</span> — a balance of
-              precision and time (recommended).
+              {t.rich("depth15", {
+                code: (chunks) => <span className="font-mono text-text">{chunks}</span>,
+              })}
             </li>
             <li>
-              <span className="font-mono text-text">18</span> — more precise (catches
-              deep tactics and sacrifices), but can take 3–5× the time of 12.
+              {t.rich("depth18", {
+                code: (chunks) => <span className="font-mono text-text">{chunks}</span>,
+              })}
             </li>
           </ul>
           <p>
-            Below ~2000 Elo, 15 and 18 rarely change the verdict on big blunders:
-            keep 15 by default, and go to 18 only for important games you want to
-            study in depth.
+            {t("depthAdvice")}
           </p>
         </div>
       </details>
 
       {otherRunning && (
         <p className="text-xs text-text-muted">
-          Analysis running on another game: wait for it to finish.
+          {t("otherGameRunning")}
         </p>
       )}
 
@@ -140,7 +144,7 @@ export function AnalyzeRunner({
             />
           </div>
           <p className="font-mono text-xs text-text-muted">
-            position {thisJob.current}/{thisJob.total}
+            {t("positionProgress", { current: thisJob.current, total: thisJob.total })}
           </p>
         </div>
       )}

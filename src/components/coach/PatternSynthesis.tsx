@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
@@ -19,6 +20,7 @@ export function PatternSynthesis({
   coachConfigured: boolean;
   hasData: boolean;
 }) {
+  const t = useTranslations("study");
   const { toast } = useToast();
   const [pending, start] = useTransition();
   const [synthesis, setSynthesis] = useState<CoachSynthesis | null>(null);
@@ -27,7 +29,7 @@ export function PatternSynthesis({
     start(async () => {
       const res = await refreshProgressAndSynthesize();
       if (!res.ok) {
-        toast({ title: "Summary unavailable", description: res.error, variant: "error" });
+        toast({ title: t("synthesis.toast.unavailable"), description: res.error, variant: "error" });
         return;
       }
       setSynthesis(res.synthesis ?? null);
@@ -38,19 +40,20 @@ export function PatternSynthesis({
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <Button onClick={onGenerate} disabled={pending || !coachConfigured || !hasData}>
-          {pending ? "…" : synthesis ? "Regenerate summary" : "Generate coach summary"}
+          {pending ? "…" : synthesis ? t("synthesis.regenerate") : t("synthesis.generate")}
         </Button>
         {pending && (
           <span className="flex items-center gap-2 text-sm text-text-muted">
-            <Spinner /> The coach is analyzing your patterns…
+            <Spinner /> {t("synthesis.analyzing")}
           </span>
         )}
       </div>
 
       {!coachConfigured && (
         <p className="text-sm text-text-muted">
-          The AI coach isn&apos;t configured (<code className="font-mono">ANTHROPIC_API_KEY</code> is missing).
-          The metrics above remain available.
+          {t.rich("synthesis.notConfigured", {
+            code: (chunks) => <code className="font-mono">{chunks}</code>,
+          })}
         </p>
       )}
 
@@ -66,7 +69,7 @@ export function PatternSynthesis({
           )}
           {synthesis.suggestion && (
             <p className="text-sm text-text-muted">
-              <span className="font-medium text-text">Tip: </span>
+              <span className="font-medium text-text">{t("synthesis.tip")} </span>
               {synthesis.suggestion}
             </p>
           )}

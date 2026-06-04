@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Menu } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -13,6 +14,7 @@ export function Topbar({
   avatarUrl?: string | null;
   onOpenMobile?: () => void;
 }) {
+  const t = useTranslations("nav");
   return (
     // pt = safe-area-inset-top: in PWA standalone (status bar translucent) la
     // barra resterebbe sotto la status bar/notch e l'hamburger irraggiungibile.
@@ -25,14 +27,14 @@ export function Topbar({
           <button
             type="button"
             onClick={onOpenMobile}
-            aria-label="Open menu"
+            aria-label={t("openMenu")}
             className="-ml-1 rounded-md p-1.5 text-text-muted hover:bg-surface-2 hover:text-text md:hidden"
           >
             <Menu className="h-5 w-5" aria-hidden />
           </button>
           <BackButton />
           <div className="truncate text-sm text-text-muted">
-            {displayName ? `Hi, ${displayName}` : " "}
+            {displayName ? t("greeting", { name: displayName }) : " "}
           </div>
         </div>
         <div className="flex items-center gap-2">

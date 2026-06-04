@@ -10,6 +10,8 @@
  * sulla valutazione del motore del prompt 02).
  */
 
+import type { Locale } from "@/i18n/config";
+
 export type TbCategory =
   | "win"
   | "cursed-win"
@@ -66,10 +68,20 @@ export function isTablebaseEligible(fen: string): boolean {
   return countPieces(fen) <= MAX_PIECES;
 }
 
-/** Interroga la tablebase. Risultato cachato per FEN. */
-export async function fetchTablebase(fen: string): Promise<TablebaseResult> {
+/**
+ * Interroga la tablebase. Risultato (dati) cachato per FEN.
+ * `locale` opzionale: omesso → messaggi d'errore in inglese (retrocompatibile).
+ */
+export async function fetchTablebase(fen: string, locale: Locale = "en"): Promise<TablebaseResult> {
+  const it = locale === "it";
   if (!isTablebaseEligible(fen)) {
-    return { ok: false, error: "Position with more than 7 pieces: outside the tablebase.", tooManyPieces: true };
+    return {
+      ok: false,
+      error: it
+        ? "Posizione con più di 7 pezzi: fuori dalla tablebase."
+        : "Position with more than 7 pieces: outside the tablebase.",
+      tooManyPieces: true,
+    };
   }
 
   const cached = cache.get(fen);
@@ -85,19 +97,36 @@ export async function fetchTablebase(fen: string): Promise<TablebaseResult> {
         headers: { Accept: "application/json" },
       });
     } catch {
-      return { ok: false, error: "Network error contacting the tablebase." };
+      return {
+        ok: false,
+        error: it ? "Errore di rete nel contattare la tablebase." : "Network error contacting the tablebase.",
+      };
     }
     if (res.status === 429) {
-      return { ok: false, error: "Too many requests to the tablebase. Try again shortly.", rateLimited: true };
+      return {
+        ok: false,
+        error: it
+          ? "Troppe richieste alla tablebase. Riprova tra poco."
+          : "Too many requests to the tablebase. Try again shortly.",
+        rateLimited: true,
+      };
     }
     if (!res.ok) {
-      return { ok: false, error: `The tablebase responded with status ${res.status}.` };
+      return {
+        ok: false,
+        error: it
+          ? `La tablebase ha risposto con stato ${res.status}.`
+          : `The tablebase responded with status ${res.status}.`,
+      };
     }
     let raw: TablebaseData;
     try {
       raw = (await res.json()) as TablebaseData;
     } catch {
-      return { ok: false, error: "Invalid tablebase response." };
+      return {
+        ok: false,
+        error: it ? "Risposta della tablebase non valida." : "Invalid tablebase response.",
+      };
     }
     const data: TablebaseData = {
       category: raw.category ?? "unknown",

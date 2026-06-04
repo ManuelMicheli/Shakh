@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
@@ -14,6 +15,7 @@ interface Row {
 
 export default async function MediogiocoPage() {
   const supabase = await createClient();
+  const t = await getTranslations("theory");
   // RLS: lettura pubblica solo dei contenuti published.
   const { data } = await supabase
     .from("content_items")
@@ -28,25 +30,24 @@ export default async function MediogiocoPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Strategic themes"
-        title="Middlegame"
-        desc="Plans for both sides and “find the plan” exercises."
+        eyebrow={t("middlegame.eyebrow")}
+        title={t("middlegame.title")}
+        desc={t("middlegame.mobileDesc")}
       />
       <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">
-          ← Theory
+          ← {t("branch.theory")}
         </Link>
-        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Middlegame</h1>
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">{t("middlegame.title")}</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Strategic themes on typical positions: plans for both sides and
-          &quot;find the plan&quot; exercises, evaluated by the engine and commented by the coach.
+          {t("middlegame.desc")}
         </p>
       </div>
 
       {lessons.length === 0 ? (
         <Card>
           <CardContent className="py-6 text-center text-sm text-text-muted">
-            Lessons coming soon.
+            {t("lessonsSoon")}
           </CardContent>
         </Card>
       ) : (

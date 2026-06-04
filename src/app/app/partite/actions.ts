@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { splitPgn, parseGame, detectUserColor, type ParsedGame } from "@/lib/games/pgn";
 import { lichessProvider, chesscomProvider, ProviderError } from "@/lib/games/providers";
@@ -72,12 +73,13 @@ async function importParsed(
   username: string | null,
 ): Promise<ImportResult> {
   const supabase = await createClient();
+  const t = await getTranslations("games");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
   if (games.length === 0)
-    return { ok: false, error: "No valid game found in the PGN." };
+    return { ok: false, error: t("errNoValidGame") };
 
   // Le partite incidono sul profilo solo se sono del proprio account verificato.
   const countsForProfile = await isVerifiedOwner(supabase, user.id, source, username);
@@ -151,11 +153,12 @@ const MAX_GAMES_PER_IMPORT = 200;
 
 /** Import da PGN incollato o da file (.pgn letto come testo). */
 export async function importPgnText(text: string): Promise<ImportResult> {
-  if (!text.trim()) return { ok: false, error: "Paste a PGN." };
+  const t = await getTranslations("games");
+  if (!text.trim()) return { ok: false, error: t("errPastePgn") };
   if (text.length > MAX_PGN_CHARS)
     return {
       ok: false,
-      error: "PGN too large (max ~500KB). Import fewer games at a time.",
+      error: t("errPgnTooLarge"),
     };
   const games = splitPgn(text)
     .slice(0, MAX_GAMES_PER_IMPORT)
@@ -169,8 +172,9 @@ export async function importLichess(
   username: string,
   max: number,
 ): Promise<ImportResult> {
+  const t = await getTranslations("games");
   const u = username.trim();
-  if (!u) return { ok: false, error: "Enter a Lichess username." };
+  if (!u) return { ok: false, error: t("errEnterLichess") };
   const n = Math.max(1, Math.min(100, Math.floor(max) || 10));
 
   let pgnText: string;
@@ -178,7 +182,7 @@ export async function importLichess(
     pgnText = await lichessProvider.fetchUserGamesPgn(u, n);
   } catch (e) {
     if (e instanceof ProviderError) return { ok: false, error: e.message };
-    return { ok: false, error: "Unexpected error while importing from Lichess." };
+    return { ok: false, error: t("errLichessImport") };
   }
 
   const games = splitPgn(pgnText)
@@ -192,8 +196,9 @@ export async function importChesscom(
   username: string,
   max: number,
 ): Promise<ImportResult> {
+  const t = await getTranslations("games");
   const u = username.trim();
-  if (!u) return { ok: false, error: "Enter a Chess.com username." };
+  if (!u) return { ok: false, error: t("errEnterChesscom") };
   const n = Math.max(1, Math.min(100, Math.floor(max) || 10));
 
   let pgnText: string;
@@ -201,7 +206,7 @@ export async function importChesscom(
     pgnText = await chesscomProvider.fetchUserGamesPgn(u, n);
   } catch (e) {
     if (e instanceof ProviderError) return { ok: false, error: e.message };
-    return { ok: false, error: "Unexpected error while importing from Chess.com." };
+    return { ok: false, error: t("errChesscomImport") };
   }
 
   const games = splitPgn(pgnText)
@@ -361,14 +366,15 @@ const MAX_BATCH_COMMENTS = 12;
 export async function generateKeyErrorComments(
   gameId: string,
 ): Promise<GenerateCommentsResult> {
+  const t = await getTranslations("games");
   if (!isCoachConfigured())
-    return { ok: false, error: "The AI coach is not configured." };
+    return { ok: false, error: t("errCoachNotConfigured") };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   // RLS garantisce che si vedano solo le righe delle proprie partite.
   const { data: rows, error } = await supabase
@@ -424,7 +430,7 @@ export async function generateKeyErrorComments(
       generated++;
     } catch (e) {
       // Interrompi al primo errore API (rate limit/timeout): salva il parziale.
-      const msg = e instanceof Error ? e.message : "AI coach error.";
+      const msg = e instanceof Error ? e.message : t("errCoachGeneric");
       return { ok: false, error: msg, generated };
     }
   }

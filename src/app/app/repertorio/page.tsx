@@ -1,9 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { RepertoireList, type RepertoireItem } from "@/components/theory/RepertoireList";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { PieceColor } from "@/lib/theory/repertoire";
 
-export const metadata = { title: "Repertoire — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("study");
+  return { title: t("repertoire.metaTitle") };
+}
 
 interface RepRow {
   id: string;
@@ -14,6 +18,7 @@ interface RepRow {
 
 export default async function RepertorioPage() {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const user = await getUser();
 
   // RLS limita ai propri repertori; il conteggio mosse arriva dalla relazione.
@@ -33,15 +38,14 @@ export default async function RepertorioPage() {
   return (
     <div className="space-y-6">
       <MobilePageHeader
-        eyebrow="Your lines"
-        title="Repertoire"
-        desc="Build lines by color, then drill them with spaced repetition."
+        eyebrow={t("repertoire.eyebrow")}
+        title={t("repertoire.title")}
+        desc={t("repertoire.desc")}
       />
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">My repertoire</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">{t("repertoire.myTitle")}</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Build your lines by color, then drill them with spaced repetition.
-          Add moves by playing on the board or from the explorer.
+          {t("repertoire.intro")}
         </p>
       </div>
       <RepertoireList items={items} />

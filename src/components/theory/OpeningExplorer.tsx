@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Spinner } from "@/components/ui/spinner";
 import {
   fetchOpeningExplorer,
@@ -20,6 +21,7 @@ export interface OpeningExplorerProps {
 
 /** Barra di esito bianco / patta / nero — identità monocromatica, niente colori semantici. */
 function OutcomeBar({ white, draws, black }: { white: number; draws: number; black: number }) {
+  const t = useTranslations("theory");
   const total = white + draws + black;
   if (total === 0) return <div className="h-3 w-full rounded-sm bg-surface-2" />;
   const w = (white / total) * 100;
@@ -30,8 +32,8 @@ function OutcomeBar({ white, draws, black }: { white: number; draws: number; bla
     <div
       className="flex h-3 w-full overflow-hidden rounded-sm border border-border"
       role="img"
-      aria-label={`White ${pct(w)}, draws ${pct(d)}, Black ${pct(b)}`}
-      title={`White ${pct(w)} · Draws ${pct(d)} · Black ${pct(b)}`}
+      aria-label={t("explorer.outcomeAria", { white: pct(w), draws: pct(d), black: pct(b) })}
+      title={t("explorer.outcomeTitle", { white: pct(w), draws: pct(d), black: pct(b) })}
     >
       <span className="bg-neutral-100" style={{ width: `${w}%` }} />
       <span className="bg-neutral-400" style={{ width: `${d}%` }} />
@@ -41,6 +43,7 @@ function OutcomeBar({ white, draws, black }: { white: number; draws: number; bla
 }
 
 export function OpeningExplorer({ fen, onPlayMove, className }: OpeningExplorerProps) {
+  const t = useTranslations("theory");
   const [db, setDb] = useState<ExplorerDb>("masters");
   const [state, setState] = useState<ExplorerResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,7 +65,7 @@ export function OpeningExplorer({ fen, onPlayMove, className }: OpeningExplorerP
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">What&apos;s really played</h3>
+        <h3 className="text-sm font-medium">{t("explorer.title")}</h3>
         <div className="inline-flex rounded-md border border-border bg-surface p-0.5 text-xs">
           {(["masters", "lichess"] as ExplorerDb[]).map((d) => (
             <button
@@ -74,7 +77,7 @@ export function OpeningExplorer({ fen, onPlayMove, className }: OpeningExplorerP
                 db === d ? "bg-text text-bg" : "text-text-muted hover:text-text",
               )}
             >
-              {d === "masters" ? "Masters" : "Online"}
+              {d === "masters" ? t("explorer.masters") : t("explorer.online")}
             </button>
           ))}
         </div>
@@ -82,7 +85,7 @@ export function OpeningExplorer({ fen, onPlayMove, className }: OpeningExplorerP
 
       {loading && (
         <p className="flex items-center gap-2 text-sm text-text-muted">
-          <Spinner /> Querying the explorer…
+          <Spinner /> {t("explorer.querying")}
         </p>
       )}
 
@@ -102,8 +105,9 @@ function ExplorerTable({
   data: ExplorerData;
   onPlayMove?: (san: string) => void;
 }) {
+  const t = useTranslations("theory");
   if (data.moves.length === 0) {
-    return <p className="text-sm text-text-muted">No games for this position.</p>;
+    return <p className="text-sm text-text-muted">{t("explorer.noGames")}</p>;
   }
   const totalGames = data.moves.reduce((s, m) => s + moveGames(m), 0);
   return (
@@ -116,9 +120,9 @@ function ExplorerTable({
       <table className="w-full text-sm">
         <thead>
           <tr className="text-text-muted">
-            <th className="py-1 text-left font-normal">Move</th>
-            <th className="px-2 py-1 text-right font-normal">Games</th>
-            <th className="py-1 text-left font-normal">Result (W / draw / B)</th>
+            <th className="py-1 text-left font-normal">{t("explorer.move")}</th>
+            <th className="px-2 py-1 text-right font-normal">{t("explorer.games")}</th>
+            <th className="py-1 text-left font-normal">{t("explorer.result")}</th>
           </tr>
         </thead>
         <tbody>

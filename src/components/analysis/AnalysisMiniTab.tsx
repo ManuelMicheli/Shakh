@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAnalysisJob } from "./AnalysisJobContext";
@@ -12,6 +13,7 @@ import { useAnalysisJob } from "./AnalysisJobContext";
  * partita analizzata. Renderizzata dall'AppShell, sopra i toast.
  */
 export function AnalysisMiniTab() {
+  const t = useTranslations("games");
   const { job, queueLength, cancel, dismiss } = useAnalysisJob();
 
   const pct =
@@ -32,15 +34,15 @@ export function AnalysisMiniTab() {
         >
           <div className="flex items-start justify-between gap-2">
             <p className="text-sm font-medium text-text">
-              {job.status === "running" && "Analyzing"}
-              {job.status === "done" && "Analysis complete"}
-              {job.status === "error" && "Analysis failed"}
+              {job.status === "running" && t("miniAnalyzing")}
+              {job.status === "done" && t("miniComplete")}
+              {job.status === "error" && t("miniFailed")}
             </p>
             {job.status !== "running" && (
               <button
                 type="button"
                 onClick={dismiss}
-                aria-label="Close"
+                aria-label={t("close")}
                 className="-mr-1 -mt-1 rounded p-1 text-text-muted hover:text-text"
               >
                 ✕
@@ -54,7 +56,7 @@ export function AnalysisMiniTab() {
 
           {queueLength > 0 && (
             <p className="mt-0.5 font-mono text-xs text-text-muted">
-              {queueLength} still queued
+              {t("stillQueued", { count: queueLength })}
             </p>
           )}
 
@@ -70,14 +72,16 @@ export function AnalysisMiniTab() {
               </div>
               <div className="flex items-center justify-between">
                 <p className="font-mono text-xs text-text-muted">
-                  {job.total > 0 ? `position ${job.current}/${job.total}` : "starting…"}
+                  {job.total > 0
+                    ? t("positionProgress", { current: job.current, total: job.total })
+                    : t("starting")}
                 </p>
                 <button
                   type="button"
                   onClick={cancel}
                   className="text-xs text-text-muted underline-offset-2 hover:text-text hover:underline"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
               </div>
             </div>
@@ -93,7 +97,7 @@ export function AnalysisMiniTab() {
                   "bg-text text-bg hover:opacity-90",
                 )}
               >
-                Open
+                {t("open")}
               </Link>
             </div>
           )}
@@ -104,7 +108,7 @@ export function AnalysisMiniTab() {
           {job.status === "error" && (
             <div className="mt-3">
               <Button variant="secondary" size="sm" onClick={dismiss} className="w-full">
-                Close
+                {t("close")}
               </Button>
             </div>
           )}

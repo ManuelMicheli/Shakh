@@ -11,6 +11,7 @@
  * per sapere se una candidata è cattura/scacco.
  */
 import { Chess, type Square, type PieceSymbol } from "chess.js";
+import type { Locale } from "@/i18n/config";
 
 export type Style = "aggressive" | "positional" | "drawish";
 
@@ -134,3 +135,14 @@ export const STYLE_LABEL: Record<Style, string> = {
   positional: "Positional",
   drawish: "Solid",
 };
+
+const STYLE_LABEL_IT: Record<Style, string> = {
+  aggressive: "Aggressivo",
+  positional: "Posizionale",
+  drawish: "Solido",
+};
+
+/** Etichetta localizzata dello stile dell'avversario-motore. */
+export function styleLabel(style: Style, locale: Locale): string {
+  return (locale === "it" ? STYLE_LABEL_IT : STYLE_LABEL)[style];
+}

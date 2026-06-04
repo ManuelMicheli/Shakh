@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { ArrowUpToLine, Trash2, Save } from "lucide-react";
 import { useMoveTree } from "@/lib/chess/useMoveTree";
@@ -35,6 +36,7 @@ export interface RepertoireEditorProps {
  */
 export function RepertoireEditor({ repertoireId, name, color, tree }: RepertoireEditorProps) {
   const t = useMoveTree(tree);
+  const tr = useTranslations("theory");
   const { toast } = useToast();
   const [orientation, setOrientation] = useState<"white" | "black">(color);
   const [dirty, setDirty] = useState(false);
@@ -47,11 +49,11 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
     startSave(async () => {
       const res = await saveRepertoire(repertoireId, t.serialize());
       if (!res.ok) {
-        toast({ title: "Save failed", description: res.error, variant: "error" });
+        toast({ title: tr("repertoireEditor.saveFailed"), description: res.error, variant: "error" });
         return;
       }
       setDirty(false);
-      toast({ title: "Repertoire saved" });
+      toast({ title: tr("repertoireEditor.saved") });
     });
   };
 
@@ -63,12 +65,12 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">{name}</h1>
           <p className="mt-1 text-sm text-text-muted">
-            {color === "white" ? "White" : "Black"} · build and annotate your lines
+            {color === "white" ? tr("color.white") : tr("color.black")} · {tr("repertoireEditor.buildAnnotate")}
           </p>
         </div>
         <Button onClick={onSave} disabled={saving || !dirty}>
           <Save className="mr-1 h-4 w-4" />
-          {saving ? "Saving…" : dirty ? "Save" : "Saved"}
+          {saving ? tr("repertoireEditor.saving") : dirty ? tr("repertoireEditor.save") : tr("repertoireEditor.savedBtn")}
         </Button>
       </div>
 
@@ -114,9 +116,9 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
                   touch();
                 }}
                 disabled={t.atStart}
-                title="Make this the main line"
+                title={tr("repertoireEditor.makeMainLine")}
               >
-                <ArrowUpToLine className="mr-1 h-4 w-4" /> Promote
+                <ArrowUpToLine className="mr-1 h-4 w-4" /> {tr("repertoireEditor.promote")}
               </Button>
               <Button
                 variant="ghost"
@@ -126,9 +128,9 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
                   touch();
                 }}
                 disabled={t.atStart}
-                title="Delete this move and its continuation"
+                title={tr("repertoireEditor.deleteMoveTitle")}
               >
-                <Trash2 className="mr-1 h-4 w-4" /> Delete
+                <Trash2 className="mr-1 h-4 w-4" /> {tr("repertoireEditor.delete")}
               </Button>
             </div>
           </div>
@@ -136,12 +138,12 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
           {/* Annotazione del nodo corrente */}
           <Card>
             <CardHeader>
-              <CardTitle>Annotation</CardTitle>
+              <CardTitle>{tr("repertoireEditor.annotation")}</CardTitle>
             </CardHeader>
             <CardContent>
               {t.atStart ? (
                 <p className="text-sm text-text-muted">
-                  Select a move to annotate it.
+                  {tr("repertoireEditor.selectMove")}
                 </p>
               ) : (
                 <Input
@@ -150,7 +152,7 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
                     t.annotate(t.currentNodeId, { comment: e.target.value || undefined });
                     touch();
                   }}
-                  placeholder="Move idea, plan, trap…"
+                  placeholder={tr("repertoireEditor.annotationPlaceholder")}
                 />
               )}
             </CardContent>
@@ -160,8 +162,8 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
         <div>
           <Tabs defaultValue="moves">
             <TabsList className="w-full">
-              <TabsTrigger value="moves">Lines</TabsTrigger>
-              <TabsTrigger value="explorer">Explorer</TabsTrigger>
+              <TabsTrigger value="moves">{tr("repertoireEditor.linesTab")}</TabsTrigger>
+              <TabsTrigger value="explorer">{tr("repertoireEditor.explorerTab")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="moves">

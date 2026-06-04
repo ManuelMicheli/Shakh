@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,14 +7,22 @@ import { Button } from "@/components/ui/button";
 import { loadWeaknesses, MIN_ANALYZED_GAMES, type WeaknessPattern } from "@/lib/weakness/engine";
 import { AnalyzePendingButton } from "@/components/analysis/AnalyzePendingButton";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
+import { activeLocale } from "@/lib/i18n/content";
 
-export const metadata = { title: "Weaknesses — Shakh" };
+// Tipo del traduttore "study", riusato dai sotto-componenti sincroni.
+type StudyT = Awaited<ReturnType<typeof getTranslations<"study">>>;
+
+export async function generateMetadata() {
+  const t = await getTranslations("study");
+  return { title: t("weaknesses.metaTitle") };
+}
 
 export default async function DebolezzePage() {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const user = await getUser();
 
-  const { analyzedGames, patterns } = await loadWeaknesses(supabase, user!.id);
+  const { analyzedGames, patterns } = await loadWeaknesses(supabase, user!.id, await activeLocale());
 
   // Partite importate ma ancora da analizzare: alimentano la CTA di bootstrap.
   const { count: pendingCount } = await supabase
@@ -26,26 +35,25 @@ export default async function DebolezzePage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Recurring patterns"
-        title="Weaknesses"
-        desc="The losses that repeat, grouped and sorted by severity."
+        eyebrow={t("weaknesses.eyebrow")}
+        title={t("weaknesses.title")}
+        desc={t("weaknesses.desc")}
       />
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Weaknesses</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">{t("weaknesses.title")}</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Not single mistakes, but the losses that <em>repeat</em> across your games.
-          The engine groups them, sorts them by severity, and points you to where to train.
+          {t.rich("weaknesses.intro", { em: (chunks) => <em>{chunks}</em> })}
         </p>
       </div>
 
       {analyzedGames < MIN_ANALYZED_GAMES ? (
-        <EmptyState analyzed={analyzedGames} pending={pendingGames} />
+        <EmptyState analyzed={analyzedGames} pending={pendingGames} t={t} />
       ) : patterns.length === 0 ? (
-        <NoPatterns />
+        <NoPatterns t={t} />
       ) : (
         <div className="space-y-3">
           {patterns.map((p) => (
-            <PatternCard key={p.id} pattern={p} />
+            <PatternCard key={p.id} pattern={p} t={t} />
           ))}
         </div>
       )}
@@ -53,7 +61,7 @@ export default async function DebolezzePage() {
   );
 }
 
-function PatternCard({ pattern }: { pattern: WeaknessPattern }) {
+function PatternCard({ pattern, t }: { pattern: WeaknessPattern; t: StudyT }) {
   return (
     <Card>
       <CardHeader>
@@ -64,17 +72,17 @@ function PatternCard({ pattern }: { pattern: WeaknessPattern }) {
         <CardDescription>{pattern.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <SeverityBar value={pattern.severity} />
+        <SeverityBar value={pattern.severity} t={t} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-muted">
-            <span>Examples:</span>
+            <span>{t("weaknesses.examples")}</span>
             {pattern.examples.map((ex, i) => (
               <Link
                 key={`${ex.gameId}-${ex.ply}`}
                 href={`/app/partite/${ex.gameId}`}
                 className="font-mono underline-offset-2 hover:underline"
               >
-                game {i + 1} (move {Math.ceil(ex.ply / 2)})
+                {t("weaknesses.example", { n: i + 1, move: Math.ceil(ex.ply / 2) })}
               </Link>
             ))}
           </div>
@@ -88,11 +96,11 @@ function PatternCard({ pattern }: { pattern: WeaknessPattern }) {
 }
 
 /** Barra di gravità monocroma (più piena = più grave). */
-function SeverityBar({ value }: { value: number }) {
+function SeverityBar({ value, t }: { value: number; t: StudyT }) {
   const pct = Math.round(value * 100);
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs uppercase tracking-wide text-text-muted">Severity</span>
+      <span className="text-xs uppercase tracking-wide text-text-muted">{t("weaknesses.severity")}</span>
       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
         <div className="h-full rounded-full bg-text" style={{ width: `${pct}%` }} />
       </div>
@@ -100,15 +108,14 @@ function SeverityBar({ value }: { value: number }) {
   );
 }
 
-function EmptyState({ analyzed, pending }: { analyzed: number; pending: number }) {
+function EmptyState({ analyzed, pending, t }: { analyzed: number; pending: number; t: StudyT }) {
   return (
     <Card>
       <CardContent className="space-y-3 py-6 text-center">
         <p className="text-text-muted">
-          You need at least {MIN_ANALYZED_GAMES} analyzed games to detect reliable
-          patterns. You have {analyzed}
+          {t("weaknesses.empty.base", { min: MIN_ANALYZED_GAMES, analyzed })}
           {pending > 0
-            ? `, but ${pending} imported are still waiting to be analyzed.`
+            ? t("weaknesses.empty.pendingSuffix", { pending })
             : "."}
         </p>
         {pending > 0 ? (
@@ -118,12 +125,12 @@ function EmptyState({ analyzed, pending }: { analyzed: number; pending: number }
               href="/app/partite"
               className="text-xs text-text-muted underline-offset-2 hover:underline"
             >
-              Manage all games
+              {t("weaknesses.manageAll")}
             </Link>
           </div>
         ) : (
           <Link href="/app/partite">
-            <Button>Import and analyze games</Button>
+            <Button>{t("weaknesses.importAnalyze")}</Button>
           </Link>
         )}
       </CardContent>
@@ -131,12 +138,11 @@ function EmptyState({ analyzed, pending }: { analyzed: number; pending: number }
   );
 }
 
-function NoPatterns() {
+function NoPatterns({ t }: { t: StudyT }) {
   return (
     <Card>
       <CardContent className="py-6 text-center text-text-muted">
-        No recurring weaknesses stand out in your recent games. Keep it up —
-        analyze more games to sharpen the picture.
+        {t("weaknesses.noPatterns")}
       </CardContent>
     </Card>
   );

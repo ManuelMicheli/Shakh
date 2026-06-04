@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { PuzzleSolver } from "./PuzzleSolver";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,13 +11,6 @@ import { useToast } from "@/components/ui/toast";
 import { getNextPuzzle, recordAttempt } from "@/app/app/tattiche/actions";
 import { themeLabel } from "@/lib/tactics/themes";
 import type { Puzzle, SolveResult, TacticMode, TacticStats } from "@/lib/tactics/types";
-
-const MODE_TITLE: Record<TacticMode, string> = {
-  adaptive: "Adaptive",
-  theme: "By theme",
-  review: "Review",
-  timed: "Timed challenge",
-};
 
 /** Durata della sfida a tempo (secondi). */
 const TIMED_DURATION = 180;
@@ -33,6 +27,7 @@ export interface TacticsTrainerProps {
 }
 
 export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: TacticsTrainerProps) {
+  const t = useTranslations("tactics");
   const { toast } = useToast();
   const [puzzle, setPuzzle] = useState<Puzzle | null>(initialPuzzle);
   const [stats, setStats] = useState<TacticStats>(initialStats);
@@ -105,7 +100,7 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
       });
       if (res.ok && res.stats) setStats(res.stats);
       else if (!res.ok) {
-        toast({ title: "Save failed", description: res.error, variant: "error" });
+        toast({ title: t("saveFailed"), description: res.error, variant: "error" });
       }
 
       // Passaggio fluido al puzzle successivo.
@@ -113,7 +108,7 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
         advanceTimer.current = window.setTimeout(() => void loadNext(), ADVANCE_DELAY);
       }
     },
-    [puzzle, mode, toast, loadNext],
+    [puzzle, mode, toast, loadNext, t],
   );
 
   const skip = useCallback(() => {
@@ -132,21 +127,27 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
       <Shell mode={mode} theme={theme}>
         <Card>
           <CardHeader>
-            <CardTitle>Time&apos;s up</CardTitle>
+            <CardTitle>{t("timesUp")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-text-muted">
-              You solved <span className="font-mono text-text">{sessionSolved}</span> puzzles in{" "}
-              {TIMED_DURATION / 60} minutes.
+              {t.rich("timedSummary", {
+                solved: sessionSolved,
+                minutes: TIMED_DURATION / 60,
+                mono: (chunks) => <span className="font-mono text-text">{chunks}</span>,
+              })}
             </p>
             <p className="text-sm text-text-muted">
-              Best streak: <span className="font-mono text-text">{stats.bestStreak}</span> ·
-              Tactical rating: <span className="font-mono text-text">{stats.rating}</span>
+              {t.rich("timedStats", {
+                bestStreak: stats.bestStreak,
+                rating: stats.rating,
+                mono: (chunks) => <span className="font-mono text-text">{chunks}</span>,
+              })}
             </p>
             <div className="flex gap-2">
-              <Button onClick={() => window.location.reload()}>Play again</Button>
+              <Button onClick={() => window.location.reload()}>{t("playAgain")}</Button>
               <Link href="/app/tattiche">
-                <Button variant="secondary">Other modes</Button>
+                <Button variant="secondary">{t("otherModes")}</Button>
               </Link>
             </div>
           </CardContent>
@@ -161,17 +162,15 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
         <Card>
           <CardHeader>
             <CardTitle>
-              {mode === "review" ? "Review complete" : "No puzzles available"}
+              {mode === "review" ? t("reviewComplete") : t("noPuzzlesAvailable")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-text-muted">
-              {mode === "review"
-                ? "You have no due puzzles. Come back later or train in adaptive mode."
-                : "No puzzles found for these criteria. Import the dataset or change mode."}
+              {mode === "review" ? t("reviewEmpty") : t("noPuzzlesForCriteria")}
             </p>
             <Link href="/app/tattiche">
-              <Button variant="secondary">Back to tactics</Button>
+              <Button variant="secondary">{t("backToTactics")}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -195,12 +194,12 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
             <div className="flex gap-2">
               {justSolved && (
                 <Button size="sm" onClick={advanceNow} disabled={loading}>
-                  {loading ? "…" : "Next"}
+                  {loading ? "…" : t("next")}
                 </Button>
               )}
               {!justSolved && (
                 <Button size="sm" variant="ghost" onClick={skip} disabled={loading}>
-                  Skip
+                  {t("skip")}
                 </Button>
               )}
             </div>
@@ -209,13 +208,13 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
 
         <aside className="space-y-4">
           {isTimed && (
-            <Stat label="Time" value={formatTime(timeLeft)} highlight={timeLeft <= 15} />
+            <Stat label={t("time")} value={formatTime(timeLeft)} highlight={timeLeft <= 15} />
           )}
-          <Stat label="Tactical rating" value={stats.rating} />
-          <Stat label="Current streak" value={stats.currentStreak} />
-          <Stat label={isTimed ? "Solved (challenge)" : "Solved (session)"} value={sessionSolved} />
+          <Stat label={t("tacticalRating")} value={stats.rating} />
+          <Stat label={t("currentStreak")} value={stats.currentStreak} />
+          <Stat label={isTimed ? t("solvedChallenge") : t("solvedSession")} value={sessionSolved} />
           <p className="text-xs text-text-muted">
-            Puzzle difficulty:{" "}
+            {t("puzzleDifficulty")}{" "}
             <span className="font-mono text-text">{puzzle.rating}</span>
           </p>
         </aside>
@@ -234,8 +233,11 @@ function Shell({
   theme: string | null;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("tactics");
   const title =
-    mode === "theme" && theme ? `${MODE_TITLE.theme} · ${themeLabel(theme)}` : MODE_TITLE[mode];
+    mode === "theme" && theme
+      ? `${t("modes.theme.title")} · ${themeLabel(theme)}`
+      : t(`modes.${mode}.title`);
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-semibold tracking-tight">{title}</h1>

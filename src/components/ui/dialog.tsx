@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 const FOCUSABLE =
@@ -23,6 +24,7 @@ export function Dialog({
   children?: ReactNode;
   className?: string;
 }) {
+  const t = useTranslations("common");
   const panelRef = useRef<HTMLDivElement>(null);
   const prevFocus = useRef<HTMLElement | null>(null);
 
@@ -85,7 +87,7 @@ export function Dialog({
         <button
           type="button"
           onClick={() => onOpenChange(false)}
-          aria-label="Close"
+          aria-label={t("close")}
           className="absolute right-4 top-4 rounded-md p-1 text-text-muted hover:bg-surface-2 hover:text-text"
         >
           <X className="h-4 w-4" />

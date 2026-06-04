@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +29,7 @@ interface LessonView {
 export default async function FinaliPage() {
   const supabase = await createClient();
   const user = await getUser();
+  const t = await getTranslations("theory");
 
   const [{ data }, { data: progress }, domains] = await Promise.all([
     supabase
@@ -77,32 +79,30 @@ export default async function FinaliPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow={endgameRating != null ? `Endgame rating · ${endgameRating}` : "Exact technique"}
-        title="Endgames"
-        desc="Convert the result against the tablebase's perfect defense."
+        eyebrow={endgameRating != null ? t("endgames.ratingEyebrow", { rating: endgameRating }) : t("endgames.eyebrow")}
+        title={t("endgames.title")}
+        desc={t("endgames.mobileDesc")}
       />
       <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">
-          ← Theory
+          ← {t("branch.theory")}
         </Link>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Endgames</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">{t("endgames.title")}</h1>
           <div className="text-right">
             <div className="font-mono text-2xl tabular-nums">{endgameRating ?? "—"}</div>
-            <div className="text-xs uppercase tracking-wide text-text-muted">endgame rating</div>
+            <div className="text-xs uppercase tracking-wide text-text-muted">{t("endgames.ratingLabel")}</div>
           </div>
         </div>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Endgame technique, lesson and <em>practice</em>: convert the result against
-          the tablebase&apos;s perfect defense. No approximations — the tablebase
-          is absolute truth. Every conversion updates your endgame rating.
+          {t.rich("endgames.desc", { em: (chunks) => <em>{chunks}</em> })}
         </p>
       </div>
 
       {lessons.length === 0 ? (
         <Card>
           <CardContent className="py-6 text-center text-sm text-text-muted">
-            Lessons coming soon.
+            {t("lessonsSoon")}
           </CardContent>
         </Card>
       ) : (
@@ -113,13 +113,17 @@ export default async function FinaliPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle>{l.title}</CardTitle>
-                    {l.slug === recommended && <Badge>recommended</Badge>}
+                    {l.slug === recommended && <Badge>{t("endgames.recommended")}</Badge>}
                   </div>
                   {l.summary && <CardDescription>{l.summary}</CardDescription>}
                 </CardHeader>
                 {l.progressKey && (
                   <CardContent>
-                    <CompetenceTag score={l.score} attempts={l.attempts} />
+                    <CompetenceTag
+                      score={l.score}
+                      attempts={l.attempts}
+                      neverLabel={t("endgames.neverPracticed")}
+                    />
                   </CardContent>
                 )}
               </Card>
@@ -132,9 +136,17 @@ export default async function FinaliPage() {
 }
 
 /** Etichetta di competenza per una pratica di finale. */
-function CompetenceTag({ score, attempts }: { score: number | null; attempts: number }) {
+function CompetenceTag({
+  score,
+  attempts,
+  neverLabel,
+}: {
+  score: number | null;
+  attempts: number;
+  neverLabel: string;
+}) {
   if (attempts === 0) {
-    return <span className="text-xs text-text-muted">Never practiced</span>;
+    return <span className="text-xs text-text-muted">{neverLabel}</span>;
   }
   const pct = Math.round((score ?? 0) * 100);
   return (

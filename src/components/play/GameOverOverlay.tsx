@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { CLASSIFICATION_META } from "@/lib/analysis/labels";
 import { MoveBadge } from "@/components/analysis/MoveBadge";
@@ -58,6 +59,7 @@ export function GameOverOverlay({
   /** Pulsanti azione (rivincita, nuova partita, …). */
   actions?: React.ReactNode;
 }) {
+  const t = useTranslations("play");
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -80,7 +82,7 @@ export function GameOverOverlay({
             </h2>
             {checkmate && (
               <p className="mt-2 font-mono text-[0.68rem] uppercase tracking-[0.2em] text-text-muted">
-                Checkmate
+                {t("checkmate")}
               </p>
             )}
             {subtitle && (
@@ -97,7 +99,7 @@ export function GameOverOverlay({
             {analyzing ? (
               <div className="flex items-center justify-center gap-2 py-1 text-text-muted">
                 <span className="h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-border border-t-text" />
-                <span className="text-xs">Analyzing your moves…</span>
+                <span className="text-xs">{t("overlay.analyzing")}</span>
               </div>
             ) : (
               <div
@@ -144,7 +146,7 @@ export function GameOverOverlay({
               onClick={onAnalyze}
               disabled={analyzeLoading}
             >
-              {analyzeLoading ? "Opening…" : "Analyze game"}
+              {analyzeLoading ? t("overlay.opening") : t("overlay.analyzeGame")}
             </Button>
           )}
           {onDismiss && (
@@ -153,7 +155,7 @@ export function GameOverOverlay({
               onClick={onDismiss}
               className="w-full pt-1 text-xs text-text-muted underline-offset-2 transition-colors hover:text-text hover:underline"
             >
-              View the board
+              {t("overlay.viewBoard")}
             </button>
           )}
         </div>
@@ -170,6 +172,7 @@ function BreakdownBlock({
   group: BreakdownGroup;
   showLabel: boolean;
 }) {
+  const t = useTranslations("play");
   return (
     <div>
       {showLabel && (
@@ -178,7 +181,7 @@ function BreakdownBlock({
         </div>
       )}
       {group.items.length === 0 ? (
-        <div className="text-xs text-text-muted">No moves</div>
+        <div className="text-xs text-text-muted">{t("overlay.noMoves")}</div>
       ) : (
         <ul className="space-y-1.5">
           {group.items.map(({ c, n }) => {

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
@@ -11,6 +12,7 @@ import { GROUP_TYPE_LABEL, type GroupType } from "@/lib/groups/types";
 const TYPES: GroupType[] = ["circolo", "classe", "scuola"];
 
 export function CreateGroupForm() {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [name, setName] = useState("");
@@ -21,7 +23,7 @@ export function CreateGroupForm() {
     start(async () => {
       const res = await createGroup(name, type);
       if (!res.ok || !res.data) {
-        toast({ title: "Not created", description: res.error, variant: "error" });
+        toast({ title: t("toastNotCreated"), description: res.error, variant: "error" });
         return;
       }
       setName("");
@@ -39,17 +41,17 @@ export function CreateGroupForm() {
     >
           <div className="min-w-[14rem] flex-1 space-y-1">
             <label className="text-xs text-text-muted" htmlFor="group-name">
-              Name
+              {t("nameLabel")}
             </label>
             <Input
               id="group-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Milan Chess Club"
+              placeholder={t("groupNamePlaceholder")}
             />
           </div>
           <div className="space-y-1">
-            <span className="block text-xs text-text-muted">Type</span>
+            <span className="block text-xs text-text-muted">{t("typeLabel")}</span>
             <div className="inline-flex rounded-md border border-border bg-surface p-0.5">
               {TYPES.map((t) => (
                 <button
@@ -67,7 +69,7 @@ export function CreateGroupForm() {
             </div>
           </div>
           <Button type="submit" disabled={pending || !name.trim()}>
-            Create group
+            {t("createGroupButton")}
           </Button>
     </form>
   );

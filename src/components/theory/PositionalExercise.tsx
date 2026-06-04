@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
@@ -65,6 +66,7 @@ export interface PositionalExerciseProps {
  * valutazioni.
  */
 export function PositionalExercise({ exercise }: PositionalExerciseProps) {
+  const t = useTranslations("theory");
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState<string | null>(null);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
@@ -94,7 +96,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
       setShowPlan(false);
       try {
         await engine.init();
-        setPhase("The engine is analyzing the position…");
+        setPhase(t("positionalExercise.engineAnalyzing"));
         const before = await engine.analyze(fen, { depth: LINES_DEPTH, multiPV: 3 }).result;
         const lines: EngineLineFact[] = before.lines.slice(0, 3).map((l) => ({
           evalText: whiteEvalText(l.score, l.scoreType, turn),
@@ -103,7 +105,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
         const bestTop = before.lines[0];
         const bestCp = bestTop ? moverCp(bestTop.score, bestTop.scoreType) : 0;
 
-        setPhase(`Evaluating ${played.san}…`);
+        setPhase(t("positionalExercise.evaluatingMove", { move: played.san }));
         const after = await engine.analyze(afterFen, { depth: MOVE_DEPTH }).result;
         const afterTop = after.lines[0];
         const afterTurn = (afterFen.split(" ")[1] as "w" | "b") ?? "w";
@@ -127,7 +129,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
           lines,
           askedMove: { san: played.san, evalText, isBest },
         };
-        setPhase("The coach is commenting…");
+        setPhase(t("positionalExercise.coachCommenting"));
         const res = await fetch("/api/coach/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -146,7 +148,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
           setAnswer(
             msg.includes("not configured")
               ? null
-              : "The coach isn't available right now; rely on the engine's evaluation.",
+              : t("positionalExercise.coachUnavailable"),
           );
           return;
         }
@@ -160,13 +162,13 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
           setAnswer(acc);
         }
       } catch {
-        setAnswer("I couldn't evaluate the move. Try again.");
+        setAnswer(t("positionalExercise.couldNotEvaluate"));
       } finally {
         setBusy(false);
         setPhase(null);
       }
     },
-    [busy, fen, turn, exercise.userColor, exercise.progressKey],
+    [busy, fen, turn, exercise.userColor, exercise.progressKey, t],
   );
 
   const reset = useCallback(() => {
@@ -180,9 +182,11 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
-          <CardTitle>Exercise: find the plan</CardTitle>
+          <CardTitle>{t("positionalExercise.title")}</CardTitle>
           <span className="text-xs text-text-muted">
-            {exercise.userColor === "white" ? "White" : "Black"} to move
+            {t("positionalExercise.toMove", {
+              color: exercise.userColor === "white" ? t("color.white") : t("color.black"),
+            })}
           </span>
         </div>
       </CardHeader>
@@ -218,11 +222,13 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
                       verdict.reasonable ? "bg-text text-bg" : "border border-border text-text-muted",
                     )}
                   >
-                    {verdict.reasonable ? "Reasonable plan" : "Not very consistent"}
+                    {verdict.reasonable
+                      ? t("positionalExercise.reasonablePlan")
+                      : t("positionalExercise.notConsistent")}
                   </span>
                 </div>
                 <p className="mt-1 font-mono text-xs text-text-muted">
-                  Evaluation after the move: {verdict.evalText}
+                  {t("positionalExercise.evalAfter", { evalText: verdict.evalText })}
                 </p>
               </div>
             )}
@@ -231,20 +237,19 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
 
             {!verdict && !busy && (
               <p className="text-sm text-text-muted">
-                Propose a move on the board: the engine evaluates it and the coach
-                explains whether it fits the plan.
+                {t("positionalExercise.proposeMove")}
               </p>
             )}
 
             <div className="flex flex-wrap gap-2">
               {verdict && (
                 <Button size="sm" variant="secondary" onClick={reset}>
-                  Try another move
+                  {t("positionalExercise.tryAnotherMove")}
                 </Button>
               )}
               {exercise.planHint && verdict && (
                 <Button size="sm" variant="ghost" onClick={() => setShowPlan((v) => !v)}>
-                  {showPlan ? "Hide the plan" : "Show the plan"}
+                  {showPlan ? t("positionalExercise.hidePlan") : t("positionalExercise.showPlan")}
                 </Button>
               )}
             </div>
@@ -257,19 +262,18 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
 
             {exercise.relatedTacticsTheme && (
               <p className="text-xs text-text-muted">
-                Related theme:{" "}
+                {t("positionalExercise.relatedTheme")}{" "}
                 <Link
                   href={`/app/tattiche?mode=theme&theme=${exercise.relatedTacticsTheme}`}
                   className="underline underline-offset-2 hover:text-text"
                 >
-                  train themed tactics →
+                  {t("positionalExercise.trainThemed")} →
                 </Link>
               </p>
             )}
 
             <p className="text-[11px] leading-relaxed text-text-muted">
-              There&apos;s no single solution: what&apos;s evaluated is the reasonableness of the
-              plan. The engine gives the numbers, the coach the words.
+              {t("positionalExercise.disclaimer")}
             </p>
           </div>
         </div>

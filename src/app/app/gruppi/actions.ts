@@ -2,10 +2,12 @@
 
 import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getMyGroupRole, isInstructorRole } from "@/lib/groups/access";
 import { loadClassData } from "@/lib/groups/class";
 import { synthesizeClass } from "@/lib/ai/coach";
+import { activeLocale } from "@/lib/i18n/content";
 import type { CoachSynthesis } from "@/lib/ai/types";
 import type {
   GroupRole,
@@ -21,8 +23,13 @@ export interface ActionResult<T = undefined> {
   error?: string;
 }
 
-const AUTH_ERR = "Session expired. Sign in again.";
-const PERM_ERR = "You don't have permission for this action.";
+// Messaggi d'errore localizzati (namespace groups), risolti a runtime.
+async function authErr(): Promise<string> {
+  return (await getTranslations("groups"))("errAuth");
+}
+async function permErr(): Promise<string> {
+  return (await getTranslations("groups"))("errPerm");
+}
 
 /** Slug url-friendly con suffisso casuale per garantire l'unicità. */
 function makeSlug(name: string): string {
@@ -58,10 +65,10 @@ export async function createGroup(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const trimmed = name.trim();
-  if (!trimmed) return { ok: false, error: "Give the group a name." };
+  if (!trimmed) return { ok: false, error: (await getTranslations("groups"))("errGroupNameRequired") };
 
   const { data: group, error } = await supabase
     .from("groups")
@@ -90,10 +97,10 @@ export async function createInvite(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const role = await getMyGroupRole(supabase, groupId, user.id);
-  if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
+  if (!isInstructorRole(role)) return { ok: false, error: await permErr() };
 
   const code = makeInviteCode();
   const expires_at =
@@ -119,10 +126,10 @@ export async function revokeInvite(groupId: string, inviteId: string): Promise<A
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const role = await getMyGroupRole(supabase, groupId, user.id);
-  if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
+  if (!isInstructorRole(role)) return { ok: false, error: await permErr() };
 
   // Scope esplicito al gruppo (oltre alla RLS): evita revoche cross-gruppo.
   const { error } = await supabase
@@ -141,7 +148,7 @@ export async function joinByCode(code: string): Promise<ActionResult<{ groupId: 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const { data, error } = await supabase.rpc("join_group_by_code", {
     invite_code: code.trim(),
@@ -163,12 +170,13 @@ export async function updateMemberRole(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   // Solo l'owner gestisce i ruoli (coerente con la policy group_members_owner_write).
   const myRole = await getMyGroupRole(supabase, groupId, user.id);
-  if (myRole !== "owner") return { ok: false, error: PERM_ERR };
-  if (role === "owner") return { ok: false, error: "The owner role can't be assigned here." };
+  if (myRole !== "owner") return { ok: false, error: await permErr() };
+  if (role === "owner")
+    return { ok: false, error: (await getTranslations("groups"))("errOwnerNotAssignable") };
 
   const { error } = await supabase
     .from("group_members")
@@ -186,11 +194,12 @@ export async function removeMember(groupId: string, userId: string): Promise<Act
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const myRole = await getMyGroupRole(supabase, groupId, user.id);
-  if (myRole !== "owner") return { ok: false, error: PERM_ERR };
-  if (userId === user.id) return { ok: false, error: "You can't remove yourself (owner)." };
+  if (myRole !== "owner") return { ok: false, error: await permErr() };
+  if (userId === user.id)
+    return { ok: false, error: (await getTranslations("groups"))("errCantRemoveSelf") };
 
   const { error } = await supabase
     .from("group_members")
@@ -215,13 +224,14 @@ export async function createGroupRepertoire(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const role = await getMyGroupRole(supabase, groupId, user.id);
-  if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
+  if (!isInstructorRole(role)) return { ok: false, error: await permErr() };
 
   const trimmed = name.trim();
-  if (!trimmed) return { ok: false, error: "Give the repertoire a name." };
+  if (!trimmed)
+    return { ok: false, error: (await getTranslations("groups"))("errRepertoireNameRequired") };
 
   // RLS repertoires_write consente l'insert di gruppo agli istruttori/owner.
   const { data, error } = await supabase
@@ -253,18 +263,20 @@ export async function createAssignment(input: CreateAssignmentInput): Promise<Ac
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const role = await getMyGroupRole(supabase, input.groupId, user.id);
-  if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
+  if (!isInstructorRole(role)) return { ok: false, error: await permErr() };
 
   if (input.targetType === "user") {
-    if (!input.targetUserId) return { ok: false, error: "Choose a student." };
+    if (!input.targetUserId)
+      return { ok: false, error: (await getTranslations("groups"))("errChooseStudent") };
     // L'allievo deve far parte del gruppo: la RLS su assignments controlla solo
     // assigned_by, non il target, quindi senza questo check un istruttore
     // potrebbe assegnare a un utente qualsiasi della piattaforma.
     const targetRole = await getMyGroupRole(supabase, input.groupId, input.targetUserId);
-    if (!targetRole) return { ok: false, error: "The student isn't part of this group." };
+    if (!targetRole)
+      return { ok: false, error: (await getTranslations("groups"))("errStudentNotInGroup") };
   }
 
   const { error } = await supabase.from("assignments").insert({
@@ -305,7 +317,7 @@ export async function markAssignmentDone(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const { error } = await supabase.from("assignment_progress").upsert(
     {
@@ -333,14 +345,14 @@ export async function refreshClassSynthesis(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: AUTH_ERR };
+  if (!user) return { ok: false, error: await authErr() };
 
   const role = await getMyGroupRole(supabase, groupId, user.id);
-  if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
+  if (!isInstructorRole(role)) return { ok: false, error: await permErr() };
 
-  const data = await loadClassData(supabase, groupId);
+  const data = await loadClassData(supabase, groupId, await activeLocale());
   if (data.students.length === 0)
-    return { ok: false, error: "No students in the group." };
+    return { ok: false, error: (await getTranslations("groups"))("errNoStudents") };
 
   const synthesis = await synthesizeClass({
     studentCount: data.students.length,
@@ -353,7 +365,8 @@ export async function refreshClassSynthesis(
       .filter((w) => w.count >= 2)
       .map((w) => ({ label: w.label, count: w.count })),
   });
-  if (!synthesis) return { ok: false, error: "Summary unavailable, try again." };
+  if (!synthesis)
+    return { ok: false, error: (await getTranslations("groups"))("errSummaryUnavailable") };
 
   return { ok: true, data: { synthesis } };
 }

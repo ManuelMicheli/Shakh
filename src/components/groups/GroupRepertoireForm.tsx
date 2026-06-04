@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
@@ -10,6 +11,7 @@ import type { PieceColor } from "@/lib/theory/repertoire";
 
 /** Crea un repertorio di gruppo e apre l'editor del 06b. */
 export function GroupRepertoireForm({ groupId }: { groupId: string }) {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [name, setName] = useState("");
@@ -20,7 +22,7 @@ export function GroupRepertoireForm({ groupId }: { groupId: string }) {
     start(async () => {
       const res = await createGroupRepertoire(groupId, name, color);
       if (!res.ok || !res.data) {
-        toast({ title: "Not created", description: res.error, variant: "error" });
+        toast({ title: t("toastNotCreated"), description: res.error, variant: "error" });
         return;
       }
       setName("");
@@ -38,17 +40,17 @@ export function GroupRepertoireForm({ groupId }: { groupId: string }) {
     >
       <div className="min-w-[12rem] flex-1 space-y-1">
         <label className="text-xs text-text-muted" htmlFor="grep-name">
-          Name
+          {t("nameLabel")}
         </label>
         <Input
           id="grep-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Club Italian Game"
+          placeholder={t("repertoireNamePlaceholder")}
         />
       </div>
       <div className="space-y-1">
-        <span className="block text-xs text-text-muted">Color</span>
+        <span className="block text-xs text-text-muted">{t("colorLabel")}</span>
         <div className="inline-flex rounded-md border border-border bg-surface p-0.5">
           {(["white", "black"] as PieceColor[]).map((c) => (
             <button
@@ -60,13 +62,13 @@ export function GroupRepertoireForm({ groupId }: { groupId: string }) {
                 (color === c ? "bg-text text-bg" : "text-text-muted hover:text-text")
               }
             >
-              {c === "white" ? "White" : "Black"}
+              {c === "white" ? t("white") : t("black")}
             </button>
           ))}
         </div>
       </div>
       <Button type="submit" disabled={pending || !name.trim()}>
-        Create group repertoire
+        {t("createGroupRepertoireButton")}
       </Button>
     </form>
   );

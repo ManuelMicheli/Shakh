@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
 import {
@@ -32,29 +33,30 @@ const ChessBoard = dynamic(
 type Color = "white" | "black";
 type ColorChoice = Color | "random";
 
-/** Avversari selezionabili: nome + Elo. Coprono dal principiante assoluto al forte. */
-const BOTS: { elo: number; name: string }[] = [
-  { elo: 400, name: "Hatchling" },
-  { elo: 600, name: "Novice" },
-  { elo: 800, name: "Beginner" },
-  { elo: 1000, name: "Amateur" },
-  { elo: 1200, name: "Casual" },
-  { elo: 1400, name: "Club" },
-  { elo: 1600, name: "Expert" },
-  { elo: 2000, name: "Candidate Master" },
-  { elo: 2400, name: "Master" },
+/** Avversari selezionabili: chiave i18n + Elo. Coprono dal principiante assoluto al forte. */
+const BOTS: { elo: number; key: string }[] = [
+  { elo: 400, key: "hatchling" },
+  { elo: 600, key: "novice" },
+  { elo: 800, key: "beginner" },
+  { elo: 1000, key: "amateur" },
+  { elo: 1200, key: "casual" },
+  { elo: 1400, key: "club" },
+  { elo: 1600, key: "expert" },
+  { elo: 2000, key: "candidateMaster" },
+  { elo: 2400, key: "master" },
 ];
 
-const NAME_FOR_ELO = (e: number) => BOTS.find((b) => b.elo === e)?.name ?? `${e}`;
+/** Chiave i18n del nome del bot per un dato Elo (fallback: l'Elo stesso). */
+const BOT_KEY_FOR_ELO = (e: number) => BOTS.find((b) => b.elo === e)?.key ?? null;
 
 /** Aperture seme (UCI): danno una posizione di partenza tematica. */
-const OPENINGS: { key: string; label: string; moves: string[] }[] = [
-  { key: "normale", label: "Standard game", moves: [] },
-  { key: "italiana", label: "Italian", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4"] },
-  { key: "spagnola", label: "Ruy Lopez", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5"] },
-  { key: "siciliana", label: "Sicilian", moves: ["e2e4", "c7c5"] },
-  { key: "francese", label: "French", moves: ["e2e4", "e7e6"] },
-  { key: "gambetto-donna", label: "Queen's Gambit", moves: ["d2d4", "d7d5", "c2c4"] },
+const OPENINGS: { key: string; moves: string[] }[] = [
+  { key: "normale", moves: [] },
+  { key: "italiana", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4"] },
+  { key: "spagnola", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5"] },
+  { key: "siciliana", moves: ["e2e4", "c7c5"] },
+  { key: "francese", moves: ["e2e4", "e7e6"] },
+  { key: "gambetto-donna", moves: ["d2d4", "d7d5", "c2c4"] },
 ];
 
 function uciParts(uci: string): { from: Square; to: Square; promotion?: PieceSymbol } {
@@ -66,7 +68,13 @@ function uciParts(uci: string): { from: Square; to: Square; promotion?: PieceSym
 }
 
 export function SparringBoard() {
+  const t = useTranslations("play");
   const game = useChessGame();
+  // Nome localizzato del bot per un Elo (fallback: l'Elo numerico).
+  const nameForElo = (e: number) => {
+    const key = BOT_KEY_FOR_ELO(e);
+    return key ? t(`bot.${key}`) : `${e}`;
+  };
   const [phase, setPhase] = useState<"setup" | "play">("setup");
   const [style, setStyle] = useState<Style>("positional");
   const [styleRandom, setStyleRandom] = useState(false);
@@ -197,24 +205,24 @@ export function SparringBoard() {
     return (
       <div className="space-y-6">
         <MobilePageHeader
-          eyebrow="Against the engine"
+          eyebrow={t("sparring.eyebrow")}
           title="Sparring"
-          desc="Full games against a personality and a strength you choose."
+          desc={t("sparring.desc")}
         />
         <div className="hidden md:block">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Sparring</h1>
           <p className="mt-2 max-w-2xl text-text-muted">
-            Play full games against the engine with a <strong>personality</strong> and a strength
-            you choose: aggressive, positional, or solid. Drill your openings and sharpen your play
-            against different styles.
+            {t.rich("sparring.lead", {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>New challenge</CardTitle>
+            <CardTitle>{t("sparring.newChallenge")}</CardTitle>
           </CardHeader>
         <CardContent className="space-y-5">
-          <Field label="Opponent style">
+          <Field label={t("sparring.opponentStyle")}>
             <Group>
               {(["aggressive", "positional", "drawish"] as Style[]).map((s) => (
                 <Choice key={s} active={!styleRandom && style === s} onClick={() => { setStyleRandom(false); setStyle(s); }}>
@@ -222,44 +230,44 @@ export function SparringBoard() {
                 </Choice>
               ))}
               <Choice active={styleRandom} onClick={() => setStyleRandom(true)}>
-                Random
+                {t("random")}
               </Choice>
             </Group>
           </Field>
-          <Field label="Strength (Elo)">
+          <Field label={t("sparring.strength")}>
             <Group>
               {BOTS.map((b) => (
                 <Choice key={b.elo} active={!eloRandom && elo === b.elo} onClick={() => { setEloRandom(false); setElo(b.elo); }}>
-                  {b.name} · {b.elo}
+                  {t(`bot.${b.key}`)} · {b.elo}
                 </Choice>
               ))}
               <Choice active={eloRandom} onClick={() => setEloRandom(true)}>
-                Random
+                {t("random")}
               </Choice>
             </Group>
           </Field>
-          <Field label="Your color">
+          <Field label={t("color.your")}>
             <Group>
               {(["white", "black", "random"] as ColorChoice[]).map((c) => (
                 <Choice key={c} active={colorChoice === c} onClick={() => setColorChoice(c)}>
-                  {c === "white" ? "White" : c === "black" ? "Black" : "Random"}
+                  {c === "white" ? t("color.white") : c === "black" ? t("color.black") : t("color.random")}
                 </Choice>
               ))}
             </Group>
           </Field>
-          <Field label="Starting opening">
+          <Field label={t("sparring.startingOpening")}>
             <Group>
               {OPENINGS.map((o) => (
                 <Choice key={o.key} active={!openingRandom && openingKey === o.key} onClick={() => { setOpeningRandom(false); setOpeningKey(o.key); }}>
-                  {o.label}
+                  {t(`opening.${o.key}`)}
                 </Choice>
               ))}
               <Choice active={openingRandom} onClick={() => setOpeningRandom(true)}>
-                Random
+                {t("random")}
               </Choice>
             </Group>
           </Field>
-          <Button onClick={start}>Start playing</Button>
+          <Button onClick={start}>{t("startPlaying")}</Button>
         </CardContent>
         </Card>
       </div>
@@ -271,17 +279,17 @@ export function SparringBoard() {
   // Partita "viva": posizione corrente, non finita, non abbandonata.
   const liveOpen = atLive && !resigned && !game.isGameOver;
   const canMove = liveOpen && !thinking && game.turn === userColor[0];
-  const status = gameStatus(game, userColor, resigned);
-  const result = sparringResult(game, userColor, resigned);
+  const status = gameStatus(game, userColor, resigned, t);
+  const result = sparringResult(game, userColor, resigned, t);
 
   return (
     <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_16rem] 2xl:grid-cols-[auto_16rem] 2xl:justify-center">
       <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
         <PlayerBar
-          name={`${NAME_FOR_ELO(activeElo)} · ${activeElo}`}
+          name={`${nameForElo(activeElo)} · ${activeElo}`}
           sub={STYLE_LABEL[activeStyle]}
           active={!status && game.turn === engineColorChar}
-          note={thinking ? "thinking…" : undefined}
+          note={thinking ? t("sparring.thinking") : undefined}
           material={<CapturedMaterial fen={game.fen} color={engineColorChar} />}
         />
         <div className="relative">
@@ -311,7 +319,7 @@ export function SparringBoard() {
               onAnalyze={
                 pgn && result
                   ? () => {
-                      const bot = `${NAME_FOR_ELO(activeElo)} ${activeElo}`;
+                      const bot = `${nameForElo(activeElo)} ${activeElo}`;
                       const res =
                         result.outcome === "draw"
                           ? "1/2-1/2"
@@ -324,8 +332,8 @@ export function SparringBoard() {
                               : "1-0";
                       analyze({
                         pgn,
-                        white: userColor === "white" ? "You" : bot,
-                        black: userColor === "black" ? "You" : bot,
+                        white: userColor === "white" ? t("sparring.you") : bot,
+                        black: userColor === "black" ? t("sparring.you") : bot,
                         result: res,
                         userColor: userColor[0] as "w" | "b",
                       });
@@ -335,15 +343,15 @@ export function SparringBoard() {
               onDismiss={() => setOverlayOff(true)}
               actions={
                 <Button size="sm" className="w-full" onClick={start}>
-                  Rematch
+                  {t("sparring.rematch")}
                 </Button>
               }
             />
           )}
         </div>
         <PlayerBar
-          name="You"
-          sub={userColor === "white" ? "White" : "Black"}
+          name={t("sparring.you")}
+          sub={userColor === "white" ? t("color.white") : t("color.black")}
           active={!status && game.turn === userColor[0]}
           material={<CapturedMaterial fen={game.fen} color={userColor[0] as "w" | "b"} />}
         />
@@ -365,7 +373,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.first}
             disabled={game.cursor < 0}
-            aria-label="First move"
+            aria-label={t("nav.first")}
           >
             <ChevronsLeft className="h-5 w-5" />
           </Button>
@@ -375,7 +383,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.prev}
             disabled={game.cursor < 0}
-            aria-label="Previous move"
+            aria-label={t("nav.prev")}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -385,7 +393,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.next}
             disabled={atLive}
-            aria-label="Next move"
+            aria-label={t("nav.next")}
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
@@ -395,7 +403,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.last}
             disabled={atLive}
-            aria-label="Last move"
+            aria-label={t("nav.last")}
           >
             <ChevronsRight className="h-5 w-5" />
           </Button>
@@ -403,16 +411,21 @@ export function SparringBoard() {
 
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm text-text-muted">
-            {status ?? (thinking ? "Opponent is thinking…" : `Your move (${userColor === "white" ? "White" : "Black"})`)}
+            {status ??
+              (thinking
+                ? t("sparring.opponentThinking")
+                : t("sparring.yourMove", {
+                    color: userColor === "white" ? t("color.white") : t("color.black"),
+                  }))}
           </span>
           <div className="flex gap-2">
             {status && (
               <Button size="sm" onClick={start}>
-                Rematch
+                {t("sparring.rematch")}
               </Button>
             )}
             <Button variant="secondary" size="sm" onClick={() => setPhase("setup")}>
-              New challenge
+              {t("sparring.newChallenge")}
             </Button>
           </div>
         </div>
@@ -437,15 +450,16 @@ function gameStatus(
   game: ReturnType<typeof useChessGame>,
   userColor: Color,
   resigned: boolean,
+  t: PlayTranslator,
 ): string | null {
-  if (resigned) return "You resigned.";
+  if (resigned) return t("sparring.status.resigned");
   if (game.isCheckmate) {
     // Sotto matto perde chi deve muovere.
     const loserIsUser = game.turn === userColor[0];
-    return loserIsUser ? "Checkmate — you lost." : "Checkmate — you won!";
+    return loserIsUser ? t("sparring.status.checkmateLost") : t("sparring.status.checkmateWon");
   }
-  if (game.isStalemate) return "Stalemate — draw.";
-  if (game.isDraw) return "Draw.";
+  if (game.isStalemate) return t("sparring.status.stalemate");
+  if (game.isDraw) return t("sparring.status.draw");
   return null;
 }
 
@@ -454,22 +468,27 @@ function sparringResult(
   game: ReturnType<typeof useChessGame>,
   userColor: Color,
   resigned: boolean,
+  t: PlayTranslator,
 ): { title: string; subtitle?: string; checkmate: boolean; outcome: GameOutcome } | null {
   if (resigned)
-    return { title: "You lost", subtitle: "You resigned the game.", checkmate: false, outcome: "loss" };
+    return { title: t("result.youLost"), subtitle: t("sparring.result.resignedGame"), checkmate: false, outcome: "loss" };
   if (game.isCheckmate) {
     // Sotto matto perde chi deve muovere.
     const loserIsUser = game.turn === userColor[0];
     return loserIsUser
-      ? { title: "You lost", checkmate: true, outcome: "loss" }
-      : { title: "You won", checkmate: true, outcome: "win" };
+      ? { title: t("result.youLost"), checkmate: true, outcome: "loss" }
+      : { title: t("result.youWon"), checkmate: true, outcome: "win" };
   }
-  if (game.isStalemate) return { title: "Draw", subtitle: "Stalemate.", checkmate: false, outcome: "draw" };
-  if (game.isDraw) return { title: "Draw", checkmate: false, outcome: "draw" };
+  if (game.isStalemate) return { title: t("result.draw"), subtitle: t("result.stalemate"), checkmate: false, outcome: "draw" };
+  if (game.isDraw) return { title: t("result.draw"), checkmate: false, outcome: "draw" };
   return null;
 }
 
+/** Tipo del traduttore next-intl per il namespace "play", per i helper non-componenti. */
+type PlayTranslator = ReturnType<typeof useTranslations<"play">>;
+
 function MoveList({ history }: { history: ReturnType<typeof useChessGame>["history"] }) {
+  const t = useTranslations("play");
   const rows: { no: number; white?: string; black?: string }[] = [];
   history.forEach((m, i) => {
     const no = Math.floor(i / 2) + 1;
@@ -478,7 +497,7 @@ function MoveList({ history }: { history: ReturnType<typeof useChessGame>["histo
   });
   return (
     <div className="rounded-lg border border-border bg-surface p-3">
-      <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">Moves</div>
+      <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">{t("moves")}</div>
       <div className="max-h-72 overflow-y-auto font-mono text-sm">
         {rows.length === 0 ? (
           <span className="text-text-muted">—</span>

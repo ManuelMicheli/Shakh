@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 export interface NavItem {
+  /** Chiave i18n (namespace "nav") tradotta a runtime dai componenti. */
   label: string;
   href: string;
   icon: LucideIcon;
@@ -35,7 +36,7 @@ export function isNavActive(pathname: string, href: string): boolean {
 }
 
 export interface NavGroup {
-  /** Etichetta della sezione. Assente = ancore principali senza intestazione. */
+  /** Chiave i18n della sezione. Assente = ancore principali senza intestazione. */
   label?: string;
   items: NavItem[];
 }
@@ -49,43 +50,43 @@ export const navGroups: NavGroup[] = [
   {
     // Ancore: orientamento e guida quotidiana. Il percorso è la spina dorsale.
     items: [
-      { label: "Dashboard", href: "/app", icon: LayoutDashboard },
-      { label: "Today", href: "/app/oggi", icon: CalendarCheck },
-      { label: "Path", href: "/app/percorso", icon: Route },
-      { label: "Coach", href: "/app/coach", icon: Bot },
+      { label: "item.dashboard", href: "/app", icon: LayoutDashboard },
+      { label: "item.today", href: "/app/oggi", icon: CalendarCheck },
+      { label: "item.path", href: "/app/percorso", icon: Route },
+      { label: "item.coach", href: "/app/coach", icon: Bot },
     ],
   },
   {
-    label: "Study",
+    label: "group.study",
     items: [
-      { label: "Learn", href: "/app/impara", icon: GraduationCap },
-      { label: "Theory", href: "/app/teoria", icon: BookOpen },
-      { label: "Repertoire", href: "/app/repertorio", icon: Library },
-      { label: "Preparation", href: "/app/preparazione", icon: Radar },
+      { label: "item.learn", href: "/app/impara", icon: GraduationCap },
+      { label: "item.theory", href: "/app/teoria", icon: BookOpen },
+      { label: "item.repertoire", href: "/app/repertorio", icon: Library },
+      { label: "item.preparation", href: "/app/preparazione", icon: Radar },
     ],
   },
   {
-    label: "Train",
+    label: "group.train",
     items: [
-      { label: "Tactics", href: "/app/tattiche", icon: Target },
-      { label: "Calculation", href: "/app/calcolo", icon: Brain },
-      { label: "Traps", href: "/app/trappole", icon: Zap },
-      { label: "Sparring", href: "/app/sparring", icon: Cpu },
+      { label: "item.tactics", href: "/app/tattiche", icon: Target },
+      { label: "item.calculation", href: "/app/calcolo", icon: Brain },
+      { label: "item.traps", href: "/app/trappole", icon: Zap },
+      { label: "item.sparring", href: "/app/sparring", icon: Cpu },
     ],
   },
   {
-    label: "Play & analyze",
+    label: "group.playAnalyze",
     items: [
-      { label: "Play a friend", href: "/app/gioca", icon: Gamepad2 },
-      { label: "My games", href: "/app/partite", icon: Swords },
-      { label: "Weaknesses", href: "/app/debolezze", icon: Crosshair },
-      { label: "Fix mistakes", href: "/app/ripara", icon: Wrench },
+      { label: "item.playFriend", href: "/app/gioca", icon: Gamepad2 },
+      { label: "item.myGames", href: "/app/partite", icon: Swords },
+      { label: "item.weaknesses", href: "/app/debolezze", icon: Crosshair },
+      { label: "item.fixMistakes", href: "/app/ripara", icon: Wrench },
     ],
   },
 ];
 
 /** Voci ancorate in fondo alla sidebar: gestione e account. */
 export const navFooter: NavItem[] = [
-  { label: "Groups", href: "/app/gruppi", icon: Users },
-  { label: "Profile", href: "/app/profilo", icon: User },
+  { label: "item.groups", href: "/app/gruppi", icon: Users },
+  { label: "item.profile", href: "/app/profilo", icon: User },
 ];

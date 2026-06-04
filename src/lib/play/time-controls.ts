@@ -3,6 +3,8 @@
  * partita senza orologio (illimitata). L'incremento è alla Fischer: aggiunto
  * al giocatore DOPO ogni sua mossa.
  */
+import type { Locale } from "@/i18n/config";
+
 export interface TimeControl {
   id: string;
   label: string;
@@ -29,6 +31,30 @@ export const TIME_CONTROLS: TimeControl[] = [
 
 export function findTimeControl(id: string): TimeControl {
   return TIME_CONTROLS.find((t) => t.id === id) ?? TIME_CONTROLS[0];
+}
+
+// ──────────────────────────── Etichette bilingue ─────────────────────────────
+// Gli `id`/`label` sono notazione (lingua-neutra). Solo i nomi-gruppo e la voce
+// "Unlimited"/"No clock" sono traducibili: qui gli accessor locale-aware.
+
+const GROUP_I18N: Record<string, { it: string; en: string }> = {
+  "No clock": { it: "Senza orologio", en: "No clock" },
+  Bullet: { it: "Bullet", en: "Bullet" },
+  Blitz: { it: "Blitz", en: "Blitz" },
+  Rapid: { it: "Rapid", en: "Rapid" },
+  Classical: { it: "Classica", en: "Classical" },
+};
+
+/** Nome localizzato di un gruppo di controlli di tempo (fallback al grezzo). */
+export function timeControlGroupLabel(group: string, locale: Locale): string {
+  const v = GROUP_I18N[group];
+  return v ? (locale === "it" ? v.it : v.en) : group;
+}
+
+/** Etichetta localizzata di un controllo (solo "Unlimited" è tradotto). */
+export function timeControlLabel(tc: TimeControl, locale: Locale): string {
+  if (tc.id === "unlimited") return locale === "it" ? "Illimitato" : "Unlimited";
+  return tc.label;
 }
 
 /** Formatta i ms residui in m:ss (o h:mm:ss oltre l'ora). */

@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface RadarArea {
@@ -35,6 +36,7 @@ function polygon(pts: [number, number][]): string {
  * Monocromo (grigi/contrasto): il colore qui non rappresenta un esito.
  */
 export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
+  const t = useTranslations("dashboard");
   const n = areas.length;
   const geom = useMemo(() => {
     const valuePts = areas.map((a, i) => point(i, n, a.value ?? 0));
@@ -51,7 +53,7 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         className="h-auto w-full max-w-[280px]"
         role="img"
-        aria-label="Skills map"
+        aria-label={t("skillsMap.title")}
       >
         {/* Anelli della griglia. */}
         {RINGS.map((t) => (

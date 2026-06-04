@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
@@ -9,6 +10,7 @@ import { joinByCode } from "@/app/app/gruppi/actions";
 
 /** Unisciti a un gruppo incollando il codice d'invito. */
 export function JoinForm() {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [code, setCode] = useState("");
@@ -18,11 +20,11 @@ export function JoinForm() {
     start(async () => {
       const res = await joinByCode(code);
       if (!res.ok || !res.data) {
-        toast({ title: "Couldn't join", description: res.error, variant: "error" });
+        toast({ title: t("toastCouldntJoin"), description: res.error, variant: "error" });
         return;
       }
       setCode("");
-      toast({ title: "You joined the group" });
+      toast({ title: t("toastJoinedGroup") });
       router.push(`/app/gruppi/${res.data.groupId}`);
     });
   };
@@ -37,18 +39,18 @@ export function JoinForm() {
     >
       <div className="min-w-[12rem] flex-1 space-y-1">
         <label className="text-xs text-text-muted" htmlFor="join-code">
-          Invite code
+          {t("inviteCodeLabel")}
         </label>
         <Input
           id="join-code"
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
-          placeholder="e.g. K7P2M9QX"
+          placeholder={t("inviteCodePlaceholder")}
           className="font-mono"
         />
       </div>
       <Button type="submit" variant="secondary" disabled={pending || !code.trim()}>
-        Join
+        {t("joinButton")}
       </Button>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Spinner } from "@/components/ui/spinner";
 import {
   fetchTablebase,
@@ -18,34 +19,28 @@ export interface TablebasePanelProps {
   className?: string;
 }
 
-const OUTCOME_LABEL: Record<MoveQuality, string> = {
-  win: "Wins",
-  draw: "Holds the draw",
-  loss: "Loses",
-  unknown: "—",
-};
-
-/** Esito assoluto della posizione per il lato al tratto. */
-function positionOutcome(category: TbCategory): { label: string; quality: MoveQuality } {
+/** Chiave i18n dell'esito assoluto della posizione per il lato al tratto. */
+function positionOutcome(category: TbCategory): { labelKey: string; quality: MoveQuality } {
   switch (category) {
     case "win":
     case "maybe-win":
-      return { label: "Winning position", quality: "win" };
+      return { labelKey: "tablebase.posWinning", quality: "win" };
     case "cursed-win":
-      return { label: "Winning (but 50-move rule)", quality: "win" };
+      return { labelKey: "tablebase.posWinning50", quality: "win" };
     case "draw":
-      return { label: "Drawn position", quality: "draw" };
+      return { labelKey: "tablebase.posDrawn", quality: "draw" };
     case "blessed-loss":
-      return { label: "Lost (saved by the 50-move rule)", quality: "loss" };
+      return { labelKey: "tablebase.posLost50", quality: "loss" };
     case "loss":
     case "maybe-loss":
-      return { label: "Losing position", quality: "loss" };
+      return { labelKey: "tablebase.posLosing", quality: "loss" };
     default:
-      return { label: "Unknown result", quality: "unknown" };
+      return { labelKey: "tablebase.posUnknown", quality: "unknown" };
   }
 }
 
 export function TablebasePanel({ fen, onPlayMove, className }: TablebasePanelProps) {
+  const t = useTranslations("theory");
   const [state, setState] = useState<TablebaseResult | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -65,18 +60,18 @@ export function TablebasePanel({ fen, onPlayMove, className }: TablebasePanelPro
 
   return (
     <div className={cn("space-y-3", className)}>
-      <h3 className="text-sm font-medium">Exact endgame (tablebase)</h3>
+      <h3 className="text-sm font-medium">{t("tablebase.title")}</h3>
 
       {loading && (
         <p className="flex items-center gap-2 text-sm text-text-muted">
-          <Spinner /> Querying the tablebase…
+          <Spinner /> {t("tablebase.querying")}
         </p>
       )}
 
       {!loading && state && !state.ok && (
         <p className="text-sm text-text-muted">
           {state.error}
-          {state.tooManyPieces && " The evaluation here is the engine's (see the Engine panel)."}
+          {state.tooManyPieces && ` ${t("tablebase.tooManyPieces")}`}
         </p>
       )}
 
@@ -85,8 +80,11 @@ export function TablebasePanel({ fen, onPlayMove, className }: TablebasePanelPro
   );
 }
 
-function dtLabel(m: { dtm: number | null; dtz: number | null }): string {
-  if (m.dtm != null && m.dtm !== 0) return `mate in ${Math.abs(m.dtm)}`;
+function dtLabel(
+  m: { dtm: number | null; dtz: number | null },
+  mateIn: (n: number) => string,
+): string {
+  if (m.dtm != null && m.dtm !== 0) return mateIn(Math.abs(m.dtm));
   if (m.dtz != null && m.dtz !== 0) return `DTZ ${Math.abs(m.dtz)}`;
   return "";
 }
@@ -98,13 +96,21 @@ function TablebaseBody({
   data: TablebaseData;
   onPlayMove?: (san: string) => void;
 }) {
+  const t = useTranslations("theory");
+  const outcomeLabel: Record<MoveQuality, string> = {
+    win: t("tablebase.outcomeWins"),
+    draw: t("tablebase.outcomeHoldsDraw"),
+    loss: t("tablebase.outcomeLoses"),
+    unknown: "—",
+  };
+  const mateIn = (n: number) => t("tablebase.mateIn", { n });
   const outcome = positionOutcome(data.category);
   return (
     <div className="space-y-3">
       <div className="rounded-md border border-border bg-surface p-3">
-        <p className="text-sm font-medium">{outcome.label}</p>
+        <p className="text-sm font-medium">{t(outcome.labelKey)}</p>
         {(data.dtm != null || data.dtz != null) && (
-          <p className="mt-0.5 font-mono text-xs text-text-muted">{dtLabel(data)}</p>
+          <p className="mt-0.5 font-mono text-xs text-text-muted">{dtLabel(data, mateIn)}</p>
         )}
       </div>
 
@@ -121,7 +127,7 @@ function TablebaseBody({
                 >
                   <span className="font-mono font-medium">{m.san}</span>
                   <span className="flex items-center gap-2 text-xs text-text-muted">
-                    <span>{dtLabel(m)}</span>
+                    <span>{dtLabel(m, mateIn)}</span>
                     <span
                       className={cn(
                         "rounded px-1.5 py-0.5 font-medium",
@@ -130,7 +136,7 @@ function TablebaseBody({
                         q === "loss" && "border border-border text-text-muted",
                       )}
                     >
-                      {OUTCOME_LABEL[q]}
+                      {outcomeLabel[q]}
                     </span>
                   </span>
                 </button>

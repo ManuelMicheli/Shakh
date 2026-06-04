@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { loadUserMetrics } from "@/lib/ai/userMetrics";
@@ -21,24 +22,25 @@ export interface SynthesisResult {
  */
 export async function refreshProgressAndSynthesize(): Promise<SynthesisResult> {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Sign in again." };
+  if (!user) return { ok: false, error: t("error.sessionExpiredSignIn") };
 
   const metrics = await loadUserMetrics(supabase, user.id);
   await upsertProgress(supabase, user.id, metrics);
   revalidatePath("/app/coach");
 
   if (metrics.userMoves === 0)
-    return { ok: false, error: "Analyze a few games first: there's no data yet." };
+    return { ok: false, error: t("error.noDataYet") };
   if (!isCoachConfigured())
-    return { ok: false, error: "The AI coach isn't configured (ANTHROPIC_API_KEY is missing)." };
+    return { ok: false, error: t("error.coachNotConfigured") };
 
   try {
     const synthesis = await synthesizePatterns(metrics);
     if (!synthesis)
-      return { ok: false, error: "Coach response couldn't be parsed. Try again." };
+      return { ok: false, error: t("error.coachUnparsable") };
     // Cache dell'ultima sintesi: la dashboard (08) la mostra senza rigenerarla.
     await supabase.from("coach_synthesis").upsert(
       {
@@ -53,7 +55,7 @@ export async function refreshProgressAndSynthesize(): Promise<SynthesisResult> {
     revalidatePath("/app");
     return { ok: true, synthesis };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "AI coach error." };
+    return { ok: false, error: e instanceof Error ? e.message : t("error.coachGeneric") };
   }
 }
 

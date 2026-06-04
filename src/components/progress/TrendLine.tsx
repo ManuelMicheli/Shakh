@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface TrendPoint {
@@ -16,6 +17,7 @@ export interface TrendLineProps {
   /**
    * Nome del dato dietro un punto (singolare/plurale), per lo stato vuoto:
    * "Serve ancora 1 partita…" / "Servono ancora 2 puzzle…".
+   * Se omesso, usa un nome generico localizzato.
    */
   dataNoun?: { one: string; many: string };
   className?: string;
@@ -32,9 +34,12 @@ const PAD = 16;
 export function TrendLine({
   points,
   suffix = "",
-  dataNoun = { one: "data point", many: "data points" },
+  dataNoun,
   className,
 }: TrendLineProps) {
+  const t = useTranslations("dashboard");
+  // Nome del dato di default (singolare/plurale) localizzato; sovrascrivibile da chi chiama.
+  const noun = dataNoun ?? { one: t("trend.nounOne"), many: t("trend.nounMany") };
   const geom = useMemo(() => {
     const n = points.length;
     const values = points.map((p) => p.value);
@@ -55,8 +60,8 @@ export function TrendLine({
     return (
       <p className={cn("py-8 text-center text-sm text-text-muted", className)}>
         {missing === 1
-          ? `1 more ${dataNoun.one} needed to draw the trend.`
-          : `${missing} more ${dataNoun.many} needed to draw the trend.`}
+          ? t("trend.needOne", { noun: noun.one })
+          : t("trend.needMany", { missing, noun: noun.many })}
       </p>
     );
   }
@@ -78,7 +83,7 @@ export function TrendLine({
         preserveAspectRatio="none"
         className="h-36 w-full select-none"
         role="img"
-        aria-label="Trend over time"
+        aria-label={t("trend.ariaLabel")}
       >
         <motion.path
           d={geom.line}

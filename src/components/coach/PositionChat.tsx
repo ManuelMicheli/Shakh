@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -23,6 +24,7 @@ function whiteEvalText(score: number, type: "cp" | "mate", turn: "w" | "b"): str
  * calcola valutazioni e linee; poi quei numeri vanno al modello che SPIEGA.
  */
 export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
+  const t = useTranslations("study");
   const [messages, setMessages] = useState<ChatTurn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,7 +34,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
   /** Interroga il motore sulla posizione (e su un'eventuale mossa citata). */
   const buildFacts = async (question: string): Promise<PositionFacts> => {
     await engine.init();
-    setPhase("Querying the engine…");
+    setPhase(t("chat.phase.querying"));
     const evaluation = await engine.analyze(fen, { depth: LINES_DEPTH, multiPV: 3 }).result;
 
     const lines: EngineLineFact[] = evaluation.lines
@@ -49,7 +51,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
     for (const raw of extractMoveTokens(question).slice(0, 4)) {
       const played = tryPlaySan(fen, italianToEnglishSan(raw));
       if (!played) continue;
-      setPhase(`Evaluating ${played.san}…`);
+      setPhase(t("chat.phase.evaluating", { san: played.san }));
       const afterTurn = (played.fen.split(" ")[1] as "w" | "b") ?? "w";
       const afterEval = await engine.analyze(played.fen, { depth: MOVE_DEPTH }).result;
       const top = afterEval.lines[0];
@@ -75,7 +77,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
 
     try {
       const facts = await buildFacts(question);
-      setPhase("The coach is responding…");
+      setPhase(t("chat.phase.responding"));
 
       const res = await fetch("/api/coach/ask", {
         method: "POST",
@@ -90,8 +92,8 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
         }),
       });
       if (!res.ok || !res.body) {
-        const msg = await res.text().catch(() => "Coach error.");
-        setMessages((prev) => [...prev, { role: "assistant", content: `Sorry: ${msg}` }]);
+        const msg = await res.text().catch(() => t("error.coachShort"));
+        setMessages((prev) => [...prev, { role: "assistant", content: t("chat.sorry", { msg }) }]);
         return;
       }
 
@@ -114,7 +116,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "I couldn't answer. Try again." },
+        { role: "assistant", content: t("chat.couldntAnswer") },
       ]);
     } finally {
       setBusy(false);
@@ -127,7 +129,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
       <div ref={scrollRef} className="max-h-64 space-y-3 overflow-y-auto">
         {messages.length === 0 ? (
           <p className="text-sm text-text-muted">
-            Ask something about the position, e.g. &quot;what&apos;s the plan for White?&quot; or &quot;why not Nd4?&quot;.
+            {t("chat.empty")}
           </p>
         ) : (
           messages.map((m, i) => (
@@ -160,12 +162,12 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a question…"
+          placeholder={t("chat.placeholder")}
           disabled={busy}
-          aria-label="Question about the position"
+          aria-label={t("chat.ariaLabel")}
         />
         <Button type="submit" size="sm" disabled={busy || !input.trim()}>
-          Send
+          {t("chat.send")}
         </Button>
       </form>
     </div>

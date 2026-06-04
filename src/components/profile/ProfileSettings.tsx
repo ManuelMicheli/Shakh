@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export interface ProfileSettingsProps {
 
 /** Impostazioni profilo: dati, tema/locale, cambio password (Supabase Auth). */
 export function ProfileSettings({ initial }: ProfileSettingsProps) {
+  const t = useTranslations("profile");
   const { toast } = useToast();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -40,7 +42,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
     const res = await exportMyData();
     setExporting(false);
     if (!res.ok || !res.data) {
-      toast({ title: "Export failed", description: res.error, variant: "error" });
+      toast({ title: t("exportFailed"), description: res.error, variant: "error" });
       return;
     }
     const blob = new Blob([JSON.stringify(res.data, null, 2)], {
@@ -59,7 +61,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
     const res = await deleteMyAccount();
     setDeleting(false);
     if (!res.ok) {
-      toast({ title: "Deletion failed", description: res.error, variant: "error" });
+      toast({ title: t("deletionFailed"), description: res.error, variant: "error" });
       return;
     }
     setConfirmDelete(false);
@@ -85,10 +87,10 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
         themePreference: theme,
       });
       if (!res.ok) {
-        toast({ title: "Save failed", description: res.error, variant: "error" });
+        toast({ title: t("saveFailed"), description: res.error, variant: "error" });
         return;
       }
-      toast({ title: "Profile updated" });
+      toast({ title: t("profileUpdated") });
       // Ricarica i Server Component così la lingua scelta si applica subito
       // (messaggi e formati seguono il cookie NEXT_LOCALE appena impostato).
       router.refresh();
@@ -97,11 +99,11 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
 
   const onChangePassword = async () => {
     if (password.length < 8) {
-      toast({ title: "Password too short", description: "At least 8 characters.", variant: "error" });
+      toast({ title: t("passwordTooShort"), description: t("passwordTooShortDesc"), variant: "error" });
       return;
     }
     if (password !== password2) {
-      toast({ title: "Passwords don't match", variant: "error" });
+      toast({ title: t("passwordsDontMatch"), variant: "error" });
       return;
     }
     setChangingPwd(true);
@@ -109,12 +111,12 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
     const { error } = await supabase.auth.updateUser({ password });
     setChangingPwd(false);
     if (error) {
-      toast({ title: "Password change failed", description: error.message, variant: "error" });
+      toast({ title: t("passwordChangeFailed"), description: error.message, variant: "error" });
       return;
     }
     setPassword("");
     setPassword2("");
-    toast({ title: "Password updated" });
+    toast({ title: t("passwordUpdated") });
   };
 
   return (
@@ -122,31 +124,31 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Dati profilo */}
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
-          <CardDescription>How we present you in the app.</CardDescription>
+          <CardTitle>{t("profileCardTitle")}</CardTitle>
+          <CardDescription>{t("profileCardDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="displayName">Display name</Label>
+            <Label htmlFor="displayName">{t("displayName")}</Label>
             <Input
               id="displayName"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your name"
+              placeholder={t("displayNamePlaceholder")}
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">{t("username")}</Label>
             <Input
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="username"
+              placeholder={t("usernamePlaceholder")}
             />
           </div>
           <div className="flex justify-end">
             <Button onClick={onSaveProfile} disabled={savingProfile}>
-              {savingProfile ? "Saving…" : "Save"}
+              {savingProfile ? t("saving") : t("save")}
             </Button>
           </div>
         </CardContent>
@@ -155,29 +157,29 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Aspetto */}
       <Card>
         <CardHeader>
-          <CardTitle>Appearance and language</CardTitle>
-          <CardDescription>The theme applies right away; save to remember it.</CardDescription>
+          <CardTitle>{t("appearanceTitle")}</CardTitle>
+          <CardDescription>{t("appearanceDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Theme</Label>
+            <Label>{t("theme")}</Label>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant={theme === "dark" ? "primary" : "secondary"}
                 onClick={() => setTheme("dark")}
               >
-                Dark
+                {t("themeDark")}
               </Button>
               <Button
                 variant={theme === "light" ? "primary" : "secondary"}
                 onClick={() => setTheme("light")}
               >
-                Light
+                {t("themeLight")}
               </Button>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Language</Label>
+            <Label>{t("language")}</Label>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant={locale === "it" ? "primary" : "secondary"}
@@ -195,7 +197,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
           </div>
           <div className="flex justify-end">
             <Button onClick={onSaveProfile} disabled={savingProfile}>
-              {savingProfile ? "Saving…" : "Save preferences"}
+              {savingProfile ? t("saving") : t("savePreferences")}
             </Button>
           </div>
         </CardContent>
@@ -204,12 +206,12 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Account */}
       <Card>
         <CardHeader>
-          <CardTitle>Account</CardTitle>
-          <CardDescription>Change your sign-in password.</CardDescription>
+          <CardTitle>{t("accountCardTitle")}</CardTitle>
+          <CardDescription>{t("accountCardDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="pwd">New password</Label>
+            <Label htmlFor="pwd">{t("newPassword")}</Label>
             <Input
               id="pwd"
               type="password"
@@ -219,7 +221,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="pwd2">Confirm password</Label>
+            <Label htmlFor="pwd2">{t("confirmPassword")}</Label>
             <Input
               id="pwd2"
               type="password"
@@ -230,7 +232,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
           </div>
           <div className="flex justify-end">
             <Button onClick={onChangePassword} disabled={changingPwd}>
-              {changingPwd ? "…" : "Update password"}
+              {changingPwd ? "…" : t("updatePassword")}
             </Button>
           </div>
         </CardContent>
@@ -239,15 +241,15 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Gruppi e circoli (attivati nel 09) */}
       <Card>
         <CardHeader>
-          <CardTitle>Groups and clubs</CardTitle>
-          <CardDescription>Join a club or a class, or create your own.</CardDescription>
+          <CardTitle>{t("groupsTitle")}</CardTitle>
+          <CardDescription>{t("groupsDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Link
             href="/app/gruppi"
             className="inline-flex h-9 items-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-surface-2"
           >
-            Manage your groups
+            {t("manageGroups")}
           </Link>
         </CardContent>
       </Card>
@@ -255,33 +257,33 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Privacy e dati (diritti dell'interessato, prompt 10 §1) */}
       <Card>
         <CardHeader>
-          <CardTitle>Privacy and data</CardTitle>
+          <CardTitle>{t("privacyTitle")}</CardTitle>
           <CardDescription>
-            Export your data or permanently delete your account.
+            {t("privacyDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium">Export my data</p>
+              <p className="text-sm font-medium">{t("exportMyData")}</p>
               <p className="text-xs text-text-muted">
-                Profile, games, progress, and repertoires in JSON format.
+                {t("exportMyDataDesc")}
               </p>
             </div>
             <Button variant="secondary" onClick={onExport} disabled={exporting}>
-              {exporting ? "Preparing…" : "Export"}
+              {exporting ? t("preparing") : t("export")}
             </Button>
           </div>
 
           <div className="flex items-center justify-between gap-4 border-t border-border pt-4">
             <div>
-              <p className="text-sm font-medium">Delete account</p>
+              <p className="text-sm font-medium">{t("deleteAccount")}</p>
               <p className="text-xs text-text-muted">
-                Permanent removal of your account and linked data. Irreversible.
+                {t("deleteAccountDesc")}
               </p>
             </div>
             <Button variant="danger" onClick={() => setConfirmDelete(true)}>
-              Delete
+              {t("delete")}
             </Button>
           </div>
         </CardContent>
@@ -290,15 +292,15 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       <Dialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title="Delete your account?"
-        description="This action is irreversible: your profile, games, progress, and repertoires will be deleted forever."
+        title={t("deleteDialogTitle")}
+        description={t("deleteDialogDesc")}
       >
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button variant="danger" onClick={onDelete} disabled={deleting}>
-            {deleting ? "Deleting…" : "Delete permanently"}
+            {deleting ? t("deleting") : t("deletePermanently")}
           </Button>
         </div>
       </Dialog>

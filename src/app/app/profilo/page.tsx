@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -9,10 +10,15 @@ import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { LinkedAccount } from "@/app/app/profilo/actions";
 import type { ExternalSource } from "@/lib/rating/calibration";
 import { loadDashboard } from "@/lib/progress/aggregate";
+import { activeLocale } from "@/lib/i18n/content";
 
-export const metadata = { title: "Profile — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("profile");
+  return { title: t("metaTitle") };
+}
 
 export default async function ProfiloPage() {
+  const t = await getTranslations("profile");
   const supabase = await createClient();
   const user = await getUser();
   if (!user) redirect("/login");
@@ -29,7 +35,7 @@ export default async function ProfiloPage() {
       current_level: number;
     }>();
 
-  const data = await loadDashboard(supabase, user.id);
+  const data = await loadDashboard(supabase, user.id, await activeLocale());
   const radarAreas = data.competence.map((c) => ({ label: c.label, value: c.score }));
 
   const { data: extRows } = await supabase
@@ -63,33 +69,33 @@ export default async function ProfiloPage() {
   return (
     <div className="space-y-6">
       <MobilePageHeader
-        eyebrow="Your profile"
-        title={profile?.display_name ?? profile?.username ?? "Profile"}
-        desc={`${user.email}${profile?.elo_estimate != null ? ` · Elo ${profile.elo_estimate}` : ""} · level ${profile?.current_level ?? 0}`}
+        eyebrow={t("eyebrow")}
+        title={profile?.display_name ?? profile?.username ?? t("fallbackTitle")}
+        desc={`${user.email}${profile?.elo_estimate != null ? ` · ${t("eloShort", { elo: profile.elo_estimate })}` : ""} · ${t("level", { level: profile?.current_level ?? 0 })}`}
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          {profile?.display_name ?? profile?.username ?? "Profile"}
+          {profile?.display_name ?? profile?.username ?? t("fallbackTitle")}
         </h1>
         <p className="mt-2 text-text-muted">
           {user.email}
-          {profile?.elo_estimate != null && ` · estimated Elo ${profile.elo_estimate}`}
-          {` · level ${profile?.current_level ?? 0}`}
+          {profile?.elo_estimate != null && ` · ${t("elo", { elo: profile.elo_estimate })}`}
+          {` · ${t("level", { level: profile?.current_level ?? 0 })}`}
         </p>
       </div>
 
       <Tabs defaultValue="stats">
         <TabsList>
-          <TabsTrigger value="stats">Statistics</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="stats">{t("tabStats")}</TabsTrigger>
+          <TabsTrigger value="settings">{t("tabSettings")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="stats">
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Skills</CardTitle>
-                <CardDescription>Breakdown by area.</CardDescription>
+                <CardTitle>{t("competenceTitle")}</CardTitle>
+                <CardDescription>{t("competenceDesc")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <CompetenceRadar areas={radarAreas} />
@@ -98,7 +104,7 @@ export default async function ProfiloPage() {
                     <div key={c.area} className="flex items-center justify-between py-2 text-sm">
                       <span>{c.label}</span>
                       <span className="font-mono text-text-muted">
-                        {c.score == null ? "— no data" : `${Math.round(c.score * 100)}% · ${c.attempts} attempts`}
+                        {c.score == null ? t("noData") : t("competenceValue", { percent: Math.round(c.score * 100), attempts: c.attempts })}
                       </span>
                     </div>
                   ))}
@@ -108,7 +114,7 @@ export default async function ProfiloPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Tactical rating history</CardTitle>
+                <CardTitle>{t("ratingHistoryTitle")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <TrendLine points={data.trends.rating} />
@@ -117,7 +123,7 @@ export default async function ProfiloPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Accuracy in games</CardTitle>
+                <CardTitle>{t("accuracyTitle")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <TrendLine points={data.trends.accuracy} suffix="%" />

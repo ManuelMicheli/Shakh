@@ -11,6 +11,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { loadDashboard, type AreaKey, type AreaCompetence } from "@/lib/progress/aggregate";
 import type { GroupRole } from "./types";
+import type { Locale } from "@/i18n/config";
 
 type DB = SupabaseClient;
 
@@ -59,7 +60,9 @@ interface MemberRecord {
 export async function loadMembers(
   supabase: DB,
   groupId: string,
+  locale: Locale = "en",
 ): Promise<{ userId: string; name: string; username: string | null; role: GroupRole }[]> {
+  const fallback = locale === "it" ? "Allievo" : "Student";
   const { data } = await supabase
     .from("group_members")
     .select("user_id, role_in_group, profiles(display_name, username)")
@@ -68,7 +71,7 @@ export async function loadMembers(
   const rows = (data as MemberRecord[] | null) ?? [];
   return rows.map((m) => ({
     userId: m.user_id,
-    name: m.profiles?.display_name ?? m.profiles?.username ?? "Student",
+    name: m.profiles?.display_name ?? m.profiles?.username ?? fallback,
     username: m.profiles?.username ?? null,
     role: m.role_in_group,
   }));
@@ -78,12 +81,16 @@ export async function loadMembers(
  * Dati aggregati di classe: per ogni allievo carica la dashboard dell'08 e
  * combina i risultati (punti deboli comuni, competenza media per area).
  */
-export async function loadClassData(supabase: DB, groupId: string): Promise<ClassData> {
-  const members = await loadMembers(supabase, groupId);
+export async function loadClassData(
+  supabase: DB,
+  groupId: string,
+  locale: Locale = "en",
+): Promise<ClassData> {
+  const members = await loadMembers(supabase, groupId, locale);
 
   const students: StudentSummary[] = await Promise.all(
     members.map(async (m) => {
-      const dash = await loadDashboard(supabase, m.userId);
+      const dash = await loadDashboard(supabase, m.userId, locale);
       return {
         userId: m.userId,
         name: m.name,
@@ -114,12 +121,13 @@ export async function loadClassData(supabase: DB, groupId: string): Promise<Clas
     .sort((a, b) => b.count - a.count || a.avgScore - b.avgScore);
 
   // Competenza media per area fra gli allievi con dati.
+  const it = locale === "it";
   const AREAS: { area: AreaKey; label: string }[] = [
-    { area: "tattica", label: "Tactics" },
-    { area: "aperture", label: "Openings" },
-    { area: "mediogioco", label: "Middlegame" },
-    { area: "finali", label: "Endgames" },
-    { area: "trappole", label: "Traps" },
+    { area: "tattica", label: it ? "Tattica" : "Tactics" },
+    { area: "aperture", label: it ? "Aperture" : "Openings" },
+    { area: "mediogioco", label: it ? "Mediogioco" : "Middlegame" },
+    { area: "finali", label: it ? "Finali" : "Endgames" },
+    { area: "trappole", label: it ? "Trappole" : "Traps" },
   ];
   const competenceByArea: ClassAreaCompetence[] = AREAS.map(({ area, label }) => {
     const scores = students

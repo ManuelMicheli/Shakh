@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 function initials(name?: string | null) {
@@ -25,6 +26,7 @@ export function Avatar({
   size?: number;
   className?: string;
 }) {
+  const t = useTranslations("common");
   const [errored, setErrored] = useState(false);
   const showImg = src && !errored;
 
@@ -39,7 +41,7 @@ export function Avatar({
       {showImg ? (
         <Image
           src={src}
-          alt={name ?? "Avatar"}
+          alt={name ?? t("avatarAlt")}
           width={size}
           height={size}
           className="h-full w-full object-cover"

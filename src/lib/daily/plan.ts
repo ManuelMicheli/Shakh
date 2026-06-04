@@ -12,6 +12,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ensureStats, dueReviewCount } from "@/lib/tactics/query";
 import { themeLabel } from "@/lib/tactics/themes";
+import type { Locale } from "@/i18n/config";
 
 type DB = SupabaseClient;
 
@@ -52,7 +53,12 @@ interface AttemptTodayRow {
 }
 
 /** Costruisce il piano del giorno. */
-export async function buildDailyPlan(supabase: DB, userId: string): Promise<DailyPlan> {
+export async function buildDailyPlan(
+  supabase: DB,
+  userId: string,
+  locale: Locale = "en",
+): Promise<DailyPlan> {
+  const it = locale === "it";
   const todayIso = startOfTodayIso();
 
   const [stats, dueReview, weakTheme, attemptsToday, endgame, repertoire] = await Promise.all([
@@ -72,8 +78,8 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     const target = Math.min(dueReview, 10);
     blocks.push({
       kind: "review",
-      title: "Review",
-      detail: `${dueReview} puzzles due for review`,
+      title: it ? "Ripasso" : "Review",
+      detail: it ? `${dueReview} puzzle da ripassare` : `${dueReview} puzzles due for review`,
       href: "/app/tattiche?mode=review",
       target,
       done: Math.min(target, puzzlesToday),
@@ -89,8 +95,12 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     ).length;
     blocks.push({
       kind: "weakness",
-      title: `Weak spot: ${themeLabel(weakTheme.key)}`,
-      detail: `Proficiency ${Math.round(weakTheme.score * 100)}% — let's train it`,
+      title: it
+        ? `Punto debole: ${themeLabel(weakTheme.key, locale)}`
+        : `Weak spot: ${themeLabel(weakTheme.key, locale)}`,
+      detail: it
+        ? `Competenza ${Math.round(weakTheme.score * 100)}% — alleniamola`
+        : `Proficiency ${Math.round(weakTheme.score * 100)}% — let's train it`,
       href: `/app/tattiche?mode=theme&theme=${weakTheme.key}`,
       target,
       done: Math.min(target, themeDone),
@@ -103,8 +113,10 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     const target = 8;
     blocks.push({
       kind: "tactics",
-      title: "Adaptive tactics",
-      detail: "Puzzles calibrated to your level (flow zone)",
+      title: it ? "Tattica adattiva" : "Adaptive tactics",
+      detail: it
+        ? "Puzzle calibrati sul tuo livello (zona di flusso)"
+        : "Puzzles calibrated to your level (flow zone)",
       href: "/app/tattiche?mode=adaptive",
       target,
       done: Math.min(target, puzzlesToday),
@@ -116,8 +128,10 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
   if (endgame) {
     blocks.push({
       kind: "endgame",
-      title: `Endgame: ${endgame.title}`,
-      detail: "Convert the position against perfect defense",
+      title: it ? `Finale: ${endgame.title}` : `Endgame: ${endgame.title}`,
+      detail: it
+        ? "Converti la posizione contro la difesa perfetta"
+        : "Convert the position against perfect defense",
       href: `/app/teoria/${endgame.slug}`,
       target: 1,
       done: endgame.doneToday ? 1 : 0,
@@ -130,8 +144,8 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     const target = Math.min(repertoire.due, 15);
     blocks.push({
       kind: "repertoire",
-      title: "Repertoire review",
-      detail: `${repertoire.due} moves due`,
+      title: it ? "Ripasso repertorio" : "Repertoire review",
+      detail: it ? `${repertoire.due} mosse da ripassare` : `${repertoire.due} moves due`,
       href: repertoire.href,
       target,
       done: Math.min(target, repertoire.reviewedToday),

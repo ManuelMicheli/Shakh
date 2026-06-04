@@ -5,6 +5,7 @@
  */
 
 import type { GameSource } from "./types";
+import type { Locale } from "@/i18n/config";
 
 export type ProviderErrorCode =
   | "not_found"
@@ -19,6 +20,38 @@ export class ProviderError extends Error {
   ) {
     super(message);
     this.name = "ProviderError";
+  }
+}
+
+/**
+ * Messaggio d'errore localizzato a partire dal `code` stabile di un
+ * `ProviderError`. I chiamanti che hanno la locale possono usarlo al posto di
+ * `e.message` (che resta in inglese come fallback). `provider` è il nome del
+ * servizio (es. "Lichess"), `username` l'eventuale utente non trovato.
+ */
+export function providerErrorMessage(
+  code: ProviderErrorCode,
+  locale: Locale,
+  opts: { provider?: string; username?: string } = {},
+): string {
+  const it = locale === "it";
+  const provider = opts.provider ?? (it ? "il servizio" : "the service");
+  switch (code) {
+    case "not_found":
+      return it
+        ? `Utente ${provider}${opts.username ? ` "${opts.username}"` : ""} non trovato.`
+        : `${provider} user${opts.username ? ` "${opts.username}"` : ""} not found.`;
+    case "rate_limit":
+      return it
+        ? `Troppe richieste a ${provider}. Aspetta qualche secondo e riprova.`
+        : `Too many requests to ${provider}. Wait a few seconds and try again.`;
+    case "unsupported":
+      return it ? `Sorgente non supportata.` : `Unsupported source.`;
+    case "network":
+    default:
+      return it
+        ? `Errore di rete o timeout nel contattare ${provider}.`
+        : `Network error or timeout while contacting ${provider}.`;
   }
 }
 

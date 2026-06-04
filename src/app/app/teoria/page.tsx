@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { activeLocale, pickLocale } from "@/lib/i18n/content";
@@ -8,36 +9,6 @@ import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { TheoryType } from "@/lib/theory/types";
 
 export const metadata = { title: "Theory — Shakh" };
-
-const RAMI: {
-  type: TheoryType;
-  title: string;
-  desc: string;
-  browseHref: string;
-  browseLabel: string;
-}[] = [
-  {
-    type: "opening",
-    title: "Openings",
-    desc: "Opening ideas and plans, anchored to what's really played.",
-    browseHref: "/app/teoria/aperture",
-    browseLabel: "Browse the ECO tree",
-  },
-  {
-    type: "middlegame",
-    title: "Middlegame",
-    desc: "Strategic themes: pawn structure, strong pieces, plans.",
-    browseHref: "/app/teoria/mediogioco",
-    browseLabel: "Browse the themes",
-  },
-  {
-    type: "endgame",
-    title: "Endgames",
-    desc: "Endgame technique, with the exact truth of the tablebase.",
-    browseHref: "/app/teoria/finali",
-    browseLabel: "Browse all endgames",
-  },
-];
 
 interface LessonRow {
   slug: string;
@@ -63,6 +34,33 @@ interface LessonDbRow {
 export default async function TeoriaPage() {
   const supabase = await createClient();
   const locale = await activeLocale();
+  const t = await getTranslations("theory");
+
+  const RAMI: {
+    type: TheoryType;
+    title: string;
+    browseHref: string;
+    browseLabel: string;
+  }[] = [
+    {
+      type: "opening",
+      title: t("branch.openings"),
+      browseHref: "/app/teoria/aperture",
+      browseLabel: t("home.browseEco"),
+    },
+    {
+      type: "middlegame",
+      title: t("branch.middlegame"),
+      browseHref: "/app/teoria/mediogioco",
+      browseLabel: t("home.browseThemes"),
+    },
+    {
+      type: "endgame",
+      title: t("branch.endgames"),
+      browseHref: "/app/teoria/finali",
+      browseLabel: t("home.browseEndgames"),
+    },
+  ];
   // Solo le lezioni pubblicate (RLS: lettura pubblica dei contenuti published).
   const { data } = await supabase
     .from("content_items")
@@ -84,17 +82,16 @@ export default async function TeoriaPage() {
   return (
     <div className="space-y-10">
       <MobilePageHeader
-        eyebrow="Guided study"
-        title="Theory"
-        desc="Understand the why of moves, with real data."
+        eyebrow={t("home.eyebrow")}
+        title={t("home.title")}
+        desc={t("home.mobileDesc")}
       />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Theory</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">{t("home.title")}</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Guided lessons over the board: understand the <em>why</em> of moves,
-          with real explorer data and the exact truth of endgames.
+          {t.rich("home.desc", { em: (chunks) => <em>{chunks}</em> })}
         </p>
       </div>
 
@@ -124,7 +121,7 @@ export default async function TeoriaPage() {
             {items.length === 0 ? (
               <Card>
                 <CardContent className="py-6 text-center text-sm text-text-muted">
-                  Lessons coming soon. <Badge className="ml-1">soon</Badge>
+                  {t("home.lessonsSoon")} <Badge className="ml-1">{t("home.soonBadge")}</Badge>
                 </CardContent>
               </Card>
             ) : (

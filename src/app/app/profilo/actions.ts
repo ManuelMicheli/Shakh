@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isLocale, LOCALE_COOKIE } from "@/i18n/config";
@@ -54,16 +55,17 @@ export async function setLocalePreference(locale: string): Promise<void> {
 
 /** Aggiorna le impostazioni del profilo (nome, username, locale, tema preferito). */
 export async function updateProfile(input: UpdateProfileInput): Promise<UpdateResult> {
+  const t = await getTranslations("profile");
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   const username = input.username.trim();
   const displayName = input.displayName.trim();
   if (username && !/^[a-zA-Z0-9_]{3,30}$/.test(username))
-    return { ok: false, error: "Username: 3–30 characters, letters/numbers/underscore." };
+    return { ok: false, error: t("errUsernameFormat") };
 
   const { error } = await supabase
     .from("profiles")
@@ -77,7 +79,7 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdateRe
     .eq("id", user.id);
 
   if (error) {
-    if (error.code === "23505") return { ok: false, error: "Username already taken." };
+    if (error.code === "23505") return { ok: false, error: t("errUsernameTaken") };
     return { ok: false, error: error.message };
   }
 
@@ -119,11 +121,12 @@ export interface ExportResult {
  * vengono semplicemente ignorate.
  */
 export async function exportMyData(): Promise<ExportResult> {
+  const t = await getTranslations("profile");
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   const out: Record<string, unknown> = {
     exported_at: new Date().toISOString(),
@@ -156,18 +159,19 @@ export interface DeleteResult {
  * Richiede conferma esplicita lato client.
  */
 export async function deleteMyAccount(): Promise<DeleteResult> {
+  const t = await getTranslations("profile");
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   try {
     const admin = createAdminClient();
     const { error } = await admin.auth.admin.deleteUser(user.id);
     if (error) return { ok: false, error: error.message };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Error." };
+    return { ok: false, error: e instanceof Error ? e.message : t("errGeneric") };
   }
 
   // Chiude la sessione locale (i cookie vengono invalidati).
@@ -212,10 +216,13 @@ function isExternalSource(s: string): s is ExternalSource {
   return s === "lichess" || s === "chesscom";
 }
 
-/** Messaggio leggibile da un ProviderError (rete/non trovato/rate limit/insufficiente). */
-function providerMessage(e: unknown): string {
+/**
+ * Messaggio leggibile da un ProviderError (rete/non trovato/rate limit/insufficiente).
+ * `fallback` è il testo localizzato usato quando l'errore non espone un messaggio.
+ */
+function providerMessage(e: unknown, fallback: string): string {
   if (e instanceof ProviderError) return e.message;
-  return e instanceof Error ? e.message : "Unexpected error.";
+  return e instanceof Error ? e.message : fallback;
 }
 
 /** Validità del token di verifica (minuti). */
@@ -411,22 +418,23 @@ export async function beginLinkExternalAccount(
   source: string,
   username: string,
 ): Promise<LinkResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
+  const t = await getTranslations("profile");
+  if (!isExternalSource(source)) return { ok: false, error: t("errUnsupportedPlatform") };
   const handle = username.trim();
   if (!/^[a-zA-Z0-9_-]{2,30}$/.test(handle))
-    return { ok: false, error: "Invalid username (2–30 characters)." };
+    return { ok: false, error: t("errInvalidUsername") };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   let report;
   try {
     report = await fetchExternalRating(source, handle);
   } catch (e) {
-    return { ok: false, error: providerMessage(e) };
+    return { ok: false, error: providerMessage(e, t("errUnexpected")) };
   }
 
   const token = makeVerifyToken();
@@ -476,12 +484,13 @@ export async function beginLinkExternalAccount(
  * il token. Se sì, marca l'account come verificato e alimenta il Rating Shakh.
  */
 export async function verifyExternalAccount(source: string): Promise<LinkResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
+  const t = await getTranslations("profile");
+  if (!isExternalSource(source)) return { ok: false, error: t("errUnsupportedPlatform") };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   const { data: row } = await supabase
     .from("external_accounts")
@@ -496,22 +505,22 @@ export async function verifyExternalAccount(source: string): Promise<LinkResult>
       rating_otb: number | null;
       n_games: number;
     }>();
-  if (!row) return { ok: false, error: "Account not linked." };
-  if (!row.verify_token) return { ok: false, error: "No verification in progress." };
+  if (!row) return { ok: false, error: t("errAccountNotLinked") };
+  if (!row.verify_token) return { ok: false, error: t("errNoVerification") };
   if (row.verify_expires_at && new Date(row.verify_expires_at) < new Date())
-    return { ok: false, error: "Token expired. Relink the account to generate a new one." };
+    return { ok: false, error: t("errTokenExpired") };
 
   let profileText: string;
   try {
     profileText = await fetchProfileText(source, row.username);
   } catch (e) {
-    return { ok: false, error: providerMessage(e) };
+    return { ok: false, error: providerMessage(e, t("errUnexpected")) };
   }
 
   if (!profileText.includes(row.verify_token)) {
     return {
       ok: false,
-      error: "Token not found in your profile. Save the token, wait a few seconds, then try again.",
+      error: t("errTokenNotFound"),
     };
   }
 
@@ -556,12 +565,13 @@ export async function verifyExternalAccount(source: string): Promise<LinkResult>
 
 /** Aggiorna il rating di un account già VERIFICATO (rilettura dall'API). */
 export async function refreshExternalAccount(source: string): Promise<LinkResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
+  const t = await getTranslations("profile");
+  if (!isExternalSource(source)) return { ok: false, error: t("errUnsupportedPlatform") };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   const { data: existing } = await supabase
     .from("external_accounts")
@@ -569,14 +579,14 @@ export async function refreshExternalAccount(source: string): Promise<LinkResult
     .eq("user_id", user.id)
     .eq("source", source)
     .maybeSingle<{ username: string; verified: boolean }>();
-  if (!existing) return { ok: false, error: "Account not linked." };
-  if (!existing.verified) return { ok: false, error: "Verify the account first." };
+  if (!existing) return { ok: false, error: t("errAccountNotLinked") };
+  if (!existing.verified) return { ok: false, error: t("errVerifyFirst") };
 
   let report;
   try {
     report = await fetchExternalRating(source, existing.username);
   } catch (e) {
-    return { ok: false, error: providerMessage(e) };
+    return { ok: false, error: providerMessage(e, t("errUnexpected")) };
   }
 
   const now = new Date();
@@ -614,12 +624,13 @@ export async function refreshExternalAccount(source: string): Promise<LinkResult
 
 /** Scollega un account online e azzera (o ricalcola) il dominio 'external'. */
 export async function unlinkExternalAccount(source: string): Promise<UpdateResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
+  const t = await getTranslations("profile");
+  if (!isExternalSource(source)) return { ok: false, error: t("errUnsupportedPlatform") };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errSessionExpired") };
 
   const { error } = await supabase
     .from("external_accounts")

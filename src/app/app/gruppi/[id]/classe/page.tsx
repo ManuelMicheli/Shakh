@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { ClassRoster, type RosterStudent } from "@/components/groups/ClassRoster
 import { ClassSynthesis } from "@/components/groups/ClassSynthesis";
 import { loadClassData } from "@/lib/groups/class";
 import { getMyGroupRole, isInstructorRole } from "@/lib/groups/access";
+import { activeLocale } from "@/lib/i18n/content";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -15,6 +17,7 @@ interface PageProps {
 
 export default async function ClassePage({ params }: PageProps) {
   const { id } = await params;
+  const t = await getTranslations("groups");
   const supabase = await createClient();
   const user = await getUser();
   if (!user) redirect("/login");
@@ -30,7 +33,7 @@ export default async function ClassePage({ params }: PageProps) {
     .maybeSingle<{ name: string }>();
   if (!group) notFound();
 
-  const data = await loadClassData(supabase, id);
+  const data = await loadClassData(supabase, id, await activeLocale());
 
   // Solo gli allievi (member) nel roster; istruttori/owner restano fuori.
   const roster: RosterStudent[] = data.students
@@ -54,27 +57,26 @@ export default async function ClassePage({ params }: PageProps) {
           ← {group.name}
         </Link>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">
-          Class dashboard
+          {t("classDashboard")}
         </h1>
         <p className="mt-1 text-text-muted">
-          {roster.length} students. Read-only aggregated view: every data access
-          goes through the security checks.
+          {t("classDashboardIntro", { count: roster.length })}
         </p>
       </div>
 
       {roster.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-sm text-text-muted">
-            No students in the group. Generate an invite to bring your students in.
+            {t("classEmptyState")}
           </CardContent>
         </Card>
       ) : (
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Students</CardTitle>
+              <CardTitle>{t("students")}</CardTitle>
               <CardDescription>
-                Sort by column to see who&apos;s ahead and who&apos;s behind.
+                {t("studentsDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -85,8 +87,8 @@ export default async function ClassePage({ params }: PageProps) {
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Average class proficiency</CardTitle>
-                <CardDescription>Average profile across the five areas.</CardDescription>
+                <CardTitle>{t("avgProficiencyTitle")}</CardTitle>
+                <CardDescription>{t("avgProficiencyDesc")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <CompetenceRadar areas={radarAreas} />
@@ -95,13 +97,13 @@ export default async function ClassePage({ params }: PageProps) {
 
             <Card>
               <CardHeader>
-                <CardTitle>Common weaknesses</CardTitle>
-                <CardDescription>The themes where more students fall below the threshold.</CardDescription>
+                <CardTitle>{t("commonWeaknessesTitle")}</CardTitle>
+                <CardDescription>{t("commonWeaknessesDesc")}</CardDescription>
               </CardHeader>
               <CardContent>
                 {data.commonWeaknesses.length === 0 ? (
                   <p className="py-6 text-sm text-text-muted">
-                    No marked shared weaknesses.
+                    {t("noSharedWeaknesses")}
                   </p>
                 ) : (
                   <ul className="divide-y divide-border">
@@ -112,7 +114,7 @@ export default async function ClassePage({ params }: PageProps) {
                       >
                         <span className="min-w-0 truncate">{w.label}</span>
                         <Badge variant="muted">
-                          {w.count} {w.count === 1 ? "student" : "students"}
+                          {t("studentCount", { count: w.count })}
                         </Badge>
                       </li>
                     ))}
@@ -124,8 +126,8 @@ export default async function ClassePage({ params }: PageProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Class summary</CardTitle>
-              <CardDescription>Coach summary of the aggregated data.</CardDescription>
+              <CardTitle>{t("classSummaryTitle")}</CardTitle>
+              <CardDescription>{t("classSummaryDesc")}</CardDescription>
             </CardHeader>
             <CardContent>
               <ClassSynthesis groupId={id} />

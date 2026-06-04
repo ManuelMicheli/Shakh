@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
 import type { DrawShape } from "chessground/draw";
 import { useChessGame, type LegalDests } from "@/lib/chess/useChessGame";
@@ -55,6 +56,7 @@ function givesMate(fen: string, from: Square, to: Square, promotion?: PieceSymbo
  * automaticamente dall'avversario; il solver parte dalla 2ª.
  */
 export function PuzzleSolver({ puzzle, onSolved }: PuzzleSolverProps) {
+  const t = useTranslations("tactics");
   const game = useChessGame(puzzle.fen);
 
   // Il lato che deve risolvere è l'opposto di chi gioca la mossa d'innesco.
@@ -214,10 +216,10 @@ export function PuzzleSolver({ puzzle, onSolved }: PuzzleSolverProps) {
 
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm text-text-muted">
-          {solverColor === "white" ? "White" : "Black"} to move
+          {solverColor === "white" ? t("whiteToMove") : t("blackToMove")}
         </span>
         <Button variant="ghost" size="sm" onClick={onHint} disabled={busy || solved}>
-          Hint
+          {t("hint")}
         </Button>
       </div>
     </div>

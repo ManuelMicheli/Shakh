@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 type ToastVariant = "default" | "success" | "error";
@@ -27,6 +28,7 @@ export function useToast() {
 let nextId = 1;
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("common");
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const remove = useCallback((id: number) => {
@@ -48,7 +50,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div
         className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-full max-w-sm flex-col gap-2"
         role="region"
-        aria-label="Notifiche"
+        aria-label={t("notifications")}
       >
         {toasts.map((t) => (
           <div

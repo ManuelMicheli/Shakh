@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
 import { useMoveTree } from "@/lib/chess/useMoveTree";
@@ -56,6 +57,7 @@ export function LessonViewer({
   coachConfigured,
   contentItemId,
 }: LessonViewerProps) {
+  const t = useTranslations("theory");
   const tree = useMoveTree(lesson.tree);
   const [orientation, setOrientation] = useState<"white" | "black">("white");
   const [guided, setGuided] = useState(0);
@@ -205,7 +207,7 @@ export function LessonViewer({
               size="sm"
               onClick={() => setEngineOn((v) => !v)}
             >
-              Engine {engineOn ? "on" : "off"}
+              {t("lessonViewer.engine")} {engineOn ? t("lessonViewer.on") : t("lessonViewer.off")}
             </Button>
           </div>
 
@@ -215,10 +217,13 @@ export function LessonViewer({
               <div className="flex items-center justify-between">
                 <CardTitle>
                   {isDeviation
-                    ? "You left the line"
+                    ? t("lessonViewer.leftLine")
                     : currentStepIndex !== null
-                      ? `Step ${currentStepIndex + 1} of ${lesson.steps.length}`
-                      : "Free exploration"}
+                      ? t("lessonViewer.stepOf", {
+                          current: currentStepIndex + 1,
+                          total: lesson.steps.length,
+                        })
+                      : t("lessonViewer.freeExploration")}
                 </CardTitle>
                 {lesson.steps.length > 0 && !isDeviation && (
                   <div className="flex gap-1">
@@ -228,7 +233,7 @@ export function LessonViewer({
                       onClick={prevStep}
                       disabled={(currentStepIndex ?? guided) <= 0}
                     >
-                      ← Back
+                      ← {t("lessonViewer.back")}
                     </Button>
                     <Button
                       variant="secondary"
@@ -236,7 +241,7 @@ export function LessonViewer({
                       onClick={nextStep}
                       disabled={(currentStepIndex ?? guided) >= lesson.steps.length - 1}
                     >
-                      Next →
+                      {t("lessonViewer.next")} →
                     </Button>
                   </div>
                 )}
@@ -246,8 +251,7 @@ export function LessonViewer({
               {isDeviation ? (
                 <>
                   <p className="text-sm text-text-muted">
-                    You&apos;re exploring a move outside the lesson. Evaluate it with the
-                    engine or ask the coach why it isn&apos;t the best choice.
+                    {t("lessonViewer.deviationText")}
                   </p>
                   {deviationParentFen && tree.currentNode.san && (
                     <DeviationCoach
@@ -257,7 +261,7 @@ export function LessonViewer({
                     />
                   )}
                   <Button variant="ghost" size="sm" onClick={tree.prev}>
-                    ← Back to the line
+                    ← {t("lessonViewer.backToLine")}
                   </Button>
                 </>
               ) : currentStep ? (
@@ -265,13 +269,13 @@ export function LessonViewer({
                   <p className="text-sm leading-relaxed">{currentStep.text}</p>
                   {completed && isLastStep && (
                     <p className="text-sm font-medium text-text">
-                      ✓ Lesson completed — recorded in your path.
+                      ✓ {t("lessonViewer.lessonCompleted")}
                     </p>
                   )}
                 </>
               ) : (
                 <p className="text-sm text-text-muted">
-                  Navigate the moves or play on the board to explore.
+                  {t("lessonViewer.navigateExplore")}
                 </p>
               )}
             </CardContent>
@@ -282,11 +286,11 @@ export function LessonViewer({
         <div>
           <Tabs defaultValue="moves">
             <TabsList className="w-full">
-              <TabsTrigger value="moves">Moves</TabsTrigger>
-              <TabsTrigger value="engine">Engine</TabsTrigger>
+              <TabsTrigger value="moves">{t("lessonViewer.movesTab")}</TabsTrigger>
+              <TabsTrigger value="engine">{t("lessonViewer.engineTab")}</TabsTrigger>
               {contextTab && (
                 <TabsTrigger value="context">
-                  {type === "opening" ? "Explorer" : "Tablebase"}
+                  {type === "opening" ? t("lessonViewer.explorerTab") : t("lessonViewer.tablebaseTab")}
                 </TabsTrigger>
               )}
             </TabsList>
@@ -321,11 +325,11 @@ export function LessonViewer({
                         }}
                       />
                     ) : (
-                      <p className="text-sm text-text-muted">The engine is thinking…</p>
+                      <p className="text-sm text-text-muted">{t("lessonViewer.engineThinking")}</p>
                     )
                   ) : (
                     <p className="text-sm text-text-muted">
-                      Engine off. Turn it on to evaluate the position and deviations.
+                      {t("lessonViewer.engineOff")}
                     </p>
                   )}
                 </CardContent>

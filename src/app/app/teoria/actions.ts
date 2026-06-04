@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { recomputePath } from "@/lib/path/recompute";
 import { recordDomainOutcomes } from "@/lib/rating/store";
@@ -23,14 +24,15 @@ async function bumpProgress(
   key: string,
   success: boolean,
 ): Promise<ProgressResult> {
+  const t = await getTranslations("theory");
   const k = key.trim();
-  if (!k) return { ok: false, error: "Missing progress key." };
+  if (!k) return { ok: false, error: t("errors.missingProgressKey") };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errors.sessionExpired") };
 
   const { data: existing } = await supabase
     .from("user_progress")
@@ -113,11 +115,12 @@ export async function recordMiddlegameAttempt(
 export async function recordLessonCompletion(
   contentItemId: string,
 ): Promise<{ ok: boolean; error?: string }> {
+  const t = await getTranslations("theory");
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("errors.sessionExpired") };
 
   const { error } = await supabase
     .from("content_completions")

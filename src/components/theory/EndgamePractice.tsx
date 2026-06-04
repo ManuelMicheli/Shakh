@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
 import { Button } from "@/components/ui/button";
@@ -44,13 +45,6 @@ function directQuality(category: TbCategory): MoveQuality {
   }
 }
 
-const QUALITY_LABEL: Record<MoveQuality, string> = {
-  win: "winning",
-  draw: "drawn",
-  loss: "lost",
-  unknown: "unknown",
-};
-
 function turnOf(fen: string): "white" | "black" {
   return fen.split(" ")[1] === "b" ? "black" : "white";
 }
@@ -83,6 +77,16 @@ export interface EndgamePracticeProps {
  * impeccabile perché la tablebase è verità assoluta, niente allucinazioni.
  */
 export function EndgamePractice({ practice }: EndgamePracticeProps) {
+  const t = useTranslations("theory");
+  const qualityLabel = useMemo<Record<MoveQuality, string>>(
+    () => ({
+      win: t("quality.winning"),
+      draw: t("quality.drawn"),
+      loss: t("quality.lost"),
+      unknown: t("quality.unknown"),
+    }),
+    [t],
+  );
   const [history, setHistory] = useState<string[]>([practice.fen]);
   const [status, setStatus] = useState<Status>("playing");
   const [busy, setBusy] = useState(false);
@@ -206,8 +210,8 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
         setStatus("blunder");
         setMessage(
           practice.goal === "win"
-            ? `That throws away the win: the position is now ${QUALITY_LABEL[userQ]}. Go back and try again.`
-            : `Careful: this move loses the draw (position ${QUALITY_LABEL[userQ]}). Go back and try again.`,
+            ? t("endgamePractice.throwsAwayWin", { quality: qualityLabel[userQ] })
+            : t("endgamePractice.losesDraw", { quality: qualityLabel[userQ] }),
         );
         setBusy(false);
         return;
@@ -217,14 +221,14 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
       const afterChess = new Chess(afterUser);
       if (afterChess.isCheckmate()) {
         setHistory((h) => [...h, afterUser]);
-        finish("won", "Mate! Endgame converted perfectly.", true);
+        finish("won", t("endgamePractice.mateConverted"), true);
         setBusy(false);
         return;
       }
       if (afterChess.isStalemate() || afterChess.isInsufficientMaterial() || afterChess.isDraw()) {
         setHistory((h) => [...h, afterUser]);
-        if (practice.goal === "draw") finish("drawn", "Draw reached. Correct defense.", true);
-        else finish("lost", "Stalemate: the win slipped into a draw.", false);
+        if (practice.goal === "draw") finish("drawn", t("endgamePractice.drawReached"), true);
+        else finish("lost", t("endgamePractice.stalemateWin"), false);
         setBusy(false);
         return;
       }
@@ -241,18 +245,18 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
       setLastUci(reply.uci);
 
       if (afterOppChess.isCheckmate()) {
-        finish("lost", "The opponent checkmated you.", false);
+        finish("lost", t("endgamePractice.opponentMated"), false);
       } else if (
         afterOppChess.isStalemate() ||
         afterOppChess.isInsufficientMaterial() ||
         afterOppChess.isDraw()
       ) {
-        if (practice.goal === "draw") finish("drawn", "Draw reached. Correct defense.", true);
-        else finish("lost", "Ended in a draw: the win slipped away.", false);
+        if (practice.goal === "draw") finish("drawn", t("endgamePractice.drawReached"), true);
+        else finish("lost", t("endgamePractice.endedDraw"), false);
       }
       setBusy(false);
     },
-    [interactive, current, practice.goal, finish, opponentReply],
+    [interactive, current, practice.goal, finish, opponentReply, t, qualityLabel],
   );
 
   const retry = useCallback(() => {
@@ -279,22 +283,24 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
     const res = await fetchTablebase(current);
     setBusy(false);
     if (res.ok && directQuality(res.data.category) === "draw") {
-      finish("drawn", "Draw held: you proved the defense. Result confirmed by the tablebase.", true);
+      finish("drawn", t("endgamePractice.drawHeld"), true);
     } else {
-      setMessage("The position isn't a safe draw yet: keep defending.");
+      setMessage(t("endgamePractice.notSafeDraw"));
     }
-  }, [status, userTurn, history.length, current, finish]);
+  }, [status, userTurn, history.length, current, finish, t]);
 
-  const goalText = practice.goal === "win" ? "Win the position" : "Hold the draw";
+  const goalText = practice.goal === "win" ? t("endgamePractice.goalWin") : t("endgamePractice.goalDraw");
   const canClaimDraw = practice.goal === "draw" && status === "playing" && userTurn && history.length > 1;
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
-          <CardTitle>Endgame practice</CardTitle>
+          <CardTitle>{t("endgamePractice.title")}</CardTitle>
           <span className="text-xs text-text-muted">
-            {goalText} · you play {practice.userColor === "white" ? "White" : "Black"}
+            {goalText} · {t("endgamePractice.youPlay", {
+              color: practice.userColor === "white" ? t("color.white") : t("color.black"),
+            })}
           </span>
         </div>
       </CardHeader>
@@ -316,28 +322,28 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
           <div className="space-y-3">
             {/* Esito teorico corrente (verità della tablebase). */}
             <div className="rounded-md border border-border bg-surface p-3">
-              <p className="text-xs text-text-muted">Theoretical result</p>
+              <p className="text-xs text-text-muted">{t("endgamePractice.theoreticalResult")}</p>
               <p className="mt-0.5 text-sm font-medium">
                 {estimate ? (
-                  "Engine estimate (position outside the tablebase)"
+                  t("endgamePractice.engineEstimate")
                 ) : outcome ? (
-                  <>
-                    Position{" "}
-                    <span
-                      className={cn(
-                        "font-semibold",
-                        outcome === "win" && "text-text",
-                        outcome === "draw" && "text-text-muted",
-                        outcome === "loss" && "text-text-muted",
-                      )}
-                    >
-                      {QUALITY_LABEL[outcome]}
-                    </span>{" "}
-                    for you
-                  </>
+                  t.rich("endgamePractice.positionForYou", {
+                    quality: () => (
+                      <span
+                        className={cn(
+                          "font-semibold",
+                          outcome === "win" && "text-text",
+                          outcome === "draw" && "text-text-muted",
+                          outcome === "loss" && "text-text-muted",
+                        )}
+                      >
+                        {qualityLabel[outcome]}
+                      </span>
+                    ),
+                  })
                 ) : busy ? (
                   <span className="flex items-center gap-2 text-text-muted">
-                    <Spinner /> Checking with the tablebase…
+                    <Spinner /> {t("endgamePractice.checkingTablebase")}
                   </span>
                 ) : (
                   "—"
@@ -347,7 +353,7 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
 
             {busy && (
               <p className="flex items-center gap-2 text-xs text-text-muted">
-                <Spinner /> The opponent is defending…
+                <Spinner /> {t("endgamePractice.opponentDefending")}
               </p>
             )}
 
@@ -371,22 +377,21 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
             <div className="flex flex-wrap gap-2">
               {status === "blunder" && (
                 <Button size="sm" onClick={retry}>
-                  ← Try again
+                  ← {t("endgamePractice.tryAgain")}
                 </Button>
               )}
               {canClaimDraw && (
                 <Button size="sm" variant="secondary" onClick={() => void claimDraw()} disabled={busy}>
-                  Claim the draw
+                  {t("endgamePractice.claimDraw")}
                 </Button>
               )}
               <Button size="sm" variant="ghost" onClick={restart}>
-                Restart
+                {t("endgamePractice.restart")}
               </Button>
             </div>
 
             <p className="text-[11px] leading-relaxed text-text-muted">
-              The opponent plays the Lichess tablebase&apos;s perfect defense. After
-              each of your moves the result is verified: no approximations.
+              {t("endgamePractice.disclaimer")}
             </p>
           </div>
         </div>

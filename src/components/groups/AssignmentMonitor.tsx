@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
@@ -19,23 +20,24 @@ export interface MonitorItem {
   inProgress: number;
 }
 
-function dueLabel(iso: string | null): string | null {
-  if (!iso) return null;
-  const d = new Date(iso);
-  return `due ${d.getMonth() + 1}/${d.getDate()}`;
-}
-
 /** Monitoraggio assegnazioni con completamento derivato (prompt 09 §5). */
 export function AssignmentMonitor({ groupId, items }: { groupId: string; items: MonitorItem[] }) {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [pending, start] = useTransition();
+
+  const dueLabel = (iso: string | null): string | null => {
+    if (!iso) return null;
+    const d = new Date(iso);
+    return t("dueDate", { date: `${d.getMonth() + 1}/${d.getDate()}` });
+  };
 
   const onDelete = (id: string) => {
     start(async () => {
       const res = await deleteAssignment(groupId, id);
       if (!res.ok) {
-        toast({ title: "Not deleted", description: res.error, variant: "error" });
+        toast({ title: t("toastNotDeleted"), description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -43,7 +45,7 @@ export function AssignmentMonitor({ groupId, items }: { groupId: string; items: 
   };
 
   if (items.length === 0) {
-    return <p className="text-sm text-text-muted">No active assignments.</p>;
+    return <p className="text-sm text-text-muted">{t("noActiveAssignments")}</p>;
   }
 
   return (
@@ -56,13 +58,13 @@ export function AssignmentMonitor({ groupId, items }: { groupId: string; items: 
               <div className="flex items-center gap-2">
                 <span className="text-xs text-text-muted">{a.typeLabel}</span>
                 <Badge variant="muted">
-                  {a.targetType === "group" ? "Class" : "Individual"}
+                  {a.targetType === "group" ? t("targetClass") : t("targetIndividual")}
                 </Badge>
               </div>
               <p className="truncate font-medium">{a.label}</p>
               <p className="text-xs text-text-muted">
-                {a.completed}/{a.total} completed
-                {a.inProgress > 0 ? ` · ${a.inProgress} in progress` : ""}
+                {t("completedCount", { completed: a.completed, total: a.total })}
+                {a.inProgress > 0 ? ` · ${t("inProgressCount", { count: a.inProgress })}` : ""}
                 {a.note ? ` · ${a.note}` : ""}
                 {due ? ` · ${due}` : ""}
               </p>
@@ -73,7 +75,7 @@ export function AssignmentMonitor({ groupId, items }: { groupId: string; items: 
               disabled={pending}
               onClick={() => onDelete(a.id)}
             >
-              Delete
+              {t("deleteButton")}
             </Button>
           </li>
         );

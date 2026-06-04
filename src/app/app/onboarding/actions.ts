@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { recomputePath, loadNodes } from "@/lib/path/recompute";
@@ -87,7 +88,10 @@ export async function completeOnboarding(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) {
+    const t = await getTranslations("common");
+    return { ok: false, error: t("error.sessionExpired") };
+  }
 
   // Un account online VERIFICATO durante l'onboarding ha già posizionato l'utente
   // (rating reale OTB → vedi seedFromVerifiedAccount): segnale ben più affidabile

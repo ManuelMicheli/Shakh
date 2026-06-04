@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
@@ -52,6 +53,7 @@ export interface OnlineGameProps {
 }
 
 export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
+  const t = useTranslations("play");
   const { toast } = useToast();
   const [game, setGame] = useState<FriendGameRow>(initialGame);
   const [follow, setFollow] = useState(true);
@@ -229,7 +231,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     if (!res.ok) toast({ title: res.error, variant: "error" });
     else {
       applyRow(res.data);
-      toast({ title: "Draw offered" });
+      toast({ title: t("toast.drawOffered") });
     }
   };
 
@@ -253,7 +255,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      toast({ title: "Copy failed", variant: "error" });
+      toast({ title: t("toast.copyFailed"), variant: "error" });
     }
   };
 
@@ -291,7 +293,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     game.status === "ongoing" && bothJoined && game.turn === c && game.initial_ms != null;
   const sinceTs = game.last_move_at ? Date.parse(game.last_move_at) : null;
   const nameOf = (c: "w" | "b") =>
-    c === "w" ? game.white_name ?? "White" : game.black_name ?? "Black";
+    c === "w" ? game.white_name ?? t("color.white") : game.black_name ?? t("color.black");
   const msOf = (c: "w" | "b") => (c === "w" ? game.white_ms : game.black_ms);
 
   const drawOfferToMe =
@@ -313,15 +315,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              {isPlayer ? "Waiting for opponent" : "Join the game"}
+              {isPlayer ? t("waiting.titleHost") : t("waiting.titleGuest")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {isPlayer ? (
               <>
                 <p className="text-sm text-text-muted">
-                  Share this link with your friend. They&apos;ll need to sign in to
-                  play.
+                  {t("waiting.shareLink")}
                 </p>
                 <div className="flex gap-2">
                   <input
@@ -331,17 +332,18 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                   />
                   <Button variant="secondary" size="sm" onClick={copyLink}>
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    {copied ? "Copied" : "Copy"}
+                    {copied ? t("waiting.copied") : t("waiting.copy")}
                   </Button>
                 </div>
               </>
             ) : (
               <>
                 <p className="text-sm text-text-muted">
-                  You&apos;ve been invited to play. Join as{" "}
-                  {game.white_user_id ? "Black" : "White"}.
+                  {t("waiting.invitedAs", {
+                    color: game.white_user_id ? t("color.black") : t("color.white"),
+                  })}
                 </p>
-                <Button onClick={onJoin}>Join</Button>
+                <Button onClick={onJoin}>{t("waiting.join")}</Button>
               </>
             )}
           </CardContent>
@@ -351,14 +353,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       {drawOfferToMe && (
         <Card>
           <CardHeader>
-            <CardTitle>Draw offer</CardTitle>
+            <CardTitle>{t("drawOffer.title")}</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-2">
             <Button size="sm" onClick={() => onRespondDraw(true)}>
-              Accept
+              {t("drawOffer.accept")}
             </Button>
             <Button variant="secondary" size="sm" onClick={() => onRespondDraw(false)}>
-              Decline
+              {t("drawOffer.decline")}
             </Button>
           </CardContent>
         </Card>
@@ -367,14 +369,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       {game.status === "finished" && (
         <Card>
           <CardHeader>
-            <CardTitle>Game over</CardTitle>
+            <CardTitle>{t("finished.title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Badge variant="muted">{outcomeText(game)}</Badge>
+            <Badge variant="muted">{outcomeText(game, t)}</Badge>
             <div>
               <Link href="/app/gioca">
                 <Button variant="secondary" size="sm">
-                  New game
+                  {t("newGame")}
                 </Button>
               </Link>
             </div>
@@ -414,14 +416,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                 onPremoveCancel={() => setPremove(null)}
               />
               {game.status === "finished" && !overlayOff && (() => {
-                const r = onlineResult(game, myColor);
+                const r = onlineResult(game, myColor, t);
                 // Base dalla FEN + durata se la partita ha orologio.
                 const stats =
                   game.initial_ms != null && game.white_ms != null && game.black_ms != null
                     ? [
                         ...gameStatsFromFen(game.fen),
                         {
-                          label: "Duration",
+                          label: t("stat.duration"),
                           value: formatDuration(
                             game.initial_ms * 2 +
                               game.increment_ms * game.moves.length -
@@ -445,8 +447,8 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                         ? () =>
                             analyze({
                               pgn: game.pgn,
-                              white: game.white_name ?? "White",
-                              black: game.black_name ?? "Black",
+                              white: game.white_name ?? t("color.white"),
+                              black: game.black_name ?? t("color.black"),
                               result: game.result ?? "*",
                               userColor: myColor ?? "w",
                             })
@@ -456,7 +458,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                     actions={
                       <Link href="/app/gioca">
                         <Button size="sm" className="w-full">
-                          New game
+                          {t("newGame")}
                         </Button>
                       </Link>
                     }
@@ -487,7 +489,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                 keyboardTarget={boardWrapRef}
               />
               <span className="font-mono text-sm text-text-muted">
-                {statusText(game)}
+                {statusText(game, t)}
               </span>
             </div>
           </div>
@@ -507,7 +509,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={first}
               disabled={cursor < 0}
-              aria-label="First move"
+              aria-label={t("nav.first")}
             >
               <ChevronsLeft className="h-5 w-5" />
             </Button>
@@ -517,7 +519,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={prev}
               disabled={cursor < 0}
-              aria-label="Previous move"
+              aria-label={t("nav.prev")}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
@@ -527,7 +529,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={next}
               disabled={atLive}
-              aria-label="Next move"
+              aria-label={t("nav.next")}
             >
               <ChevronRight className="h-5 w-5" />
             </Button>
@@ -537,7 +539,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={last}
               disabled={atLive}
-              aria-label="Last move"
+              aria-label={t("nav.last")}
             >
               <ChevronsRight className="h-5 w-5" />
             </Button>
@@ -548,7 +550,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                   variant="secondary"
                   size="icon"
                   onClick={() => setMenuOpen((v) => !v)}
-                  aria-label="Game actions"
+                  aria-label={t("nav.gameActions")}
                   aria-expanded={menuOpen}
                 >
                   <MoreVertical className="h-5 w-5" />
@@ -572,8 +574,8 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                       >
                         <Handshake className="h-4 w-4" />
                         {game.draw_offer_by === myColor
-                          ? "Draw offered"
-                          : "Offer draw"}
+                          ? t("draw.offered")
+                          : t("draw.offer")}
                       </button>
                       <ConfirmResignButton
                         onConfirm={() => {
@@ -602,14 +604,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                 disabled={game.draw_offer_by === myColor}
               >
                 <Handshake className="h-4 w-4" />
-                {game.draw_offer_by === myColor ? "Draw offered" : "Offer draw"}
+                {game.draw_offer_by === myColor ? t("draw.offered") : t("draw.offer")}
               </Button>
             </div>
           )}
 
           <Card>
             <CardHeader>
-              <CardTitle>Moves</CardTitle>
+              <CardTitle>{t("moves")}</CardTitle>
             </CardHeader>
             <CardContent>
               <MoveList
@@ -634,56 +636,65 @@ function inCheck(fen: string): boolean {
   }
 }
 
-function statusText(g: FriendGameRow): string {
-  if (g.status === "waiting") return "Waiting…";
-  if (g.status === "finished") return outcomeText(g);
-  const side = g.turn === "w" ? "White" : "Black";
-  return `${side} to move`;
+function statusText(g: FriendGameRow, t: PlayTranslator): string {
+  if (g.status === "waiting") return t("status.waitingEllipsis");
+  if (g.status === "finished") return outcomeText(g, t);
+  const side = g.turn === "w" ? t("color.white") : t("color.black");
+  return t("status.toMove", { side });
 }
 
-function outcomeText(g: FriendGameRow): string {
+function outcomeText(g: FriendGameRow, t: PlayTranslator): string {
   const reason: Record<string, string> = {
-    checkmate: "checkmate",
-    resign: "resignation",
-    timeout: "time out",
-    stalemate: "stalemate",
-    draw: "draw",
-    agreement: "draw by agreement",
-    aborted: "aborted",
+    checkmate: t("reason.checkmate"),
+    resign: t("reason.resign"),
+    timeout: t("reason.timeout"),
+    stalemate: t("reason.stalemate"),
+    draw: t("reason.draw"),
+    agreement: t("reason.agreement"),
+    aborted: t("reason.aborted"),
   };
   const r = g.end_reason ? ` (${reason[g.end_reason] ?? g.end_reason})` : "";
-  if (g.result === "1-0") return `White wins${r}`;
-  if (g.result === "0-1") return `Black wins${r}`;
-  if (g.result === "1/2-1/2") return `Draw${r}`;
-  return "Over";
+  if (g.result === "1-0") return `${t("outcome.whiteWins")}${r}`;
+  if (g.result === "0-1") return `${t("outcome.blackWins")}${r}`;
+  if (g.result === "1/2-1/2") return `${t("outcome.draw")}${r}`;
+  return t("outcome.over");
 }
 
 /** Esito strutturato per la schermata finale (overlay sulla scacchiera). */
 function onlineResult(
   g: FriendGameRow,
   myColor: "w" | "b" | null,
+  t: PlayTranslator,
 ): { title: string; subtitle?: string; checkmate: boolean; outcome?: GameOutcome } {
   const checkmate = g.end_reason === "checkmate";
   // Sottotitolo col motivo, tranne il matto (mostrato come simbolo).
   const reason: Record<string, string> = {
-    resign: "Resignation.",
-    timeout: "Time's up.",
-    stalemate: "Stalemate.",
-    agreement: "Draw by agreement.",
-    aborted: "Game aborted.",
+    resign: t("result.resignation"),
+    timeout: t("result.timesUp"),
+    stalemate: t("result.stalemate"),
+    agreement: t("result.byAgreement"),
+    aborted: t("result.aborted"),
   };
   const subtitle = g.end_reason && !checkmate ? reason[g.end_reason] : undefined;
 
-  if (g.result === "1/2-1/2") return { title: "Draw", subtitle, checkmate: false, outcome: "draw" };
+  if (g.result === "1/2-1/2") return { title: t("result.draw"), subtitle, checkmate: false, outcome: "draw" };
 
   // Spettatore (non sei un giocatore): mostra il colore vincente.
   if (!myColor) {
     const decisive = g.result === "1-0" || g.result === "0-1";
-    const title = g.result === "1-0" ? "White wins" : g.result === "0-1" ? "Black wins" : "Over";
+    const title =
+      g.result === "1-0"
+        ? t("outcome.whiteWins")
+        : g.result === "0-1"
+          ? t("outcome.blackWins")
+          : t("outcome.over");
     return { title, subtitle, checkmate, outcome: decisive ? "win" : undefined };
   }
 
   const iWon =
     (g.result === "1-0" && myColor === "w") || (g.result === "0-1" && myColor === "b");
-  return { title: iWon ? "You won" : "You lost", subtitle, checkmate, outcome: iWon ? "win" : "loss" };
+  return { title: iWon ? t("result.youWon") : t("result.youLost"), subtitle, checkmate, outcome: iWon ? "win" : "loss" };
 }
+
+/** Tipo del traduttore next-intl per il namespace "play", per i helper non-componenti. */
+type PlayTranslator = ReturnType<typeof useTranslations<"play">>;

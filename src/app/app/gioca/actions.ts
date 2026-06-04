@@ -2,6 +2,7 @@
 
 import { Chess, type PieceSymbol } from "chess.js";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { findTimeControl } from "@/lib/play/time-controls";
 import type { FriendGameRow, FriendMove } from "@/lib/play/types";
@@ -34,17 +35,18 @@ export async function createOnlineGame(input: {
   timeControlId: string;
 }): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
+  const t = await getTranslations("play");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "You must sign in to play." };
+  if (!user) return { ok: false, error: t("error.signInToPlay") };
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("display_name")
     .eq("id", user.id)
     .maybeSingle();
-  const name = (profile?.display_name as string | null) ?? "Player";
+  const name = (profile?.display_name as string | null) ?? t("defaultPlayer");
 
   const color: "w" | "b" =
     input.color === "random" ? (Math.random() < 0.5 ? "w" : "b") : input.color;
@@ -93,12 +95,13 @@ export async function saveGameForReview(input: {
   userColor: "w" | "b";
 }): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
+  const t = await getTranslations("play");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "You must sign in to analyze a game." };
+  if (!user) return { ok: false, error: t("error.signInToAnalyze") };
 
-  if (!input.pgn.trim()) return { ok: false, error: "Empty game." };
+  if (!input.pgn.trim()) return { ok: false, error: t("error.emptyGame") };
 
   const { data, error } = await supabase
     .from("games")
@@ -142,26 +145,27 @@ export async function makeOnlineMove(
   promotion?: string,
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
+  const t = await getTranslations("play");
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "You must sign in." };
+  if (!uid) return { ok: false, error: t("error.signIn") };
 
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Game not found." };
-  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
+  if (!g) return { ok: false, error: t("error.gameNotFound") };
+  if (g.status !== "ongoing") return { ok: false, error: t("error.notInProgress") };
 
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "You are not a player in this game." };
-  if (g.turn !== myColor) return { ok: false, error: "It's not your turn." };
+  if (!myColor) return { ok: false, error: t("error.notPlayerInGame") };
+  if (g.turn !== myColor) return { ok: false, error: t("error.notYourTurn") };
 
   const chess = new Chess(g.fen);
   let mv;
   try {
     mv = chess.move({ from, to, promotion: promotion as PieceSymbol | undefined });
   } catch {
-    return { ok: false, error: "Illegal move." };
+    return { ok: false, error: t("error.illegalMove") };
   }
-  if (!mv) return { ok: false, error: "Illegal move." };
+  if (!mv) return { ok: false, error: t("error.illegalMove") };
 
   const now = Date.now();
   let white_ms = g.white_ms;
@@ -249,14 +253,15 @@ export async function resignOnlineGame(
   id: string,
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
+  const t = await getTranslations("play");
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "You must sign in." };
+  if (!uid) return { ok: false, error: t("error.signIn") };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Game not found." };
-  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
+  if (!g) return { ok: false, error: t("error.gameNotFound") };
+  if (g.status !== "ongoing") return { ok: false, error: t("error.notInProgress") };
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "You are not a player." };
+  if (!myColor) return { ok: false, error: t("error.notPlayer") };
 
   const result = myColor === "w" ? "0-1" : "1-0";
   const { data, error } = await supabase
@@ -275,14 +280,15 @@ export async function offerDrawOnline(
   id: string,
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
+  const t = await getTranslations("play");
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "You must sign in." };
+  if (!uid) return { ok: false, error: t("error.signIn") };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Game not found." };
-  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
+  if (!g) return { ok: false, error: t("error.gameNotFound") };
+  if (g.status !== "ongoing") return { ok: false, error: t("error.notInProgress") };
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "You are not a player." };
+  if (!myColor) return { ok: false, error: t("error.notPlayer") };
 
   const { data, error } = await supabase
     .from("friend_games")
@@ -301,14 +307,15 @@ export async function respondDrawOnline(
   accept: boolean,
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
+  const t = await getTranslations("play");
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "You must sign in." };
+  if (!uid) return { ok: false, error: t("error.signIn") };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Game not found." };
-  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
+  if (!g) return { ok: false, error: t("error.gameNotFound") };
+  if (g.status !== "ongoing") return { ok: false, error: t("error.notInProgress") };
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "You are not a player." };
+  if (!myColor) return { ok: false, error: t("error.notPlayer") };
 
   if (accept && g.draw_offer_by && g.draw_offer_by !== myColor) {
     const { data, error } = await supabase
@@ -348,15 +355,16 @@ export async function claimTimeoutOnline(
   id: string,
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
+  const t = await getTranslations("play");
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "You must sign in." };
+  if (!uid) return { ok: false, error: t("error.signIn") };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Game not found." };
+  if (!g) return { ok: false, error: t("error.gameNotFound") };
   if (g.status !== "ongoing" || g.initial_ms == null) {
     return { ok: true, data: g };
   }
   if (g.white_user_id !== uid && g.black_user_id !== uid) {
-    return { ok: false, error: "You are not a player." };
+    return { ok: false, error: t("error.notPlayer") };
   }
 
   const mover = g.turn;

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { navGroups, navFooter, isNavActive, type NavItem } from "./nav";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +24,9 @@ function MobileRow({
   active: boolean;
   onNavigate: () => void;
 }) {
+  const t = useTranslations("nav");
   const Icon = item.icon;
+  const label = t(item.label);
 
   if (item.comingSoon) {
     return (
@@ -33,9 +36,9 @@ function MobileRow({
       >
         <span className="flex items-center gap-3">
           <Icon className="h-5 w-5 shrink-0" aria-hidden />
-          {item.label}
+          {label}
         </span>
-        <Badge variant="muted">soon</Badge>
+        <Badge variant="muted">{t("soon")}</Badge>
       </span>
     );
   }
@@ -53,7 +56,7 @@ function MobileRow({
       )}
     >
       <Icon className="h-5 w-5 shrink-0" aria-hidden />
-      {item.label}
+      {label}
     </Link>
   );
 }
@@ -66,6 +69,7 @@ export function MobileNav({
   onClose: () => void;
 }) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   // Blocca lo scroll del body mentre il drawer è aperto.
   useEffect(() => {
@@ -92,7 +96,7 @@ export function MobileNav({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation menu"
+        aria-label={t("navigationMenu")}
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex w-[85%] max-w-sm flex-col border-r border-border bg-surface transition-transform duration-200",
           open ? "translate-x-0" : "-translate-x-full",
@@ -114,7 +118,7 @@ export function MobileNav({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close menu"
+            aria-label={t("closeMenu")}
             className="ml-auto rounded-md p-1.5 text-text-muted hover:bg-surface-2 hover:text-text"
           >
             <X className="h-5 w-5" aria-hidden />
@@ -123,12 +127,12 @@ export function MobileNav({
 
         <div className="flex-1 overflow-y-auto px-3 pb-4 pt-2">
           {/* Menu completo a gruppi (stesse macrocategorie del desktop). */}
-          <nav className="space-y-4" aria-label="Full navigation">
+          <nav className="space-y-4" aria-label={t("fullNav")}>
             {navGroups.map((group, gi) => (
               <div key={group.label ?? `group-${gi}`} className="space-y-1">
                 {group.label && (
                   <p className="px-3 pb-1 pt-1 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-                    {group.label}
+                    {t(group.label)}
                   </p>
                 )}
                 {group.items.map((item) => (

@@ -6,10 +6,13 @@
  * "schermo fermo per 1-2s" e feedback immediato: la shell resta, il contenuto
  * mostra un placeholder sobrio finché i dati arrivano.
  */
-export default function AppLoading() {
+import { getTranslations } from "next-intl/server";
+
+export default async function AppLoading() {
+  const t = await getTranslations("dashboard");
   return (
     <div className="space-y-8" aria-busy="true" aria-live="polite">
-      <span className="sr-only">Loading…</span>
+      <span className="sr-only">{t("loading")}</span>
 
       {/* Testata */}
       <div className="space-y-3">

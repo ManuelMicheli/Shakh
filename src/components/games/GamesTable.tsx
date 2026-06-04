@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,32 +65,32 @@ function opponentOf(g: GameRow): string {
  */
 const OUTCOME_META: Record<
   Outcome,
-  { letter: string; label: string; tile: string; letterCls: string; resultCls: string }
+  { letter: string; labelKey: string; tile: string; letterCls: string; resultCls: string }
 > = {
   win: {
     letter: "W",
-    label: "Win",
+    labelKey: "outcomeWin",
     tile: "bg-text",
     letterCls: "text-bg",
     resultCls: "text-bg",
   },
   draw: {
     letter: "½",
-    label: "Draw",
+    labelKey: "outcomeDraw",
     tile: "border border-border bg-surface",
     letterCls: "text-text",
     resultCls: "text-text-muted",
   },
   loss: {
     letter: "L",
-    label: "Loss",
+    labelKey: "outcomeLoss",
     tile: "bg-surface-2",
     letterCls: "text-text",
     resultCls: "text-text",
   },
   unknown: {
     letter: "–",
-    label: "Unknown result",
+    labelKey: "outcomeUnknown",
     tile: "bg-surface-2",
     letterCls: "text-text-muted",
     resultCls: "text-text-muted",
@@ -98,6 +99,7 @@ const OUTCOME_META: Record<
 
 export function GamesTable({ games }: { games: GameRow[] }) {
   const router = useRouter();
+  const t = useTranslations("games");
   const { toast } = useToast();
   const { job, startBatch } = useAnalysisJob();
   const [pending, startTransition] = useTransition();
@@ -107,16 +109,16 @@ export function GamesTable({ games }: { games: GameRow[] }) {
   const analyzing = job?.status === "running";
 
   const onDelete = (id: string) => {
-    if (!confirm("Delete this game and its analysis?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
     setDeletingId(id);
     startTransition(async () => {
       const res = await deleteGame(id);
       setDeletingId(null);
       if (!res.ok) {
-        toast({ title: "Delete failed", description: res.error, variant: "error" });
+        toast({ title: t("deleteFailed"), description: res.error, variant: "error" });
         return;
       }
-      toast({ title: "Game deleted" });
+      toast({ title: t("gameDeleted") });
       setSelected((prev) => {
         const next = new Set(prev);
         next.delete(id);
@@ -135,8 +137,8 @@ export function GamesTable({ games }: { games: GameRow[] }) {
         next.add(id);
       } else {
         toast({
-          title: `Up to ${MAX_BATCH_JOBS} games at a time`,
-          description: "Deselect a game to pick another.",
+          title: t("maxGamesTitle", { max: MAX_BATCH_JOBS }),
+          description: t("maxGamesDesc"),
         });
       }
       return next;
@@ -152,8 +154,8 @@ export function GamesTable({ games }: { games: GameRow[] }) {
     const n = startBatch(jobs);
     setSelected(new Set());
     toast({
-      title: n > 1 ? `${n} games queued` : "Analysis started",
-      description: "They're analyzed one at a time in the background.",
+      title: n > 1 ? t("gamesQueued", { n }) : t("analysisStarted"),
+      description: t("analyzedInBackground"),
     });
   };
 
@@ -165,7 +167,7 @@ export function GamesTable({ games }: { games: GameRow[] }) {
   if (games.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-border p-10 text-center text-text-muted">
-        No games yet. Import one above to get started.
+        {t("emptyState")}
       </div>
     );
   }
@@ -175,14 +177,14 @@ export function GamesTable({ games }: { games: GameRow[] }) {
       {selectedCount > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-surface-2 px-4 py-2.5">
           <span className="text-sm text-text">
-            {selectedCount} of {MAX_BATCH_JOBS} selected
+            {t("selectedCount", { count: selectedCount, max: MAX_BATCH_JOBS })}
           </span>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button size="sm" onClick={onAnalyzeSelected} disabled={analyzing}>
-              {analyzing ? "Analyzing…" : "Analyze selected"}
+              {analyzing ? t("analyzing") : t("analyzeSelected")}
             </Button>
           </div>
         </div>
@@ -194,9 +196,9 @@ export function GamesTable({ games }: { games: GameRow[] }) {
           const o = OUTCOME_META[outcomeOf(g)];
           const youColor =
             g.user_color === "white"
-              ? "White"
+              ? t("colorWhite")
               : g.user_color === "black"
-                ? "Black"
+                ? t("colorBlack")
                 : "—";
           return (
             <div
@@ -208,7 +210,7 @@ export function GamesTable({ games }: { games: GameRow[] }) {
                   "flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg leading-none",
                   o.tile,
                 )}
-                title={o.label}
+                title={t(o.labelKey)}
               >
                 <span className={cn("font-mono text-base font-semibold", o.letterCls)}>
                   {o.letter}
@@ -243,12 +245,12 @@ export function GamesTable({ games }: { games: GameRow[] }) {
                     : "bg-text text-bg",
                 )}
               >
-                {g.analyzed ? "Review" : "Analyze"}
+                {g.analyzed ? t("review") : t("analyze")}
               </Link>
 
               <button
                 type="button"
-                aria-label="Delete game"
+                aria-label={t("deleteGame")}
                 disabled={pending && deletingId === g.id}
                 onClick={() => onDelete(g.id)}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-text-muted hover:bg-surface-2 disabled:opacity-50"
@@ -275,7 +277,7 @@ export function GamesTable({ games }: { games: GameRow[] }) {
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => toggle(g.id)}
-                    aria-label={`Select ${gameTitle(g)} for analysis`}
+                    aria-label={t("selectForAnalysis", { title: gameTitle(g) })}
                     className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)] sm:mt-0"
                   />
                 )}
@@ -299,7 +301,7 @@ export function GamesTable({ games }: { games: GameRow[] }) {
 
               <div className="flex items-center justify-between gap-2 sm:justify-end">
                 <Badge variant={g.analyzed ? "default" : "muted"}>
-                  {g.analyzed ? "analyzed" : "not analyzed"}
+                  {g.analyzed ? t("badgeAnalyzed") : t("badgeNotAnalyzed")}
                 </Badge>
 
                 <div className="flex items-center gap-1">
@@ -312,12 +314,12 @@ export function GamesTable({ games }: { games: GameRow[] }) {
                         : "bg-text text-bg hover:opacity-90")
                     }
                   >
-                    {g.analyzed ? "Review" : "Analyze"}
+                    {g.analyzed ? t("review") : t("analyze")}
                   </Link>
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="Delete game"
+                    aria-label={t("deleteGame")}
                     disabled={pending && deletingId === g.id}
                     onClick={() => onDelete(g.id)}
                   >

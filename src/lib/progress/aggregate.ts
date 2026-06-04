@@ -13,6 +13,7 @@ import type { UserMetrics } from "@/lib/ai/types";
 import type { CoachSynthesis } from "@/lib/ai/types";
 import { loadOverallRating } from "@/lib/rating/store";
 import type { OverallRating } from "@/lib/rating/aggregate";
+import type { Locale } from "@/i18n/config";
 
 type DB = SupabaseClient;
 
@@ -122,6 +123,18 @@ const AREA_LABEL: Record<AreaKey, string> = {
   trappole: "Traps",
 };
 
+const AREA_LABEL_IT: Record<AreaKey, string> = {
+  tattica: "Tattica",
+  aperture: "Aperture",
+  mediogioco: "Mediogioco",
+  finali: "Finali",
+  trappole: "Trappole",
+};
+
+function areaLabel(area: AreaKey, locale: Locale): string {
+  return (locale === "it" ? AREA_LABEL_IT : AREA_LABEL)[area];
+}
+
 const ENDGAME_SLUG: Record<string, string> = {
   kq_vs_k: "matti-elementari",
   kp_vs_k: "re-e-pedone-contro-re",
@@ -138,41 +151,48 @@ interface ProgressRow {
 }
 
 /** Mappa una riga user_progress nell'area macro e in un'azione di allenamento. */
-function describeWeakness(row: ProgressRow): Weakness | null {
+function describeWeakness(row: ProgressRow, locale: Locale): Weakness | null {
   const { dimension, key, score, attempts } = row;
+  const it = locale === "it";
   switch (dimension) {
     case "tactic_theme":
       return {
-        label: themeLabel(key),
+        label: themeLabel(key, locale),
         area: "tattica",
         score,
         attempts,
-        action: { label: "Train", href: "/app/tattiche" },
+        action: { label: it ? "Allena" : "Train", href: "/app/tattiche" },
       };
     case "opening":
       return {
-        label: `Opening: ${key.replace(/_/g, " ")}`,
+        label: it
+          ? `Apertura: ${key.replace(/_/g, " ")}`
+          : `Opening: ${key.replace(/_/g, " ")}`,
         area: "aperture",
         score,
         attempts,
-        action: { label: "Review", href: "/app/repertorio" },
+        action: { label: it ? "Ripassa" : "Review", href: "/app/repertorio" },
       };
     case "middlegame_theme":
       return {
-        label: `Middlegame: ${key.replace(/_/g, " ")}`,
+        label: it
+          ? `Mediogioco: ${key.replace(/_/g, " ")}`
+          : `Middlegame: ${key.replace(/_/g, " ")}`,
         area: "mediogioco",
         score,
         attempts,
-        action: { label: "Exercise", href: "/app/teoria/mediogioco" },
+        action: { label: it ? "Esercitati" : "Exercise", href: "/app/teoria/mediogioco" },
       };
     case "endgame":
       return {
-        label: `Endgame: ${key.replace(/_/g, " ")}`,
+        label: it
+          ? `Finale: ${key.replace(/_/g, " ")}`
+          : `Endgame: ${key.replace(/_/g, " ")}`,
         area: "finali",
         score,
         attempts,
         action: {
-          label: "Practice",
+          label: it ? "Allena" : "Practice",
           href: `/app/teoria/${ENDGAME_SLUG[key] ?? "matti-elementari"}`,
         },
       };
@@ -200,7 +220,11 @@ function weighted(rows: ProgressRow[]): { score: number | null; attempts: number
 // Loader principale
 // ============================================================
 
-export async function loadDashboard(supabase: DB, userId: string): Promise<DashboardData> {
+export async function loadDashboard(
+  supabase: DB,
+  userId: string,
+  locale: Locale = "en",
+): Promise<DashboardData> {
   const [
     progressRows,
     trapAgg,
@@ -219,7 +243,7 @@ export async function loadDashboard(supabase: DB, userId: string): Promise<Dashb
     loadRatingTrend(supabase, userId),
     loadPathProgress(supabase, userId),
     loadSynthesis(supabase, userId),
-    loadRecent(supabase, userId),
+    loadRecent(supabase, userId, locale),
     loadOverallRating(supabase, userId),
   ]);
 
@@ -229,11 +253,11 @@ export async function loadDashboard(supabase: DB, userId: string): Promise<Dashb
   ).map((area) => {
     const rows = progressRows.filter((r) => AREA_OF_DIMENSION[r.dimension] === area);
     const w = weighted(rows);
-    return { area, label: AREA_LABEL[area], score: w.score, attempts: w.attempts };
+    return { area, label: areaLabel(area, locale), score: w.score, attempts: w.attempts };
   });
   competence.push({
     area: "trappole",
-    label: AREA_LABEL.trappole,
+    label: areaLabel("trappole", locale),
     score: trapAgg.score,
     attempts: trapAgg.attempts,
   });
@@ -242,7 +266,7 @@ export async function loadDashboard(supabase: DB, userId: string): Promise<Dashb
   const MIN_ATTEMPTS = 3;
   const weaknesses = progressRows
     .filter((r) => r.attempts >= MIN_ATTEMPTS && r.score < 0.7)
-    .map(describeWeakness)
+    .map((r) => describeWeakness(r, locale))
     .filter((w): w is Weakness => w !== null)
     .sort((a, b) => a.score - b.score)
     .slice(0, 5);
@@ -492,7 +516,8 @@ async function loadSynthesis(supabase: DB, userId: string): Promise<CoachSynthes
   return { summary: data.summary, focusAreas: data.focus_areas ?? [], suggestion: data.suggestion ?? "" };
 }
 
-async function loadRecent(supabase: DB, userId: string): Promise<RecentItem[]> {
+async function loadRecent(supabase: DB, userId: string, locale: Locale): Promise<RecentItem[]> {
+  const it = locale === "it";
   const [games, puzzles, lessons] = await Promise.all([
     supabase
       .from("games")
@@ -523,7 +548,7 @@ async function loadRecent(supabase: DB, userId: string): Promise<RecentItem[]> {
     items.push({
       kind: "game",
       label: `${g.white ?? "?"} – ${g.black ?? "?"}`,
-      detail: g.result ?? "analyzed",
+      detail: g.result ?? (it ? "analizzata" : "analyzed"),
       at: g.played_at ?? g.created_at,
       href: `/app/partite/${g.id}`,
     });
@@ -532,8 +557,8 @@ async function loadRecent(supabase: DB, userId: string): Promise<RecentItem[]> {
   for (const p of (puzzles.data as { success: boolean; attempted_at: string }[] | null) ?? []) {
     items.push({
       kind: "puzzle",
-      label: "Tactic puzzle",
-      detail: p.success ? "solved" : "failed",
+      label: it ? "Puzzle tattico" : "Tactic puzzle",
+      detail: p.success ? (it ? "risolto" : "solved") : it ? "fallito" : "failed",
       at: p.attempted_at,
       href: "/app/tattiche",
     });
@@ -546,7 +571,7 @@ async function loadRecent(supabase: DB, userId: string): Promise<RecentItem[]> {
     items.push({
       kind: "lesson",
       label: l.content_items.title,
-      detail: "lesson completed",
+      detail: it ? "lezione completata" : "lesson completed",
       at: l.completed_at,
       href: `/app/teoria/${l.content_items.slug}`,
     });

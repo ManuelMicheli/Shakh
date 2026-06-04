@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { GuidedReplay } from "@/components/learn/GuidedReplay";
 import { findGuided } from "@/lib/learn/guided";
 
@@ -14,12 +15,14 @@ export default async function ReplayPage({
   const game = findGuided(slug);
   if (!game) notFound();
 
+  const t = await getTranslations("theory");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">{game.title}</h1>
         <Link href="/app/impara" className="text-sm text-text-muted hover:text-text">
-          ← Learn
+          ← {t("learn.title")}
         </Link>
       </div>
       <GuidedReplay

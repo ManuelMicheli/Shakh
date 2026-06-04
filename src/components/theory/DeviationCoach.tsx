@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { engine } from "@/lib/engine/engine";
@@ -30,6 +31,7 @@ export interface DeviationCoachProps {
  * numeri, il modello dà le parole.
  */
 export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: DeviationCoachProps) {
+  const t = useTranslations("theory");
   const [busy, setBusy] = useState(false);
   const [phase, setPhase] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
@@ -42,7 +44,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
     setAnswer("");
     try {
       await engine.init();
-      setPhase("Querying the engine…");
+      setPhase(t("deviation.queryingEngine"));
       const evaluation = await engine.analyze(fenBefore, { depth: LINES_DEPTH, multiPV: 3 }).result;
       const lines: EngineLineFact[] = evaluation.lines.slice(0, 3).map((l) => ({
         evalText: whiteEvalText(l.score, l.scoreType, turn),
@@ -54,7 +56,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
       // Valuta la mossa di deviazione concreta.
       const played = tryPlaySan(fenBefore, deviationSan);
       if (played) {
-        setPhase(`Evaluating ${played.san}…`);
+        setPhase(t("deviation.evaluatingMove", { move: played.san }));
         const afterTurn = (played.fen.split(" ")[1] as "w" | "b") ?? "w";
         const afterEval = await engine.analyze(played.fen, { depth: MOVE_DEPTH }).result;
         const top = afterEval.lines[0];
@@ -67,7 +69,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
         }
       }
 
-      setPhase("The coach is replying…");
+      setPhase(t("deviation.coachReplying"));
       const res = await fetch("/api/coach/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,8 +82,8 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
         }),
       });
       if (!res.ok || !res.body) {
-        const msg = await res.text().catch(() => "Coach error.");
-        setAnswer(`Sorry: ${msg}`);
+        const msg = await res.text().catch(() => t("deviation.coachError"));
+        setAnswer(t("deviation.sorry", { msg }));
         return;
       }
       const reader = res.body.getReader();
@@ -94,7 +96,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
         setAnswer(acc);
       }
     } catch {
-      setAnswer("I couldn't answer. Try again.");
+      setAnswer(t("deviation.couldNotAnswer"));
     } finally {
       setBusy(false);
       setPhase(null);
@@ -104,7 +106,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
   if (!coachConfigured) {
     return (
       <p className="text-xs text-text-muted">
-        Coach not configured: you can still evaluate the deviation with the engine.
+        {t("deviation.notConfigured")}
       </p>
     );
   }
@@ -112,7 +114,9 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
   return (
     <div className="space-y-2">
       <Button variant="secondary" size="sm" onClick={() => void ask()} disabled={busy}>
-        Why not <span className="ml-1 font-mono">{deviationSan}</span>?
+        {t.rich("deviation.whyNot", {
+          move: () => <span className="ml-1 font-mono">{deviationSan}</span>,
+        })}
       </Button>
       {busy && phase && (
         <p className="flex items-center gap-2 text-xs text-text-muted">

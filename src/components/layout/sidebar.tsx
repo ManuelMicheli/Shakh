@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { PanelLeftClose, PanelLeftOpen, ChevronDown } from "lucide-react";
 import {
   navGroups,
@@ -30,13 +31,15 @@ function NavRow({
   active: boolean;
   collapsed: boolean;
 }) {
+  const t = useTranslations("nav");
   const Icon = item.icon;
+  const label = t(item.label);
 
   if (item.comingSoon) {
     return (
       <span
         aria-disabled="true"
-        title={collapsed ? item.label : undefined}
+        title={collapsed ? label : undefined}
         className={cn(
           "flex cursor-not-allowed items-center justify-between rounded-md px-3 py-2 text-sm text-text-muted opacity-60",
           collapsed && "justify-center px-2",
@@ -44,10 +47,10 @@ function NavRow({
       >
         <span className="flex items-center gap-3">
           <Icon className="h-4 w-4 shrink-0" aria-hidden />
-          <span className={cn(collapsed && "hidden")}>{item.label}</span>
+          <span className={cn(collapsed && "hidden")}>{label}</span>
         </span>
         <Badge variant="muted" className={cn(collapsed && "hidden")}>
-          soon
+          {t("soon")}
         </Badge>
       </span>
     );
@@ -57,7 +60,7 @@ function NavRow({
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
-      title={collapsed ? item.label : undefined}
+      title={collapsed ? label : undefined}
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
         collapsed && "justify-center px-2",
@@ -67,7 +70,7 @@ function NavRow({
       )}
     >
       <Icon className="h-4 w-4 shrink-0" aria-hidden />
-      <span className={cn(collapsed && "hidden")}>{item.label}</span>
+      <span className={cn(collapsed && "hidden")}>{label}</span>
     </Link>
   );
 }
@@ -84,6 +87,7 @@ function CollapsibleGroup({
   group: NavGroup;
   pathname: string;
 }) {
+  const t = useTranslations("nav");
   const hasActive = group.items.some((item) =>
     isNavActive(pathname, item.href),
   );
@@ -100,7 +104,7 @@ function CollapsibleGroup({
           "text-text hover:bg-surface-2",
         )}
       >
-        <span>{group.label}</span>
+        <span>{group.label ? t(group.label) : null}</span>
         <ChevronDown
           className={cn(
             "h-4 w-4 shrink-0 text-text-muted transition-transform duration-200",
@@ -133,6 +137,7 @@ export function Sidebar({
   onToggleCollapsed: () => void;
 }) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <aside
@@ -160,7 +165,7 @@ export function Sidebar({
 
       <nav
         className="flex-1 space-y-4 overflow-y-auto px-3 py-2"
-        aria-label="Main navigation"
+        aria-label={t("mainNav")}
       >
         {navGroups.map((group, gi) => {
           // Rail ridotto: niente accordion, voci piatte come icone (divider tra gruppi).
@@ -222,8 +227,8 @@ export function Sidebar({
         <button
           type="button"
           onClick={onToggleCollapsed}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand" : "Collapse"}
+          aria-label={collapsed ? t("expandSidebar") : t("collapseSidebar")}
+          title={collapsed ? t("expand") : t("collapse")}
           className={cn(
             "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-2 hover:text-text",
             collapsed && "justify-center px-2",
@@ -234,7 +239,7 @@ export function Sidebar({
           ) : (
             <PanelLeftClose className="h-4 w-4 shrink-0" aria-hidden />
           )}
-          <span className={cn(collapsed && "hidden")}>Collapse</span>
+          <span className={cn(collapsed && "hidden")}>{t("collapse")}</span>
         </button>
       </div>
     </aside>

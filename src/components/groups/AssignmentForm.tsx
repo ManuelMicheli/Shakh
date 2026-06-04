@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
@@ -17,18 +18,19 @@ export interface AssignmentFormData {
   pathNodes: { id: string; title: string }[];
 }
 
-const ENDGAMES: { key: string; label: string }[] = [
-  { key: "kq_vs_k", label: "King+Queen vs King" },
-  { key: "kp_vs_k", label: "King and pawn vs King" },
-  { key: "q_vs_p", label: "Queen vs pawn" },
-  { key: "lucena", label: "Lucena position" },
-  { key: "philidor", label: "Philidor position" },
+const ENDGAMES: { key: string; labelKey: string }[] = [
+  { key: "kq_vs_k", labelKey: "endgameKqVsK" },
+  { key: "kp_vs_k", labelKey: "endgameKpVsK" },
+  { key: "q_vs_p", labelKey: "endgameQVsP" },
+  { key: "lucena", labelKey: "endgameLucena" },
+  { key: "philidor", labelKey: "endgamePhilidor" },
 ];
 
 const SELECT_CLS =
   "h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-text focus-visible:outline-2 focus-visible:outline-offset-2";
 
 export function AssignmentForm({ groupId, data }: { groupId: string; data: AssignmentFormData }) {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [pending, start] = useTransition();
@@ -52,29 +54,29 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
   const buildPayload = (): { refId: string | null; params: AssignmentParams | null } | string => {
     switch (refType) {
       case "lesson":
-        if (!refId) return "Choose a lesson.";
+        if (!refId) return t("errChooseLesson");
         return { refId, params: null };
       case "puzzle_set":
         return { refId: null, params: { theme, count: Math.max(1, Number(count) || 10) } };
       case "endgame":
         return { refId: null, params: { key: endgame } };
       case "trap":
-        if (!refId) return "Choose a trap.";
+        if (!refId) return t("errChooseTrap");
         return { refId, params: null };
       case "repertoire":
-        if (!refId) return "Choose a repertoire.";
+        if (!refId) return t("errChooseRepertoire");
         return { refId, params: null };
       case "path_node":
-        if (!refId) return "Choose a path node.";
+        if (!refId) return t("errChoosePathNode");
         return { refId, params: null };
       default:
-        return "Invalid type.";
+        return t("errInvalidType");
     }
   };
 
   const onSubmit = () => {
     if (targetType === "user" && !targetUserId) {
-      toast({ title: "Choose a student", variant: "error" });
+      toast({ title: t("errChooseStudentShort"), variant: "error" });
       return;
     }
     const payload = buildPayload();
@@ -94,12 +96,12 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
         dueAt: due ? new Date(due).toISOString() : null,
       });
       if (!res.ok) {
-        toast({ title: "Not assigned", description: res.error, variant: "error" });
+        toast({ title: t("toastNotAssigned"), description: res.error, variant: "error" });
         return;
       }
       setNote("");
       setDue("");
-      toast({ title: "Assignment created" });
+      toast({ title: t("toastAssignmentCreated") });
       router.refresh();
     });
   };
@@ -115,25 +117,25 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Destinatario */}
         <div className="space-y-1.5">
-          <span className="text-xs text-text-muted">Recipient</span>
+          <span className="text-xs text-text-muted">{t("recipientLabel")}</span>
           <select
             className={SELECT_CLS}
             value={targetType}
             onChange={(e) => setTargetType(e.target.value as "group" | "user")}
           >
-            <option value="group">The whole class</option>
-            <option value="user">A student</option>
+            <option value="group">{t("recipientWholeClass")}</option>
+            <option value="user">{t("recipientAStudent")}</option>
           </select>
         </div>
         {targetType === "user" && (
           <div className="space-y-1.5">
-            <span className="text-xs text-text-muted">Student</span>
+            <span className="text-xs text-text-muted">{t("studentLabel")}</span>
             <select
               className={SELECT_CLS}
               value={targetUserId}
               onChange={(e) => setTargetUserId(e.target.value)}
             >
-              <option value="">— choose —</option>
+              <option value="">{t("chooseOption")}</option>
               {data.members.map((m) => (
                 <option key={m.userId} value={m.userId}>
                   {m.name}
@@ -147,7 +149,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Tipo di attività */}
         <div className="space-y-1.5">
-          <span className="text-xs text-text-muted">Activity type</span>
+          <span className="text-xs text-text-muted">{t("activityTypeLabel")}</span>
           <select
             className={SELECT_CLS}
             value={refType}
@@ -165,13 +167,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
         <div className="space-y-1.5">
           {refType === "lesson" && (
             <>
-              <span className="text-xs text-text-muted">Lesson</span>
+              <span className="text-xs text-text-muted">{t("lessonLabel")}</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— choose —</option>
+                <option value="">{t("chooseOption")}</option>
                 {data.lessons.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.title}
@@ -182,7 +184,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "puzzle_set" && (
             <>
-              <span className="text-xs text-text-muted">Puzzle theme</span>
+              <span className="text-xs text-text-muted">{t("puzzleThemeLabel")}</span>
               <select
                 className={SELECT_CLS}
                 value={theme}
@@ -198,7 +200,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "endgame" && (
             <>
-              <span className="text-xs text-text-muted">Endgame</span>
+              <span className="text-xs text-text-muted">{t("endgameLabel")}</span>
               <select
                 className={SELECT_CLS}
                 value={endgame}
@@ -206,7 +208,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
               >
                 {ENDGAMES.map((e) => (
                   <option key={e.key} value={e.key}>
-                    {e.label}
+                    {t(e.labelKey)}
                   </option>
                 ))}
               </select>
@@ -214,13 +216,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "trap" && (
             <>
-              <span className="text-xs text-text-muted">Trap</span>
+              <span className="text-xs text-text-muted">{t("trapLabel")}</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— choose —</option>
+                <option value="">{t("chooseOption")}</option>
                 {data.traps.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
@@ -231,13 +233,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "repertoire" && (
             <>
-              <span className="text-xs text-text-muted">Group repertoire</span>
+              <span className="text-xs text-text-muted">{t("groupRepertoireLabel")}</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— choose —</option>
+                <option value="">{t("chooseOption")}</option>
                 {data.repertoires.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -248,13 +250,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "path_node" && (
             <>
-              <span className="text-xs text-text-muted">Path node</span>
+              <span className="text-xs text-text-muted">{t("pathNodeLabel")}</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— choose —</option>
+                <option value="">{t("chooseOption")}</option>
                 {data.pathNodes.map((n) => (
                   <option key={n.id} value={n.id}>
                     {n.title}
@@ -269,7 +271,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       {refType === "puzzle_set" && (
         <div className="w-32 space-y-1.5">
           <label className="text-xs text-text-muted" htmlFor="puzzle-count">
-            How many puzzles
+            {t("howManyPuzzlesLabel")}
           </label>
           <Input
             id="puzzle-count"
@@ -284,18 +286,18 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label className="text-xs text-text-muted" htmlFor="assign-note">
-            Note (optional)
+            {t("noteOptionalLabel")}
           </label>
           <Input
             id="assign-note"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="e.g. focus on accuracy"
+            placeholder={t("notePlaceholder")}
           />
         </div>
         <div className="space-y-1.5">
           <label className="text-xs text-text-muted" htmlFor="assign-due">
-            Due date (optional)
+            {t("dueDateOptionalLabel")}
           </label>
           <Input
             id="assign-due"
@@ -308,7 +310,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
 
       <div className="flex justify-end">
         <Button type="submit" disabled={pending}>
-          {pending ? "Assigning…" : "Assign"}
+          {pending ? t("assigningPending") : t("assignButton")}
         </Button>
       </div>
     </form>

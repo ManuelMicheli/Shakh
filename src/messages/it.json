@@ -3,7 +3,88 @@
     "login": "Accedi",
     "signup": "Inizia ora",
     "haveAccount": "Ho già un account",
-    "openApp": "Vai alla piattaforma"
+    "openApp": "Vai alla piattaforma",
+    "close": "Chiudi",
+    "notifications": "Notifiche",
+    "avatarAlt": "Avatar",
+    "continue": "Continua",
+    "next": "Avanti",
+    "back": "Indietro",
+    "theme": {
+      "switchToLight": "Passa al tema chiaro",
+      "switchToDark": "Passa al tema scuro"
+    },
+    "error": {
+      "unexpected": "Errore imprevisto.",
+      "sessionExpired": "Sessione scaduta. Accedi di nuovo."
+    },
+    "page": {
+      "title": "Benvenuto — Shakh"
+    },
+    "intro": {
+      "title": "Benvenuto in Shakh",
+      "titleNamed": "Benvenuto, {name}",
+      "desc": "Sono il tuo coach. Insieme partiamo dal tuo livello reale e costruiamo un percorso su misura, dove ti spiego sempre il <em>perché</em> delle mosse. Bastano un paio di minuti per cominciare bene.",
+      "step1": "1 · Due domande veloci su di te",
+      "step2": "2 · Collega Lichess o Chess.com (se vuoi)",
+      "step3": "3 · Un mini-test per tararti, e si parte",
+      "start": "Iniziamo"
+    },
+    "self": {
+      "title": "Qualche domanda",
+      "desc": "Rispondi a istinto: serve solo a partire dal punto giusto.",
+      "rulesQ": "Sai come muovono i pezzi?",
+      "yes": "Sì",
+      "no": "No",
+      "notEntirely": "Non del tutto",
+      "onlineQ": "Giochi online?",
+      "ratingPlaceholder": "Rating circa (es. 1200)",
+      "experienceQ": "Da quanto giochi?",
+      "expNew": "Da poco (meno di sei mesi)",
+      "expSome": "Qualche anno, senza allenarmi sul serio",
+      "expExperienced": "Gioco da tempo e mi alleno"
+    },
+    "connect": {
+      "title": "Collega un account online",
+      "desc": "Giochi su Lichess o Chess.com? Collegalo: dopo una rapida verifica useremo il tuo rating reale per posizionarti con precisione e importeremo le tue ultime partite. È facoltativo — puoi farlo anche più tardi dal profilo.",
+      "doneBadge": "fatto",
+      "verified": "Account verificato: ti abbiamo già posizionato dal tuo rating reale.",
+      "skipTestMoveOn": "Salta il test, vai avanti",
+      "skipLinkLater": "Salta, lo collego dopo"
+    },
+    "test": {
+      "title": "Mini-test tattico",
+      "preparing": "Sto preparando qualche posizione…",
+      "complete": "Test completato",
+      "estimate": "Stima provvisoria: rating tattico ~{rating}, livello di partenza {level}.",
+      "findBest": "Trova la mossa migliore. Se non la vedi, puoi saltare.",
+      "verifiedNote": "Hai già un account verificato: il test non è necessario, ma se lo fai affiniamo ancora la stima.",
+      "skipThis": "Salta questo",
+      "skipTest": "Salta il test"
+    },
+    "tour": {
+      "path": {
+        "title": "Il tuo percorso",
+        "body": "Una mappa a livelli ti porta da principiante a giocatore di club. I nodi si sbloccano quando dimostri di padroneggiare i precedenti."
+      },
+      "coach": {
+        "title": "Il coach spiega il perché",
+        "body": "Niente mosse a memoria: il coach in italiano spiega il senso delle scelte, ancorato ai dati del motore e alle statistiche."
+      },
+      "free": {
+        "title": "Prima guidato, poi libero",
+        "body": "All'inizio ti diciamo il prossimo passo. Crescendo, il percorso resta come riferimento e tu alleni dove vuoi."
+      }
+    },
+    "done": {
+      "title": "Tutto pronto",
+      "titleNamed": "Tutto pronto, {name}",
+      "desc": "Ti ho posizionato nel percorso e la dashboard è pronta. Da qui in poi ti seguo passo dopo passo. In bocca al lupo e buon gioco!",
+      "goToDashboard": "Vai alla dashboard"
+    },
+    "saving": {
+      "preparing": "Preparo il tuo percorso…"
+    }
   },
   "landing": {
     "navCta": "Inizia ora",
@@ -65,5 +146,1293 @@
     "preferencesBody": "Ricordano scelte non essenziali (es. layout) per migliorare l'esperienza.",
     "alwaysOn": "Sempre attivi",
     "moreInfo": "Maggiori informazioni nella"
+  },
+  "dashboard": {
+    "defaultPlayerName": "giocatore",
+    "greeting": "Ciao, {name}",
+    "subtitle": "Il quadro dei tuoi progressi.",
+    "loading": "Caricamento…",
+    "trainNow": "Allenati ora",
+    "empty": {
+      "title": "Inizia a raccogliere dati",
+      "desc": "Risolvi qualche puzzle o importa una partita: la dashboard si popolerà di progressi, grafici e consigli su misura.",
+      "trainPuzzles": "Allenati sui puzzle",
+      "importGame": "Importa una partita"
+    },
+    "nudge": {
+      "title": "Analizza le partite importate",
+      "desc": "Hai {count} {count, plural, one {partita importata} other {partite importate}} ancora da analizzare. Analizzale per sbloccare punti deboli, accuratezza e i consigli del coach."
+    },
+    "shakhRating": {
+      "title": "Rating Shakh",
+      "notCalibrated": "non calibrato",
+      "desc": "Stima di forza su scala reale (OTB), da puzzle, partite, finali, calcolo, qualità di gioco e — se collegato — dal rating del tuo account online.",
+      "notCalibratedDetail": "Stima non ancora calibrata: <mono>{collected}</mono>/<mono>{total}</mono> dati raccolti, ne mancano <mono>{missing}</mono>. Ogni puzzle risolto, partita analizzata o finale giocato conta.",
+      "refining": "Stima in affinamento: hai abbastanza dati, continua ad allenarti e il margine d'errore (±) calerà."
+    },
+    "kind": {
+      "game": "Partita",
+      "puzzle": "Puzzle",
+      "lesson": "Lezione"
+    },
+    "stat": {
+      "pathLevel": "Livello percorso",
+      "pathNodes": "{completed}/{total} nodi",
+      "tacticalRating": "Rating tattico",
+      "solved": "{count} risolti",
+      "streak": "Streak",
+      "bestStreak": "record {best}",
+      "accuracy": "Accuratezza",
+      "analyzedGames": "{count} partite"
+    },
+    "coach": {
+      "title": "Il coach dice",
+      "latestSummary": "ultima sintesi",
+      "advice": "Consiglio:"
+    },
+    "skillsMap": {
+      "title": "Mappa delle competenze",
+      "desc": "Profilo sulle cinque aree."
+    },
+    "weaknesses": {
+      "title": "Punti deboli prioritari",
+      "desc": "Ognuno con l'allenamento giusto.",
+      "noData": "Nessun dato ancora: servono almeno {minAttempts} tentativi su uno stesso tema perché venga valutato.",
+      "noneFlagged": "Nessun punto debole marcato: finora {attempts} tentativi su {trackedThemes} {trackedThemes, plural, one {tema} other {temi}}, ma ne servono almeno {minAttempts} per tema per segnalarne uno.",
+      "attempts": "{count} prove",
+      "attemptsShort": "{count} tent."
+    },
+    "gameStats": {
+      "title": "Statistiche di gioco",
+      "desc": "Dalle partite analizzate.",
+      "asWhite": "Col Bianco",
+      "asBlack": "Col Nero",
+      "gamesMoves": "{games} partite · {moves} mosse",
+      "accuracyByPhase": "Accuratezza per fase",
+      "criticalArea": "punto critico"
+    },
+    "trendRating": {
+      "title": "Rating tattico",
+      "desc": "Andamento nel tempo.",
+      "nounOne": "puzzle risolto",
+      "nounMany": "puzzle risolti"
+    },
+    "trendAccuracy": {
+      "title": "Accuratezza partite",
+      "desc": "Una percentuale per partita.",
+      "nounOne": "partita analizzata",
+      "nounMany": "partite analizzate"
+    },
+    "trend": {
+      "nounOne": "dato",
+      "nounMany": "dati",
+      "needOne": "Serve ancora 1 {noun} per disegnare l'andamento.",
+      "needMany": "Servono ancora {missing} {noun} per disegnare l'andamento.",
+      "ariaLabel": "Andamento nel tempo"
+    },
+    "distribution": {
+      "inaccuracies": "Imprecisioni",
+      "mistakes": "Errori",
+      "blunders": "Gravi errori",
+      "empty": "Nessun errore registrato: ottimo, o pochi dati ancora."
+    },
+    "recentActivity": {
+      "title": "Attività recente"
+    },
+    "glossary": {
+      "title": "Legenda dei termini",
+      "desc": "Cosa significano le parole che trovi nella dashboard e nell'analisi.",
+      "moveQuality": "Qualità delle mosse",
+      "metrics": {
+        "title": "Statistiche e analisi",
+        "accuracy": {
+          "term": "Accuratezza",
+          "def": "Quanto le tue mosse si avvicinano a quelle migliori del motore, in percentuale. Più è alta, meglio hai giocato."
+        },
+        "tacticalRating": {
+          "term": "Rating tattico",
+          "def": "Un numero che misura la tua forza nei puzzle: sale se risolvi, scende se sbagli (come un punteggio Elo)."
+        },
+        "streak": {
+          "term": "Streak",
+          "def": "Quanti puzzle hai risolto di fila senza errori. Il record è la striscia più lunga raggiunta."
+        },
+        "pawn": {
+          "term": "Pedone / centipawn",
+          "def": "L'unità di misura del vantaggio. 1 pedone = avere un pezzo leggero in più, all'incirca. Il motore lo misura in centesimi (centipawn)."
+        },
+        "criticalArea": {
+          "term": "Punto critico",
+          "def": "La fase di gioco in cui commetti più errori: è lì che conviene allenarsi di più."
+        }
+      },
+      "phases": {
+        "title": "Fasi della partita",
+        "opening": {
+          "term": "Apertura",
+          "def": "Le prime mosse: si sviluppano i pezzi, si controlla il centro e si mette al sicuro il re (arrocco)."
+        },
+        "middlegame": {
+          "term": "Mediogioco",
+          "def": "Il cuore della partita: piani, attacchi e combinazioni con molti pezzi ancora in gioco."
+        },
+        "endgame": {
+          "term": "Finale",
+          "def": "La fase con pochi pezzi rimasti, dove i pedoni e il re diventano protagonisti."
+        }
+      },
+      "tactics": {
+        "title": "Tattiche",
+        "fork": {
+          "term": "Forchetta",
+          "def": "Un pezzo attacca due bersagli contemporaneamente: l'avversario ne può salvare uno solo."
+        },
+        "pin": {
+          "term": "Inchiodatura",
+          "def": "Un pezzo non si può muovere perché dietro di lui c'è un pezzo più prezioso (spesso il re)."
+        },
+        "skewer": {
+          "term": "Infilata",
+          "def": "Come l'inchiodatura al contrario: il pezzo prezioso è davanti e, spostandosi, lascia prendere quello dietro."
+        },
+        "discovered": {
+          "term": "Scoperta",
+          "def": "Sposti un pezzo e ne liberi un altro che dà scacco o attacca: due minacce in una mossa."
+        },
+        "sacrifice": {
+          "term": "Sacrificio",
+          "def": "Cedi materiale di proposito per ottenere un vantaggio maggiore (attacco al re, matto, promozione)."
+        }
+      },
+      "general": {
+        "title": "Concetti di base",
+        "castling": {
+          "term": "Arrocco",
+          "def": "Mossa speciale che muove insieme re e torre, per mettere il re al sicuro."
+        },
+        "development": {
+          "term": "Sviluppo",
+          "def": "Portare i pezzi (cavalli e alfieri) fuori dalla posizione iniziale verso caselle attive."
+        },
+        "initiative": {
+          "term": "Iniziativa",
+          "def": "Avere il controllo del gioco: sei tu a creare minacce e l'avversario deve difendersi."
+        },
+        "repertoire": {
+          "term": "Repertorio",
+          "def": "L'insieme di aperture che scegli di giocare e impari a memoria."
+        }
+      }
+    },
+    "quick": {
+      "tactics": {
+        "label": "Tattiche",
+        "detail": "Il tuo set di puzzle"
+      },
+      "weaknesses": {
+        "label": "Punti deboli",
+        "detail": "Allena le aree fragili"
+      },
+      "fixMistakes": {
+        "label": "Ripara errori",
+        "detail": "Dai blunder delle partite"
+      }
+    }
+  },
+  "games": {
+    "metaTitle": "Le mie partite — Shakh",
+    "headerEyebrow": "Archivio",
+    "headerTitle": "Le mie partite",
+    "headerDesc": "Importa, analizza, rivedi mossa per mossa.",
+    "pageIntro": "Importa le tue partite, analizzale col motore e rivedile mossa per mossa.",
+    "errSessionExpired": "Sessione scaduta. Accedi di nuovo.",
+    "errNoValidGame": "Nessuna partita valida trovata nel PGN.",
+    "errPastePgn": "Incolla un PGN.",
+    "errPgnTooLarge": "PGN troppo grande (max ~500KB). Importa meno partite per volta.",
+    "errEnterLichess": "Inserisci uno username Lichess.",
+    "errLichessImport": "Errore imprevisto durante l'import da Lichess.",
+    "errEnterChesscom": "Inserisci uno username Chess.com.",
+    "errChesscomImport": "Errore imprevisto durante l'import da Chess.com.",
+    "errCoachNotConfigured": "Il coach AI non è configurato.",
+    "errCoachGeneric": "Errore del coach AI.",
+    "deleteConfirm": "Eliminare questa partita e la sua analisi?",
+    "deleteFailed": "Eliminazione non riuscita",
+    "gameDeleted": "Partita eliminata",
+    "maxGamesTitle": "Massimo {max} partite per volta",
+    "maxGamesDesc": "Deseleziona una partita per sceglierne un'altra.",
+    "gamesQueued": "{n} partite in coda",
+    "analysisStarted": "Analisi avviata",
+    "analyzedInBackground": "Vengono analizzate una alla volta in background.",
+    "emptyState": "Nessuna partita ancora. Importane una qui sopra per iniziare.",
+    "selectedCount": "{count} di {max} selezionate",
+    "cancel": "Annulla",
+    "analyzing": "Analisi in corso…",
+    "analyzeSelected": "Analizza selezionate",
+    "colorWhite": "Bianco",
+    "colorBlack": "Nero",
+    "review": "Rivedi",
+    "analyze": "Analizza",
+    "deleteGame": "Elimina partita",
+    "selectForAnalysis": "Seleziona {title} per l'analisi",
+    "badgeAnalyzed": "analizzata",
+    "badgeNotAnalyzed": "da analizzare",
+    "outcomeWin": "Vittoria",
+    "outcomeDraw": "Patta",
+    "outcomeLoss": "Sconfitta",
+    "outcomeUnknown": "Esito ignoto",
+    "importFailed": "Import non riuscito",
+    "importedCount": "{n} importate",
+    "duplicatesSkipped": "{n} duplicate ignorate",
+    "gamesImported": "Partite importate",
+    "noNewGames": "Nessuna nuova partita",
+    "analyzeBgPlural": "{n} partite in analisi in background per i tuoi punti deboli.",
+    "analyzeBgSingular": "1 partita in analisi in background per i tuoi punti deboli.",
+    "verifyTitle": "Verifica il tuo account per far contare le partite nel profilo.",
+    "verifyDesc": "Solo le partite del tuo account verificato alimentano punti deboli, Rating Shakh e statistiche. Puoi comunque importare partite di altri giocatori: restano consultabili e analizzabili, ma non toccano il tuo profilo.",
+    "verifyAccount": "Verifica account →",
+    "fileReadFailed": "Lettura file non riuscita",
+    "tabImport": "Importa",
+    "chesscomPlaceholder": "Username Chess.com",
+    "lichessPlaceholder": "Username Lichess",
+    "importShort": "Importa",
+    "importPgn": "Importa PGN",
+    "file": "File",
+    "tabFile": "File .pgn",
+    "tabPastePgn": "Incolla PGN",
+    "pgnLabel": "Uno o più giochi in formato PGN",
+    "importing": "Importazione…",
+    "fileUploadHint": "Carica un file <code>.pgn</code> (anche con più partite).",
+    "chooseFile": "Scegli file",
+    "lichessUsername": "Username Lichess",
+    "lichessExample": "es. DrNykterstein",
+    "chesscomExample": "es. MagnusCarlsen",
+    "howMany": "Quante",
+    "downloading": "Scaricamento…",
+    "importFromLichess": "Importa da Lichess",
+    "lichessApiHint": "Scarica le ultime partite pubbliche dell'utente tramite l'API di Lichess.",
+    "chesscomUsername": "Username Chess.com",
+    "importFromChesscom": "Importa da Chess.com",
+    "chesscomApiHint": "Scarica le partite pubbliche più recenti dell'utente tramite l'API di Chess.com.",
+    "operationFailed": "Operazione non riuscita",
+    "gameAnalysisTitle": "Analisi partita",
+    "createReel": "Crea reel",
+    "reanalyze": "Rianalizza",
+    "tabMoves": "Mosse",
+    "tabSummary": "Riepilogo",
+    "evalOverTime": "Andamento",
+    "summary": "Riepilogo",
+    "accuracyNote": "L'accuratezza % è una stima basata sulla perdita media in centipawn, non lo standard ufficiale di Lichess/Chess.com.",
+    "moveLabel": "Mossa",
+    "evaluation": "Valutazione",
+    "bestMove": "Mossa migliore",
+    "howToReadAnalysis": "Come leggere l'analisi",
+    "legendIntro": "La <bar>barra</bar> e il numero in pedoni dicono chi sta meglio: valori col <plus>+</plus> favoriscono il Bianco, col <minus>−</minus> il Nero. Ogni mossa è etichettata così:",
+    "sumAccuracy": "Accuratezza",
+    "sumInaccuracies": "Imprecisioni",
+    "sumMistakes": "Errori",
+    "sumMissedMoves": "Mosse mancate",
+    "sumBlunders": "Errori gravi",
+    "tableWhite": "Bianco",
+    "tableBlack": "Nero",
+    "analyzeGame": "Analizza partita",
+    "defaultGameTitle": "Partita",
+    "engineAnalysis": "Analisi col motore",
+    "engineAnalysisDesc": "L'analisi gira in parallelo nel browser e prosegue anche se cambi pagina: ogni mossa viene valutata e classificata.",
+    "depth": "Profondità",
+    "whatIsDepth": "Cos'è la profondità?",
+    "depthExplain": "È quante <strong>mezze mosse avanti</strong> il motore calcola da ogni posizione prima di dare il giudizio. Più alta = analisi più affidabile, ma più lenta (il tempo cresce in modo quasi esponenziale, non lineare).",
+    "depth12": "<code>12</code> — veloce, per un ripasso rapido o partite blitz.",
+    "depth15": "<code>15</code> — equilibrio tra precisione e tempo (consigliata).",
+    "depth18": "<code>18</code> — più precisa (coglie tattiche e sacrifici profondi), ma può richiedere 3–5× il tempo di 12.",
+    "depthAdvice": "Sotto i ~2000 Elo, 15 e 18 raramente cambiano il verdetto sugli errori grossi: tieni 15 di norma, sali a 18 solo per partite importanti da studiare a fondo.",
+    "otherGameRunning": "Analisi in corso su un'altra partita: attendi che finisca.",
+    "positionProgress": "posizione {current}/{total}",
+    "saveFailed": "Salvataggio non riuscito",
+    "analysisComplete": "Analisi completata",
+    "errDuringAnalysis": "Errore durante l'analisi.",
+    "analysisFailed": "Analisi non riuscita",
+    "miniAnalyzing": "Analisi in corso",
+    "miniComplete": "Analisi completata",
+    "miniFailed": "Analisi non riuscita",
+    "close": "Chiudi",
+    "stillQueued": "ancora {count} in coda",
+    "starting": "avvio…",
+    "open": "Apri",
+    "noGamesToAnalyze": "Nessuna partita da analizzare",
+    "analyzedOneAtATime": "Analizzate una alla volta in background.",
+    "startingShort": "Avvio…",
+    "analyzeNGames": "Analizza {count, plural, one {# partita} other {# partite}}"
+  },
+  "groups": {
+    "metaTitle": "Gruppi — Shakh",
+    "indexEyebrow": "Circoli e classi",
+    "indexTitle": "Gruppi",
+    "indexDesc": "Segui gli allievi e assegna attività, o unisciti con un codice.",
+    "indexHeading": "Circoli e gruppi",
+    "indexIntro": "Crea un circolo o una classe per seguire i progressi dei tuoi allievi e assegnare attività, oppure unisciti a un gruppo con un codice d'invito.",
+    "noGroups": "Non fai ancora parte di alcun gruppo. Creane uno o unisciti con un codice.",
+    "memberCount": "{count, plural, one {# membro} other {# membri}}",
+    "createGroupTitle": "Crea un gruppo",
+    "createGroupDesc": "Diventi istruttore del gruppo che crei.",
+    "joinWithCodeTitle": "Unisciti con un codice",
+    "joinWithCodeDesc": "Hai ricevuto un invito? Incolla qui il codice.",
+    "backAllGroups": "Tutti i gruppi",
+    "classDashboard": "Dashboard di classe",
+    "classDashboardDesc": "Progressi aggregati degli allievi",
+    "assignments": "Assegnazioni",
+    "assignmentsNavDesc": "Crea e monitora le attività",
+    "members": "Membri",
+    "membersDescOwner": "Promuovi a istruttore, rimuovi o apri i progressi di un allievo.",
+    "membersDescInstructor": "Apri i progressi di un allievo.",
+    "membersDescMember": "Le persone in questo gruppo.",
+    "invites": "Inviti",
+    "invitesDesc": "Genera un codice/link con ruolo e scadenza. Ogni invito vale per un ingresso.",
+    "groupRepertoires": "Repertori di gruppo",
+    "groupRepertoiresDesc": "«Nel nostro circolo giochiamo così». Gli allievi li allenano con il trainer.",
+    "white": "Bianco",
+    "black": "Nero",
+    "moveCount": "{count, plural, one {# mossa} other {# mosse}}",
+    "editor": "Editor",
+    "train": "Allena",
+    "classDashboardIntro": "{count, plural, one {# allievo} other {# allievi}}. Vista aggregata in sola lettura: ogni accesso ai dati passa dai controlli di sicurezza.",
+    "classEmptyState": "Nessun allievo nel gruppo. Genera un invito per far entrare i tuoi studenti.",
+    "students": "Allievi",
+    "studentsDesc": "Ordina per colonna per vedere chi è avanti e chi è indietro.",
+    "avgProficiencyTitle": "Competenza media di classe",
+    "avgProficiencyDesc": "Profilo medio sulle cinque aree.",
+    "commonWeaknessesTitle": "Punti deboli comuni",
+    "commonWeaknessesDesc": "I temi in cui più allievi sono sotto soglia.",
+    "noSharedWeaknesses": "Nessun punto debole condiviso marcato.",
+    "studentCount": "{count, plural, one {# allievo} other {# allievi}}",
+    "classSummaryTitle": "Riassunto di classe",
+    "classSummaryDesc": "Sintesi del coach sui dati aggregati.",
+    "assignmentsIntro": "Assegna attività a un allievo o all'intera classe. Il completamento è derivato dai progressi reali; dove non possibile, l'allievo la segna fatta.",
+    "newAssignmentTitle": "Nuova assegnazione",
+    "newAssignmentDesc": "Lezione, puzzle, finale, trappola, repertorio o nodo.",
+    "monitoringTitle": "Monitoraggio",
+    "monitoringDesc": "Stato di completamento fra gli allievi.",
+    "studentFallbackName": "Allievo",
+    "readOnly": "sola lettura",
+    "drilldownIntro": "Contesto didattico: i progressi dell'allievo come li vede lui, in sola lettura.",
+    "drilldownEmptyState": "L'allievo non ha ancora dati sufficienti per la dashboard.",
+    "errAuth": "Sessione scaduta. Accedi di nuovo.",
+    "errPerm": "Non hai i permessi per questa azione.",
+    "errGroupNameRequired": "Dai un nome al gruppo.",
+    "errOwnerNotAssignable": "Il ruolo owner non è assegnabile qui.",
+    "errCantRemoveSelf": "Non puoi rimuovere te stesso (owner).",
+    "errRepertoireNameRequired": "Dai un nome al repertorio.",
+    "errChooseStudent": "Scegli un allievo.",
+    "errStudentNotInGroup": "L'allievo non fa parte di questo gruppo.",
+    "errNoStudents": "Nessun allievo nel gruppo.",
+    "errSummaryUnavailable": "Sintesi non disponibile, riprova.",
+    "nameLabel": "Nome",
+    "groupNamePlaceholder": "es. Circolo Scacchi Milano",
+    "typeLabel": "Tipo",
+    "createGroupButton": "Crea gruppo",
+    "repertoireNamePlaceholder": "es. Italiana del circolo",
+    "colorLabel": "Colore",
+    "createGroupRepertoireButton": "Crea repertorio di gruppo",
+    "rosterStudent": "Allievo",
+    "rosterLevel": "Livello",
+    "rosterRating": "Rating",
+    "rosterAccuracy": "Accuratezza",
+    "rosterLastActivity": "Ultima attività",
+    "toastNotCreated": "Non creato",
+    "toastInviteNotCreated": "Invito non creato",
+    "toastInviteCreated": "Invito creato",
+    "toastLinkCopiedToClipboard": "Link copiato negli appunti.",
+    "toastNotRevoked": "Non revocato",
+    "toastLinkCopied": "Link copiato",
+    "toastCopyFailed": "Copia non riuscita",
+    "roleLabel": "Ruolo",
+    "expiresDaysLabel": "Scadenza (giorni)",
+    "emailOptionalLabel": "Email (opzionale)",
+    "emailReservePlaceholder": "riserva l'invito a un'email",
+    "generateInviteButton": "Genera invito",
+    "noInvitesGenerated": "Nessun invito generato.",
+    "inviteStateUsed": "usato",
+    "inviteStateExpired": "scaduto",
+    "inviteStateActive": "attivo",
+    "inviteExpiresOn": "scade il {date}",
+    "inviteNoExpiration": "senza scadenza",
+    "copyLinkButton": "Copia link",
+    "revokeButton": "Revoca",
+    "toastJoinFailed": "Join non riuscito",
+    "toastJoinedGroup": "Sei entrato nel gruppo",
+    "clickwrapNotice": "Entrando nel gruppo, l'istruttore potrà vedere i tuoi progressi (in sola lettura) per aiutarti a migliorare. Puoi lasciare il gruppo in qualunque momento.",
+    "joiningPending": "Ingresso…",
+    "acceptAndJoinButton": "Accetto ed entro",
+    "cancelButton": "Annulla",
+    "toastCouldntJoin": "Join non riuscito",
+    "inviteCodeLabel": "Codice d'invito",
+    "inviteCodePlaceholder": "es. K7P2M9QX",
+    "joinButton": "Unisciti",
+    "toastNotUpdated": "Non aggiornato",
+    "toastNotRemoved": "Non rimosso",
+    "progressLink": "Progressi",
+    "makeStudentButton": "Rendi allievo",
+    "promoteInstructorButton": "Promuovi istruttore",
+    "removeButton": "Rimuovi",
+    "statusAssigned": "Da fare",
+    "statusInProgress": "In corso",
+    "statusCompleted": "Completata",
+    "statusSkipped": "Saltata",
+    "dueDate": "entro il {date}",
+    "assignedByInstructorTitle": "Assegnato dal tuo istruttore",
+    "assignedByInstructorDesc": "Attività da svolgere, con scadenze e stato.",
+    "goLink": "Vai",
+    "undoButton": "Annulla",
+    "markDoneButton": "Segna fatta",
+    "toastNotDeleted": "Non eliminata",
+    "noActiveAssignments": "Nessuna assegnazione attiva.",
+    "targetClass": "Classe",
+    "targetIndividual": "Individuale",
+    "completedCount": "{completed}/{total} completate",
+    "inProgressCount": "{count, plural, one {# in corso} other {# in corso}}",
+    "deleteButton": "Elimina",
+    "toastSummaryFailed": "Sintesi non riuscita",
+    "synthesisSuggestionLabel": "Proposta:",
+    "synthesisPlaceholder": "Genera una sintesi in italiano dei punti deboli aggregati della classe, con una proposta di lezione. I dati sono deterministici; il coach scrive solo la sintesi.",
+    "generatingPending": "Generazione…",
+    "regenerateSummaryButton": "Rigenera sintesi",
+    "generateClassSummaryButton": "Genera sintesi di classe",
+    "endgameKqVsK": "Re+Donna contro Re",
+    "endgameKpVsK": "Re e pedone contro Re",
+    "endgameQVsP": "Donna contro pedone",
+    "endgameLucena": "Posizione di Lucena",
+    "endgamePhilidor": "Posizione di Philidor",
+    "errChooseLesson": "Scegli una lezione.",
+    "errChooseTrap": "Scegli una trappola.",
+    "errChooseRepertoire": "Scegli un repertorio.",
+    "errChoosePathNode": "Scegli un nodo del percorso.",
+    "errInvalidType": "Tipo non valido.",
+    "errChooseStudentShort": "Scegli un allievo",
+    "toastNotAssigned": "Non assegnato",
+    "toastAssignmentCreated": "Assegnazione creata",
+    "recipientLabel": "Destinatario",
+    "recipientWholeClass": "Tutta la classe",
+    "recipientAStudent": "Un allievo",
+    "studentLabel": "Allievo",
+    "chooseOption": "— scegli —",
+    "activityTypeLabel": "Tipo di attività",
+    "lessonLabel": "Lezione",
+    "puzzleThemeLabel": "Tema dei puzzle",
+    "endgameLabel": "Finale",
+    "trapLabel": "Trappola",
+    "groupRepertoireLabel": "Repertorio di gruppo",
+    "pathNodeLabel": "Nodo del percorso",
+    "howManyPuzzlesLabel": "Quanti puzzle",
+    "noteOptionalLabel": "Nota (opzionale)",
+    "notePlaceholder": "es. concentrati sulla precisione",
+    "dueDateOptionalLabel": "Scadenza (opzionale)",
+    "assigningPending": "Assegnazione…",
+    "assignButton": "Assegna"
+  },
+  "nav": {
+    "item": {
+      "dashboard": "Dashboard",
+      "today": "Oggi",
+      "path": "Percorso",
+      "coach": "Coach",
+      "learn": "Impara",
+      "theory": "Teoria",
+      "repertoire": "Repertorio",
+      "preparation": "Preparazione",
+      "tactics": "Tattiche",
+      "calculation": "Calcolo",
+      "traps": "Trappole",
+      "sparring": "Sparring",
+      "playFriend": "Gioca con un amico",
+      "myGames": "Le mie partite",
+      "weaknesses": "Punti deboli",
+      "fixMistakes": "Ripara errori",
+      "groups": "Gruppi",
+      "profile": "Profilo"
+    },
+    "group": {
+      "study": "Studia",
+      "train": "Allenati",
+      "playAnalyze": "Gioca e analizza"
+    },
+    "soon": "presto",
+    "mainNav": "Navigazione principale",
+    "fullNav": "Navigazione completa",
+    "navigationMenu": "Menu di navigazione",
+    "closeMenu": "Chiudi menu",
+    "openMenu": "Apri menu",
+    "expandSidebar": "Espandi barra laterale",
+    "collapseSidebar": "Riduci barra laterale",
+    "expand": "Espandi",
+    "collapse": "Riduci",
+    "goBack": "Torna indietro",
+    "back": "Indietro",
+    "signOut": "Esci",
+    "greeting": "Ciao, {name}"
+  },
+  "play": {
+    "hub": {
+      "eyebrow": "Con un amico",
+      "title": "Gioca",
+      "desc": "Stesso dispositivo o online in differita con un link condivisibile.",
+      "heading": "Gioca con un amico",
+      "lead": "Sfida un amico sullo stesso dispositivo, oppure online in differita con un link condivisibile. Scegli il tempo, rivedi le mosse, torna indietro.",
+      "tabLocal": "Stesso dispositivo",
+      "tabOnline": "Online (in differita)"
+    },
+    "notFound": {
+      "title": "Partita non trovata",
+      "desc": "La partita non esiste, è già al completo, oppure non hai accesso.",
+      "back": "Torna alle partite"
+    },
+    "game": {
+      "title": "Partita con un amico",
+      "allGames": "Tutte le partite"
+    },
+    "error": {
+      "signInToPlay": "Devi accedere per giocare.",
+      "signInToAnalyze": "Devi accedere per analizzare una partita.",
+      "emptyGame": "Partita vuota.",
+      "signIn": "Devi accedere.",
+      "gameNotFound": "Partita non trovata.",
+      "notInProgress": "Partita non in corso.",
+      "notPlayerInGame": "Non sei un giocatore di questa partita.",
+      "notYourTurn": "Non è il tuo turno.",
+      "illegalMove": "Mossa illegale.",
+      "notPlayer": "Non sei un giocatore."
+    },
+    "defaultPlayer": "Giocatore",
+    "resign": {
+      "label": "Abbandona",
+      "confirmTitle": "Abbandonare la partita?",
+      "confirmDesc": "Perderai la partita. L'azione non si può annullare.",
+      "confirm": "Sì, abbandona"
+    },
+    "cancel": "Annulla",
+    "checkmate": "Scacco matto",
+    "overlay": {
+      "analyzing": "Analisi delle tue mosse…",
+      "opening": "Apertura…",
+      "analyzeGame": "Analizza partita",
+      "viewBoard": "Rivedi la scacchiera",
+      "noMoves": "Nessuna mossa"
+    },
+    "color": {
+      "white": "Bianco",
+      "black": "Nero",
+      "random": "Casuale",
+      "your": "Il tuo colore"
+    },
+    "create": {
+      "title": "Nuova partita online",
+      "desc": "Crea la partita, condividi il link con un amico e giocate quando volete: le mosse si sincronizzano in tempo reale.",
+      "yourColor": "Il tuo colore",
+      "creating": "Creazione…",
+      "submit": "Crea e ottieni il link"
+    },
+    "timeControl": "Tempo",
+    "myGames": {
+      "title": "Le tue partite online",
+      "empty": "Nessuna partita online. Creane una per iniziare.",
+      "vs": "vs {name}",
+      "waiting": "in attesa…"
+    },
+    "status": {
+      "waiting": "in attesa",
+      "inProgress": "in corso",
+      "over": "conclusa",
+      "draw": "Patta",
+      "checkToMove": "Scacco — muove il {side}",
+      "toMove": "Muove il {side}",
+      "waitingEllipsis": "In attesa…"
+    },
+    "hotseat": {
+      "setupTitle": "Stesso dispositivo",
+      "setupDesc": "Giocate a turno sullo stesso schermo. La scacchiera può girarsi automaticamente dal lato di chi muove.",
+      "autoFlip": "Gira la scacchiera a ogni mossa",
+      "flipBoard": "Gira scacchiera",
+      "undoMove": "Annulla mossa",
+      "status": {
+        "losesOnTime": "{side} perde per tempo",
+        "checkmateWins": "Scacco matto — vince il {side}",
+        "stalemate": "Stallo — patta"
+      }
+    },
+    "newGame": "Nuova partita",
+    "moves": "Mosse",
+    "startPlaying": "Inizia a giocare",
+    "random": "Casuale",
+    "stat": {
+      "duration": "Durata"
+    },
+    "nav": {
+      "first": "Prima mossa",
+      "prev": "Mossa precedente",
+      "next": "Mossa successiva",
+      "last": "Ultima mossa",
+      "gameActions": "Azioni partita"
+    },
+    "result": {
+      "sideWins": "Vince il {side}",
+      "timesUp": "Tempo scaduto.",
+      "draw": "Patta",
+      "stalemate": "Stallo.",
+      "resignation": "Abbandono.",
+      "byAgreement": "Patta concordata.",
+      "aborted": "Partita annullata.",
+      "youWon": "Hai vinto",
+      "youLost": "Hai perso"
+    },
+    "toast": {
+      "drawOffered": "Patta proposta",
+      "copyFailed": "Copia non riuscita"
+    },
+    "waiting": {
+      "titleHost": "In attesa dell'avversario",
+      "titleGuest": "Unisciti alla partita",
+      "shareLink": "Condividi questo link con il tuo amico. Dovrà accedere per giocare.",
+      "copied": "Copiato",
+      "copy": "Copia",
+      "invitedAs": "Sei stato invitato a giocare. Entra come {color}.",
+      "join": "Unisciti"
+    },
+    "drawOffer": {
+      "title": "Proposta di patta",
+      "accept": "Accetta",
+      "decline": "Rifiuta"
+    },
+    "finished": {
+      "title": "Partita conclusa"
+    },
+    "draw": {
+      "offered": "Patta proposta",
+      "offer": "Proponi patta"
+    },
+    "reason": {
+      "checkmate": "scacco matto",
+      "resign": "abbandono",
+      "timeout": "tempo scaduto",
+      "stalemate": "stallo",
+      "draw": "patta",
+      "agreement": "patta concordata",
+      "aborted": "annullata"
+    },
+    "outcome": {
+      "whiteWins": "Vince il Bianco",
+      "blackWins": "Vince il Nero",
+      "draw": "Patta",
+      "over": "Conclusa"
+    },
+    "sparring": {
+      "eyebrow": "Contro il motore",
+      "desc": "Partite intere contro una personalità e una forza scelte da te.",
+      "lead": "Gioca partite intere contro il motore con una <strong>personalità</strong> e una forza scelte da te: aggressivo, posizionale o solido. Allena le tue aperture e affina il gioco contro stili diversi.",
+      "newChallenge": "Nuova sfida",
+      "opponentStyle": "Stile dell'avversario",
+      "strength": "Forza (Elo)",
+      "startingOpening": "Apertura di partenza",
+      "thinking": "pensa…",
+      "you": "Tu",
+      "rematch": "Rivincita",
+      "opponentThinking": "L'avversario pensa…",
+      "yourMove": "Muovi tu ({color})",
+      "status": {
+        "resigned": "Hai abbandonato.",
+        "checkmateLost": "Scacco matto — hai perso.",
+        "checkmateWon": "Scacco matto — hai vinto!",
+        "stalemate": "Stallo — patta.",
+        "draw": "Patta."
+      },
+      "result": {
+        "resignedGame": "Hai abbandonato la partita."
+      }
+    },
+    "bot": {
+      "hatchling": "Pulcino",
+      "novice": "Novellino",
+      "beginner": "Esordiente",
+      "amateur": "Amatore",
+      "casual": "Dilettante",
+      "club": "Circolo",
+      "expert": "Esperto",
+      "candidateMaster": "Candidato Maestro",
+      "master": "Maestro"
+    },
+    "opening": {
+      "normale": "Partita normale",
+      "italiana": "Italiana",
+      "spagnola": "Spagnola",
+      "siciliana": "Siciliana",
+      "francese": "Francese",
+      "gambetto-donna": "Gambetto di Donna"
+    }
+  },
+  "profile": {
+    "metaTitle": "Profilo — Shakh",
+    "eyebrow": "Il tuo profilo",
+    "fallbackTitle": "Profilo",
+    "elo": "stima Elo {elo}",
+    "eloShort": "Elo {elo}",
+    "level": "livello {level}",
+    "tabStats": "Statistiche",
+    "tabSettings": "Impostazioni",
+    "competenceTitle": "Competenze",
+    "competenceDesc": "Dettaglio per area.",
+    "noData": "— nessun dato",
+    "competenceValue": "{percent}% · {attempts} prove",
+    "ratingHistoryTitle": "Storico rating tattico",
+    "accuracyTitle": "Accuratezza nelle partite",
+    "exportFailed": "Esportazione non riuscita",
+    "deletionFailed": "Cancellazione non riuscita",
+    "saveFailed": "Salvataggio non riuscito",
+    "profileUpdated": "Profilo aggiornato",
+    "passwordTooShort": "Password troppo corta",
+    "passwordTooShortDesc": "Almeno 8 caratteri.",
+    "passwordsDontMatch": "Le password non coincidono",
+    "passwordChangeFailed": "Cambio password non riuscito",
+    "passwordUpdated": "Password aggiornata",
+    "profileCardTitle": "Profilo",
+    "profileCardDesc": "Come ti presentiamo nell'app.",
+    "displayName": "Nome visualizzato",
+    "displayNamePlaceholder": "Il tuo nome",
+    "username": "Username",
+    "usernamePlaceholder": "username",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "appearanceTitle": "Aspetto e lingua",
+    "appearanceDesc": "Il tema viene applicato subito; salva per ricordarlo.",
+    "theme": "Tema",
+    "themeDark": "Scuro",
+    "themeLight": "Chiaro",
+    "language": "Lingua",
+    "savePreferences": "Salva preferenze",
+    "accountCardTitle": "Account",
+    "accountCardDesc": "Cambia la password di accesso.",
+    "newPassword": "Nuova password",
+    "confirmPassword": "Conferma password",
+    "updatePassword": "Aggiorna password",
+    "groupsTitle": "Gruppi e circoli",
+    "groupsDesc": "Unisciti a un circolo o una classe, o creane uno tuo.",
+    "manageGroups": "Gestisci i tuoi gruppi",
+    "privacyTitle": "Privacy e dati",
+    "privacyDesc": "Esporta i tuoi dati o elimina definitivamente l'account.",
+    "exportMyData": "Esporta i miei dati",
+    "exportMyDataDesc": "Profilo, partite, progressi e repertori in formato JSON.",
+    "export": "Esporta",
+    "preparing": "Preparo…",
+    "deleteAccount": "Elimina account",
+    "deleteAccountDesc": "Rimozione definitiva di account e dati collegati. Irreversibile.",
+    "delete": "Elimina",
+    "deleteDialogTitle": "Eliminare l'account?",
+    "deleteDialogDesc": "Questa azione è irreversibile: profilo, partite, progressi e repertori verranno cancellati per sempre.",
+    "cancel": "Annulla",
+    "deletePermanently": "Elimina definitivamente",
+    "deleting": "Elimino…",
+    "verifyHintLichess": "Incolla il token nella tua biografia Lichess (Preferenze → Modifica profilo → Biografia), salva, poi premi Verifica.",
+    "verifyHintChesscom": "Incolla il token nel campo Nome o Località del profilo Chess.com (Impostazioni → Profilo), salva, poi premi Verifica.",
+    "externalTitle": "Account online",
+    "externalDesc": "Collega Lichess o Chess.com: dopo la verifica, il tuo rating online incide molto sul Rating Shakh, riportato alla scala reale (OTB).",
+    "linkingFailed": "Collegamento non riuscito",
+    "tokenGenerated": "Token generato",
+    "tokenGeneratedDesc": "Aggiungilo al profilo, poi verifica.",
+    "verificationFailed": "Verifica non riuscita",
+    "ratingUpdatedShakh": "Rating Shakh aggiornato.",
+    "gamesImported": "{count} partite scaricate.",
+    "pathAtLevel": "Percorso al livello {level}.",
+    "sourceVerified": "{source} verificato",
+    "updateFailed": "Aggiornamento non riuscito",
+    "ratingUpdated": "Rating aggiornato",
+    "unlinkingFailed": "Scollegamento non riuscito",
+    "sourceUnlinked": "{source} scollegato",
+    "tokenCopied": "Token copiato",
+    "badgeVerified": "verificato",
+    "onlineSuffix": "{rating} online",
+    "otbSuffix": "{rating} OTB",
+    "gamesCount": "{count} partite",
+    "refresh": "Aggiorna",
+    "unlink": "Scollega",
+    "badgeToVerify": "da verificare",
+    "copy": "Copia",
+    "verify": "Verifica",
+    "verifying": "Verifico…",
+    "badgeNotLinked": "non collegato",
+    "placeholderLichess": "username Lichess",
+    "placeholderChesscom": "username Chess.com",
+    "link": "Collega",
+    "errSessionExpired": "Sessione scaduta. Accedi di nuovo.",
+    "errUsernameFormat": "Username: 3–30 caratteri, lettere/numeri/underscore.",
+    "errUsernameTaken": "Username già in uso.",
+    "errGeneric": "Errore.",
+    "errUnexpected": "Errore imprevisto.",
+    "errUnsupportedPlatform": "Piattaforma non supportata.",
+    "errInvalidUsername": "Username non valido (2–30 caratteri).",
+    "errAccountNotLinked": "Account non collegato.",
+    "errNoVerification": "Nessuna verifica in corso.",
+    "errTokenExpired": "Token scaduto. Ricollega l'account per generarne uno nuovo.",
+    "errTokenNotFound": "Token non trovato nel profilo. Salva il token e attendi qualche secondo, poi riprova.",
+    "errVerifyFirst": "Verifica prima l'account."
+  },
+  "study": {
+    "coach": {
+      "eyebrow": "Il tuo allenatore",
+      "title": "Coach",
+      "desc": "Sintesi dei tuoi punti deboli ricorrenti dai dati delle partite.",
+      "intro": {
+        "before": "Il coach analizza i dati delle tue partite (calcolati dal motore) e sintetizza i tuoi punti deboli ricorrenti. Per spiegazioni mossa per mossa apri una partita dalla",
+        "link": "revisione",
+        "after": "."
+      },
+      "noData": {
+        "title": "Nessun dato ancora",
+        "desc": "Importa e analizza qualche partita: la sintesi del coach si basa sugli errori rilevati dal motore."
+      },
+      "goToGames": "Vai alle partite",
+      "errorsByPhase": {
+        "title": "I tuoi errori per fase",
+        "desc": "Su {games} partite, {moves} tue mosse esaminate."
+      },
+      "table": {
+        "phase": "Fase",
+        "moves": "Mosse",
+        "inacc": "Impr.",
+        "mistakes": "Errori",
+        "blunders": "Gravi",
+        "quality": "Qualità"
+      },
+      "weakest": "più debole",
+      "summary": {
+        "title": "Sintesi del coach",
+        "desc": "Un riassunto motivante e azionabile dei tuoi pattern d'errore."
+      },
+      "notConfiguredInline": "Il coach AI non è configurato (manca <code>ANTHROPIC_API_KEY</code>).",
+      "tabMove": "Mossa",
+      "tabQuestions": "Domande",
+      "move": {
+        "analyzeFirst": "Analizza prima la partita con il motore: il coach spiega i dati che il motore calcola.",
+        "selectMove": "Seleziona una mossa per farti spiegare cosa è successo.",
+        "label": "Mossa",
+        "explainErrors": "Spiega errori",
+        "writing": "Il coach sta scrivendo…",
+        "explainThis": "Spiega questa mossa",
+        "basedOnEngine": "Le spiegazioni si basano sui dati del motore (valutazioni e mossa migliore), non li ricalcolano."
+      },
+      "toast": {
+        "explainFailed": "Spiegazione non riuscita",
+        "generationInterrupted": "Generazione interrotta",
+        "generatedComments": "Generati {count} commenti",
+        "noNewErrors": "Nessun nuovo errore da commentare"
+      }
+    },
+    "synthesis": {
+      "toast": {
+        "unavailable": "Sintesi non disponibile"
+      },
+      "regenerate": "Rigenera sintesi",
+      "generate": "Genera sintesi del coach",
+      "analyzing": "Il coach sta analizzando i tuoi pattern…",
+      "notConfigured": "Il coach AI non è configurato (manca <code>ANTHROPIC_API_KEY</code>). Le metriche qui sopra restano comunque disponibili.",
+      "tip": "Consiglio:"
+    },
+    "chat": {
+      "phase": {
+        "querying": "Interrogo il motore…",
+        "evaluating": "Valuto {san}…",
+        "responding": "Il coach sta rispondendo…"
+      },
+      "sorry": "Spiacente: {msg}",
+      "couldntAnswer": "Non sono riuscito a rispondere. Riprova.",
+      "empty": "Chiedi qualcosa sulla posizione, es. «qual è il piano per il Bianco?» o «perché non Cd4?».",
+      "placeholder": "Fai una domanda…",
+      "ariaLabel": "Domanda sulla posizione",
+      "send": "Invia"
+    },
+    "weaknesses": {
+      "metaTitle": "Punti deboli — Shakh",
+      "eyebrow": "Pattern ricorrenti",
+      "title": "Punti deboli",
+      "desc": "Le perdite che si ripetono, raggruppate e ordinate per gravità.",
+      "intro": "Non i singoli errori, ma le perdite che si <em>ripetono</em> fra le tue partite. Il motore le raggruppa, le ordina per gravità e ti indica dove allenarti.",
+      "examples": "Esempi:",
+      "example": "partita {n} (mossa {move})",
+      "severity": "Gravità",
+      "empty": {
+        "base": "Servono almeno {min} partite analizzate per individuare pattern affidabili. Ne hai {analyzed}",
+        "pendingSuffix": ", ma {pending} importate sono ancora in attesa di analisi."
+      },
+      "manageAll": "Gestisci tutte le partite",
+      "importAnalyze": "Importa e analizza partite",
+      "noPatterns": "Nessuna debolezza ricorrente evidente nelle partite recenti. Continua così — analizza altre partite per affinare il quadro."
+    },
+    "path": {
+      "metaTitle": "Percorso — Shakh",
+      "eyebrow": "Da principiante a club",
+      "title": "Percorso",
+      "desc": "I nodi si sbloccano man mano che padroneggi i precedenti.",
+      "intro": "Da principiante a giocatore di club. I nodi si sbloccano man mano che dimostri di padroneggiare i precedenti.",
+      "curriculumNote": "Il curriculum è una bozza di design didattico: un punto di partenza, non una verità definitiva."
+    },
+    "nextStep": {
+      "title": "Prossimo passo",
+      "completeDiagnostic": "Completa il diagnostico per ricevere un consiglio personalizzato.",
+      "startDiagnostic": "Inizia il diagnostico",
+      "freeMode": "Modalità libera",
+      "pathBadge": "Percorso",
+      "viewPath": "Vedi il percorso"
+    },
+    "skillTree": {
+      "status": {
+        "locked": "Bloccato",
+        "available": "Disponibile",
+        "inProgress": "In corso",
+        "completed": "Completato"
+      },
+      "unlockHint": "Sblocca completando i passi precedenti.",
+      "level": {
+        "0": "Livello 0 — Fondamenta",
+        "1": "Livello 1 — Tattica di base",
+        "2": "Livello 2 — Apertura e finali chiave",
+        "3": "Livello 3 — Mediogioco",
+        "4": "Livello 4 — Verso il club"
+      },
+      "levelFallback": "Livello {level}"
+    },
+    "repertoire": {
+      "metaTitle": "Repertorio — Shakh",
+      "eyebrow": "Le tue linee",
+      "title": "Repertorio",
+      "desc": "Costruisci le linee per colore, poi allenale con la ripetizione spaziata.",
+      "myTitle": "Il mio repertorio",
+      "intro": "Costruisci le tue linee per colore, poi allenale con la ripetizione spaziata. Aggiungi mosse muovendo sulla scacchiera o dall'explorer.",
+      "emptyEditor": "Repertorio vuoto: aggiungi prima qualche linea nell'editor."
+    },
+    "error": {
+      "sessionExpiredSignIn": "Sessione scaduta. Accedi di nuovo.",
+      "sessionExpired": "Sessione scaduta.",
+      "noDataYet": "Analizza qualche partita prima: non ci sono ancora dati.",
+      "coachNotConfigured": "Il coach AI non è configurato (manca ANTHROPIC_API_KEY).",
+      "coachUnparsable": "Risposta del coach non interpretabile. Riprova.",
+      "coachGeneric": "Errore del coach AI.",
+      "coachShort": "Errore del coach.",
+      "repertoireName": "Dai un nome al repertorio.",
+      "repertoireNotFound": "Repertorio non trovato.",
+      "invalidTree": "Albero non valido."
+    }
+  },
+  "tactics": {
+    "metaTitle": "Tattiche — Shakh",
+    "calcMetaTitle": "Calcolo — Shakh",
+    "title": "Tattiche",
+    "tacticalVision": "Visione tattica",
+    "tacticalRating": "Rating tattico",
+    "currentStreak": "Serie attuale",
+    "bestStreak": "Miglior serie",
+    "streak": "Serie",
+    "best": "Record",
+    "solved": "Risolti",
+    "train": "Allenati",
+    "due": "{count} in scadenza",
+    "hubIntro": "Allena la visione tattica con i puzzle. Il rating si adatta a te e i puzzle sbagliati tornano da rivedere.",
+    "modes": {
+      "adaptive": {
+        "title": "Adattivo",
+        "desc": "Flusso continuo di puzzle al tuo livello. Aggiorna rating e serie."
+      },
+      "theme": {
+        "title": "Per tema",
+        "desc": "Allena un motivo specifico: forchetta, inchiodatura, finali…"
+      },
+      "review": {
+        "title": "Ripasso",
+        "desc": "Rivedi i puzzle sbagliati in scadenza (ripetizione spaziata)."
+      },
+      "timed": {
+        "title": "Sfida a tempo",
+        "desc": "3 minuti, difficoltà crescente: quanti ne risolvi?"
+      }
+    },
+    "themePickerTitle": "Per tema — scegli un motivo",
+    "backToTacticsArrow": "← Tattiche",
+    "whiteToMove": "Muove il Bianco",
+    "blackToMove": "Muove il Nero",
+    "hint": "Suggerimento",
+    "saveFailed": "Salvataggio non riuscito",
+    "timesUp": "Tempo scaduto",
+    "timedSummary": "Hai risolto <mono>{solved}</mono> puzzle in {minutes} minuti.",
+    "timedStats": "Miglior serie: <mono>{bestStreak}</mono> · Rating tattico: <mono>{rating}</mono>",
+    "playAgain": "Rigioca",
+    "otherModes": "Altre modalità",
+    "reviewComplete": "Ripasso completato",
+    "noPuzzlesAvailable": "Nessun puzzle disponibile",
+    "reviewEmpty": "Non hai puzzle in scadenza. Torna più tardi o allenati in modalità adattiva.",
+    "noPuzzlesForCriteria": "Non sono stati trovati puzzle per questi criteri. Importa il dataset o cambia modalità.",
+    "backToTactics": "Torna alle tattiche",
+    "next": "Prossimo",
+    "skip": "Salta",
+    "time": "Tempo",
+    "solvedChallenge": "Risolti (sfida)",
+    "solvedSession": "Risolti (sessione)",
+    "puzzleDifficulty": "Difficoltà puzzle:",
+    "sessionExpired": "Sessione scaduta. Accedi di nuovo.",
+    "calculation": "Calcolo",
+    "calculationRating": "Rating calcolo",
+    "calculationRatingLower": "rating calcolo",
+    "ratingNotUpdated": "Rating non aggiornato",
+    "ratingNotUpdatedError": "Rating non aggiornato.",
+    "wrongMove": "Mossa sbagliata. Calcolo interrotto.",
+    "opponentPlays": "L'avversario gioca {san}",
+    "noExercise": "Nessun esercizio disponibile",
+    "noSuitablePuzzle": "Nessun puzzle adatto trovato. Importa il dataset dei puzzle o riprova più tardi.",
+    "blindfoldCalculation": "Calcolo alla cieca",
+    "blindfoldIntro": "Memorizza la posizione, poi la scacchiera si svuota: gioca l'intera combinazione <strong>a memoria</strong>, senza vedere i pezzi. L'avversario risponde nella tua testa — te lo confermiamo solo a parole.",
+    "start": "Inizia",
+    "movesToCalculate": " · {count} mosse da calcolare",
+    "memorize": "memorizza: {seconds}s",
+    "readyHide": "Sono pronto — nascondi",
+    "moveOf": "mossa {current} di {total}",
+    "playYourMove": "Gioca la tua mossa",
+    "giveUp": "Arrenditi",
+    "calcSolved": "Risolto — {total} mosse calcolate alla cieca.",
+    "calcReached": "Arrivato a {reached}/{total} mosse.",
+    "exit": "Esci",
+    "depth": "Profondità",
+    "depthMoves": "{count} mosse",
+    "depthHint": "La profondità sale quando risolvi, scende quando sbagli."
+  },
+  "theory": {
+    "branch": {
+      "openings": "Aperture",
+      "middlegame": "Mediogioco",
+      "endgames": "Finali",
+      "theory": "Teoria"
+    },
+    "color": {
+      "white": "Bianco",
+      "black": "Nero"
+    },
+    "lessonsSoon": "Lezioni in arrivo.",
+    "home": {
+      "eyebrow": "Studio guidato",
+      "title": "Teoria",
+      "mobileDesc": "Capisci il perché delle mosse, con dati reali.",
+      "desc": "Lezioni guidate sulla scacchiera: capisci il <em>perché</em> delle mosse, con i dati reali dell'explorer e la verità esatta dei finali.",
+      "browseEco": "Sfoglia l'albero ECO",
+      "browseThemes": "Sfoglia i temi",
+      "browseEndgames": "Sfoglia tutti i finali",
+      "lessonsSoon": "Lezioni in arrivo.",
+      "soonBadge": "presto"
+    },
+    "learn": {
+      "eyebrow": "Un concetto alla volta",
+      "title": "Impara",
+      "mobileDesc": "Capisci l'idea, riconoscila, sfruttala. Poi partite spiegate.",
+      "desc": "I fondamentali, un concetto alla volta. Prima capisci l'idea, poi la riconosci e la sfrutti in piccoli esercizi. Poi guarda partite spiegate mossa per mossa.",
+      "concepts": "Concetti",
+      "doneBadge": "fatto",
+      "explainedGames": "Partite spiegate"
+    },
+    "openings": {
+      "eyebrow": "Albero ECO",
+      "title": "Aperture",
+      "mobileDesc": "Famiglie, aperture e varianti. Apri una lezione per studiarla.",
+      "desc": "Sfoglia l'albero ECO: famiglie, aperture e varianti. Apri una lezione per studiarla sulla scacchiera.",
+      "myRepertoire": "Il mio repertorio"
+    },
+    "middlegame": {
+      "eyebrow": "Temi strategici",
+      "title": "Mediogioco",
+      "mobileDesc": "Piani per entrambi i lati ed esercizi \"trova il piano\".",
+      "desc": "Temi strategici su posizioni tipiche: piani per entrambi i lati ed esercizi \"trova il piano\", valutati dal motore e commentati dal coach."
+    },
+    "endgames": {
+      "eyebrow": "Tecnica esatta",
+      "ratingEyebrow": "Rating finali · {rating}",
+      "title": "Finali",
+      "mobileDesc": "Converti il risultato contro la difesa perfetta della tablebase.",
+      "desc": "Tecnica dei finali, lezione e <em>pratica</em>: converti il risultato contro la difesa perfetta della tablebase. Niente approssimazioni: la tablebase è verità assoluta. Ogni conversione aggiorna il tuo rating finali.",
+      "ratingLabel": "rating finali",
+      "recommended": "consigliato",
+      "neverPracticed": "Mai praticato"
+    },
+    "lesson": {
+      "notAvailable": "Questa lezione non è ancora disponibile."
+    },
+    "errors": {
+      "missingProgressKey": "Chiave di progresso mancante.",
+      "sessionExpired": "Sessione scaduta. Accedi di nuovo."
+    },
+    "deviation": {
+      "queryingEngine": "Interrogo il motore…",
+      "evaluatingMove": "Valuto {move}…",
+      "coachReplying": "Il coach sta rispondendo…",
+      "coachError": "Errore del coach.",
+      "sorry": "Spiacente: {msg}",
+      "couldNotAnswer": "Non sono riuscito a rispondere. Riprova.",
+      "notConfigured": "Coach non configurato: puoi comunque valutare la deviazione con il motore.",
+      "whyNot": "Perché non <move></move>?"
+    },
+    "openingTree": {
+      "empty": "Nessuna apertura pubblicata. Il contenuto arriva con i seed.",
+      "collapse": "Comprimi",
+      "expand": "Espandi"
+    },
+    "tablebase": {
+      "title": "Finale esatto (tablebase)",
+      "querying": "Interrogo la tablebase…",
+      "tooManyPieces": "Qui la valutazione è quella del motore (vedi il pannello Motore).",
+      "posWinning": "Posizione vinta",
+      "posWinning50": "Vinta (ma regola delle 50 mosse)",
+      "posDrawn": "Posizione patta",
+      "posLost50": "Persa (salvata dalla regola delle 50 mosse)",
+      "posLosing": "Posizione persa",
+      "posUnknown": "Risultato sconosciuto",
+      "outcomeWins": "Vince",
+      "outcomeHoldsDraw": "Mantiene la patta",
+      "outcomeLoses": "Perde",
+      "mateIn": "matto in {n}"
+    },
+    "repertoireEditor": {
+      "saveFailed": "Salvataggio non riuscito",
+      "saved": "Repertorio salvato",
+      "buildAnnotate": "costruisci e annota le tue linee",
+      "saving": "Salvo…",
+      "save": "Salva",
+      "savedBtn": "Salvato",
+      "makeMainLine": "Rendi questa la linea principale",
+      "promote": "Promuovi",
+      "deleteMoveTitle": "Elimina questa mossa e la sua continuazione",
+      "delete": "Elimina",
+      "annotation": "Annotazione",
+      "selectMove": "Seleziona una mossa per annotarla.",
+      "annotationPlaceholder": "Idea della mossa, piano, trappola…",
+      "linesTab": "Linee",
+      "explorerTab": "Explorer"
+    },
+    "repertoireList": {
+      "notCreated": "Non creato",
+      "notDeleted": "Non eliminato",
+      "name": "Nome",
+      "namePlaceholder": "es. Bianco — Italiana",
+      "color": "Colore",
+      "create": "Crea repertorio",
+      "empty": "Nessun repertorio. Creane uno per iniziare a costruire le tue linee.",
+      "movesCount": "{count} mosse",
+      "editor": "Editor",
+      "train": "Allena",
+      "deleteAria": "Elimina repertorio"
+    },
+    "quality": {
+      "winning": "vinta",
+      "drawn": "patta",
+      "lost": "persa",
+      "unknown": "sconosciuta"
+    },
+    "endgamePractice": {
+      "title": "Pratica del finale",
+      "youPlay": "giochi col {color}",
+      "goalWin": "Vinci la posizione",
+      "goalDraw": "Mantieni la patta",
+      "throwsAwayWin": "Così butti via la vittoria: la posizione ora è {quality}. Torna indietro e riprova.",
+      "losesDraw": "Attento: questa mossa perde la patta (posizione {quality}). Torna indietro e riprova.",
+      "mateConverted": "Matto! Finale convertito alla perfezione.",
+      "drawReached": "Patta raggiunta. Difesa corretta.",
+      "stalemateWin": "Stallo: la vittoria è sfumata in patta.",
+      "opponentMated": "L'avversario ti ha dato matto.",
+      "endedDraw": "Finita in patta: la vittoria è sfumata.",
+      "drawHeld": "Patta mantenuta: hai dimostrato la difesa. Risultato confermato dalla tablebase.",
+      "notSafeDraw": "La posizione non è ancora una patta sicura: continua a difenderti.",
+      "theoreticalResult": "Risultato teorico",
+      "engineEstimate": "Stima del motore (posizione fuori dalla tablebase)",
+      "positionForYou": "Posizione <quality></quality> per te",
+      "checkingTablebase": "Verifico con la tablebase…",
+      "opponentDefending": "L'avversario sta difendendo…",
+      "tryAgain": "Riprova",
+      "claimDraw": "Reclama la patta",
+      "restart": "Ricomincia",
+      "disclaimer": "L'avversario gioca la difesa perfetta della tablebase di Lichess. Dopo ogni tua mossa il risultato viene verificato: niente approssimazioni."
+    },
+    "lessonViewer": {
+      "engine": "Motore",
+      "on": "acceso",
+      "off": "spento",
+      "leftLine": "Hai lasciato la linea",
+      "stepOf": "Passo {current} di {total}",
+      "freeExploration": "Esplorazione libera",
+      "back": "Indietro",
+      "next": "Avanti",
+      "deviationText": "Stai esplorando una mossa fuori dalla lezione. Valutala con il motore o chiedi al coach perché non è la scelta migliore.",
+      "backToLine": "Torna alla linea",
+      "lessonCompleted": "Lezione completata — registrata nel tuo percorso.",
+      "navigateExplore": "Naviga le mosse o gioca sulla scacchiera per esplorare.",
+      "movesTab": "Mosse",
+      "engineTab": "Motore",
+      "explorerTab": "Explorer",
+      "tablebaseTab": "Tablebase",
+      "engineThinking": "Il motore sta pensando…",
+      "engineOff": "Motore spento. Accendilo per valutare la posizione e le deviazioni."
+    },
+    "explorer": {
+      "title": "Cosa si gioca davvero",
+      "masters": "Maestri",
+      "online": "Online",
+      "querying": "Interrogo l'explorer…",
+      "noGames": "Nessuna partita per questa posizione.",
+      "move": "Mossa",
+      "games": "Partite",
+      "result": "Risultato (B / patta / N)",
+      "outcomeAria": "Bianco {white}, patte {draws}, Nero {black}",
+      "outcomeTitle": "Bianco {white} · Patte {draws} · Nero {black}"
+    },
+    "openingTrainer": {
+      "leftRepertoire": "L'avversario è uscito dal tuo repertorio con {move} (la mossa più comune). Valuta di aggiungerla.",
+      "endOfLine": "Fine della linea coperta dal repertorio.",
+      "correct": "{move} — corretta.",
+      "wrong": "{move} non è nel repertorio. Corretta: {expected}.",
+      "trainHeading": "Allena · {name}",
+      "reviewDue": "Ripasso degli item in scadenza",
+      "repertoireDrill": "Drill del repertorio",
+      "dueCount": "{count} in scadenza",
+      "trapWarning": "⚠ Attento: qui c'è una trappola, <trap></trap>.",
+      "newLine": "Nuova linea",
+      "yourTurn": "Il tuo turno",
+      "opponentMoving": "L'avversario sta muovendo…",
+      "endOfLineTitle": "Fine della linea",
+      "playRepertoireMove": "Gioca la tua mossa di repertorio.",
+      "trainAnotherLine": "Allena un'altra linea"
+    },
+    "positionalExercise": {
+      "engineAnalyzing": "Il motore sta analizzando la posizione…",
+      "evaluatingMove": "Valuto {move}…",
+      "coachCommenting": "Il coach sta commentando…",
+      "coachUnavailable": "Il coach non è disponibile in questo momento; affidati alla valutazione del motore.",
+      "couldNotEvaluate": "Non sono riuscito a valutare la mossa. Riprova.",
+      "title": "Esercizio: trova il piano",
+      "toMove": "{color} muove",
+      "reasonablePlan": "Piano ragionevole",
+      "notConsistent": "Poco coerente",
+      "evalAfter": "Valutazione dopo la mossa: {evalText}",
+      "proposeMove": "Proponi una mossa sulla scacchiera: il motore la valuta e il coach spiega se è coerente con il piano.",
+      "tryAnotherMove": "Prova un'altra mossa",
+      "hidePlan": "Nascondi il piano",
+      "showPlan": "Mostra il piano",
+      "relatedTheme": "Tema correlato:",
+      "trainThemed": "allena tattiche a tema",
+      "disclaimer": "Non c'è un'unica soluzione: ciò che si valuta è la ragionevolezza del piano. Il motore dà i numeri, il coach le parole."
+    },
+    "guidedReplay": {
+      "back": "Indietro",
+      "start": "inizio",
+      "move": "mossa {n}",
+      "next": "Avanti",
+      "backToLearn": "Torna a Impara"
+    },
+    "conceptRunner": {
+      "saveFailed": "Salvataggio non riuscito",
+      "goal": "Obiettivo:",
+      "noExercises": "Nessun esercizio disponibile al momento per questo concetto.",
+      "start": "Inizia ({count} esercizi)",
+      "completed": "Concetto completato",
+      "solvedSummary": "Hai risolto <solved></solved> di {total} in modo pulito. Concetto <title></title> sbloccato.",
+      "moreConcepts": "Altri concetti",
+      "keepTraining": "Continua ad allenarti"
+    }
   }
 }

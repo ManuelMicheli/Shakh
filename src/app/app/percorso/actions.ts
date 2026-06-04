@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { recomputePath } from "@/lib/path/recompute";
 
@@ -16,10 +17,11 @@ export interface RecomputeResult {
  */
 export async function recomputePathAction(): Promise<RecomputeResult> {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("error.sessionExpiredSignIn") };
 
   const { currentLevel } = await recomputePath(supabase, user.id);
   revalidatePath("/app/percorso");

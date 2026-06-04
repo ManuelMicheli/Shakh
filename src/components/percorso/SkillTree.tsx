@@ -1,25 +1,23 @@
 import Link from "next/link";
 import { Lock, Circle, CircleDot, CheckCircle2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { PathNodeStatus, PathNodeView } from "@/lib/path/types";
 
-const LEVEL_TITLES: Record<number, string> = {
-  0: "Level 0 — Foundations",
-  1: "Level 1 — Basic tactics",
-  2: "Level 2 — Openings and key endgames",
-  3: "Level 3 — Middlegame",
-  4: "Level 4 — Toward the club",
+// Icona per stato; l'etichetta è localizzata via chiave i18n in STATUS_LABEL_KEY.
+const STATUS_ICON: Record<PathNodeStatus, typeof Circle> = {
+  locked: Lock,
+  available: Circle,
+  in_progress: CircleDot,
+  completed: CheckCircle2,
 };
 
-const STATUS_META: Record<
-  PathNodeStatus,
-  { label: string; Icon: typeof Circle }
-> = {
-  locked: { label: "Locked", Icon: Lock },
-  available: { label: "Available", Icon: Circle },
-  in_progress: { label: "In progress", Icon: CircleDot },
-  completed: { label: "Completed", Icon: CheckCircle2 },
+const STATUS_LABEL_KEY: Record<PathNodeStatus, string> = {
+  locked: "skillTree.status.locked",
+  available: "skillTree.status.available",
+  in_progress: "skillTree.status.inProgress",
+  completed: "skillTree.status.completed",
 };
 
 const ACTIVITY_LINK =
@@ -36,7 +34,9 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 function NodeCard({ node }: { node: PathNodeView }) {
-  const { Icon, label } = STATUS_META[node.status];
+  const t = useTranslations("study");
+  const Icon = STATUS_ICON[node.status];
+  const label = t(STATUS_LABEL_KEY[node.status]);
   const locked = node.status === "locked";
   const completed = node.status === "completed";
   const inProgress = node.status === "in_progress";
@@ -82,7 +82,7 @@ function NodeCard({ node }: { node: PathNodeView }) {
 
       {locked && node.prerequisites.length > 0 && (
         <p className="mt-3 text-xs text-text-muted">
-          Unlock by completing the previous steps.
+          {t("skillTree.unlockHint")}
         </p>
       )}
     </div>
@@ -91,7 +91,9 @@ function NodeCard({ node }: { node: PathNodeView }) {
 
 /** Tappa della timeline mobile: marker di stato sulla spina + scheda a fianco. */
 function NodeRow({ node }: { node: PathNodeView }) {
-  const { Icon, label } = STATUS_META[node.status];
+  const t = useTranslations("study");
+  const Icon = STATUS_ICON[node.status];
+  const label = t(STATUS_LABEL_KEY[node.status]);
   const locked = node.status === "locked";
   const completed = node.status === "completed";
 
@@ -147,7 +149,7 @@ function NodeRow({ node }: { node: PathNodeView }) {
 
         {locked && node.prerequisites.length > 0 && (
           <p className="mt-2 text-xs text-text-muted">
-            Unlock by completing the previous steps.
+            {t("skillTree.unlockHint")}
           </p>
         )}
       </div>
@@ -157,7 +159,16 @@ function NodeRow({ node }: { node: PathNodeView }) {
 
 /** Skill tree: nodi raggruppati per livello, con stato e sblocco progressivo. */
 export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
+  const t = useTranslations("study");
   const levels = Array.from(new Set(nodes.map((n) => n.level))).sort((a, b) => a - b);
+  // Titoli dei livelli noti (0..4); per livelli fuori range si usa il fallback.
+  const LEVEL_TITLE_KEYS: Record<number, string> = {
+    0: "skillTree.level.0",
+    1: "skillTree.level.1",
+    2: "skillTree.level.2",
+    3: "skillTree.level.3",
+    4: "skillTree.level.4",
+  };
 
   return (
     <div className="space-y-8">
@@ -166,7 +177,10 @@ export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
           .filter((n) => n.level === level)
           .sort((a, b) => a.order_index - b.order_index);
         const done = ofLevel.filter((n) => n.status === "completed").length;
-        const title = LEVEL_TITLES[level] ?? `Level ${level}`;
+        const title =
+          level in LEVEL_TITLE_KEYS
+            ? t(LEVEL_TITLE_KEYS[level])
+            : t("skillTree.levelFallback", { level });
         return (
           <section key={level} className="space-y-3">
             {/* MOBILE: intestazione con regola damier. */}

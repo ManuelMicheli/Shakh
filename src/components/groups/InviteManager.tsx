@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -14,14 +15,15 @@ function inviteLink(code: string): string {
   return `${window.location.origin}/app/join/${code}`;
 }
 
-function inviteState(inv: InviteRow): { label: string; muted: boolean } {
-  if (inv.usedBy) return { label: "used", muted: true };
+function inviteState(inv: InviteRow): { labelKey: string; muted: boolean } {
+  if (inv.usedBy) return { labelKey: "inviteStateUsed", muted: true };
   if (inv.expiresAt && new Date(inv.expiresAt) <= new Date())
-    return { label: "expired", muted: true };
-  return { label: "active", muted: false };
+    return { labelKey: "inviteStateExpired", muted: true };
+  return { labelKey: "inviteStateActive", muted: false };
 }
 
 export function InviteManager({ groupId, invites }: { groupId: string; invites: InviteRow[] }) {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [role, setRole] = useState<GroupRole>("member");
@@ -37,12 +39,12 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
         email: email || null,
       });
       if (!res.ok || !res.data) {
-        toast({ title: "Invite not created", description: res.error, variant: "error" });
+        toast({ title: t("toastInviteNotCreated"), description: res.error, variant: "error" });
         return;
       }
       setEmail("");
       await navigator.clipboard?.writeText(inviteLink(res.data.code)).catch(() => {});
-      toast({ title: "Invite created", description: "Link copied to clipboard." });
+      toast({ title: t("toastInviteCreated"), description: t("toastLinkCopiedToClipboard") });
       router.refresh();
     });
   };
@@ -51,7 +53,7 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
     start(async () => {
       const res = await revokeInvite(groupId, id);
       if (!res.ok) {
-        toast({ title: "Not revoked", description: res.error, variant: "error" });
+        toast({ title: t("toastNotRevoked"), description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -60,8 +62,8 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
 
   const copy = (code: string) => {
     navigator.clipboard?.writeText(inviteLink(code)).then(
-      () => toast({ title: "Link copied" }),
-      () => toast({ title: "Copy failed", variant: "error" }),
+      () => toast({ title: t("toastLinkCopied") }),
+      () => toast({ title: t("toastCopyFailed"), variant: "error" }),
     );
   };
 
@@ -75,7 +77,7 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
         className="flex flex-wrap items-end gap-3"
       >
         <div className="space-y-1">
-          <span className="block text-xs text-text-muted">Role</span>
+          <span className="block text-xs text-text-muted">{t("roleLabel")}</span>
           <div className="inline-flex rounded-md border border-border bg-surface p-0.5">
             {(["member", "instructor"] as GroupRole[]).map((r) => (
               <button
@@ -94,7 +96,7 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
         </div>
         <div className="w-24 space-y-1">
           <label className="text-xs text-text-muted" htmlFor="inv-days">
-            Expires (days)
+            {t("expiresDaysLabel")}
           </label>
           <Input
             id="inv-days"
@@ -106,23 +108,23 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
         </div>
         <div className="min-w-[12rem] flex-1 space-y-1">
           <label className="text-xs text-text-muted" htmlFor="inv-email">
-            Email (optional)
+            {t("emailOptionalLabel")}
           </label>
           <Input
             id="inv-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="reserve the invite for an email"
+            placeholder={t("emailReservePlaceholder")}
           />
         </div>
         <Button type="submit" disabled={pending}>
-          Generate invite
+          {t("generateInviteButton")}
         </Button>
       </form>
 
       {invites.length === 0 ? (
-        <p className="text-sm text-text-muted">No invites generated.</p>
+        <p className="text-sm text-text-muted">{t("noInvitesGenerated")}</p>
       ) : (
         <ul className="divide-y divide-border">
           {invites.map((inv) => {
@@ -136,19 +138,21 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-sm">{inv.code}</span>
                     <Badge variant="muted">{GROUP_ROLE_LABEL[inv.roleInGroup]}</Badge>
-                    <Badge variant={st.muted ? "muted" : undefined}>{st.label}</Badge>
+                    <Badge variant={st.muted ? "muted" : undefined}>{t(st.labelKey)}</Badge>
                   </div>
                   <p className="text-xs text-text-muted">
                     {inv.email ? `${inv.email} · ` : ""}
                     {inv.expiresAt
-                      ? `expires ${new Date(inv.expiresAt).toLocaleDateString("en-US")}`
-                      : "no expiration"}
+                      ? t("inviteExpiresOn", {
+                          date: new Date(inv.expiresAt).toLocaleDateString("en-US"),
+                        })
+                      : t("inviteNoExpiration")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   {!st.muted && (
                     <Button variant="secondary" size="sm" onClick={() => copy(inv.code)}>
-                      Copy link
+                      {t("copyLinkButton")}
                     </Button>
                   )}
                   <Button
@@ -157,7 +161,7 @@ export function InviteManager({ groupId, invites }: { groupId: string; invites: 
                     disabled={pending}
                     onClick={() => onRevoke(inv.id)}
                   >
-                    Revoke
+                    {t("revokeButton")}
                   </Button>
                 </div>
               </li>

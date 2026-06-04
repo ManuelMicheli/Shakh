@@ -6,6 +6,7 @@ import { otbToLichessPuzzle } from "@/lib/rating/calibration";
 import { decodeEval, toMoverCp } from "@/lib/analysis/evalScore";
 import { moverFromPly } from "@/lib/ai/format";
 import { classifyMotif, motifThemes, motifLabel, type MotifClass } from "@/lib/repair/motif";
+import { activeLocale } from "@/lib/i18n/content";
 import type { Puzzle } from "@/lib/tactics/types";
 
 interface PuzzleRow {
@@ -88,6 +89,7 @@ export async function getRepairPuzzles(gameId: string, ply: number): Promise<Rep
   }
   const motif = classifyMotif({ mateForUser, bestSan: row.best_move_san, cpLoss });
   const themes = motifThemes(motif);
+  const locale = await activeLocale();
 
   // Selezione: finestra di rating attorno al livello (meno l'offset di flusso).
   const stats = await ensureStats(supabase, user.id);
@@ -105,7 +107,7 @@ export async function getRepairPuzzles(gameId: string, ply: number): Promise<Rep
     const pool = (data as PuzzleRow[] | null) ?? [];
     if (pool.length >= 3) {
       const picked = shuffle(pool).slice(0, 3).map(toPuzzle);
-      return { ok: true, motif, motifLabel: motifLabel(motif), puzzles: picked };
+      return { ok: true, motif, motifLabel: motifLabel(motif, locale), puzzles: picked };
     }
   }
 
@@ -122,7 +124,7 @@ export async function getRepairPuzzles(gameId: string, ply: number): Promise<Rep
   return {
     ok: true,
     motif,
-    motifLabel: motifLabel(motif),
+    motifLabel: motifLabel(motif, locale),
     puzzles: shuffle(pool).slice(0, 3).map(toPuzzle),
   };
 }

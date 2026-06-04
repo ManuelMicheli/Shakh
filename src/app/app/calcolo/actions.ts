@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ensureStats } from "@/lib/tactics/query";
 import { otbToLichessPuzzle, lichessPuzzleToOtb } from "@/lib/rating/calibration";
@@ -97,7 +98,10 @@ export async function recordCalcResult(input: CalcResultInput): Promise<CalcResu
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) {
+    const t = await getTranslations("tactics");
+    return { ok: false, error: t("sessionExpired") };
+  }
 
   // Difficoltà = forza OTB del puzzle + bonus per la profondità calcolata.
   const opponentRating =
@@ -112,7 +116,8 @@ export async function recordCalcResult(input: CalcResultInput): Promise<CalcResu
       "calculation",
     );
   } catch {
-    return { ok: false, error: "Rating not updated." };
+    const t = await getTranslations("tactics");
+    return { ok: false, error: t("ratingNotUpdatedError") };
   }
   return { ok: true };
 }

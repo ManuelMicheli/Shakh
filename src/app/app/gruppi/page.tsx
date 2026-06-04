@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,10 @@ import {
 import { isInstructorRole } from "@/lib/groups/access";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Groups — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("groups");
+  return { title: t("metaTitle") };
+}
 
 interface MembershipRow {
   role_in_group: GroupRole;
@@ -23,6 +27,7 @@ interface MembershipRow {
 }
 
 export default async function GruppiPage() {
+  const t = await getTranslations("groups");
   const supabase = await createClient();
   const user = await getUser();
   if (!user) redirect("/login");
@@ -61,21 +66,20 @@ export default async function GruppiPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Clubs and classes"
-        title="Groups"
-        desc="Follow your students and assign activities, or join with a code."
+        eyebrow={t("indexEyebrow")}
+        title={t("indexTitle")}
+        desc={t("indexDesc")}
       />
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Clubs and groups</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">{t("indexHeading")}</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Create a club or a class to follow your students&apos; progress and
-          assign activities, or join a group with an invite code.
+          {t("indexIntro")}
         </p>
       </div>
 
       {groups.length === 0 ? (
         <p className="text-sm text-text-muted">
-          You&apos;re not part of any group yet. Create one or join with a code.
+          {t("noGroups")}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -92,7 +96,7 @@ export default async function GruppiPage() {
                         )}
                       </div>
                       <p className="text-xs text-text-muted">
-                        {GROUP_TYPE_LABEL[g.type]} · {g.memberCount} members
+                        {GROUP_TYPE_LABEL[g.type]} · {t("memberCount", { count: g.memberCount })}
                       </p>
                     </div>
                   </CardContent>
@@ -105,8 +109,8 @@ export default async function GruppiPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Create a group</CardTitle>
-          <CardDescription>You become the instructor of the group you create.</CardDescription>
+          <CardTitle>{t("createGroupTitle")}</CardTitle>
+          <CardDescription>{t("createGroupDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <CreateGroupForm />
@@ -115,8 +119,8 @@ export default async function GruppiPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Join with a code</CardTitle>
-          <CardDescription>Got an invite? Paste the code here.</CardDescription>
+          <CardTitle>{t("joinWithCodeTitle")}</CardTitle>
+          <CardDescription>{t("joinWithCodeDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <JoinForm />

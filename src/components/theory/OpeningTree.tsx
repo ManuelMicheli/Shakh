@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ChevronRight, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ export interface OpeningTreeProps {
 
 /** Albero ECO espandibile: famiglia → apertura → variante. SAN/ECO in monospace. */
 export function OpeningTree({ nodes }: OpeningTreeProps) {
+  const t = useTranslations("theory");
   const { roots, childrenOf } = useMemo(() => {
     const ids = new Set(nodes.map((n) => n.id));
     const childrenOf = new Map<string | null, OpeningNode[]>();
@@ -37,7 +39,7 @@ export function OpeningTree({ nodes }: OpeningTreeProps) {
   if (nodes.length === 0) {
     return (
       <p className="text-sm text-text-muted">
-        No published openings. Content comes with the seeds.
+        {t("openingTree.empty")}
       </p>
     );
   }
@@ -60,6 +62,7 @@ function TreeRow({
   childrenOf: Map<string | null, OpeningNode[]>;
   depth: number;
 }) {
+  const t = useTranslations("theory");
   const children = childrenOf.get(node.id) ?? [];
   const [open, setOpen] = useState(depth === 0);
   const hasChildren = children.length > 0;
@@ -74,7 +77,7 @@ function TreeRow({
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Collapse" : "Expand"}
+            aria-label={open ? t("openingTree.collapse") : t("openingTree.expand")}
             className="text-text-muted"
           >
             <ChevronRight className={cn("h-4 w-4 transition-transform", open && "rotate-90")} />

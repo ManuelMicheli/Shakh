@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,6 +53,7 @@ export interface CalculationTrainerProps {
 }
 
 export function CalculationTrainer({ initialPuzzle, initialRating }: CalculationTrainerProps) {
+  const t = useTranslations("tactics");
   const { toast } = useToast();
 
   const [phase, setPhase] = useState<Phase>("idle");
@@ -119,14 +121,14 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
         solved,
       });
       if (!res.ok && res.error) {
-        toast({ title: "Rating not updated", description: res.error, variant: "error" });
+        toast({ title: t("ratingNotUpdated"), description: res.error, variant: "error" });
       }
       // Scala di difficoltà per il prossimo.
       depthRef.current = solved
         ? Math.min(MAX_DEPTH, depthRef.current + 1)
         : Math.max(MIN_DEPTH, depthRef.current - 1);
     },
-    [puzzle, toast],
+    [puzzle, toast, t],
   );
 
   // ----- Tentativo di mossa (alla cieca) -----
@@ -145,7 +147,7 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
       setSelectedFrom(null);
 
       if (!correct) {
-        setMessage("Wrong move. Calculation stopped.");
+        setMessage(t("wrongMove"));
         void finish(false, movesDone);
         return;
       }
@@ -172,9 +174,9 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
         void finish(true, doneNow);
         return;
       }
-      setMessage(reply ? `Opponent plays ${reply.san}` : null);
+      setMessage(reply ? t("opponentPlays", { san: reply.san }) : null);
     },
-    [puzzle, movesDone, finish],
+    [puzzle, movesDone, finish, t],
   );
 
   const onSquare = useCallback(
@@ -229,11 +231,11 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
       <Shell rating={rating}>
         <Card>
           <CardHeader>
-            <CardTitle>No exercise available</CardTitle>
+            <CardTitle>{t("noExercise")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-text-muted">
-              No suitable puzzle found. Import the puzzle dataset or try again later.
+              {t("noSuitablePuzzle")}
             </p>
           </CardContent>
         </Card>
@@ -250,15 +252,15 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
           {phase === "idle" && (
             <Card>
               <CardHeader>
-                <CardTitle>Blindfold calculation</CardTitle>
+                <CardTitle>{t("blindfoldCalculation")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-text-muted">
-                  Memorize the position, then the board clears: play the entire
-                  combination <strong>from memory</strong>, without seeing the pieces. The opponent
-                  replies in your head — we just confirm it in words.
+                  {t.rich("blindfoldIntro", {
+                    strong: (chunks) => <strong>{chunks}</strong>,
+                  })}
                 </p>
-                <Button onClick={() => setup(puzzle)}>Start</Button>
+                <Button onClick={() => setup(puzzle)}>{t("start")}</Button>
               </CardContent>
             </Card>
           )}
@@ -267,13 +269,14 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
             <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-text-muted">
-                  {orientation === "white" ? "White" : "Black"} to move · {total} moves to calculate
+                  {(orientation === "white" ? t("whiteToMove") : t("blackToMove")) +
+                    t("movesToCalculate", { count: total })}
                 </span>
-                <span className="font-mono text-sm">memorize: {previewLeft}s</span>
+                <span className="font-mono text-sm">{t("memorize", { seconds: previewLeft })}</span>
               </div>
               <ChessBoard fen={previewFenRef.current} orientation={orientation} mode="view" />
               <Button onClick={() => setPhase("solve")} className="w-full">
-                I&apos;m ready — hide
+                {t("readyHide")}
               </Button>
             </div>
           )}
@@ -282,17 +285,17 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
             <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-text-muted">
-                  {orientation === "white" ? "White" : "Black"} to move
+                  {orientation === "white" ? t("whiteToMove") : t("blackToMove")}
                 </span>
                 <span className="font-mono text-sm">
-                  move {Math.min(movesDone + 1, total)} of {total}
+                  {t("moveOf", { current: Math.min(movesDone + 1, total), total })}
                 </span>
               </div>
               <BlindGrid orientation={orientation} selected={selectedFrom} onSquare={onSquare} />
               <div className="flex min-h-6 items-center justify-between gap-3">
-                <span className="text-sm text-text-muted">{message ?? "Play your move"}</span>
+                <span className="text-sm text-text-muted">{message ?? t("playYourMove")}</span>
                 <Button variant="ghost" size="sm" onClick={() => void finish(false, movesDone)}>
-                  Give up
+                  {t("giveUp")}
                 </Button>
               </div>
             </div>
@@ -305,15 +308,15 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
                 <CardContent className="space-y-3 py-4">
                   <p className="font-medium">
                     {result.solved
-                      ? `Solved — ${result.total} moves calculated blindfold.`
-                      : `Reached ${result.reached}/${result.total} moves.`}
+                      ? t("calcSolved", { total: result.total })
+                      : t("calcReached", { reached: result.reached, total: result.total })}
                   </p>
                   <div className="flex gap-2">
                     <Button onClick={() => void loadNext()} disabled={loading}>
-                      {loading ? "…" : "Next"}
+                      {loading ? "…" : t("next")}
                     </Button>
                     <Link href="/app/calcolo">
-                      <Button variant="secondary">Exit</Button>
+                      <Button variant="secondary">{t("exit")}</Button>
                     </Link>
                   </div>
                 </CardContent>
@@ -323,10 +326,10 @@ export function CalculationTrainer({ initialPuzzle, initialRating }: Calculation
         </div>
 
         <aside className="space-y-4">
-          <Stat label="Calculation rating" value={rating ?? "—"} />
-          <Stat label="Depth" value={`${depthRef.current} moves`} />
+          <Stat label={t("calculationRating")} value={rating ?? "—"} />
+          <Stat label={t("depth")} value={t("depthMoves", { count: depthRef.current })} />
           <p className="text-xs text-text-muted">
-            Depth rises when you solve, drops when you miss.
+            {t("depthHint")}
           </p>
         </aside>
       </div>
@@ -378,13 +381,16 @@ function BlindGrid({
 }
 
 function Shell({ rating, children }: { rating: number | null; children: React.ReactNode }) {
+  const t = useTranslations("tactics");
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-3">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Calculation</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">{t("calculation")}</h1>
         <div className="text-right">
           <div className="font-mono text-2xl tabular-nums">{rating ?? "—"}</div>
-          <div className="text-xs uppercase tracking-wide text-text-muted">calculation rating</div>
+          <div className="text-xs uppercase tracking-wide text-text-muted">
+            {t("calculationRatingLower")}
+          </div>
         </div>
       </div>
       {children}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Users, ClipboardList } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { MemberList } from "@/components/groups/MemberList";
@@ -8,6 +9,7 @@ import { InviteManager } from "@/components/groups/InviteManager";
 import { GroupRepertoireForm } from "@/components/groups/GroupRepertoireForm";
 import { loadMembers } from "@/lib/groups/class";
 import { getMyGroupRole, isInstructorRole } from "@/lib/groups/access";
+import { activeLocale } from "@/lib/i18n/content";
 import {
   GROUP_TYPE_LABEL,
   type GroupRole,
@@ -40,6 +42,7 @@ interface GroupRepRow {
 
 export default async function GroupPage({ params }: PageProps) {
   const { id } = await params;
+  const t = await getTranslations("groups");
   const supabase = await createClient();
   const user = await getUser();
   if (!user) redirect("/login");
@@ -56,7 +59,7 @@ export default async function GroupPage({ params }: PageProps) {
   const instructor = isInstructorRole(role);
   const isOwner = role === "owner";
 
-  const membersRaw = await loadMembers(supabase, id);
+  const membersRaw = await loadMembers(supabase, id, await activeLocale());
   const members: MemberRow[] = membersRaw.map((m) => ({
     userId: m.userId,
     displayName: m.name,
@@ -98,11 +101,11 @@ export default async function GroupPage({ params }: PageProps) {
     <div className="space-y-8">
       <div>
         <Link href="/app/gruppi" className="text-sm text-text-muted hover:text-text">
-          ← All groups
+          ← {t("backAllGroups")}
         </Link>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">{group.name}</h1>
         <p className="mt-1 text-text-muted">
-          {GROUP_TYPE_LABEL[group.type]} · {members.length} members
+          {GROUP_TYPE_LABEL[group.type]} · {t("memberCount", { count: members.length })}
         </p>
       </div>
 
@@ -113,8 +116,8 @@ export default async function GroupPage({ params }: PageProps) {
               <CardContent className="flex items-center gap-3 py-4">
                 <Users className="h-5 w-5" aria-hidden />
                 <div>
-                  <p className="font-medium">Class dashboard</p>
-                  <p className="text-xs text-text-muted">Aggregated student progress</p>
+                  <p className="font-medium">{t("classDashboard")}</p>
+                  <p className="text-xs text-text-muted">{t("classDashboardDesc")}</p>
                 </div>
               </CardContent>
             </Card>
@@ -124,8 +127,8 @@ export default async function GroupPage({ params }: PageProps) {
               <CardContent className="flex items-center gap-3 py-4">
                 <ClipboardList className="h-5 w-5" aria-hidden />
                 <div>
-                  <p className="font-medium">Assignments</p>
-                  <p className="text-xs text-text-muted">Create and track activities</p>
+                  <p className="font-medium">{t("assignments")}</p>
+                  <p className="text-xs text-text-muted">{t("assignmentsNavDesc")}</p>
                 </div>
               </CardContent>
             </Card>
@@ -135,13 +138,13 @@ export default async function GroupPage({ params }: PageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Members</CardTitle>
+          <CardTitle>{t("members")}</CardTitle>
           <CardDescription>
             {isOwner
-              ? "Promote to instructor, remove, or open a student's progress."
+              ? t("membersDescOwner")
               : instructor
-                ? "Open a student's progress."
-                : "The people in this group."}
+                ? t("membersDescInstructor")
+                : t("membersDescMember")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -153,9 +156,9 @@ export default async function GroupPage({ params }: PageProps) {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Invites</CardTitle>
+              <CardTitle>{t("invites")}</CardTitle>
               <CardDescription>
-                Generate a code/link with a role and expiry. Each invite is valid for one entry.
+                {t("invitesDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -165,9 +168,9 @@ export default async function GroupPage({ params }: PageProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Group repertoires</CardTitle>
+              <CardTitle>{t("groupRepertoires")}</CardTitle>
               <CardDescription>
-                &quot;This is how we play in our club.&quot; Students train them with the trainer.
+                {t("groupRepertoiresDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -182,8 +185,8 @@ export default async function GroupPage({ params }: PageProps) {
                       <div>
                         <p className="font-medium">{r.name}</p>
                         <p className="text-xs text-text-muted">
-                          {r.color === "white" ? "White" : "Black"} ·{" "}
-                          {r.repertoire_moves?.[0]?.count ?? 0} moves
+                          {r.color === "white" ? t("white") : t("black")} ·{" "}
+                          {t("moveCount", { count: r.repertoire_moves?.[0]?.count ?? 0 })}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -191,13 +194,13 @@ export default async function GroupPage({ params }: PageProps) {
                           href={`/app/repertorio/${r.id}`}
                           className="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm font-medium text-text hover:bg-surface"
                         >
-                          Editor
+                          {t("editor")}
                         </Link>
                         <Link
                           href={`/app/repertorio/${r.id}/training`}
                           className="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm font-medium text-text hover:bg-surface"
                         >
-                          Train
+                          {t("train")}
                         </Link>
                       </div>
                     </li>

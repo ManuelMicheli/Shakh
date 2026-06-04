@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -21,9 +22,10 @@ export function ConfirmResignButton({
   onConfirm,
   disabled,
   className,
-  label = "Resign",
+  label,
   size = "sm",
 }: ConfirmResignButtonProps) {
+  const t = useTranslations("play");
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,17 +38,17 @@ export function ConfirmResignButton({
         onClick={() => setOpen(true)}
       >
         <Flag className="h-4 w-4" />
-        {label}
+        {label ?? t("resign.label")}
       </Button>
       <Dialog
         open={open}
         onOpenChange={setOpen}
-        title="Resign the game?"
-        description="You'll lose the game. This action can't be undone."
+        title={t("resign.confirmTitle")}
+        description={t("resign.confirmDesc")}
       >
         <div className="flex justify-end gap-2">
           <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             variant="danger"
@@ -56,7 +58,7 @@ export function ConfirmResignButton({
               onConfirm();
             }}
           >
-            Yes, resign
+            {t("resign.confirm")}
           </Button>
         </div>
       </Dialog>

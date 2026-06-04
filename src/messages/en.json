@@ -3,7 +3,88 @@
     "login": "Log in",
     "signup": "Get started",
     "haveAccount": "I already have an account",
-    "openApp": "Open the app"
+    "openApp": "Open the app",
+    "close": "Close",
+    "notifications": "Notifications",
+    "avatarAlt": "Avatar",
+    "continue": "Continue",
+    "next": "Next",
+    "back": "Back",
+    "theme": {
+      "switchToLight": "Switch to light theme",
+      "switchToDark": "Switch to dark theme"
+    },
+    "error": {
+      "unexpected": "Unexpected error.",
+      "sessionExpired": "Session expired. Please sign in again."
+    },
+    "page": {
+      "title": "Welcome — Shakh"
+    },
+    "intro": {
+      "title": "Welcome to Shakh",
+      "titleNamed": "Welcome, {name}",
+      "desc": "I'm your coach. Together we'll start from your real level and build a tailored path, where I always explain the <em>why</em> behind the moves. It only takes a couple of minutes to get off to a good start.",
+      "step1": "1 · A couple of quick questions about you",
+      "step2": "2 · Link Lichess or Chess.com (if you want)",
+      "step3": "3 · A mini-test to calibrate, and you're off",
+      "start": "Let's start"
+    },
+    "self": {
+      "title": "A few questions",
+      "desc": "Go with your gut: it just helps us start from the right point.",
+      "rulesQ": "Do you know how the pieces move?",
+      "yes": "Yes",
+      "no": "No",
+      "notEntirely": "Not entirely",
+      "onlineQ": "Do you play online?",
+      "ratingPlaceholder": "Approximate rating (e.g. 1200)",
+      "experienceQ": "How long have you been playing?",
+      "expNew": "Not long (less than six months)",
+      "expSome": "A few years, without training seriously",
+      "expExperienced": "I've played for a while and I train"
+    },
+    "connect": {
+      "title": "Link an online account",
+      "desc": "Do you play on Lichess or Chess.com? Link it: after a quick verification we'll use your real rating to place you precisely and import your latest games. It's optional — you can also do it later from your profile.",
+      "doneBadge": "done",
+      "verified": "Account verified: we've already placed you from your real rating.",
+      "skipTestMoveOn": "Skip the test, move on",
+      "skipLinkLater": "Skip, I'll link it later"
+    },
+    "test": {
+      "title": "Tactical mini-test",
+      "preparing": "Preparing a few positions…",
+      "complete": "Test complete",
+      "estimate": "Provisional estimate: tactical rating ~{rating}, starting level {level}.",
+      "findBest": "Find the best move. If you don't see it, you can skip.",
+      "verifiedNote": "You already have a verified account: the test isn't required, but taking it refines the estimate further.",
+      "skipThis": "Skip this one",
+      "skipTest": "Skip the test"
+    },
+    "tour": {
+      "path": {
+        "title": "Your path",
+        "body": "A leveled map takes you from beginner to club player. Nodes unlock once you prove you've mastered the previous ones."
+      },
+      "coach": {
+        "title": "The coach explains the why",
+        "body": "No memorizing moves: the coach explains the meaning behind your choices, anchored to engine data and statistics."
+      },
+      "free": {
+        "title": "Guided first, then free",
+        "body": "At the start we tell you the next step. As you grow, the path stays as a reference and you train wherever you like."
+      }
+    },
+    "done": {
+      "title": "All set",
+      "titleNamed": "All set, {name}",
+      "desc": "I've placed you on the path and your dashboard is ready. From here on I'll guide you step by step. Good luck and enjoy the game!",
+      "goToDashboard": "Go to dashboard"
+    },
+    "saving": {
+      "preparing": "Preparing your path…"
+    }
   },
   "landing": {
     "navCta": "Get started",
@@ -65,5 +146,1293 @@
     "preferencesBody": "Remember non-essential choices (e.g. layout) to improve the experience.",
     "alwaysOn": "Always on",
     "moreInfo": "More information in the"
+  },
+  "dashboard": {
+    "defaultPlayerName": "player",
+    "greeting": "Hi, {name}",
+    "subtitle": "An overview of your progress.",
+    "loading": "Loading…",
+    "trainNow": "Train now",
+    "empty": {
+      "title": "Start collecting data",
+      "desc": "Solve a few puzzles or import a game: the dashboard will fill up with progress, charts, and tailored advice.",
+      "trainPuzzles": "Train with puzzles",
+      "importGame": "Import a game"
+    },
+    "nudge": {
+      "title": "Analyze your imported games",
+      "desc": "You have {count} {count, plural, one {imported game} other {imported games}} still to analyze. Analyze them to unlock weaknesses, accuracy, and the coach's advice."
+    },
+    "shakhRating": {
+      "title": "Shakh Rating",
+      "notCalibrated": "not calibrated",
+      "desc": "A strength estimate on the real-world (OTB) scale, from puzzles, games, endgames, calculation, play quality, and — if linked — your online account's rating.",
+      "notCalibratedDetail": "Estimate not yet calibrated: <mono>{collected}</mono>/<mono>{total}</mono> data points collected, <mono>{missing}</mono> still needed. Every puzzle solved, game analyzed, or endgame played counts.",
+      "refining": "Estimate is being refined: you have enough data, keep training and the margin of error (±) will shrink."
+    },
+    "kind": {
+      "game": "Game",
+      "puzzle": "Puzzle",
+      "lesson": "Lesson"
+    },
+    "stat": {
+      "pathLevel": "Path level",
+      "pathNodes": "{completed}/{total} nodes",
+      "tacticalRating": "Tactical rating",
+      "solved": "{count} solved",
+      "streak": "Streak",
+      "bestStreak": "best {best}",
+      "accuracy": "Accuracy",
+      "analyzedGames": "{count} games"
+    },
+    "coach": {
+      "title": "The coach says",
+      "latestSummary": "latest summary",
+      "advice": "Advice:"
+    },
+    "skillsMap": {
+      "title": "Skills map",
+      "desc": "Your profile across the five areas."
+    },
+    "weaknesses": {
+      "title": "Priority weaknesses",
+      "desc": "Each with the right training.",
+      "noData": "No data yet: at least {minAttempts} attempts on the same theme are needed for it to be evaluated.",
+      "noneFlagged": "No weakness flagged: so far {attempts} attempts across {trackedThemes} {trackedThemes, plural, one {theme} other {themes}}, but at least {minAttempts} per theme are needed to flag one.",
+      "attempts": "{count} attempts",
+      "attemptsShort": "{count} att."
+    },
+    "gameStats": {
+      "title": "Game statistics",
+      "desc": "From your analyzed games.",
+      "asWhite": "As White",
+      "asBlack": "As Black",
+      "gamesMoves": "{games} games · {moves} moves",
+      "accuracyByPhase": "Accuracy by phase",
+      "criticalArea": "critical area"
+    },
+    "trendRating": {
+      "title": "Tactical rating",
+      "desc": "Trend over time.",
+      "nounOne": "puzzle solved",
+      "nounMany": "puzzles solved"
+    },
+    "trendAccuracy": {
+      "title": "Game accuracy",
+      "desc": "One percentage per game.",
+      "nounOne": "game analyzed",
+      "nounMany": "games analyzed"
+    },
+    "trend": {
+      "nounOne": "data point",
+      "nounMany": "data points",
+      "needOne": "1 more {noun} needed to draw the trend.",
+      "needMany": "{missing} more {noun} needed to draw the trend.",
+      "ariaLabel": "Trend over time"
+    },
+    "distribution": {
+      "inaccuracies": "Inaccuracies",
+      "mistakes": "Mistakes",
+      "blunders": "Blunders",
+      "empty": "No errors recorded: great, or not much data yet."
+    },
+    "recentActivity": {
+      "title": "Recent activity"
+    },
+    "glossary": {
+      "title": "Glossary of terms",
+      "desc": "What the words you see in the dashboard and the analysis mean.",
+      "moveQuality": "Move quality",
+      "metrics": {
+        "title": "Statistics and analysis",
+        "accuracy": {
+          "term": "Accuracy",
+          "def": "How close your moves are to the engine's best ones, as a percentage. The higher it is, the better you played."
+        },
+        "tacticalRating": {
+          "term": "Tactical rating",
+          "def": "A number measuring your strength in puzzles: it goes up when you solve them, down when you miss (like an Elo score)."
+        },
+        "streak": {
+          "term": "Streak",
+          "def": "How many puzzles you've solved in a row without mistakes. The best is the longest streak you've reached."
+        },
+        "pawn": {
+          "term": "Pawn / centipawn",
+          "def": "The unit for measuring an advantage. 1 pawn ≈ having one extra minor piece, roughly. The engine measures it in hundredths (centipawns)."
+        },
+        "criticalArea": {
+          "term": "Critical area",
+          "def": "The phase of the game where you make the most mistakes: that's where it pays to train more."
+        }
+      },
+      "phases": {
+        "title": "Phases of the game",
+        "opening": {
+          "term": "Opening",
+          "def": "The first moves: you develop your pieces, control the center, and get your king to safety (castling)."
+        },
+        "middlegame": {
+          "term": "Middlegame",
+          "def": "The heart of the game: plans, attacks, and combinations with many pieces still on the board."
+        },
+        "endgame": {
+          "term": "Endgame",
+          "def": "The phase with few pieces left, where the pawns and the king take center stage."
+        }
+      },
+      "tactics": {
+        "title": "Tactics",
+        "fork": {
+          "term": "Fork",
+          "def": "One piece attacks two targets at once: your opponent can only save one of them."
+        },
+        "pin": {
+          "term": "Pin",
+          "def": "A piece can't move because behind it sits a more valuable piece (often the king)."
+        },
+        "skewer": {
+          "term": "Skewer",
+          "def": "Like a pin in reverse: the valuable piece is in front and, when it moves, leaves the one behind it to be captured."
+        },
+        "discovered": {
+          "term": "Discovered attack",
+          "def": "You move one piece and free another that gives check or attacks: two threats in one move."
+        },
+        "sacrifice": {
+          "term": "Sacrifice",
+          "def": "You give up material on purpose to gain a bigger advantage (an attack on the king, mate, promotion)."
+        }
+      },
+      "general": {
+        "title": "Basic concepts",
+        "castling": {
+          "term": "Castling",
+          "def": "A special move that moves the king and rook together, to bring the king to safety."
+        },
+        "development": {
+          "term": "Development",
+          "def": "Bringing your pieces (knights and bishops) out of their starting squares to active ones."
+        },
+        "initiative": {
+          "term": "Initiative",
+          "def": "Having control of the game: you're the one creating threats and your opponent has to defend."
+        },
+        "repertoire": {
+          "term": "Repertoire",
+          "def": "The set of openings you choose to play and learn by heart."
+        }
+      }
+    },
+    "quick": {
+      "tactics": {
+        "label": "Tactics",
+        "detail": "Your puzzle set"
+      },
+      "weaknesses": {
+        "label": "Weaknesses",
+        "detail": "Train your weak areas"
+      },
+      "fixMistakes": {
+        "label": "Fix mistakes",
+        "detail": "From your game blunders"
+      }
+    }
+  },
+  "games": {
+    "metaTitle": "My games — Shakh",
+    "headerEyebrow": "Archive",
+    "headerTitle": "My games",
+    "headerDesc": "Import, analyze, review move by move.",
+    "pageIntro": "Import your games, analyze them with the engine, and review them move by move.",
+    "errSessionExpired": "Session expired. Sign in again.",
+    "errNoValidGame": "No valid game found in the PGN.",
+    "errPastePgn": "Paste a PGN.",
+    "errPgnTooLarge": "PGN too large (max ~500KB). Import fewer games at a time.",
+    "errEnterLichess": "Enter a Lichess username.",
+    "errLichessImport": "Unexpected error while importing from Lichess.",
+    "errEnterChesscom": "Enter a Chess.com username.",
+    "errChesscomImport": "Unexpected error while importing from Chess.com.",
+    "errCoachNotConfigured": "The AI coach is not configured.",
+    "errCoachGeneric": "AI coach error.",
+    "deleteConfirm": "Delete this game and its analysis?",
+    "deleteFailed": "Delete failed",
+    "gameDeleted": "Game deleted",
+    "maxGamesTitle": "Up to {max} games at a time",
+    "maxGamesDesc": "Deselect a game to pick another.",
+    "gamesQueued": "{n} games queued",
+    "analysisStarted": "Analysis started",
+    "analyzedInBackground": "They're analyzed one at a time in the background.",
+    "emptyState": "No games yet. Import one above to get started.",
+    "selectedCount": "{count} of {max} selected",
+    "cancel": "Cancel",
+    "analyzing": "Analyzing…",
+    "analyzeSelected": "Analyze selected",
+    "colorWhite": "White",
+    "colorBlack": "Black",
+    "review": "Review",
+    "analyze": "Analyze",
+    "deleteGame": "Delete game",
+    "selectForAnalysis": "Select {title} for analysis",
+    "badgeAnalyzed": "analyzed",
+    "badgeNotAnalyzed": "not analyzed",
+    "outcomeWin": "Win",
+    "outcomeDraw": "Draw",
+    "outcomeLoss": "Loss",
+    "outcomeUnknown": "Unknown result",
+    "importFailed": "Import failed",
+    "importedCount": "{n} imported",
+    "duplicatesSkipped": "{n} duplicates skipped",
+    "gamesImported": "Games imported",
+    "noNewGames": "No new games",
+    "analyzeBgPlural": "{n} games being analyzed in the background for your weak points.",
+    "analyzeBgSingular": "1 game being analyzed in the background for your weak points.",
+    "verifyTitle": "Verify your account to make games count toward your profile.",
+    "verifyDesc": "Only games from your verified account feed weak points, Shakh Rating, and statistics. You can still import other players' games: they stay browsable and analyzable, but don't touch your profile.",
+    "verifyAccount": "Verify account →",
+    "fileReadFailed": "Couldn't read the file",
+    "tabImport": "Import",
+    "chesscomPlaceholder": "Chess.com username",
+    "lichessPlaceholder": "Lichess username",
+    "importShort": "Import",
+    "importPgn": "Import PGN",
+    "file": "File",
+    "tabFile": ".pgn file",
+    "tabPastePgn": "Paste PGN",
+    "pgnLabel": "One or more games in PGN format",
+    "importing": "Importing…",
+    "fileUploadHint": "Upload a <code>.pgn</code> file (multiple games are fine too).",
+    "chooseFile": "Choose file",
+    "lichessUsername": "Lichess username",
+    "lichessExample": "e.g. DrNykterstein",
+    "chesscomExample": "e.g. MagnusCarlsen",
+    "howMany": "How many",
+    "downloading": "Downloading…",
+    "importFromLichess": "Import from Lichess",
+    "lichessApiHint": "Downloads the user's latest public games via the Lichess API.",
+    "chesscomUsername": "Chess.com username",
+    "importFromChesscom": "Import from Chess.com",
+    "chesscomApiHint": "Downloads the user's most recent public games via the Chess.com API.",
+    "operationFailed": "Operation failed",
+    "gameAnalysisTitle": "Game analysis",
+    "createReel": "Create reel",
+    "reanalyze": "Reanalyze",
+    "tabMoves": "Moves",
+    "tabSummary": "Summary",
+    "evalOverTime": "Evaluation over time",
+    "summary": "Summary",
+    "accuracyNote": "The accuracy % is an estimate based on average centipawn loss, not the official Lichess/Chess.com standard.",
+    "moveLabel": "Move",
+    "evaluation": "Evaluation",
+    "bestMove": "Best move",
+    "howToReadAnalysis": "How to read the analysis",
+    "legendIntro": "The <bar>bar</bar> and the number in pawns tell you who's better: values with <plus>+</plus> favor White, with <minus>−</minus> Black. Each move is labeled like this:",
+    "sumAccuracy": "Accuracy",
+    "sumInaccuracies": "Inaccuracies",
+    "sumMistakes": "Mistakes",
+    "sumMissedMoves": "Missed moves",
+    "sumBlunders": "Blunders",
+    "tableWhite": "White",
+    "tableBlack": "Black",
+    "analyzeGame": "Analyze game",
+    "defaultGameTitle": "Game",
+    "engineAnalysis": "Engine analysis",
+    "engineAnalysisDesc": "The analysis runs in parallel in your browser and keeps going even if you switch pages: every move is evaluated and classified.",
+    "depth": "Depth",
+    "whatIsDepth": "What is depth?",
+    "depthExplain": "It's how many <strong>half-moves ahead</strong> the engine calculates from each position before judging it. Higher = more reliable analysis, but slower (the time grows almost exponentially, not linearly).",
+    "depth12": "<code>12</code> — fast, for a quick review or blitz games.",
+    "depth15": "<code>15</code> — a balance of precision and time (recommended).",
+    "depth18": "<code>18</code> — more precise (catches deep tactics and sacrifices), but can take 3–5× the time of 12.",
+    "depthAdvice": "Below ~2000 Elo, 15 and 18 rarely change the verdict on big blunders: keep 15 by default, and go to 18 only for important games you want to study in depth.",
+    "otherGameRunning": "Analysis running on another game: wait for it to finish.",
+    "positionProgress": "position {current}/{total}",
+    "saveFailed": "Save failed",
+    "analysisComplete": "Analysis complete",
+    "errDuringAnalysis": "Error during analysis.",
+    "analysisFailed": "Analysis failed",
+    "miniAnalyzing": "Analyzing",
+    "miniComplete": "Analysis complete",
+    "miniFailed": "Analysis failed",
+    "close": "Close",
+    "stillQueued": "{count} still queued",
+    "starting": "starting…",
+    "open": "Open",
+    "noGamesToAnalyze": "No games to analyze",
+    "analyzedOneAtATime": "Analyzed one at a time in the background.",
+    "startingShort": "Starting…",
+    "analyzeNGames": "Analyze {count, plural, one {# game} other {# games}}"
+  },
+  "groups": {
+    "metaTitle": "Groups — Shakh",
+    "indexEyebrow": "Clubs and classes",
+    "indexTitle": "Groups",
+    "indexDesc": "Follow your students and assign activities, or join with a code.",
+    "indexHeading": "Clubs and groups",
+    "indexIntro": "Create a club or a class to follow your students' progress and assign activities, or join a group with an invite code.",
+    "noGroups": "You're not part of any group yet. Create one or join with a code.",
+    "memberCount": "{count, plural, one {# member} other {# members}}",
+    "createGroupTitle": "Create a group",
+    "createGroupDesc": "You become the instructor of the group you create.",
+    "joinWithCodeTitle": "Join with a code",
+    "joinWithCodeDesc": "Got an invite? Paste the code here.",
+    "backAllGroups": "All groups",
+    "classDashboard": "Class dashboard",
+    "classDashboardDesc": "Aggregated student progress",
+    "assignments": "Assignments",
+    "assignmentsNavDesc": "Create and track activities",
+    "members": "Members",
+    "membersDescOwner": "Promote to instructor, remove, or open a student's progress.",
+    "membersDescInstructor": "Open a student's progress.",
+    "membersDescMember": "The people in this group.",
+    "invites": "Invites",
+    "invitesDesc": "Generate a code/link with a role and expiry. Each invite is valid for one entry.",
+    "groupRepertoires": "Group repertoires",
+    "groupRepertoiresDesc": "\"This is how we play in our club.\" Students train them with the trainer.",
+    "white": "White",
+    "black": "Black",
+    "moveCount": "{count, plural, one {# move} other {# moves}}",
+    "editor": "Editor",
+    "train": "Train",
+    "classDashboardIntro": "{count, plural, one {# student} other {# students}}. Read-only aggregated view: every data access goes through the security checks.",
+    "classEmptyState": "No students in the group. Generate an invite to bring your students in.",
+    "students": "Students",
+    "studentsDesc": "Sort by column to see who's ahead and who's behind.",
+    "avgProficiencyTitle": "Average class proficiency",
+    "avgProficiencyDesc": "Average profile across the five areas.",
+    "commonWeaknessesTitle": "Common weaknesses",
+    "commonWeaknessesDesc": "The themes where more students fall below the threshold.",
+    "noSharedWeaknesses": "No marked shared weaknesses.",
+    "studentCount": "{count, plural, one {# student} other {# students}}",
+    "classSummaryTitle": "Class summary",
+    "classSummaryDesc": "Coach summary of the aggregated data.",
+    "assignmentsIntro": "Assign activities to a student or the whole class. Completion is derived from real progress; where that's not possible, the student marks it done.",
+    "newAssignmentTitle": "New assignment",
+    "newAssignmentDesc": "Lesson, puzzle, endgame, trap, repertoire, or node.",
+    "monitoringTitle": "Monitoring",
+    "monitoringDesc": "Completion status across students.",
+    "studentFallbackName": "Student",
+    "readOnly": "read-only",
+    "drilldownIntro": "Teaching context: the student's progress as they see it, read-only.",
+    "drilldownEmptyState": "This student doesn't have enough data for the dashboard yet.",
+    "errAuth": "Session expired. Sign in again.",
+    "errPerm": "You don't have permission for this action.",
+    "errGroupNameRequired": "Give the group a name.",
+    "errOwnerNotAssignable": "The owner role can't be assigned here.",
+    "errCantRemoveSelf": "You can't remove yourself (owner).",
+    "errRepertoireNameRequired": "Give the repertoire a name.",
+    "errChooseStudent": "Choose a student.",
+    "errStudentNotInGroup": "The student isn't part of this group.",
+    "errNoStudents": "No students in the group.",
+    "errSummaryUnavailable": "Summary unavailable, try again.",
+    "nameLabel": "Name",
+    "groupNamePlaceholder": "e.g. Milan Chess Club",
+    "typeLabel": "Type",
+    "createGroupButton": "Create group",
+    "repertoireNamePlaceholder": "e.g. Club Italian Game",
+    "colorLabel": "Color",
+    "createGroupRepertoireButton": "Create group repertoire",
+    "rosterStudent": "Student",
+    "rosterLevel": "Level",
+    "rosterRating": "Rating",
+    "rosterAccuracy": "Accuracy",
+    "rosterLastActivity": "Last activity",
+    "toastNotCreated": "Not created",
+    "toastInviteNotCreated": "Invite not created",
+    "toastInviteCreated": "Invite created",
+    "toastLinkCopiedToClipboard": "Link copied to clipboard.",
+    "toastNotRevoked": "Not revoked",
+    "toastLinkCopied": "Link copied",
+    "toastCopyFailed": "Copy failed",
+    "roleLabel": "Role",
+    "expiresDaysLabel": "Expires (days)",
+    "emailOptionalLabel": "Email (optional)",
+    "emailReservePlaceholder": "reserve the invite for an email",
+    "generateInviteButton": "Generate invite",
+    "noInvitesGenerated": "No invites generated.",
+    "inviteStateUsed": "used",
+    "inviteStateExpired": "expired",
+    "inviteStateActive": "active",
+    "inviteExpiresOn": "expires {date}",
+    "inviteNoExpiration": "no expiration",
+    "copyLinkButton": "Copy link",
+    "revokeButton": "Revoke",
+    "toastJoinFailed": "Join failed",
+    "toastJoinedGroup": "You joined the group",
+    "clickwrapNotice": "By joining the group, the instructor will be able to see your progress (read-only) to help you improve. You can leave the group at any time.",
+    "joiningPending": "Joining…",
+    "acceptAndJoinButton": "Accept and join",
+    "cancelButton": "Cancel",
+    "toastCouldntJoin": "Couldn't join",
+    "inviteCodeLabel": "Invite code",
+    "inviteCodePlaceholder": "e.g. K7P2M9QX",
+    "joinButton": "Join",
+    "toastNotUpdated": "Not updated",
+    "toastNotRemoved": "Not removed",
+    "progressLink": "Progress",
+    "makeStudentButton": "Make student",
+    "promoteInstructorButton": "Promote to instructor",
+    "removeButton": "Remove",
+    "statusAssigned": "To do",
+    "statusInProgress": "In progress",
+    "statusCompleted": "Completed",
+    "statusSkipped": "Skipped",
+    "dueDate": "due {date}",
+    "assignedByInstructorTitle": "Assigned by your instructor",
+    "assignedByInstructorDesc": "Activities to complete, with due dates and status.",
+    "goLink": "Go",
+    "undoButton": "Undo",
+    "markDoneButton": "Mark done",
+    "toastNotDeleted": "Not deleted",
+    "noActiveAssignments": "No active assignments.",
+    "targetClass": "Class",
+    "targetIndividual": "Individual",
+    "completedCount": "{completed}/{total} completed",
+    "inProgressCount": "{count, plural, one {# in progress} other {# in progress}}",
+    "deleteButton": "Delete",
+    "toastSummaryFailed": "Summary failed",
+    "synthesisSuggestionLabel": "Suggestion:",
+    "synthesisPlaceholder": "Generate a summary of the class's aggregated weaknesses, with a lesson suggestion. The data is deterministic; the coach only writes the summary.",
+    "generatingPending": "Generating…",
+    "regenerateSummaryButton": "Regenerate summary",
+    "generateClassSummaryButton": "Generate class summary",
+    "endgameKqVsK": "King+Queen vs King",
+    "endgameKpVsK": "King and pawn vs King",
+    "endgameQVsP": "Queen vs pawn",
+    "endgameLucena": "Lucena position",
+    "endgamePhilidor": "Philidor position",
+    "errChooseLesson": "Choose a lesson.",
+    "errChooseTrap": "Choose a trap.",
+    "errChooseRepertoire": "Choose a repertoire.",
+    "errChoosePathNode": "Choose a path node.",
+    "errInvalidType": "Invalid type.",
+    "errChooseStudentShort": "Choose a student",
+    "toastNotAssigned": "Not assigned",
+    "toastAssignmentCreated": "Assignment created",
+    "recipientLabel": "Recipient",
+    "recipientWholeClass": "The whole class",
+    "recipientAStudent": "A student",
+    "studentLabel": "Student",
+    "chooseOption": "— choose —",
+    "activityTypeLabel": "Activity type",
+    "lessonLabel": "Lesson",
+    "puzzleThemeLabel": "Puzzle theme",
+    "endgameLabel": "Endgame",
+    "trapLabel": "Trap",
+    "groupRepertoireLabel": "Group repertoire",
+    "pathNodeLabel": "Path node",
+    "howManyPuzzlesLabel": "How many puzzles",
+    "noteOptionalLabel": "Note (optional)",
+    "notePlaceholder": "e.g. focus on accuracy",
+    "dueDateOptionalLabel": "Due date (optional)",
+    "assigningPending": "Assigning…",
+    "assignButton": "Assign"
+  },
+  "nav": {
+    "item": {
+      "dashboard": "Dashboard",
+      "today": "Today",
+      "path": "Path",
+      "coach": "Coach",
+      "learn": "Learn",
+      "theory": "Theory",
+      "repertoire": "Repertoire",
+      "preparation": "Preparation",
+      "tactics": "Tactics",
+      "calculation": "Calculation",
+      "traps": "Traps",
+      "sparring": "Sparring",
+      "playFriend": "Play a friend",
+      "myGames": "My games",
+      "weaknesses": "Weaknesses",
+      "fixMistakes": "Fix mistakes",
+      "groups": "Groups",
+      "profile": "Profile"
+    },
+    "group": {
+      "study": "Study",
+      "train": "Train",
+      "playAnalyze": "Play & analyze"
+    },
+    "soon": "soon",
+    "mainNav": "Main navigation",
+    "fullNav": "Full navigation",
+    "navigationMenu": "Navigation menu",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "goBack": "Go back",
+    "back": "Back",
+    "signOut": "Sign out",
+    "greeting": "Hi, {name}"
+  },
+  "play": {
+    "hub": {
+      "eyebrow": "With a friend",
+      "title": "Play",
+      "desc": "Same device or asynchronous online with a shareable link.",
+      "heading": "Play a friend",
+      "lead": "Challenge a friend on the same device, or play asynchronously online with a shareable link. Pick the time control, review the moves, step back.",
+      "tabLocal": "Same device",
+      "tabOnline": "Online (turn-based)"
+    },
+    "notFound": {
+      "title": "Game not found",
+      "desc": "The game doesn't exist, is already full, or you don't have access.",
+      "back": "Back to games"
+    },
+    "game": {
+      "title": "Game with a friend",
+      "allGames": "All games"
+    },
+    "error": {
+      "signInToPlay": "You must sign in to play.",
+      "signInToAnalyze": "You must sign in to analyze a game.",
+      "emptyGame": "Empty game.",
+      "signIn": "You must sign in.",
+      "gameNotFound": "Game not found.",
+      "notInProgress": "Game is not in progress.",
+      "notPlayerInGame": "You are not a player in this game.",
+      "notYourTurn": "It's not your turn.",
+      "illegalMove": "Illegal move.",
+      "notPlayer": "You are not a player."
+    },
+    "defaultPlayer": "Player",
+    "resign": {
+      "label": "Resign",
+      "confirmTitle": "Resign the game?",
+      "confirmDesc": "You'll lose the game. This action can't be undone.",
+      "confirm": "Yes, resign"
+    },
+    "cancel": "Cancel",
+    "checkmate": "Checkmate",
+    "overlay": {
+      "analyzing": "Analyzing your moves…",
+      "opening": "Opening…",
+      "analyzeGame": "Analyze game",
+      "viewBoard": "View the board",
+      "noMoves": "No moves"
+    },
+    "color": {
+      "white": "White",
+      "black": "Black",
+      "random": "Random",
+      "your": "Your color"
+    },
+    "create": {
+      "title": "New online game",
+      "desc": "Create the game, share the link with a friend, and play whenever you like: moves sync in real time.",
+      "yourColor": "Your color",
+      "creating": "Creating…",
+      "submit": "Create and get the link"
+    },
+    "timeControl": "Time control",
+    "myGames": {
+      "title": "Your online games",
+      "empty": "No online games yet. Create one to get started.",
+      "vs": "vs {name}",
+      "waiting": "waiting…"
+    },
+    "status": {
+      "waiting": "waiting",
+      "inProgress": "in progress",
+      "over": "over",
+      "draw": "Draw",
+      "checkToMove": "Check — {side} to move",
+      "toMove": "{side} to move",
+      "waitingEllipsis": "Waiting…"
+    },
+    "hotseat": {
+      "setupTitle": "Same device",
+      "setupDesc": "Take turns on the same screen. The board can flip automatically to the side that's to move.",
+      "autoFlip": "Flip the board on every move",
+      "flipBoard": "Flip board",
+      "undoMove": "Undo move",
+      "status": {
+        "losesOnTime": "{side} loses on time",
+        "checkmateWins": "Checkmate — {side} wins",
+        "stalemate": "Stalemate — draw"
+      }
+    },
+    "newGame": "New game",
+    "moves": "Moves",
+    "startPlaying": "Start playing",
+    "random": "Random",
+    "stat": {
+      "duration": "Duration"
+    },
+    "nav": {
+      "first": "First move",
+      "prev": "Previous move",
+      "next": "Next move",
+      "last": "Last move",
+      "gameActions": "Game actions"
+    },
+    "result": {
+      "sideWins": "{side} wins",
+      "timesUp": "Time's up.",
+      "draw": "Draw",
+      "stalemate": "Stalemate.",
+      "resignation": "Resignation.",
+      "byAgreement": "Draw by agreement.",
+      "aborted": "Game aborted.",
+      "youWon": "You won",
+      "youLost": "You lost"
+    },
+    "toast": {
+      "drawOffered": "Draw offered",
+      "copyFailed": "Copy failed"
+    },
+    "waiting": {
+      "titleHost": "Waiting for opponent",
+      "titleGuest": "Join the game",
+      "shareLink": "Share this link with your friend. They'll need to sign in to play.",
+      "copied": "Copied",
+      "copy": "Copy",
+      "invitedAs": "You've been invited to play. Join as {color}.",
+      "join": "Join"
+    },
+    "drawOffer": {
+      "title": "Draw offer",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "finished": {
+      "title": "Game over"
+    },
+    "draw": {
+      "offered": "Draw offered",
+      "offer": "Offer draw"
+    },
+    "reason": {
+      "checkmate": "checkmate",
+      "resign": "resignation",
+      "timeout": "time out",
+      "stalemate": "stalemate",
+      "draw": "draw",
+      "agreement": "draw by agreement",
+      "aborted": "aborted"
+    },
+    "outcome": {
+      "whiteWins": "White wins",
+      "blackWins": "Black wins",
+      "draw": "Draw",
+      "over": "Over"
+    },
+    "sparring": {
+      "eyebrow": "Against the engine",
+      "desc": "Full games against a personality and a strength you choose.",
+      "lead": "Play full games against the engine with a <strong>personality</strong> and a strength you choose: aggressive, positional, or solid. Drill your openings and sharpen your play against different styles.",
+      "newChallenge": "New challenge",
+      "opponentStyle": "Opponent style",
+      "strength": "Strength (Elo)",
+      "startingOpening": "Starting opening",
+      "thinking": "thinking…",
+      "you": "You",
+      "rematch": "Rematch",
+      "opponentThinking": "Opponent is thinking…",
+      "yourMove": "Your move ({color})",
+      "status": {
+        "resigned": "You resigned.",
+        "checkmateLost": "Checkmate — you lost.",
+        "checkmateWon": "Checkmate — you won!",
+        "stalemate": "Stalemate — draw.",
+        "draw": "Draw."
+      },
+      "result": {
+        "resignedGame": "You resigned the game."
+      }
+    },
+    "bot": {
+      "hatchling": "Hatchling",
+      "novice": "Novice",
+      "beginner": "Beginner",
+      "amateur": "Amateur",
+      "casual": "Casual",
+      "club": "Club",
+      "expert": "Expert",
+      "candidateMaster": "Candidate Master",
+      "master": "Master"
+    },
+    "opening": {
+      "normale": "Standard game",
+      "italiana": "Italian",
+      "spagnola": "Ruy Lopez",
+      "siciliana": "Sicilian",
+      "francese": "French",
+      "gambetto-donna": "Queen's Gambit"
+    }
+  },
+  "profile": {
+    "metaTitle": "Profile — Shakh",
+    "eyebrow": "Your profile",
+    "fallbackTitle": "Profile",
+    "elo": "estimated Elo {elo}",
+    "eloShort": "Elo {elo}",
+    "level": "level {level}",
+    "tabStats": "Statistics",
+    "tabSettings": "Settings",
+    "competenceTitle": "Skills",
+    "competenceDesc": "Breakdown by area.",
+    "noData": "— no data",
+    "competenceValue": "{percent}% · {attempts} attempts",
+    "ratingHistoryTitle": "Tactical rating history",
+    "accuracyTitle": "Accuracy in games",
+    "exportFailed": "Export failed",
+    "deletionFailed": "Deletion failed",
+    "saveFailed": "Save failed",
+    "profileUpdated": "Profile updated",
+    "passwordTooShort": "Password too short",
+    "passwordTooShortDesc": "At least 8 characters.",
+    "passwordsDontMatch": "Passwords don't match",
+    "passwordChangeFailed": "Password change failed",
+    "passwordUpdated": "Password updated",
+    "profileCardTitle": "Profile",
+    "profileCardDesc": "How we present you in the app.",
+    "displayName": "Display name",
+    "displayNamePlaceholder": "Your name",
+    "username": "Username",
+    "usernamePlaceholder": "username",
+    "save": "Save",
+    "saving": "Saving…",
+    "appearanceTitle": "Appearance and language",
+    "appearanceDesc": "The theme applies right away; save to remember it.",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "language": "Language",
+    "savePreferences": "Save preferences",
+    "accountCardTitle": "Account",
+    "accountCardDesc": "Change your sign-in password.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "updatePassword": "Update password",
+    "groupsTitle": "Groups and clubs",
+    "groupsDesc": "Join a club or a class, or create your own.",
+    "manageGroups": "Manage your groups",
+    "privacyTitle": "Privacy and data",
+    "privacyDesc": "Export your data or permanently delete your account.",
+    "exportMyData": "Export my data",
+    "exportMyDataDesc": "Profile, games, progress, and repertoires in JSON format.",
+    "export": "Export",
+    "preparing": "Preparing…",
+    "deleteAccount": "Delete account",
+    "deleteAccountDesc": "Permanent removal of your account and linked data. Irreversible.",
+    "delete": "Delete",
+    "deleteDialogTitle": "Delete your account?",
+    "deleteDialogDesc": "This action is irreversible: your profile, games, progress, and repertoires will be deleted forever.",
+    "cancel": "Cancel",
+    "deletePermanently": "Delete permanently",
+    "deleting": "Deleting…",
+    "verifyHintLichess": "Paste the token into your Lichess bio (Preferences → Edit profile → Biography), save, then press Verify.",
+    "verifyHintChesscom": "Paste the token into the Name or Location field of your Chess.com profile (Settings → Profile), save, then press Verify.",
+    "externalTitle": "Online accounts",
+    "externalDesc": "Link Lichess or Chess.com: after verification, your online rating weighs heavily on your Shakh Rating, mapped to the real-world (OTB) scale.",
+    "linkingFailed": "Linking failed",
+    "tokenGenerated": "Token generated",
+    "tokenGeneratedDesc": "Add it to your profile, then verify.",
+    "verificationFailed": "Verification failed",
+    "ratingUpdatedShakh": "Shakh Rating updated.",
+    "gamesImported": "{count} games imported.",
+    "pathAtLevel": "Path at level {level}.",
+    "sourceVerified": "{source} verified",
+    "updateFailed": "Update failed",
+    "ratingUpdated": "Rating updated",
+    "unlinkingFailed": "Unlinking failed",
+    "sourceUnlinked": "{source} unlinked",
+    "tokenCopied": "Token copied",
+    "badgeVerified": "verified",
+    "onlineSuffix": "{rating} online",
+    "otbSuffix": "{rating} OTB",
+    "gamesCount": "{count} games",
+    "refresh": "Refresh",
+    "unlink": "Unlink",
+    "badgeToVerify": "to verify",
+    "copy": "Copy",
+    "verify": "Verify",
+    "verifying": "Verifying…",
+    "badgeNotLinked": "not linked",
+    "placeholderLichess": "Lichess username",
+    "placeholderChesscom": "Chess.com username",
+    "link": "Link",
+    "errSessionExpired": "Session expired. Please sign in again.",
+    "errUsernameFormat": "Username: 3–30 characters, letters/numbers/underscore.",
+    "errUsernameTaken": "Username already taken.",
+    "errGeneric": "Error.",
+    "errUnexpected": "Unexpected error.",
+    "errUnsupportedPlatform": "Unsupported platform.",
+    "errInvalidUsername": "Invalid username (2–30 characters).",
+    "errAccountNotLinked": "Account not linked.",
+    "errNoVerification": "No verification in progress.",
+    "errTokenExpired": "Token expired. Relink the account to generate a new one.",
+    "errTokenNotFound": "Token not found in your profile. Save the token, wait a few seconds, then try again.",
+    "errVerifyFirst": "Verify the account first."
+  },
+  "study": {
+    "coach": {
+      "eyebrow": "Your coach",
+      "title": "Coach",
+      "desc": "A summary of your recurring weaknesses from your game data.",
+      "intro": {
+        "before": "The coach analyzes your game data (computed by the engine) and summarizes your recurring weaknesses. For move-by-move explanations, open a game from the",
+        "link": "review",
+        "after": "."
+      },
+      "noData": {
+        "title": "No data yet",
+        "desc": "Import and analyze a few games: the coach's summary is based on the errors detected by the engine."
+      },
+      "goToGames": "Go to games",
+      "errorsByPhase": {
+        "title": "Your errors by phase",
+        "desc": "Across {games} games, {moves} of your moves examined."
+      },
+      "table": {
+        "phase": "Phase",
+        "moves": "Moves",
+        "inacc": "Inacc.",
+        "mistakes": "Mistakes",
+        "blunders": "Blunders",
+        "quality": "Quality"
+      },
+      "weakest": "weakest",
+      "summary": {
+        "title": "Coach summary",
+        "desc": "A motivating, actionable recap of your error patterns."
+      },
+      "notConfiguredInline": "The AI coach isn't configured (<code>ANTHROPIC_API_KEY</code> is missing).",
+      "tabMove": "Move",
+      "tabQuestions": "Questions",
+      "move": {
+        "analyzeFirst": "Analyze the game first with the engine: the coach explains the data the engine computes.",
+        "selectMove": "Select a move to have it explained.",
+        "label": "Move",
+        "explainErrors": "Explain errors",
+        "writing": "The coach is writing…",
+        "explainThis": "Explain this move",
+        "basedOnEngine": "Explanations are based on the engine's data (evaluations and best move), they don't recompute it."
+      },
+      "toast": {
+        "explainFailed": "Explanation failed",
+        "generationInterrupted": "Generation interrupted",
+        "generatedComments": "Generated {count} comments",
+        "noNewErrors": "No new errors to comment on"
+      }
+    },
+    "synthesis": {
+      "toast": {
+        "unavailable": "Summary unavailable"
+      },
+      "regenerate": "Regenerate summary",
+      "generate": "Generate coach summary",
+      "analyzing": "The coach is analyzing your patterns…",
+      "notConfigured": "The AI coach isn't configured (<code>ANTHROPIC_API_KEY</code> is missing). The metrics above remain available.",
+      "tip": "Tip:"
+    },
+    "chat": {
+      "phase": {
+        "querying": "Querying the engine…",
+        "evaluating": "Evaluating {san}…",
+        "responding": "The coach is responding…"
+      },
+      "sorry": "Sorry: {msg}",
+      "couldntAnswer": "I couldn't answer. Try again.",
+      "empty": "Ask something about the position, e.g. \"what's the plan for White?\" or \"why not Nd4?\".",
+      "placeholder": "Ask a question…",
+      "ariaLabel": "Question about the position",
+      "send": "Send"
+    },
+    "weaknesses": {
+      "metaTitle": "Weaknesses — Shakh",
+      "eyebrow": "Recurring patterns",
+      "title": "Weaknesses",
+      "desc": "The losses that repeat, grouped and sorted by severity.",
+      "intro": "Not single mistakes, but the losses that <em>repeat</em> across your games. The engine groups them, sorts them by severity, and points you to where to train.",
+      "examples": "Examples:",
+      "example": "game {n} (move {move})",
+      "severity": "Severity",
+      "empty": {
+        "base": "You need at least {min} analyzed games to detect reliable patterns. You have {analyzed}",
+        "pendingSuffix": ", but {pending} imported are still waiting to be analyzed."
+      },
+      "manageAll": "Manage all games",
+      "importAnalyze": "Import and analyze games",
+      "noPatterns": "No recurring weaknesses stand out in your recent games. Keep it up — analyze more games to sharpen the picture."
+    },
+    "path": {
+      "metaTitle": "Path — Shakh",
+      "eyebrow": "From beginner to club",
+      "title": "Path",
+      "desc": "Nodes unlock as you master the previous ones.",
+      "intro": "From beginner to club player. Nodes unlock as you prove you've mastered the previous ones.",
+      "curriculumNote": "The curriculum is an instructional-design draft: a starting point, not a definitive truth."
+    },
+    "nextStep": {
+      "title": "Next step",
+      "completeDiagnostic": "Complete the diagnostic to get a personalized recommendation.",
+      "startDiagnostic": "Start the diagnostic",
+      "freeMode": "Free mode",
+      "pathBadge": "Path",
+      "viewPath": "View the path"
+    },
+    "skillTree": {
+      "status": {
+        "locked": "Locked",
+        "available": "Available",
+        "inProgress": "In progress",
+        "completed": "Completed"
+      },
+      "unlockHint": "Unlock by completing the previous steps.",
+      "level": {
+        "0": "Level 0 — Foundations",
+        "1": "Level 1 — Basic tactics",
+        "2": "Level 2 — Openings and key endgames",
+        "3": "Level 3 — Middlegame",
+        "4": "Level 4 — Toward the club"
+      },
+      "levelFallback": "Level {level}"
+    },
+    "repertoire": {
+      "metaTitle": "Repertoire — Shakh",
+      "eyebrow": "Your lines",
+      "title": "Repertoire",
+      "desc": "Build lines by color, then drill them with spaced repetition.",
+      "myTitle": "My repertoire",
+      "intro": "Build your lines by color, then drill them with spaced repetition. Add moves by playing on the board or from the explorer.",
+      "emptyEditor": "Empty repertoire: add some lines in the editor first."
+    },
+    "error": {
+      "sessionExpiredSignIn": "Session expired. Please sign in again.",
+      "sessionExpired": "Session expired.",
+      "noDataYet": "Analyze a few games first: there's no data yet.",
+      "coachNotConfigured": "The AI coach isn't configured (ANTHROPIC_API_KEY is missing).",
+      "coachUnparsable": "Coach response couldn't be parsed. Try again.",
+      "coachGeneric": "AI coach error.",
+      "coachShort": "Coach error.",
+      "repertoireName": "Give the repertoire a name.",
+      "repertoireNotFound": "Repertoire not found.",
+      "invalidTree": "Invalid tree."
+    }
+  },
+  "tactics": {
+    "metaTitle": "Tactics — Shakh",
+    "calcMetaTitle": "Calculation — Shakh",
+    "title": "Tactics",
+    "tacticalVision": "Tactical vision",
+    "tacticalRating": "Tactical rating",
+    "currentStreak": "Current streak",
+    "bestStreak": "Best streak",
+    "streak": "Streak",
+    "best": "Best",
+    "solved": "Solved",
+    "train": "Train",
+    "due": "{count} due",
+    "hubIntro": "Train your tactical vision with puzzles. The rating adapts to you and missed puzzles come back for review.",
+    "modes": {
+      "adaptive": {
+        "title": "Adaptive",
+        "desc": "A continuous flow of puzzles at your level. Updates rating and streak."
+      },
+      "theme": {
+        "title": "By theme",
+        "desc": "Train a specific motif: fork, pin, endgames…"
+      },
+      "review": {
+        "title": "Review",
+        "desc": "Revisit due missed puzzles (spaced repetition)."
+      },
+      "timed": {
+        "title": "Timed challenge",
+        "desc": "3 minutes, rising difficulty: how many can you solve?"
+      }
+    },
+    "themePickerTitle": "By theme — pick a motif",
+    "backToTacticsArrow": "← Tactics",
+    "whiteToMove": "White to move",
+    "blackToMove": "Black to move",
+    "hint": "Hint",
+    "saveFailed": "Save failed",
+    "timesUp": "Time's up",
+    "timedSummary": "You solved <mono>{solved}</mono> puzzles in {minutes} minutes.",
+    "timedStats": "Best streak: <mono>{bestStreak}</mono> · Tactical rating: <mono>{rating}</mono>",
+    "playAgain": "Play again",
+    "otherModes": "Other modes",
+    "reviewComplete": "Review complete",
+    "noPuzzlesAvailable": "No puzzles available",
+    "reviewEmpty": "You have no due puzzles. Come back later or train in adaptive mode.",
+    "noPuzzlesForCriteria": "No puzzles found for these criteria. Import the dataset or change mode.",
+    "backToTactics": "Back to tactics",
+    "next": "Next",
+    "skip": "Skip",
+    "time": "Time",
+    "solvedChallenge": "Solved (challenge)",
+    "solvedSession": "Solved (session)",
+    "puzzleDifficulty": "Puzzle difficulty:",
+    "sessionExpired": "Session expired. Please sign in again.",
+    "calculation": "Calculation",
+    "calculationRating": "Calculation rating",
+    "calculationRatingLower": "calculation rating",
+    "ratingNotUpdated": "Rating not updated",
+    "ratingNotUpdatedError": "Rating not updated.",
+    "wrongMove": "Wrong move. Calculation stopped.",
+    "opponentPlays": "Opponent plays {san}",
+    "noExercise": "No exercise available",
+    "noSuitablePuzzle": "No suitable puzzle found. Import the puzzle dataset or try again later.",
+    "blindfoldCalculation": "Blindfold calculation",
+    "blindfoldIntro": "Memorize the position, then the board clears: play the entire combination <strong>from memory</strong>, without seeing the pieces. The opponent replies in your head — we just confirm it in words.",
+    "start": "Start",
+    "movesToCalculate": " · {count} moves to calculate",
+    "memorize": "memorize: {seconds}s",
+    "readyHide": "I'm ready — hide",
+    "moveOf": "move {current} of {total}",
+    "playYourMove": "Play your move",
+    "giveUp": "Give up",
+    "calcSolved": "Solved — {total} moves calculated blindfold.",
+    "calcReached": "Reached {reached}/{total} moves.",
+    "exit": "Exit",
+    "depth": "Depth",
+    "depthMoves": "{count} moves",
+    "depthHint": "Depth rises when you solve, drops when you miss."
+  },
+  "theory": {
+    "branch": {
+      "openings": "Openings",
+      "middlegame": "Middlegame",
+      "endgames": "Endgames",
+      "theory": "Theory"
+    },
+    "color": {
+      "white": "White",
+      "black": "Black"
+    },
+    "lessonsSoon": "Lessons coming soon.",
+    "home": {
+      "eyebrow": "Guided study",
+      "title": "Theory",
+      "mobileDesc": "Understand the why of moves, with real data.",
+      "desc": "Guided lessons over the board: understand the <em>why</em> of moves, with real explorer data and the exact truth of endgames.",
+      "browseEco": "Browse the ECO tree",
+      "browseThemes": "Browse the themes",
+      "browseEndgames": "Browse all endgames",
+      "lessonsSoon": "Lessons coming soon.",
+      "soonBadge": "soon"
+    },
+    "learn": {
+      "eyebrow": "One concept at a time",
+      "title": "Learn",
+      "mobileDesc": "Understand the idea, recognize it, exploit it. Then explained games.",
+      "desc": "The fundamentals, one concept at a time. First you understand the idea, then you recognize it and exploit it in small exercises. Then watch games explained move by move.",
+      "concepts": "Concepts",
+      "doneBadge": "done",
+      "explainedGames": "Explained games"
+    },
+    "openings": {
+      "eyebrow": "ECO tree",
+      "title": "Openings",
+      "mobileDesc": "Families, openings and variations. Open a lesson to study it.",
+      "desc": "Browse the ECO tree: families, openings and variations. Open a lesson to study it on the board.",
+      "myRepertoire": "My repertoire"
+    },
+    "middlegame": {
+      "eyebrow": "Strategic themes",
+      "title": "Middlegame",
+      "mobileDesc": "Plans for both sides and “find the plan” exercises.",
+      "desc": "Strategic themes on typical positions: plans for both sides and \"find the plan\" exercises, evaluated by the engine and commented by the coach."
+    },
+    "endgames": {
+      "eyebrow": "Exact technique",
+      "ratingEyebrow": "Endgame rating · {rating}",
+      "title": "Endgames",
+      "mobileDesc": "Convert the result against the tablebase's perfect defense.",
+      "desc": "Endgame technique, lesson and <em>practice</em>: convert the result against the tablebase's perfect defense. No approximations — the tablebase is absolute truth. Every conversion updates your endgame rating.",
+      "ratingLabel": "endgame rating",
+      "recommended": "recommended",
+      "neverPracticed": "Never practiced"
+    },
+    "lesson": {
+      "notAvailable": "This lesson isn't available yet."
+    },
+    "errors": {
+      "missingProgressKey": "Missing progress key.",
+      "sessionExpired": "Session expired. Please sign in again."
+    },
+    "deviation": {
+      "queryingEngine": "Querying the engine…",
+      "evaluatingMove": "Evaluating {move}…",
+      "coachReplying": "The coach is replying…",
+      "coachError": "Coach error.",
+      "sorry": "Sorry: {msg}",
+      "couldNotAnswer": "I couldn't answer. Try again.",
+      "notConfigured": "Coach not configured: you can still evaluate the deviation with the engine.",
+      "whyNot": "Why not <move></move>?"
+    },
+    "openingTree": {
+      "empty": "No published openings. Content comes with the seeds.",
+      "collapse": "Collapse",
+      "expand": "Expand"
+    },
+    "tablebase": {
+      "title": "Exact endgame (tablebase)",
+      "querying": "Querying the tablebase…",
+      "tooManyPieces": "The evaluation here is the engine's (see the Engine panel).",
+      "posWinning": "Winning position",
+      "posWinning50": "Winning (but 50-move rule)",
+      "posDrawn": "Drawn position",
+      "posLost50": "Lost (saved by the 50-move rule)",
+      "posLosing": "Losing position",
+      "posUnknown": "Unknown result",
+      "outcomeWins": "Wins",
+      "outcomeHoldsDraw": "Holds the draw",
+      "outcomeLoses": "Loses",
+      "mateIn": "mate in {n}"
+    },
+    "repertoireEditor": {
+      "saveFailed": "Save failed",
+      "saved": "Repertoire saved",
+      "buildAnnotate": "build and annotate your lines",
+      "saving": "Saving…",
+      "save": "Save",
+      "savedBtn": "Saved",
+      "makeMainLine": "Make this the main line",
+      "promote": "Promote",
+      "deleteMoveTitle": "Delete this move and its continuation",
+      "delete": "Delete",
+      "annotation": "Annotation",
+      "selectMove": "Select a move to annotate it.",
+      "annotationPlaceholder": "Move idea, plan, trap…",
+      "linesTab": "Lines",
+      "explorerTab": "Explorer"
+    },
+    "repertoireList": {
+      "notCreated": "Not created",
+      "notDeleted": "Not deleted",
+      "name": "Name",
+      "namePlaceholder": "e.g. White — Italian",
+      "color": "Color",
+      "create": "Create repertoire",
+      "empty": "No repertoires. Create one to start building your lines.",
+      "movesCount": "{count} moves",
+      "editor": "Editor",
+      "train": "Train",
+      "deleteAria": "Delete repertoire"
+    },
+    "quality": {
+      "winning": "winning",
+      "drawn": "drawn",
+      "lost": "lost",
+      "unknown": "unknown"
+    },
+    "endgamePractice": {
+      "title": "Endgame practice",
+      "youPlay": "you play {color}",
+      "goalWin": "Win the position",
+      "goalDraw": "Hold the draw",
+      "throwsAwayWin": "That throws away the win: the position is now {quality}. Go back and try again.",
+      "losesDraw": "Careful: this move loses the draw (position {quality}). Go back and try again.",
+      "mateConverted": "Mate! Endgame converted perfectly.",
+      "drawReached": "Draw reached. Correct defense.",
+      "stalemateWin": "Stalemate: the win slipped into a draw.",
+      "opponentMated": "The opponent checkmated you.",
+      "endedDraw": "Ended in a draw: the win slipped away.",
+      "drawHeld": "Draw held: you proved the defense. Result confirmed by the tablebase.",
+      "notSafeDraw": "The position isn't a safe draw yet: keep defending.",
+      "theoreticalResult": "Theoretical result",
+      "engineEstimate": "Engine estimate (position outside the tablebase)",
+      "positionForYou": "Position <quality></quality> for you",
+      "checkingTablebase": "Checking with the tablebase…",
+      "opponentDefending": "The opponent is defending…",
+      "tryAgain": "Try again",
+      "claimDraw": "Claim the draw",
+      "restart": "Restart",
+      "disclaimer": "The opponent plays the Lichess tablebase's perfect defense. After each of your moves the result is verified: no approximations."
+    },
+    "lessonViewer": {
+      "engine": "Engine",
+      "on": "on",
+      "off": "off",
+      "leftLine": "You left the line",
+      "stepOf": "Step {current} of {total}",
+      "freeExploration": "Free exploration",
+      "back": "Back",
+      "next": "Next",
+      "deviationText": "You're exploring a move outside the lesson. Evaluate it with the engine or ask the coach why it isn't the best choice.",
+      "backToLine": "Back to the line",
+      "lessonCompleted": "Lesson completed — recorded in your path.",
+      "navigateExplore": "Navigate the moves or play on the board to explore.",
+      "movesTab": "Moves",
+      "engineTab": "Engine",
+      "explorerTab": "Explorer",
+      "tablebaseTab": "Tablebase",
+      "engineThinking": "The engine is thinking…",
+      "engineOff": "Engine off. Turn it on to evaluate the position and deviations."
+    },
+    "explorer": {
+      "title": "What's really played",
+      "masters": "Masters",
+      "online": "Online",
+      "querying": "Querying the explorer…",
+      "noGames": "No games for this position.",
+      "move": "Move",
+      "games": "Games",
+      "result": "Result (W / draw / B)",
+      "outcomeAria": "White {white}, draws {draws}, Black {black}",
+      "outcomeTitle": "White {white} · Draws {draws} · Black {black}"
+    },
+    "openingTrainer": {
+      "leftRepertoire": "The opponent left your repertoire with {move} (the most common move). Consider adding it.",
+      "endOfLine": "End of the line covered by the repertoire.",
+      "correct": "{move} — correct.",
+      "wrong": "{move} isn't in the repertoire. Correct: {expected}.",
+      "trainHeading": "Train · {name}",
+      "reviewDue": "Review of due items",
+      "repertoireDrill": "Repertoire drill",
+      "dueCount": "{count} due",
+      "trapWarning": "⚠ Careful: there's a trap here, <trap></trap>.",
+      "newLine": "New line",
+      "yourTurn": "Your turn",
+      "opponentMoving": "The opponent is moving…",
+      "endOfLineTitle": "End of line",
+      "playRepertoireMove": "Play your repertoire move.",
+      "trainAnotherLine": "Train another line"
+    },
+    "positionalExercise": {
+      "engineAnalyzing": "The engine is analyzing the position…",
+      "evaluatingMove": "Evaluating {move}…",
+      "coachCommenting": "The coach is commenting…",
+      "coachUnavailable": "The coach isn't available right now; rely on the engine's evaluation.",
+      "couldNotEvaluate": "I couldn't evaluate the move. Try again.",
+      "title": "Exercise: find the plan",
+      "toMove": "{color} to move",
+      "reasonablePlan": "Reasonable plan",
+      "notConsistent": "Not very consistent",
+      "evalAfter": "Evaluation after the move: {evalText}",
+      "proposeMove": "Propose a move on the board: the engine evaluates it and the coach explains whether it fits the plan.",
+      "tryAnotherMove": "Try another move",
+      "hidePlan": "Hide the plan",
+      "showPlan": "Show the plan",
+      "relatedTheme": "Related theme:",
+      "trainThemed": "train themed tactics",
+      "disclaimer": "There's no single solution: what's evaluated is the reasonableness of the plan. The engine gives the numbers, the coach the words."
+    },
+    "guidedReplay": {
+      "back": "Back",
+      "start": "start",
+      "move": "move {n}",
+      "next": "Next",
+      "backToLearn": "Back to Learn"
+    },
+    "conceptRunner": {
+      "saveFailed": "Save failed",
+      "goal": "Goal:",
+      "noExercises": "No exercises available right now for this concept.",
+      "start": "Start ({count} exercises)",
+      "completed": "Concept completed",
+      "solvedSummary": "You solved <solved></solved> of {total} cleanly. Concept <title></title> unlocked.",
+      "moreConcepts": "More concepts",
+      "keepTraining": "Keep training"
+    }
   }
 }

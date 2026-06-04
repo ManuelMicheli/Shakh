@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { activeLocale, pickLocale } from "@/lib/i18n/content";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +23,7 @@ interface Row {
 export default async function AperturePage() {
   const supabase = await createClient();
   const locale = await activeLocale();
+  const t = await getTranslations("theory");
   const { data } = await supabase
     .from("content_items")
     .select("id, parent_id, slug, title_it, title_en, eco_code, summary_it, summary_en, body")
@@ -43,20 +45,19 @@ export default async function AperturePage() {
   return (
     <div className="space-y-6">
       <MobilePageHeader
-        eyebrow="ECO tree"
-        title="Openings"
-        desc="Families, openings and variations. Open a lesson to study it."
+        eyebrow={t("openings.eyebrow")}
+        title={t("openings.title")}
+        desc={t("openings.mobileDesc")}
       />
       <div className="hidden items-center justify-between gap-3 md:flex">
         <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Openings</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">{t("openings.title")}</h1>
           <p className="mt-2 text-text-muted">
-            Browse the ECO tree: families, openings and variations. Open a lesson
-            to study it on the board.
+            {t("openings.desc")}
           </p>
         </div>
         <Link href="/app/repertorio" className="text-sm text-text-muted hover:text-text">
-          My repertoire →
+          {t("openings.myRepertoire")} →
         </Link>
       </div>
 

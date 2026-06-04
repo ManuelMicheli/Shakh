@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil, Dumbbell, Trash2 } from "lucide-react";
@@ -22,6 +23,7 @@ export interface RepertoireItem {
 }
 
 export function RepertoireList({ items }: { items: RepertoireItem[] }) {
+  const t = useTranslations("theory");
   const router = useRouter();
   const { toast } = useToast();
   const [name, setName] = useState("");
@@ -32,7 +34,7 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
     start(async () => {
       const res = await createRepertoire(name, color);
       if (!res.ok || !res.data) {
-        toast({ title: "Not created", description: res.error, variant: "error" });
+        toast({ title: t("repertoireList.notCreated"), description: res.error, variant: "error" });
         return;
       }
       setName("");
@@ -44,7 +46,7 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
     start(async () => {
       const res = await deleteRepertoire(id);
       if (!res.ok) {
-        toast({ title: "Not deleted", description: res.error, variant: "error" });
+        toast({ title: t("repertoireList.notDeleted"), description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -64,17 +66,17 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
           >
             <div className="flex-1 min-w-[12rem] space-y-1">
               <label className="text-xs text-text-muted" htmlFor="rep-name">
-                Name
+                {t("repertoireList.name")}
               </label>
               <Input
                 id="rep-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. White — Italian"
+                placeholder={t("repertoireList.namePlaceholder")}
               />
             </div>
             <div className="space-y-1">
-              <span className="block text-xs text-text-muted">Color</span>
+              <span className="block text-xs text-text-muted">{t("repertoireList.color")}</span>
               <div className="inline-flex rounded-md border border-border bg-surface p-0.5">
                 {(["white", "black"] as PieceColor[]).map((c) => (
                   <button
@@ -86,13 +88,13 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
                       (color === c ? "bg-text text-bg" : "text-text-muted hover:text-text")
                     }
                   >
-                    {c === "white" ? "White" : "Black"}
+                    {c === "white" ? t("color.white") : t("color.black")}
                   </button>
                 ))}
               </div>
             </div>
             <Button type="submit" disabled={pending || !name.trim()}>
-              Create repertoire
+              {t("repertoireList.create")}
             </Button>
           </form>
         </CardContent>
@@ -100,7 +102,7 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
 
       {items.length === 0 ? (
         <p className="text-sm text-text-muted">
-          No repertoires. Create one to start building your lines.
+          {t("repertoireList.empty")}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -117,23 +119,24 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
                     <div>
                       <p className="font-medium">{r.name}</p>
                       <p className="text-xs text-text-muted">
-                        {r.color === "white" ? "White" : "Black"} · {r.moves} moves
+                        {r.color === "white" ? t("color.white") : t("color.black")} ·{" "}
+                        {t("repertoireList.movesCount", { count: r.moves })}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
                     <Link href={`/app/repertorio/${r.id}`} className={LINK_BTN}>
-                      <Pencil className="mr-1 h-4 w-4" /> Editor
+                      <Pencil className="mr-1 h-4 w-4" /> {t("repertoireList.editor")}
                     </Link>
                     <Link href={`/app/repertorio/${r.id}/training`} className={LINK_BTN}>
-                      <Dumbbell className="mr-1 h-4 w-4" /> Train
+                      <Dumbbell className="mr-1 h-4 w-4" /> {t("repertoireList.train")}
                     </Link>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(r.id)}
                       disabled={pending}
-                      aria-label="Delete repertoire"
+                      aria-label={t("repertoireList.deleteAria")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useToast } from "@/components/ui/toast";
 import {
   analyzeGame,
@@ -123,6 +124,7 @@ function readPersisted(): PersistedState | null {
  */
 export function AnalysisJobProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const t = useTranslations("games");
   const { toast } = useToast();
   const [job, setJob] = useState<AnalysisJob | null>(null);
   const [queueLength, setQueueLength] = useState(0);
@@ -183,7 +185,7 @@ export function AnalysisJobProvider({ children }: { children: React.ReactNode })
         if (!res.ok) {
           setJob((j) => (j ? { ...j, status: "error", error: res.error } : j));
           toast({
-            title: "Save failed",
+            title: t("saveFailed"),
             description: res.error,
             variant: "error",
           });
@@ -191,7 +193,7 @@ export function AnalysisJobProvider({ children }: { children: React.ReactNode })
         }
         setJob((j) => (j ? { ...j, status: "done" } : j));
         toast({
-          title: "Analysis complete",
+          title: t("analysisComplete"),
           description: p.title,
           variant: "success",
         });
@@ -200,15 +202,15 @@ export function AnalysisJobProvider({ children }: { children: React.ReactNode })
         const msg =
           e instanceof InvalidPgnError || e instanceof EmptyGameError
             ? e.message
-            : "Error during analysis.";
+            : t("errDuringAnalysis");
         setJob((j) => (j ? { ...j, status: "error", error: msg } : j));
-        toast({ title: "Analysis failed", description: msg, variant: "error" });
+        toast({ title: t("analysisFailed"), description: msg, variant: "error" });
       } finally {
         currentRef.current = null;
         persist();
       }
     },
-    [router, toast, persist],
+    [router, toast, persist, t],
   );
 
   /** Svuota la coda processando una partita alla volta. */

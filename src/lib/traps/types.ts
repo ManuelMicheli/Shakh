@@ -5,6 +5,7 @@
  */
 
 import type { Lesson } from "@/lib/theory/types";
+import type { Locale } from "@/i18n/config";
 
 /** Mirror dell'enum DB `trap_category`. */
 export type TrapCategory =
@@ -65,7 +66,13 @@ export interface TrapProgress {
   dueAt: string | null;
 }
 
-// ───────────────────────────────── Etichette IT ──────────────────────────────
+// ──────────────────────────── Etichette bilingue ─────────────────────────────
+// I record `*_LABEL` restano in inglese per i consumatori esistenti (catalogo,
+// pagina trappola). Gli accessor `*Label(key, locale)` forniscono la variante
+// localizzata che le viste possono adottare incrementalmente.
+
+type Bilingual = { it: string; en: string };
+const pick = (v: Bilingual, locale: Locale): string => (locale === "it" ? v.it : v.en);
 
 export const CATEGORY_LABEL: Record<TrapCategory, string> = {
   opening_trap: "Opening trap",
@@ -75,12 +82,35 @@ export const CATEGORY_LABEL: Record<TrapCategory, string> = {
   tactical_motif: "Tactical motif",
 };
 
+const CATEGORY_I18N: Record<TrapCategory, Bilingual> = {
+  opening_trap: { it: "Trappola d'apertura", en: "Opening trap" },
+  gambit: { it: "Gambetto", en: "Gambit" },
+  sacrifice: { it: "Sacrificio", en: "Sacrifice" },
+  swindle: { it: "Imbroglio", en: "Swindle" },
+  tactical_motif: { it: "Motivo tattico", en: "Tactical motif" },
+};
+
+export function categoryLabel(key: TrapCategory, locale: Locale): string {
+  return pick(CATEGORY_I18N[key], locale);
+}
+
 export const FAME_LABEL: Record<TrapFame, string> = {
   famous: "Famous",
   known: "Known",
   niche: "Niche",
   obscure: "Obscure",
 };
+
+const FAME_I18N: Record<TrapFame, Bilingual> = {
+  famous: { it: "Famosa", en: "Famous" },
+  known: { it: "Nota", en: "Known" },
+  niche: { it: "Di nicchia", en: "Niche" },
+  obscure: { it: "Oscura", en: "Obscure" },
+};
+
+export function fameLabel(key: TrapFame, locale: Locale): string {
+  return pick(FAME_I18N[key], locale);
+}
 
 /** Ordine crescente di notorietà → per la manopola famose ↔ di nicchia. */
 export const FAME_ORDER: TrapFame[] = ["famous", "known", "niche", "obscure"];
@@ -90,26 +120,40 @@ export const SIDE_LABEL: Record<TrapSide, string> = {
   black: "Black",
 };
 
-/** Etichette italiane dei motivi tattici (fallback alla chiave grezza). */
-const MOTIF_LABEL: Record<string, string> = {
-  sacrifice: "Sacrifice",
-  fork: "Fork",
-  pin: "Pin",
-  skewer: "Skewer",
-  discoveredAttack: "Discovered attack",
-  doubleCheck: "Double check",
-  deflection: "Deflection",
-  smotheredMate: "Smothered mate",
-  backRankMate: "Back-rank mate",
-  mate: "Mate",
-  attack: "Attack",
-  trap: "Trap",
-  underPromotion: "Underpromotion",
-  hangingPiece: "Hanging piece",
+const SIDE_I18N: Record<TrapSide, Bilingual> = {
+  white: { it: "Bianco", en: "White" },
+  black: { it: "Nero", en: "Black" },
 };
 
-export function motifLabel(key: string): string {
-  return MOTIF_LABEL[key] ?? key;
+export function sideLabel(key: TrapSide, locale: Locale): string {
+  return pick(SIDE_I18N[key], locale);
+}
+
+/** Etichette bilingui dei motivi tattici (fallback alla chiave grezza). */
+const MOTIF_I18N: Record<string, Bilingual> = {
+  sacrifice: { it: "Sacrificio", en: "Sacrifice" },
+  fork: { it: "Forchetta", en: "Fork" },
+  pin: { it: "Inchiodatura", en: "Pin" },
+  skewer: { it: "Infilata", en: "Skewer" },
+  discoveredAttack: { it: "Attacco di scoperta", en: "Discovered attack" },
+  doubleCheck: { it: "Doppio scacco", en: "Double check" },
+  deflection: { it: "Deviazione", en: "Deflection" },
+  smotheredMate: { it: "Matto affogato", en: "Smothered mate" },
+  backRankMate: { it: "Matto della traversa", en: "Back-rank mate" },
+  mate: { it: "Matto", en: "Mate" },
+  attack: { it: "Attacco", en: "Attack" },
+  trap: { it: "Trappola", en: "Trap" },
+  underPromotion: { it: "Sottopromozione", en: "Underpromotion" },
+  hangingPiece: { it: "Pezzo in presa", en: "Hanging piece" },
+};
+
+/**
+ * Etichetta localizzata di un motivo (fallback alla chiave grezza).
+ * `locale` opzionale: omesso → inglese, per retrocompatibilità.
+ */
+export function motifLabel(key: string, locale: Locale = "en"): string {
+  const v = MOTIF_I18N[key];
+  return v ? pick(v, locale) : key;
 }
 
 /**

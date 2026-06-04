@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { cn } from "@/lib/utils";
 
 export interface DistributionBarProps {
@@ -9,25 +10,26 @@ export interface DistributionBarProps {
 
 // Eccezione monocromatica ammessa: i colori --eval-* comunicano un esito.
 const SEGMENTS = [
-  { key: "inaccuracies", label: "Inaccuracies", color: "var(--eval-inaccuracy)" },
-  { key: "mistakes", label: "Mistakes", color: "var(--eval-mistake)" },
-  { key: "blunders", label: "Blunders", color: "var(--eval-blunder)" },
+  { key: "inaccuracies", labelKey: "distribution.inaccuracies", color: "var(--eval-inaccuracy)" },
+  { key: "mistakes", labelKey: "distribution.mistakes", color: "var(--eval-mistake)" },
+  { key: "blunders", labelKey: "distribution.blunders", color: "var(--eval-blunder)" },
 ] as const;
 
 /** Distribuzione degli errori (imprecisioni/errori/gravi errori) in barra segmentata. */
-export function DistributionBar({
+export async function DistributionBar({
   inaccuracies,
   mistakes,
   blunders,
   className,
 }: DistributionBarProps) {
+  const t = await getTranslations("dashboard");
   const counts = { inaccuracies, mistakes, blunders };
   const total = inaccuracies + mistakes + blunders;
 
   if (total === 0) {
     return (
       <p className={cn("text-sm text-text-muted", className)}>
-        No errors recorded: great, or not much data yet.
+        {t("distribution.empty")}
       </p>
     );
   }
@@ -42,7 +44,7 @@ export function DistributionBar({
             <div
               key={s.key}
               style={{ width: `${(n / total) * 100}%`, backgroundColor: s.color }}
-              title={`${s.label}: ${n}`}
+              title={`${t(s.labelKey)}: ${n}`}
             />
           );
         })}
@@ -51,7 +53,7 @@ export function DistributionBar({
         {SEGMENTS.map((s) => (
           <span key={s.key} className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
-            {s.label}: <span className="font-mono tabular-nums text-text">{counts[s.key]}</span>
+            {t(s.labelKey)}: <span className="font-mono tabular-nums text-text">{counts[s.key]}</span>
           </span>
         ))}
       </div>

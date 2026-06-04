@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export interface RosterStudent {
   userId: string;
@@ -15,12 +16,12 @@ export interface RosterStudent {
 
 type SortKey = "name" | "level" | "tacticRating" | "accuracy" | "lastActivity";
 
-const HEADERS: { key: SortKey; label: string; numeric: boolean }[] = [
-  { key: "name", label: "Student", numeric: false },
-  { key: "level", label: "Level", numeric: true },
-  { key: "tacticRating", label: "Rating", numeric: true },
-  { key: "accuracy", label: "Accuracy", numeric: true },
-  { key: "lastActivity", label: "Last activity", numeric: true },
+const HEADERS: { key: SortKey; labelKey: string; numeric: boolean }[] = [
+  { key: "name", labelKey: "rosterStudent", numeric: false },
+  { key: "level", labelKey: "rosterLevel", numeric: true },
+  { key: "tacticRating", labelKey: "rosterRating", numeric: true },
+  { key: "accuracy", labelKey: "rosterAccuracy", numeric: true },
+  { key: "lastActivity", labelKey: "rosterLastActivity", numeric: true },
 ];
 
 function fmtAccuracy(v: number | null): string {
@@ -41,6 +42,7 @@ export function ClassRoster({
   groupId: string;
   students: RosterStudent[];
 }) {
+  const t = useTranslations("groups");
   const [sort, setSort] = useState<SortKey>("level");
   const [asc, setAsc] = useState(true);
 
@@ -79,7 +81,7 @@ export function ClassRoster({
                   onClick={() => onSort(h.key)}
                   className="inline-flex items-center gap-1 hover:text-text"
                 >
-                  {h.label}
+                  {t(h.labelKey)}
                   {sort === h.key && <span aria-hidden>{asc ? "↑" : "↓"}</span>}
                 </button>
               </th>

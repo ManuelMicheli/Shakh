@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -24,11 +25,12 @@ export function PlayHub({
   myGames: FriendGameRow[];
   currentUserId: string;
 }) {
+  const t = useTranslations("play");
   return (
     <Tabs defaultValue="local">
       <TabsList>
-        <TabsTrigger value="local">Same device</TabsTrigger>
-        <TabsTrigger value="online">Online (turn-based)</TabsTrigger>
+        <TabsTrigger value="local">{t("hub.tabLocal")}</TabsTrigger>
+        <TabsTrigger value="online">{t("hub.tabOnline")}</TabsTrigger>
       </TabsList>
 
       <TabsContent value="local">
@@ -46,6 +48,7 @@ export function PlayHub({
 }
 
 function CreateOnlineForm() {
+  const t = useTranslations("play");
   const router = useRouter();
   const { toast } = useToast();
   const [color, setColor] = useState<ColorChoice>("w");
@@ -64,24 +67,23 @@ function CreateOnlineForm() {
   };
 
   const colors: { id: ColorChoice; label: string }[] = [
-    { id: "w", label: "White" },
-    { id: "b", label: "Black" },
-    { id: "random", label: "Random" },
+    { id: "w", label: t("color.white") },
+    { id: "b", label: t("color.black") },
+    { id: "random", label: t("color.random") },
   ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>New online game</CardTitle>
+        <CardTitle>{t("create.title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <p className="text-sm text-text-muted">
-          Create the game, share the link with a friend, and play whenever you
-          like: moves sync in real time.
+          {t("create.desc")}
         </p>
         <div>
           <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-            Your color
+            {t("create.yourColor")}
           </div>
           <div className="flex flex-wrap gap-2">
             {colors.map((c) => (
@@ -104,12 +106,12 @@ function CreateOnlineForm() {
         </div>
         <div>
           <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-            Time control
+            {t("timeControl")}
           </div>
           <TimeControlPicker value={tcId} onChange={setTcId} />
         </div>
         <Button onClick={create} disabled={pending}>
-          {pending ? "Creating…" : "Create and get the link"}
+          {pending ? t("create.creating") : t("create.submit")}
         </Button>
       </CardContent>
     </Card>
@@ -123,15 +125,16 @@ function MyGames({
   games: FriendGameRow[];
   currentUserId: string;
 }) {
+  const t = useTranslations("play");
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your online games</CardTitle>
+        <CardTitle>{t("myGames.title")}</CardTitle>
       </CardHeader>
       <CardContent>
         {games.length === 0 ? (
           <p className="text-sm text-text-muted">
-            No online games yet. Create one to get started.
+            {t("myGames.empty")}
           </p>
         ) : (
           <ul className="divide-y divide-border">
@@ -148,10 +151,10 @@ function MyGames({
                   >
                     <span className="min-w-0">
                       <span className="block truncate text-sm">
-                        vs {oppName ?? "waiting…"}
+                        {t("myGames.vs", { name: oppName ?? t("myGames.waiting") })}
                       </span>
                       <span className="block font-mono text-xs text-text-muted">
-                        {myColor === "w" ? "White" : "Black"} · {tc.label}
+                        {myColor === "w" ? t("color.white") : t("color.black")} · {tc.label}
                       </span>
                     </span>
                     <StatusBadge g={g} />
@@ -167,9 +170,10 @@ function MyGames({
 }
 
 function StatusBadge({ g }: { g: FriendGameRow }) {
-  if (g.status === "waiting") return <Badge variant="muted">waiting</Badge>;
-  if (g.status === "ongoing") return <Badge>in progress</Badge>;
-  return <Badge variant="muted">{g.result ?? "over"}</Badge>;
+  const t = useTranslations("play");
+  if (g.status === "waiting") return <Badge variant="muted">{t("status.waiting")}</Badge>;
+  if (g.status === "ongoing") return <Badge>{t("status.inProgress")}</Badge>;
+  return <Badge variant="muted">{g.result ?? t("status.over")}</Badge>;
 }
 
 /** Ricostruisce l'id del controllo di tempo dai ms salvati (best-effort per la label). */

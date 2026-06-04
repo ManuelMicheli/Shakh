@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { OpeningTrainer } from "@/components/theory/OpeningTrainer";
 import {
@@ -64,11 +65,12 @@ export default async function TrainingPage({
   }
 
   if (moveRows.length === 0) {
+    const t = await getTranslations("study");
     return (
       <div className="mx-auto max-w-2xl py-12 text-center">
         <h1 className="font-display text-2xl font-semibold">{rep.name}</h1>
         <p className="mt-2 text-text-muted">
-          Repertorio vuoto: aggiungi prima qualche linea nell&apos;editor.
+          {t("repertoire.emptyEditor")}
         </p>
       </div>
     );

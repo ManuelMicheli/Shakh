@@ -13,6 +13,7 @@ import { decodeEval, toMoverCp } from "@/lib/analysis/evalScore";
 import { moverFromPly, phaseFromFen } from "@/lib/ai/format";
 import type { GamePhase } from "@/lib/ai/types";
 import type { Classification } from "@/lib/games/types";
+import type { Locale } from "@/i18n/config";
 
 type DB = SupabaseClient;
 
@@ -84,6 +85,7 @@ interface ErrorMove {
 export async function loadWeaknesses(
   supabase: DB,
   userId: string,
+  locale: Locale = "en",
 ): Promise<{ analyzedGames: number; patterns: WeaknessPattern[] }> {
   const { data: gamesData } = await supabase
     .from("games")
@@ -105,7 +107,7 @@ export async function loadWeaknesses(
     .in("game_id", ids);
   const rows = (rowsData as AnalysisRow[] | null) ?? [];
 
-  return { analyzedGames: games.length, patterns: detectWeaknesses(games, rows) };
+  return { analyzedGames: games.length, patterns: detectWeaknesses(games, rows, locale) };
 }
 
 // ============================================================
@@ -115,7 +117,9 @@ export async function loadWeaknesses(
 export function detectWeaknesses(
   games: { id: string; user_color: "white" | "black" | null; eco_code: string | null }[],
   rows: AnalysisRow[],
+  locale: Locale = "en",
 ): WeaknessPattern[] {
+  const it = locale === "it";
   const colorOf = new Map(games.map((g) => [g.id, g.user_color]));
   const ecoOf = new Map(games.map((g) => [g.id, g.eco_code]));
 
@@ -157,15 +161,22 @@ export function detectWeaknesses(
     if (p) candidates.push(p);
   };
 
+  const trainTactics = {
+    label: it ? "Allena la tattica" : "Train tactics",
+    href: "/app/tattiche?mode=adaptive",
+  };
+
   // 1) Spreco del vantaggio.
   push(
     build(
       "squander_advantage",
-      "You squander winning positions",
+      it ? "Sprechi le posizioni vinte" : "You squander winning positions",
       errors.filter((e) => e.cpBefore >= 150 && e.cpLoss >= 150),
       (occ, gms, avg) =>
-        `${occ} times across ${gms} games you threw away a clear advantage (−${pawns(avg)} on average). Train conversion and calculation.`,
-      { label: "Train tactics", href: "/app/tattiche?mode=adaptive" },
+        it
+          ? `${occ} volte in ${gms} partite hai buttato via un vantaggio netto (−${pawns(avg)} in media). Allena conversione e calcolo.`
+          : `${occ} times across ${gms} games you threw away a clear advantage (−${pawns(avg)} on average). Train conversion and calculation.`,
+      trainTactics,
     ),
   );
 
@@ -173,11 +184,13 @@ export function detectWeaknesses(
   push(
     build(
       "defense_collapse",
-      "You sink under pressure",
+      it ? "Crolli sotto pressione" : "You sink under pressure",
       errors.filter((e) => e.cpBefore <= -30 && e.cpBefore >= -300 && e.cpLoss >= 150),
       (occ, gms, avg) =>
-        `${occ} times across ${gms} games, from a slightly worse position you collapsed (−${pawns(avg)}). Work on defense and staying calm.`,
-      { label: "Train tactics", href: "/app/tattiche?mode=adaptive" },
+        it
+          ? `${occ} volte in ${gms} partite, da una posizione leggermente peggiore sei crollato (−${pawns(avg)}). Lavora sulla difesa e sulla calma.`
+          : `${occ} times across ${gms} games, from a slightly worse position you collapsed (−${pawns(avg)}). Work on defense and staying calm.`,
+      trainTactics,
     ),
   );
 
@@ -185,11 +198,16 @@ export function detectWeaknesses(
   push(
     build(
       "time_pressure",
-      "Mistakes after move 30",
+      it ? "Errori dopo la mossa 30" : "Mistakes after move 30",
       errors.filter((e) => e.ply >= 61 && e.cpLoss >= 120),
       (occ, gms, avg) =>
-        `${occ} serious mistakes across ${gms} games past move 30 (−${pawns(avg)}). Often it's time management: try the timed challenges.`,
-      { label: "Timed challenge", href: "/app/tattiche?mode=timed" },
+        it
+          ? `${occ} errori seri in ${gms} partite oltre la mossa 30 (−${pawns(avg)}). Spesso è gestione del tempo: prova le sfide a tempo.`
+          : `${occ} serious mistakes across ${gms} games past move 30 (−${pawns(avg)}). Often it's time management: try the timed challenges.`,
+      {
+        label: it ? "Sfida a tempo" : "Timed challenge",
+        href: "/app/tattiche?mode=timed",
+      },
     ),
   );
 
@@ -197,19 +215,25 @@ export function detectWeaknesses(
   push(
     build(
       "missed_tactic",
-      "You miss tactical shots",
+      it ? "Manchi i colpi tattici" : "You miss tactical shots",
       errors.filter((e) => e.cpLoss >= 200 && isForcing(e.bestSan)),
       (occ, gms, avg) =>
-        `${occ} times across ${gms} games there was a forcing shot you didn't see (−${pawns(avg)}). More tactical-vision puzzles.`,
-      { label: "Train tactics", href: "/app/tattiche?mode=adaptive" },
+        it
+          ? `${occ} volte in ${gms} partite c'era un colpo forzante che non hai visto (−${pawns(avg)}). Più puzzle di visione tattica.`
+          : `${occ} times across ${gms} games there was a forcing shot you didn't see (−${pawns(avg)}). More tactical-vision puzzles.`,
+      trainTactics,
     ),
   );
 
   // 5) Fase debole (per tasso d'errore, non solo conteggio).
-  const PHASE_INFO: Record<GamePhase, { label: string; href: string }> = {
-    opening: { label: "in the opening", href: "/app/teoria/aperture" },
-    middlegame: { label: "in the middlegame", href: "/app/teoria/mediogioco" },
-    endgame: { label: "in endgames", href: "/app/teoria/finali" },
+  const PHASE_INFO: Record<GamePhase, { label: string; labelIt: string; href: string }> = {
+    opening: { label: "in the opening", labelIt: "in apertura", href: "/app/teoria/aperture" },
+    middlegame: {
+      label: "in the middlegame",
+      labelIt: "nel mediogioco",
+      href: "/app/teoria/mediogioco",
+    },
+    endgame: { label: "in endgames", labelIt: "nei finali", href: "/app/teoria/finali" },
   };
   (Object.keys(phaseMoves) as GamePhase[]).forEach((ph) => {
     const moves = phaseMoves[ph];
@@ -218,14 +242,17 @@ export function detectWeaknesses(
     const rate = errs.length / moves;
     if (rate < 0.18) return;
     const info = PHASE_INFO[ph];
+    const phaseFrag = it ? info.labelIt : info.label;
     push(
       build(
         `phase_${ph}`,
-        `Shaky ${info.label}`,
+        it ? `Incerto ${phaseFrag}` : `Shaky ${phaseFrag}`,
         errs,
         (occ, gms) =>
-          `${Math.round(rate * 100)}% error rate ${info.label} (${occ} mistakes across ${gms} games). Review the theory for this phase.`,
-        { label: "Review", href: info.href },
+          it
+            ? `Tasso d'errore del ${Math.round(rate * 100)}% ${phaseFrag} (${occ} errori in ${gms} partite). Rivedi la teoria di questa fase.`
+            : `${Math.round(rate * 100)}% error rate ${phaseFrag} (${occ} mistakes across ${gms} games). Review the theory for this phase.`,
+        { label: it ? "Ripassa" : "Review", href: info.href },
       ),
     );
   });
@@ -243,11 +270,13 @@ export function detectWeaknesses(
     push(
       build(
         `opening_eco_${fam}`,
-        `Opening ${fam}: you come out badly`,
+        it ? `Apertura ${fam}: ne esci male` : `Opening ${fam}: you come out badly`,
         errs,
         (occ, gms) =>
-          `${occ} opening mistakes in the ${fam} family (${gms} games). Build or review your repertoire.`,
-        { label: "Repertoire", href: "/app/repertorio" },
+          it
+            ? `${occ} errori d'apertura nella famiglia ${fam} (${gms} partite). Costruisci o rivedi il tuo repertorio.`
+            : `${occ} opening mistakes in the ${fam} family (${gms} games). Build or review your repertoire.`,
+        { label: it ? "Repertorio" : "Repertoire", href: "/app/repertorio" },
       ),
     );
   }

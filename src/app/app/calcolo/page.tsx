@@ -1,9 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { CalculationTrainer } from "@/components/calc/CalculationTrainer";
 import { getCalcPuzzle } from "./actions";
 import { loadDomainRatings } from "@/lib/rating/store";
 
-export const metadata = { title: "Calculation — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("tactics");
+  return { title: t("calcMetaTitle") };
+}
 
 export default async function CalcoloPage() {
   const supabase = await createClient();

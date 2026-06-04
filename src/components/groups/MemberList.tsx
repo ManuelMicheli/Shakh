@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
@@ -19,6 +20,7 @@ export interface MemberListProps {
 }
 
 export function MemberList({ groupId, members, isOwner, canDrill }: MemberListProps) {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [pending, start] = useTransition();
@@ -27,7 +29,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
     start(async () => {
       const res = await updateMemberRole(groupId, userId, role);
       if (!res.ok) {
-        toast({ title: "Not updated", description: res.error, variant: "error" });
+        toast({ title: t("toastNotUpdated"), description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -38,7 +40,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
     start(async () => {
       const res = await removeMember(groupId, userId);
       if (!res.ok) {
-        toast({ title: "Not removed", description: res.error, variant: "error" });
+        toast({ title: t("toastNotRemoved"), description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -62,7 +64,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
                 href={`/app/gruppi/${groupId}/allievi/${m.userId}`}
                 className="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm font-medium text-text hover:bg-surface"
               >
-                Progress
+                {t("progressLink")}
               </Link>
             )}
             {isOwner && m.role !== "owner" && (
@@ -75,7 +77,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
                     onRole(m.userId, m.role === "instructor" ? "member" : "instructor")
                   }
                 >
-                  {m.role === "instructor" ? "Make student" : "Promote to instructor"}
+                  {m.role === "instructor" ? t("makeStudentButton") : t("promoteInstructorButton")}
                 </Button>
                 <Button
                   variant="ghost"
@@ -83,7 +85,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
                   disabled={pending}
                   onClick={() => onRemove(m.userId)}
                 >
-                  Remove
+                  {t("removeButton")}
                 </Button>
               </>
             )}

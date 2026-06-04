@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
@@ -58,6 +59,7 @@ export function OpeningTrainer({
   reviewMode,
   trapWarnings = [],
 }: OpeningTrainerProps) {
+  const t = useTranslations("theory");
   const nodes = tree.nodes;
   const rootId = tree.rootId;
   const userTurn = color === "white" ? "w" : "b";
@@ -156,12 +158,10 @@ export function OpeningTrainer({
       if (cancelled) return;
       if (res.ok && res.data.moves.length > 0) {
         const top = [...res.data.moves].sort((a, b) => moveGames(b) - moveGames(a))[0];
-        setLineNote(
-          `The opponent left your repertoire with ${top.san} (the most common move). Consider adding it.`,
-        );
+        setLineNote(t("openingTrainer.leftRepertoire", { move: top.san }));
         setOutOfBookFen(n.fen);
       } else {
-        setLineNote("End of the line covered by the repertoire.");
+        setLineNote(t("openingTrainer.endOfLine"));
       }
       setPhase("end");
     }, 450);
@@ -170,7 +170,7 @@ export function OpeningTrainer({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [phase, currentId, nodes, reviewMode, subtreeHasDue, computePhase]);
+  }, [phase, currentId, nodes, reviewMode, subtreeHasDue, computePhase, t]);
 
   // Mosse legali per l'input utente (solo nella fase 'user').
   const dests: LegalDests | undefined = useMemo(() => {
@@ -200,7 +200,7 @@ export function OpeningTrainer({
     const match = children.find((c) => c.san === san);
 
     if (match) {
-      setFeedback({ type: "ok", text: `${san} — correct.` });
+      setFeedback({ type: "ok", text: t("openingTrainer.correct", { move: san }) });
       setStats((s) => ({ ...s, correct: s.correct + 1 }));
       void recordRepertoireAttempt(repertoireId, match.id, true);
       const nextId = match.id;
@@ -210,7 +210,10 @@ export function OpeningTrainer({
       // Errato: l'item atteso è la mainline; segnalo, mostro la mossa giusta, proseguo.
       const expected = children[0];
       const expectedSan = children.map((c) => c.san).join(" / ");
-      setFeedback({ type: "wrong", text: `${san} isn't in the repertoire. Correct: ${expectedSan}.` });
+      setFeedback({
+        type: "wrong",
+        text: t("openingTrainer.wrong", { move: san, expected: expectedSan }),
+      });
       setStats((s) => ({ ...s, wrong: s.wrong + 1 }));
       if (expected) {
         void recordRepertoireAttempt(repertoireId, expected.id, false);
@@ -225,15 +228,17 @@ export function OpeningTrainer({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
-            Train · {name}
+            {t("openingTrainer.trainHeading", { name })}
           </h1>
           <p className="mt-1 text-sm text-text-muted">
-            {reviewMode ? "Review of due items" : "Repertoire drill"} ·{" "}
-            {color === "white" ? "White" : "Black"}
+            {reviewMode ? t("openingTrainer.reviewDue") : t("openingTrainer.repertoireDrill")} ·{" "}
+            {color === "white" ? t("color.white") : t("color.black")}
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm">
-          {reviewMode && dueIds.length > 0 && <Badge>{dueIds.length} due</Badge>}
+          {reviewMode && dueIds.length > 0 && (
+            <Badge>{t("openingTrainer.dueCount", { count: dueIds.length })}</Badge>
+          )}
           <span className="font-mono text-text-muted">
             ✓ {stats.correct} · ✗ {stats.wrong}
           </span>
@@ -244,14 +249,16 @@ export function OpeningTrainer({
         <div className="space-y-3">
           {currentTrap && (
             <div className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm">
-              ⚠ Careful: there&apos;s a trap here,{" "}
-              <Link
-                href={`/app/trappole/${currentTrap.slug}`}
-                className="font-medium underline underline-offset-2 hover:text-text"
-              >
-                {currentTrap.name}
-              </Link>
-              .
+              {t.rich("openingTrainer.trapWarning", {
+                trap: () => (
+                  <Link
+                    href={`/app/trappole/${currentTrap.slug}`}
+                    className="font-medium underline underline-offset-2 hover:text-text"
+                  >
+                    {currentTrap.name}
+                  </Link>
+                ),
+              })}
             </div>
           )}
           <div
@@ -272,7 +279,7 @@ export function OpeningTrainer({
 
           <div className="flex items-center justify-end gap-3">
             <Button variant="secondary" size="sm" onClick={startLine}>
-              New line
+              {t("openingTrainer.newLine")}
             </Button>
           </div>
 
@@ -280,16 +287,16 @@ export function OpeningTrainer({
             <CardHeader>
               <CardTitle>
                 {phase === "user"
-                  ? "Your turn"
+                  ? t("openingTrainer.yourTurn")
                   : phase === "opponent"
-                    ? "The opponent is moving…"
-                    : "End of line"}
+                    ? t("openingTrainer.opponentMoving")
+                    : t("openingTrainer.endOfLineTitle")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {phase === "user" && !feedback && (
                 <p className="text-sm text-text-muted">
-                  Play your repertoire move.
+                  {t("openingTrainer.playRepertoireMove")}
                 </p>
               )}
               {feedback && (
@@ -306,7 +313,7 @@ export function OpeningTrainer({
               {lineNote && <p className="text-sm text-text-muted">{lineNote}</p>}
               {phase === "end" && (
                 <Button size="sm" onClick={startLine}>
-                  Train another line
+                  {t("openingTrainer.trainAnotherLine")}
                 </Button>
               )}
             </CardContent>

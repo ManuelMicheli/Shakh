@@ -1,16 +1,22 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { recomputePath } from "@/lib/path/recompute";
 import { loadWeakest } from "@/lib/path/read";
 import { computeNextStep } from "@/lib/path/recommend";
+import { activeLocale } from "@/lib/i18n/content";
 import { SkillTree } from "@/components/percorso/SkillTree";
 import { NextStep } from "@/components/percorso/NextStep";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Path — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("study");
+  return { title: t("path.metaTitle") };
+}
 
 export default async function PercorsoPage() {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const user = await getUser();
   if (!user) redirect("/login");
 
@@ -26,22 +32,21 @@ export default async function PercorsoPage() {
   // Ricalcolo idempotente: legge i progressi dei moduli e aggiorna lo stato.
   const { nodes, currentLevel } = await recomputePath(supabase, user.id);
   const weakest = await loadWeakest(supabase, user.id);
-  const step = computeNextStep(currentLevel, nodes, weakest);
+  const step = computeNextStep(currentLevel, nodes, weakest, await activeLocale());
 
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="From beginner to club"
-        title="Path"
-        desc="Nodes unlock as you master the previous ones."
+        eyebrow={t("path.eyebrow")}
+        title={t("path.title")}
+        desc={t("path.desc")}
       />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Path</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">{t("path.title")}</h1>
         <p className="mt-2 text-text-muted">
-          From beginner to club player. Nodes unlock as you prove you&apos;ve
-          mastered the previous ones.
+          {t("path.intro")}
         </p>
       </div>
 
@@ -50,8 +55,7 @@ export default async function PercorsoPage() {
       <SkillTree nodes={nodes} />
 
       <p className="text-xs text-text-muted">
-        The curriculum is an instructional-design draft: a starting point, not a
-        definitive truth.
+        {t("path.curriculumNote")}
       </p>
     </div>
   );

@@ -9,6 +9,8 @@
  * il motivo esatto, ma un allenamento pertinente.
  */
 
+import type { Locale } from "@/i18n/config";
+
 export type MotifClass = "mate" | "tactic" | "conversion";
 
 /**
@@ -39,15 +41,19 @@ export function motifThemes(motif: MotifClass): string[] {
   }
 }
 
-/** Etichetta italiana. */
-export function motifLabel(motif: MotifClass): string {
+/**
+ * Etichetta localizzata del motivo.
+ * `locale` opzionale: omesso → inglese, per retrocompatibilità.
+ */
+export function motifLabel(motif: MotifClass, locale: Locale = "en"): string {
+  const it = locale === "it";
   switch (motif) {
     case "mate":
-      return "Missed mate";
+      return it ? "Matto mancato" : "Missed mate";
     case "tactic":
-      return "Missed tactic";
+      return it ? "Tattica mancata" : "Missed tactic";
     case "conversion":
-      return "Unconverted advantage";
+      return it ? "Vantaggio non convertito" : "Unconverted advantage";
   }
 }
 

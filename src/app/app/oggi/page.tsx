@@ -13,6 +13,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buildDailyPlan, type PlanBlock, type BlockKind } from "@/lib/daily/plan";
+import { activeLocale } from "@/lib/i18n/content";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Today's training — Shakh" };
@@ -42,7 +43,7 @@ export default async function OggiPage() {
   const supabase = await createClient();
   const user = await getUser();
 
-  const plan = await buildDailyPlan(supabase, user!.id);
+  const plan = await buildDailyPlan(supabase, user!.id, await activeLocale());
   const doneCount = plan.blocks.filter((b) => b.done >= b.target).length;
 
   return (

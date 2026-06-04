@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { PuzzleSolver } from "@/components/tactics/PuzzleSolver";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ export interface ConceptRunnerProps {
 type Stage = "intro" | "solve" | "done";
 
 export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunnerProps) {
+  const t = useTranslations("theory");
   const { toast } = useToast();
   const [stage, setStage] = useState<Stage>("intro");
   const [index, setIndex] = useState(0);
@@ -56,14 +58,14 @@ export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunn
         fromReview: false,
       });
       if (!res.ok) {
-        toast({ title: "Save failed", description: res.error, variant: "error" });
+        toast({ title: t("conceptRunner.saveFailed"), description: res.error, variant: "error" });
       }
       window.setTimeout(() => {
         if (index + 1 >= total) setStage("done");
         else setIndex((i) => i + 1);
       }, 1000);
     },
-    [index, puzzles, total, toast],
+    [index, puzzles, total, toast, t],
   );
 
   if (stage === "intro") {
@@ -75,14 +77,16 @@ export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunn
         <CardContent className="space-y-4">
           <p className="leading-relaxed text-text-muted">{intro}</p>
           <p className="text-sm">
-            <span className="font-medium">Goal:</span> {goal}
+            <span className="font-medium">{t("conceptRunner.goal")}</span> {goal}
           </p>
           {total === 0 ? (
             <p className="text-sm text-text-muted">
-              No exercises available right now for this concept.
+              {t("conceptRunner.noExercises")}
             </p>
           ) : (
-            <Button onClick={() => setStage("solve")}>Start ({total} exercises)</Button>
+            <Button onClick={() => setStage("solve")}>
+              {t("conceptRunner.start", { count: total })}
+            </Button>
           )}
         </CardContent>
       </Card>
@@ -93,19 +97,22 @@ export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunn
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Concept completed</CardTitle>
+          <CardTitle>{t("conceptRunner.completed")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-text-muted">
-            You solved <span className="font-mono text-text">{solved}</span> of {total} cleanly.
-            Concept <strong>{title}</strong> unlocked.
+            {t.rich("conceptRunner.solvedSummary", {
+              solved: () => <span className="font-mono text-text">{solved}</span>,
+              total,
+              title: () => <strong>{title}</strong>,
+            })}
           </p>
           <div className="flex flex-wrap gap-2">
             <Link href="/app/impara">
-              <Button>More concepts</Button>
+              <Button>{t("conceptRunner.moreConcepts")}</Button>
             </Link>
             <Link href="/app/tattiche?mode=adaptive">
-              <Button variant="secondary">Keep training</Button>
+              <Button variant="secondary">{t("conceptRunner.keepTraining")}</Button>
             </Link>
           </div>
         </CardContent>

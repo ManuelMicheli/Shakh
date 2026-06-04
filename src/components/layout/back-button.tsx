@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
 
 /**
@@ -14,6 +15,7 @@ import { ArrowLeft } from "lucide-react";
 export function BackButton() {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   // Niente pulsante sulla dashboard: è la radice della shell autenticata.
   if (pathname === "/app") return null;
@@ -30,11 +32,11 @@ export function BackButton() {
     <button
       type="button"
       onClick={goBack}
-      aria-label="Go back"
+      aria-label={t("goBack")}
       className="-ml-1 flex items-center gap-1.5 rounded-md p-1.5 text-sm text-text-muted hover:bg-surface-2 hover:text-text"
     >
       <ArrowLeft className="h-5 w-5" aria-hidden />
-      <span className="hidden sm:inline">Back</span>
+      <span className="hidden sm:inline">{t("back")}</span>
     </button>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AssignmentForm, type AssignmentFormData } from "@/components/groups/AssignmentForm";
@@ -7,6 +8,7 @@ import { AssignmentMonitor, type MonitorItem } from "@/components/groups/Assignm
 import { loadMembers } from "@/lib/groups/class";
 import { loadGroupAssignments } from "@/lib/groups/assignments";
 import { getMyGroupRole, isInstructorRole } from "@/lib/groups/access";
+import { activeLocale } from "@/lib/i18n/content";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -14,6 +16,7 @@ interface PageProps {
 
 export default async function AssegnazioniPage({ params }: PageProps) {
   const { id } = await params;
+  const t = await getTranslations("groups");
   const supabase = await createClient();
   const user = await getUser();
   if (!user) redirect("/login");
@@ -28,7 +31,8 @@ export default async function AssegnazioniPage({ params }: PageProps) {
     .maybeSingle<{ name: string }>();
   if (!group) notFound();
 
-  const members = await loadMembers(supabase, id);
+  const locale = await activeLocale();
+  const members = await loadMembers(supabase, id, locale);
   const allievi = members.filter((m) => m.role === "member");
   const memberIds = allievi.map((m) => m.userId);
 
@@ -54,7 +58,7 @@ export default async function AssegnazioniPage({ params }: PageProps) {
         .select("id, title")
         .eq("published", true)
         .order("level", { ascending: true }),
-      loadGroupAssignments(supabase, id, memberIds),
+      loadGroupAssignments(supabase, id, memberIds, locale),
     ]);
 
   const formData: AssignmentFormData = {
@@ -83,17 +87,16 @@ export default async function AssegnazioniPage({ params }: PageProps) {
         <Link href={`/app/gruppi/${id}`} className="text-sm text-text-muted hover:text-text">
           ← {group.name}
         </Link>
-        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Assignments</h1>
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">{t("assignments")}</h1>
         <p className="mt-1 text-text-muted">
-          Assign activities to a student or the whole class. Completion is derived
-          from real progress; where that&apos;s not possible, the student marks it done.
+          {t("assignmentsIntro")}
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>New assignment</CardTitle>
-          <CardDescription>Lesson, puzzle, endgame, trap, repertoire, or node.</CardDescription>
+          <CardTitle>{t("newAssignmentTitle")}</CardTitle>
+          <CardDescription>{t("newAssignmentDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <AssignmentForm groupId={id} data={formData} />
@@ -102,8 +105,8 @@ export default async function AssegnazioniPage({ params }: PageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Monitoring</CardTitle>
-          <CardDescription>Completion status across students.</CardDescription>
+          <CardTitle>{t("monitoringTitle")}</CardTitle>
+          <CardDescription>{t("monitoringDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <AssignmentMonitor groupId={id} items={monitorItems} />

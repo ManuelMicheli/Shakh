@@ -14,11 +14,12 @@ import { evaluateRequirement } from "@/lib/path/requirements";
 import type { Requirement } from "@/lib/path/types";
 import { themeLabel } from "@/lib/tactics/themes";
 import {
-  REF_TYPE_LABEL,
+  refTypeLabel,
   type AssignmentRefType,
   type AssignmentParams,
   type AssignmentStatus,
 } from "./types";
+import type { Locale } from "@/i18n/config";
 
 type DB = SupabaseClient;
 
@@ -37,6 +38,14 @@ const ENDGAME_LABEL: Record<string, string> = {
   q_vs_p: "Queen vs pawn",
   lucena: "Lucena position",
   philidor: "Philidor position",
+};
+
+const ENDGAME_LABEL_IT: Record<string, string> = {
+  kq_vs_k: "Re+Donna contro Re",
+  kp_vs_k: "Re e pedone contro Re",
+  q_vs_p: "Donna contro pedone",
+  lucena: "Posizione di Lucena",
+  philidor: "Posizione di Philidor",
 };
 
 export interface AssignmentRow {
@@ -163,8 +172,13 @@ export async function deriveAssignmentStatus(
 }
 
 /** Costruisce etichetta + href della risorsa assegnata (risolve gli slug). */
-export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<AssignmentView> {
-  const typeLabel = a.ref_type ? REF_TYPE_LABEL[a.ref_type] : "Activity";
+export async function enrichAssignment(
+  supabase: DB,
+  a: AssignmentRow,
+  locale: Locale = "en",
+): Promise<AssignmentView> {
+  const it = locale === "it";
+  const typeLabel = a.ref_type ? refTypeLabel(a.ref_type, locale) : it ? "Attività" : "Activity";
   let label = typeLabel;
   let href = "/app";
 
@@ -176,7 +190,7 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("title, slug")
           .eq("id", a.ref_id)
           .maybeSingle<{ title: string; slug: string }>();
-        label = data?.title ?? "Lesson";
+        label = data?.title ?? (it ? "Lezione" : "Lesson");
         href = data ? `/app/teoria/${data.slug}` : "/app/teoria";
       }
       break;
@@ -184,13 +198,17 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
     case "puzzle_set": {
       const theme = a.params?.theme;
       const count = a.params?.count ?? 10;
-      label = theme ? `Puzzles: ${themeLabel(theme)} ×${count}` : "Puzzle set";
+      label = theme
+        ? `${it ? "Puzzle" : "Puzzles"}: ${themeLabel(theme, locale)} ×${count}`
+        : it
+          ? "Set di puzzle"
+          : "Puzzle set";
       href = "/app/tattiche";
       break;
     }
     case "endgame": {
       const key = a.params?.key ?? "";
-      label = ENDGAME_LABEL[key] ?? "Endgame";
+      label = (it ? ENDGAME_LABEL_IT : ENDGAME_LABEL)[key] ?? (it ? "Finale" : "Endgame");
       href = `/app/teoria/${ENDGAME_SLUG[key] ?? "matti-elementari"}`;
       break;
     }
@@ -201,7 +219,7 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("name, slug")
           .eq("id", a.ref_id)
           .maybeSingle<{ name: string; slug: string }>();
-        label = data?.name ?? "Trap";
+        label = data?.name ?? (it ? "Trappola" : "Trap");
         href = data ? `/app/trappole/${data.slug}` : "/app/trappole";
       }
       break;
@@ -213,7 +231,11 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("name")
           .eq("id", a.ref_id)
           .maybeSingle<{ name: string }>();
-        label = data?.name ? `Repertoire: ${data.name}` : "Repertoire";
+        label = data?.name
+          ? `${it ? "Repertorio" : "Repertoire"}: ${data.name}`
+          : it
+            ? "Repertorio"
+            : "Repertoire";
         href = `/app/repertorio/${a.ref_id}/training`;
       }
       break;
@@ -225,7 +247,11 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("title")
           .eq("id", a.ref_id)
           .maybeSingle<{ title: string }>();
-        label = data?.title ? `Path: ${data.title}` : "Path node";
+        label = data?.title
+          ? `${it ? "Percorso" : "Path"}: ${data.title}`
+          : it
+            ? "Nodo del percorso"
+            : "Path node";
         href = "/app/percorso";
       }
       break;
@@ -265,6 +291,7 @@ const SELECT_COLS =
 export async function loadStudentAssignments(
   supabase: DB,
   userId: string,
+  locale: Locale = "en",
 ): Promise<StudentAssignment[]> {
   // Gruppi dell'utente per filtrare le assegnazioni di classe.
   const { data: memberships } = await supabase
@@ -296,7 +323,7 @@ export async function loadStudentAssignments(
 
   return Promise.all(
     rows.map(async (a) => {
-      const view = await enrichAssignment(supabase, a);
+      const view = await enrichAssignment(supabase, a, locale);
       const st = await deriveAssignmentStatus(supabase, userId, a, manualMap.get(a.id) ?? false);
       return { ...view, ...st };
     }),
@@ -319,6 +346,7 @@ export async function loadGroupAssignments(
   supabase: DB,
   groupId: string,
   memberIds: string[],
+  locale: Locale = "en",
 ): Promise<GroupAssignmentMonitor[]> {
   const { data } = await supabase
     .from("assignments")
@@ -340,7 +368,7 @@ export async function loadGroupAssignments(
 
   return Promise.all(
     rows.map(async (a) => {
-      const view = await enrichAssignment(supabase, a);
+      const view = await enrichAssignment(supabase, a, locale);
       const targets =
         a.target_type === "group"
           ? memberIds

@@ -1,10 +1,14 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import type { LinkedAccount } from "@/app/app/profilo/actions";
 import type { ExternalSource } from "@/lib/rating/calibration";
 
-export const metadata = { title: "Welcome — Shakh" };
+export async function generateMetadata() {
+  const t = await getTranslations("common");
+  return { title: t("page.title") };
+}
 
 /**
  * Primo accesso (prompt 07, §2): presentazione + autovalutazione + collegamento

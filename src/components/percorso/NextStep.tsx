@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Compass, Route } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { NextStep as NextStepData } from "@/lib/path/recommend";
@@ -21,19 +22,20 @@ export interface NextStepProps {
  * evidenza la modalità libera (il percorso resta riferimento, non gabbia).
  */
 export function NextStep({ step, compact = false }: NextStepProps) {
+  const t = useTranslations("study");
   if (!step) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Next step</CardTitle>
+          <CardTitle>{t("nextStep.title")}</CardTitle>
           <CardDescription>
-            Complete the diagnostic to get a personalized recommendation.
+            {t("nextStep.completeDiagnostic")}
           </CardDescription>
         </CardHeader>
         {!compact && (
           <CardContent>
             <Link href="/app/onboarding" className={PRIMARY_LINK}>
-              Start the diagnostic
+              {t("nextStep.startDiagnostic")}
             </Link>
           </CardContent>
         )}
@@ -47,15 +49,15 @@ export function NextStep({ step, compact = false }: NextStepProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
-          <CardTitle>Next step</CardTitle>
+          <CardTitle>{t("nextStep.title")}</CardTitle>
           <Badge variant={autonomous ? "outline" : "muted"}>
             {autonomous ? (
               <span className="flex items-center gap-1">
-                <Compass className="h-3 w-3" /> Free mode
+                <Compass className="h-3 w-3" /> {t("nextStep.freeMode")}
               </span>
             ) : (
               <span className="flex items-center gap-1">
-                <Route className="h-3 w-3" /> Path
+                <Route className="h-3 w-3" /> {t("nextStep.pathBadge")}
               </span>
             )}
           </Badge>
@@ -72,7 +74,7 @@ export function NextStep({ step, compact = false }: NextStepProps) {
           )}
           {autonomous && (
             <Link href="/app/percorso" className={GHOST_LINK}>
-              View the path
+              {t("nextStep.viewPath")}
             </Link>
           )}
         </div>

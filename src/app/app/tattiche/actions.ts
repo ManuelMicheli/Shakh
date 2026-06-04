@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ensureStats, selectNextPuzzle, type SelectParams } from "@/lib/tactics/query";
 import { applyTacticOutcome } from "@/lib/rating/store";
@@ -36,7 +37,10 @@ export async function recordAttempt(input: AttemptInput): Promise<RecordResult> 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) {
+    const t = await getTranslations("tactics");
+    return { ok: false, error: t("sessionExpired") };
+  }
 
   const nowMs = Date.now();
   const won = input.clean;

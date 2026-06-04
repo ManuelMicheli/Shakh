@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { DrawShape } from "chessground/draw";
@@ -22,6 +23,7 @@ export interface GuidedReplayProps {
 }
 
 export function GuidedReplay({ title, intro, pgn, comments }: GuidedReplayProps) {
+  const t = useTranslations("theory");
   const game = useChessGame();
   const loaded = useRef(false);
 
@@ -61,13 +63,13 @@ export function GuidedReplay({ title, intro, pgn, comments }: GuidedReplayProps)
         )}
         <div className="flex items-center justify-between gap-3">
           <Button variant="secondary" size="sm" onClick={game.prev} disabled={atStart}>
-            ← Back
+            ← {t("guidedReplay.back")}
           </Button>
           <span className="font-mono text-sm text-text-muted">
-            {atStart ? "start" : `move ${Math.ceil((cursor + 1) / 2)}`} {total > 0 && `/ ${Math.ceil(total / 2)}`}
+            {atStart ? t("guidedReplay.start") : t("guidedReplay.move", { n: Math.ceil((cursor + 1) / 2) })} {total > 0 && `/ ${Math.ceil(total / 2)}`}
           </span>
           <Button size="sm" onClick={game.next} disabled={atEnd}>
-            Next →
+            {t("guidedReplay.next")} →
           </Button>
         </div>
       </div>
@@ -82,7 +84,7 @@ export function GuidedReplay({ title, intro, pgn, comments }: GuidedReplayProps)
         {atEnd && total > 0 && (
           <Link href="/app/impara">
             <Button variant="secondary" className="w-full">
-              Back to Learn
+              {t("guidedReplay.backToLearn")}
             </Button>
           </Link>
         )}

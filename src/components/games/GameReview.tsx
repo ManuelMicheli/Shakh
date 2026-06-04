@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useChessGame } from "@/lib/chess/useChessGame";
 import { MoveList } from "@/components/chess/MoveList";
 import { MoveStripH } from "@/components/chess/MoveStripH";
@@ -50,6 +51,7 @@ const EVAL_CAP = 1000;
 export function GameReview({ game, analysis, coachConfigured }: GameReviewProps) {
   const chess = useChessGame();
   const router = useRouter();
+  const t = useTranslations("games");
   const { toast } = useToast();
   const searchParams = useSearchParams();
   // Arrivo da "Analyze game" (fine partita): avvia subito l'analisi.
@@ -133,7 +135,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
     startReset(async () => {
       const res = await resetGameAnalysis(game.id);
       if (!res.ok) {
-        toast({ title: "Operation failed", description: res.error, variant: "error" });
+        toast({ title: t("operationFailed"), description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -152,7 +154,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
       {/* Header compatto (non scrolla). */}
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
-          <h1 className="font-display text-xl font-semibold tracking-tight">Game analysis</h1>
+          <h1 className="font-display text-xl font-semibold tracking-tight">{t("gameAnalysisTitle")}</h1>
           {game.result && (
             <span className="font-mono text-xs text-text-muted">{game.result}</span>
           )}
@@ -161,11 +163,11 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
           <div className="flex gap-2">
             <Link href={`/app/reel/${game.id}`}>
               <Button variant="secondary" size="sm">
-                Create reel
+                {t("createReel")}
               </Button>
             </Link>
             <Button variant="secondary" size="sm" onClick={onReanalyze} disabled={resetting}>
-              {resetting ? "…" : "Reanalyze"}
+              {resetting ? "…" : t("reanalyze")}
             </Button>
           </div>
         )}
@@ -250,9 +252,9 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
 
           <Tabs defaultValue="moves" className="flex min-h-0 flex-1 flex-col">
             <TabsList className="shrink-0 self-start">
-              <TabsTrigger value="moves">Moves</TabsTrigger>
+              <TabsTrigger value="moves">{t("tabMoves")}</TabsTrigger>
               <TabsTrigger value="coach">Coach</TabsTrigger>
-              {game.analyzed && <TabsTrigger value="summary">Summary</TabsTrigger>}
+              {game.analyzed && <TabsTrigger value="summary">{t("tabSummary")}</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="moves" className="min-h-0 flex-1 space-y-3 overflow-y-auto">
@@ -284,7 +286,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
                 {graphPoints.length > 1 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Evaluation over time</CardTitle>
+                      <CardTitle>{t("evalOverTime")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <EvalGraph
@@ -299,13 +301,12 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
                 <AnalysisLegend />
                 <Card>
                   <CardHeader>
-                    <CardTitle>Summary</CardTitle>
+                    <CardTitle>{t("summary")}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <SummaryTable white={summary.white} black={summary.black} />
                     <p className="text-xs text-text-muted">
-                      The accuracy % is an estimate based on average centipawn
-                      loss, not the official Lichess/Chess.com standard.
+                      {t("accuracyNote")}
                     </p>
                   </CardContent>
                 </Card>
@@ -368,6 +369,7 @@ function CurrentMoveInfo({ row }: { row: AnalysisRow }) {
  * spiegazione in linguaggio naturale del *perché* resta al coach (prompt 04).
  */
 function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
+  const t = useTranslations("games");
   const meta = row.classification ? CLASSIFICATION_META[row.classification] : null;
 
   const before = row.eval_before != null ? decodeEval(row.eval_before) : null;
@@ -384,7 +386,7 @@ function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
     <div className="space-y-2 rounded-md border border-border bg-surface p-3">
       <div className="flex items-center gap-2">
         <span className="text-sm">
-          Move <span className="font-mono">{row.san}</span>
+          {t("moveLabel")} <span className="font-mono">{row.san}</span>
         </span>
         {meta && row.classification && (
           <span className="inline-flex items-center gap-1 font-medium">
@@ -396,7 +398,7 @@ function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
 
       {beforeLabel && afterLabel && (
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="text-text-muted">Evaluation</span>
+          <span className="text-text-muted">{t("evaluation")}</span>
           <span className="font-mono">{beforeLabel}</span>
           <span aria-hidden="true" className="text-text-muted">
             →
@@ -407,7 +409,7 @@ function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
 
       {showBest && (
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="text-text-muted">Best move</span>
+          <span className="text-text-muted">{t("bestMove")}</span>
           <span className="font-mono" style={{ color: "var(--eval-best)" }}>
             {row.best_move_san}
           </span>
@@ -423,17 +425,19 @@ function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
 
 /** Mini-guida pieghevole su come leggere i simboli dell'analisi. */
 function AnalysisLegend() {
+  const t = useTranslations("games");
   return (
     <details className="rounded-md border border-border bg-surface px-3 py-2 text-sm">
       <summary className="cursor-pointer font-medium text-text">
-        How to read the analysis
+        {t("howToReadAnalysis")}
       </summary>
       <div className="mt-3 space-y-2.5">
         <p className="text-xs leading-snug text-text-muted">
-          The <span className="font-medium text-text">bar</span> and the number in pawns
-          tell you who&apos;s better: values with <span className="font-mono">+</span> favor
-          White, with <span className="font-mono">−</span> Black. Each move is
-          labeled like this:
+          {t.rich("legendIntro", {
+            bar: (chunks) => <span className="font-medium text-text">{chunks}</span>,
+            plus: (chunks) => <span className="font-mono">{chunks}</span>,
+            minus: (chunks) => <span className="font-mono">{chunks}</span>,
+          })}
         </p>
         <ul className="space-y-1.5">
           {CLASSIFICATION_ORDER.map((k) => {
@@ -455,20 +459,21 @@ function AnalysisLegend() {
 }
 
 function SummaryTable({ white, black }: { white: SideSummary; black: SideSummary }) {
+  const t = useTranslations("games");
   const rows: { label: string; w: string | number; b: string | number }[] = [
-    { label: "Accuracy", w: `${white.accuracy}%`, b: `${black.accuracy}%` },
-    { label: "Inaccuracies", w: white.inaccuracy, b: black.inaccuracy },
-    { label: "Mistakes", w: white.mistake, b: black.mistake },
-    { label: "Missed moves", w: white.miss, b: black.miss },
-    { label: "Blunders", w: white.blunder, b: black.blunder },
+    { label: t("sumAccuracy"), w: `${white.accuracy}%`, b: `${black.accuracy}%` },
+    { label: t("sumInaccuracies"), w: white.inaccuracy, b: black.inaccuracy },
+    { label: t("sumMistakes"), w: white.mistake, b: black.mistake },
+    { label: t("sumMissedMoves"), w: white.miss, b: black.miss },
+    { label: t("sumBlunders"), w: white.blunder, b: black.blunder },
   ];
   return (
     <table className="w-full text-sm">
       <thead>
         <tr className="text-text-muted">
           <th className="text-left font-normal" />
-          <th className="px-2 py-1 text-right font-normal">White</th>
-          <th className="px-2 py-1 text-right font-normal">Black</th>
+          <th className="px-2 py-1 text-right font-normal">{t("tableWhite")}</th>
+          <th className="px-2 py-1 text-right font-normal">{t("tableBlack")}</th>
         </tr>
       </thead>
       <tbody>

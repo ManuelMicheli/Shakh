@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import {
   reconcile,
@@ -26,13 +27,14 @@ export async function createRepertoire(
   color: PieceColor,
 ): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("error.sessionExpiredSignIn") };
 
   const trimmed = name.trim();
-  if (!trimmed) return { ok: false, error: "Give the repertoire a name." };
+  if (!trimmed) return { ok: false, error: t("error.repertoireName") };
 
   const { data, error } = await supabase
     .from("repertoires")
@@ -62,10 +64,11 @@ export async function saveRepertoire(
   tree: SerializedMoveTree,
 ): Promise<ActionResult> {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
+  if (!user) return { ok: false, error: t("error.sessionExpiredSignIn") };
 
   // La RLS garantisce la proprietà; verifichiamo l'esistenza per un errore chiaro.
   const { data: rep } = await supabase
@@ -73,13 +76,13 @@ export async function saveRepertoire(
     .select("id")
     .eq("id", repertoireId)
     .maybeSingle<{ id: string }>();
-  if (!rep) return { ok: false, error: "Repertoire not found." };
+  if (!rep) return { ok: false, error: t("error.repertoireNotFound") };
 
   let parsed;
   try {
     parsed = deserializeTree(tree);
   } catch {
-    return { ok: false, error: "Invalid tree." };
+    return { ok: false, error: t("error.invalidTree") };
   }
 
   const { data: existingRows, error: loadErr } = await supabase
@@ -119,10 +122,11 @@ export async function recordRepertoireAttempt(
   success: boolean,
 ): Promise<ActionResult> {
   const supabase = await createClient();
+  const t = await getTranslations("study");
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Session expired." };
+  if (!user) return { ok: false, error: t("error.sessionExpired") };
 
   const nowMs = Date.now();
 

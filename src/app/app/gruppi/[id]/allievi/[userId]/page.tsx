@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DashboardView } from "@/components/progress";
 import { loadDashboard } from "@/lib/progress/aggregate";
 import { getMyGroupRole, isInstructorRole } from "@/lib/groups/access";
+import { activeLocale } from "@/lib/i18n/content";
 
 interface PageProps {
   params: Promise<{ id: string; userId: string }>;
@@ -13,6 +15,7 @@ interface PageProps {
 
 export default async function StudentDrilldownPage({ params }: PageProps) {
   const { id, userId } = await params;
+  const t = await getTranslations("groups");
   const supabase = await createClient();
   const user = await getUser();
   if (!user) redirect("/login");
@@ -36,30 +39,30 @@ export default async function StudentDrilldownPage({ params }: PageProps) {
     .select("display_name, username")
     .eq("id", userId)
     .maybeSingle<{ display_name: string | null; username: string | null }>();
-  const name = profile?.display_name ?? profile?.username ?? "Student";
+  const name = profile?.display_name ?? profile?.username ?? t("studentFallbackName");
 
   // Stesse aggregazioni dell'08, applicate all'allievo via RLS (sola lettura).
-  const data = await loadDashboard(supabase, userId);
+  const data = await loadDashboard(supabase, userId, await activeLocale());
 
   return (
     <div className="space-y-8">
       <div>
         <Link href={`/app/gruppi/${id}/classe`} className="text-sm text-text-muted hover:text-text">
-          ← Class dashboard
+          ← {t("classDashboard")}
         </Link>
         <div className="mt-2 flex items-center gap-3">
           <h1 className="font-display text-3xl font-semibold tracking-tight">{name}</h1>
-          <Badge variant="muted">read-only</Badge>
+          <Badge variant="muted">{t("readOnly")}</Badge>
         </div>
         <p className="mt-1 text-text-muted">
-          Teaching context: the student&apos;s progress as they see it, read-only.
+          {t("drilldownIntro")}
         </p>
       </div>
 
       {data.empty ? (
         <Card>
           <CardContent className="py-8 text-center text-sm text-text-muted">
-            This student doesn&apos;t have enough data for the dashboard yet.
+            {t("drilldownEmptyState")}
           </CardContent>
         </Card>
       ) : (

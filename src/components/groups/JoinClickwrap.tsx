@@ -2,12 +2,14 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { joinByCode } from "@/app/app/gruppi/actions";
 
 /** Clickwrap di ingresso in un gruppo: l'allievo accetta esplicitamente. */
 export function JoinClickwrap({ code }: { code: string }) {
+  const t = useTranslations("groups");
   const router = useRouter();
   const { toast } = useToast();
   const [pending, start] = useTransition();
@@ -16,10 +18,10 @@ export function JoinClickwrap({ code }: { code: string }) {
     start(async () => {
       const res = await joinByCode(code);
       if (!res.ok || !res.data) {
-        toast({ title: "Join failed", description: res.error, variant: "error" });
+        toast({ title: t("toastJoinFailed"), description: res.error, variant: "error" });
         return;
       }
-      toast({ title: "You joined the group" });
+      toast({ title: t("toastJoinedGroup") });
       router.push(`/app/gruppi/${res.data.groupId}`);
     });
   };
@@ -27,15 +29,14 @@ export function JoinClickwrap({ code }: { code: string }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-text-muted">
-        By joining the group, the instructor will be able to see your progress (read-only)
-        to help you improve. You can leave the group at any time.
+        {t("clickwrapNotice")}
       </p>
       <div className="flex gap-2">
         <Button onClick={onAccept} disabled={pending}>
-          {pending ? "Joining…" : "Accept and join"}
+          {pending ? t("joiningPending") : t("acceptAndJoinButton")}
         </Button>
         <Button variant="ghost" onClick={() => router.push("/app/gruppi")} disabled={pending}>
-          Cancel
+          {t("cancelButton")}
         </Button>
       </div>
     </div>

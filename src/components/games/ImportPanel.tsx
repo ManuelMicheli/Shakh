@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Upload, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,18 +22,19 @@ import { useAnalysisJob } from "@/components/analysis/AnalysisJobContext";
 
 /** Notifica l'esito di un import, aggiorna la lista e avvia l'analisi del campione. */
 function useImportFeedback() {
+  const t = useTranslations("games");
   const { toast } = useToast();
   const router = useRouter();
   const { startBatch } = useAnalysisJob();
   return (res: ImportResult) => {
     if (!res.ok) {
-      toast({ title: "Import failed", description: res.error, variant: "error" });
+      toast({ title: t("importFailed"), description: res.error, variant: "error" });
       return;
     }
-    const parts = [`${res.imported ?? 0} imported`];
-    if (res.skipped) parts.push(`${res.skipped} duplicates skipped`);
+    const parts = [t("importedCount", { n: res.imported ?? 0 })];
+    if (res.skipped) parts.push(t("duplicatesSkipped", { n: res.skipped }));
     toast({
-      title: res.imported ? "Games imported" : "No new games",
+      title: res.imported ? t("gamesImported") : t("noNewGames"),
       description: parts.join(" · "),
       variant: "success",
     });
@@ -45,11 +47,11 @@ function useImportFeedback() {
       const n = startBatch(queue);
       if (n > 0) {
         toast({
-          title: "Analysis started",
+          title: t("analysisStarted"),
           description:
             n > 1
-              ? `${n} games being analyzed in the background for your weak points.`
-              : "1 game being analyzed in the background for your weak points.",
+              ? t("analyzeBgPlural", { n })
+              : t("analyzeBgSingular"),
         });
       }
     }
@@ -58,23 +60,21 @@ function useImportFeedback() {
 
 /** Avviso: verifica account per far contare le partite nel profilo. */
 function VerifyNotice() {
+  const t = useTranslations("games");
   return (
     <div className="flex items-start gap-3 rounded-md border border-border bg-surface-2 p-3 text-sm">
       <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-text-muted" />
       <div className="space-y-0.5">
         <p className="text-text">
-          Verify your account to make games count toward your profile.
+          {t("verifyTitle")}
         </p>
         <p className="text-text-muted">
-          Only games from your verified account feed weak points,
-          Shakh Rating, and statistics. You can still import other players&apos;
-          games: they stay browsable and analyzable, but don&apos;t touch your
-          profile.{" "}
+          {t("verifyDesc")}{" "}
           <Link
             href="/app/profilo"
             className="font-medium text-text underline underline-offset-2 hover:no-underline"
           >
-            Verify account →
+            {t("verifyAccount")}
           </Link>
         </p>
       </div>
@@ -100,6 +100,7 @@ export function ImportPanel({
   const mFileRef = useRef<HTMLInputElement>(null);
   const feedback = useImportFeedback();
   const { toast } = useToast();
+  const t = useTranslations("games");
 
   const submitPgn = (text: string) => {
     startTransition(async () => feedback(await importPgnText(text)));
@@ -110,7 +111,7 @@ export function ImportPanel({
       const text = await file.text();
       submitPgn(text);
     } catch {
-      toast({ title: "Couldn't read the file", variant: "error" });
+      toast({ title: t("fileReadFailed"), variant: "error" });
     }
   };
 
@@ -133,7 +134,7 @@ export function ImportPanel({
               [
                 ["chesscom", "Chess.com"],
                 ["lichess", "Lichess"],
-                ["import", "Import"],
+                ["import", t("tabImport")],
               ] as const
             ).map(([id, label]) => (
               <button
@@ -155,7 +156,7 @@ export function ImportPanel({
               <Input
                 value={ccUser}
                 onChange={(e) => setCcUser(e.target.value)}
-                placeholder="Chess.com username"
+                placeholder={t("chesscomPlaceholder")}
                 className="min-w-0 flex-1"
               />
               <Button
@@ -163,7 +164,7 @@ export function ImportPanel({
                 disabled={pending || !ccUser.trim()}
                 className="shrink-0"
               >
-                {pending ? "…" : "Import"}
+                {pending ? "…" : t("importShort")}
               </Button>
             </div>
           )}
@@ -173,7 +174,7 @@ export function ImportPanel({
               <Input
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Lichess username"
+                placeholder={t("lichessPlaceholder")}
                 className="min-w-0 flex-1"
               />
               <Button
@@ -181,7 +182,7 @@ export function ImportPanel({
                 disabled={pending || !username.trim()}
                 className="shrink-0"
               >
-                {pending ? "…" : "Import"}
+                {pending ? "…" : t("importShort")}
               </Button>
             </div>
           )}
@@ -201,7 +202,7 @@ export function ImportPanel({
                   disabled={pending || !pgn.trim()}
                   className="flex-1"
                 >
-                  {pending ? "…" : "Import PGN"}
+                  {pending ? "…" : t("importPgn")}
                 </Button>
                 <input
                   ref={mFileRef}
@@ -220,7 +221,7 @@ export function ImportPanel({
                   disabled={pending}
                   className="shrink-0"
                 >
-                  <Upload className="h-4 w-4" /> File
+                  <Upload className="h-4 w-4" /> {t("file")}
                 </Button>
               </div>
             </div>
@@ -236,13 +237,13 @@ export function ImportPanel({
           <TabsList className="flex flex-wrap">
             <TabsTrigger value="chesscom">Chess.com</TabsTrigger>
             <TabsTrigger value="lichess">Lichess</TabsTrigger>
-            <TabsTrigger value="file">.pgn file</TabsTrigger>
-            <TabsTrigger value="pgn">Paste PGN</TabsTrigger>
+            <TabsTrigger value="file">{t("tabFile")}</TabsTrigger>
+            <TabsTrigger value="pgn">{t("tabPastePgn")}</TabsTrigger>
           </TabsList>
 
           {/* Incolla PGN */}
           <TabsContent value="pgn" className="space-y-3">
-            <Label htmlFor="pgn-input">One or more games in PGN format</Label>
+            <Label htmlFor="pgn-input">{t("pgnLabel")}</Label>
             <textarea
               id="pgn-input"
               value={pgn}
@@ -252,14 +253,16 @@ export function ImportPanel({
               className="w-full rounded-md border border-border bg-surface-2 p-2 font-mono text-xs text-text focus-visible:outline-2 focus-visible:outline-offset-2"
             />
             <Button onClick={() => submitPgn(pgn)} disabled={pending || !pgn.trim()}>
-              {pending ? "Importing…" : "Import PGN"}
+              {pending ? t("importing") : t("importPgn")}
             </Button>
           </TabsContent>
 
           {/* File .pgn */}
           <TabsContent value="file" className="space-y-3">
             <p className="text-sm text-text-muted">
-              Upload a <code className="font-mono">.pgn</code> file (multiple games are fine too).
+              {t.rich("fileUploadHint", {
+                code: (chunks) => <code className="font-mono">{chunks}</code>,
+              })}
             </p>
             <input
               ref={fileRef}
@@ -278,7 +281,7 @@ export function ImportPanel({
               disabled={pending}
             >
               <Upload className="h-4 w-4" />
-              {pending ? "Importing…" : "Choose file"}
+              {pending ? t("importing") : t("chooseFile")}
             </Button>
           </TabsContent>
 
@@ -286,17 +289,17 @@ export function ImportPanel({
           <TabsContent value="lichess" className="space-y-3">
             <div className="flex flex-wrap items-end gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="li-user">Lichess username</Label>
+                <Label htmlFor="li-user">{t("lichessUsername")}</Label>
                 <Input
                   id="li-user"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="e.g. DrNykterstein"
+                  placeholder={t("lichessExample")}
                   className="w-56"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="li-max">How many</Label>
+                <Label htmlFor="li-max">{t("howMany")}</Label>
                 <Input
                   id="li-max"
                   type="number"
@@ -311,11 +314,11 @@ export function ImportPanel({
                 onClick={submitLichess}
                 disabled={pending || !username.trim()}
               >
-                {pending ? "Downloading…" : "Import from Lichess"}
+                {pending ? t("downloading") : t("importFromLichess")}
               </Button>
             </div>
             <p className="text-xs text-text-muted">
-              Downloads the user&apos;s latest public games via the Lichess API.
+              {t("lichessApiHint")}
             </p>
           </TabsContent>
 
@@ -323,17 +326,17 @@ export function ImportPanel({
           <TabsContent value="chesscom" className="space-y-3">
             <div className="flex flex-wrap items-end gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="cc-user">Chess.com username</Label>
+                <Label htmlFor="cc-user">{t("chesscomUsername")}</Label>
                 <Input
                   id="cc-user"
                   value={ccUser}
                   onChange={(e) => setCcUser(e.target.value)}
-                  placeholder="e.g. MagnusCarlsen"
+                  placeholder={t("chesscomExample")}
                   className="w-56"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cc-max">How many</Label>
+                <Label htmlFor="cc-max">{t("howMany")}</Label>
                 <Input
                   id="cc-max"
                   type="number"
@@ -348,11 +351,11 @@ export function ImportPanel({
                 onClick={submitChesscom}
                 disabled={pending || !ccUser.trim()}
               >
-                {pending ? "Downloading…" : "Import from Chess.com"}
+                {pending ? t("downloading") : t("importFromChesscom")}
               </Button>
             </div>
             <p className="text-xs text-text-muted">
-              Downloads the user&apos;s most recent public games via the Chess.com API.
+              {t("chesscomApiHint")}
             </p>
           </TabsContent>
         </Tabs>
