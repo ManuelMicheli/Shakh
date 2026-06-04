@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GlyphWatermark } from "@/components/layout/GlyphWatermark";
 
 /**
  * SHOWCASE (dev-only): redesign mobile della pagina Percorso come timeline
@@ -91,7 +90,6 @@ export default function PercorsoShowcasePage() {
             <div className="space-y-5 p-4 pb-10">
               {/* Testata: testo sinistra, glifo re a destra */}
               <div className="relative">
-                <GlyphWatermark glyph="♚" />
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
                     Da principiante a club

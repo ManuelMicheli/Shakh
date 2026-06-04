@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Menu, Bell, Upload, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GlyphWatermark } from "@/components/layout/GlyphWatermark";
 
 /**
  * SHOWCASE (dev-only): redesign mobile di "Le mie partite". Direzione editoriale
@@ -90,7 +89,6 @@ export default function PartiteShowcasePage() {
             <div className="space-y-5 p-4 pb-10">
               {/* Testata: testo a sinistra, glifo torre libero a destra (non coperto) */}
               <div className="relative">
-                <GlyphWatermark glyph="♜" />
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
                     Archivio

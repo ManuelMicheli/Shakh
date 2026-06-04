@@ -11,7 +11,6 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TacticsTrainer } from "@/components/tactics/TacticsTrainer";
-import { GlyphWatermark } from "@/components/layout/GlyphWatermark";
 import { ensureStats, selectNextPuzzle, dueReviewCount } from "@/lib/tactics/query";
 import { TACTIC_THEMES, themeLabel } from "@/lib/tactics/themes";
 import type { TacticMode, TacticStats } from "@/lib/tactics/types";
@@ -68,7 +67,6 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
       {/* ===== MOBILE: testata editoriale + rating hero + modalità a list-card ===== */}
       <div className="space-y-5 md:hidden">
         <div className="relative">
-          <GlyphWatermark glyph="♛" />
           <div className="relative">
             <p className="text-xs uppercase tracking-wider text-text-muted">
               Visione tattica

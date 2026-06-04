@@ -34,7 +34,6 @@ export default async function PercorsoPage() {
         eyebrow="Da principiante a club"
         title="Percorso"
         desc="I nodi si sbloccano man mano che padroneggi i precedenti."
-        glyph="♚"
       />
 
       {/* DESKTOP: testata classica. */}

@@ -23,7 +23,6 @@ export default async function CoachPage() {
         eyebrow="Il tuo allenatore"
         title="Coach"
         desc="Sintesi dei tuoi punti deboli ricorrenti dai dati delle partite."
-        glyph="♚"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Coach</h1>

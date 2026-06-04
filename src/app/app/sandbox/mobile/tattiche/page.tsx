@@ -10,7 +10,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { GlyphWatermark } from "@/components/layout/GlyphWatermark";
 
 /**
  * SHOWCASE (dev-only): redesign mobile del Hub Tattiche. Editoriale + texture
@@ -67,7 +66,6 @@ export default function TatticheShowcasePage() {
             <div className="space-y-5 p-4 pb-10">
               {/* Testata + glifo donna + rating hero */}
               <div className="relative">
-                <GlyphWatermark glyph="♛" />
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
                     Visione tattica
