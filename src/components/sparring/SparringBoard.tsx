@@ -14,7 +14,9 @@ import { engine } from "@/lib/engine/engine";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmResignButton } from "@/components/play/ConfirmResignButton";
+import { GameOverOverlay } from "@/components/play/GameOverOverlay";
 import { MoveStripH } from "@/components/chess/MoveStripH";
+import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import { cn } from "@/lib/utils";
 import { chooseEngineMove, strengthFor, STYLE_LABEL, type Style } from "@/lib/sparring/opponent";
 
@@ -26,7 +28,20 @@ const ChessBoard = dynamic(
 type Color = "white" | "black";
 type ColorChoice = Color | "random";
 
-const ELOS = [800, 1200, 1600, 2000, 2400];
+/** Avversari selezionabili: nome + Elo. Coprono dal principiante assoluto al forte. */
+const BOTS: { elo: number; name: string }[] = [
+  { elo: 400, name: "Pulcino" },
+  { elo: 600, name: "Novellino" },
+  { elo: 800, name: "Esordiente" },
+  { elo: 1000, name: "Amatore" },
+  { elo: 1200, name: "Dilettante" },
+  { elo: 1400, name: "Circolo" },
+  { elo: 1600, name: "Esperto" },
+  { elo: 2000, name: "Candidato Maestro" },
+  { elo: 2400, name: "Maestro" },
+];
+
+const NAME_FOR_ELO = (e: number) => BOTS.find((b) => b.elo === e)?.name ?? `${e}`;
 
 /** Aperture seme (UCI): danno una posizione di partenza tematica. */
 const OPENINGS: { key: string; label: string; moves: string[] }[] = [
@@ -50,15 +65,22 @@ export function SparringBoard() {
   const game = useChessGame();
   const [phase, setPhase] = useState<"setup" | "play">("setup");
   const [style, setStyle] = useState<Style>("positional");
+  const [styleRandom, setStyleRandom] = useState(false);
   const [elo, setElo] = useState(1200);
+  const [eloRandom, setEloRandom] = useState(false);
   const [colorChoice, setColorChoice] = useState<ColorChoice>("white");
   const [openingKey, setOpeningKey] = useState("normale");
+  const [openingRandom, setOpeningRandom] = useState(false);
 
   const [userColor, setUserColor] = useState<Color>("white");
+  // Avversario effettivo della partita in corso (dopo aver risolto i "casuale").
+  const [activeStyle, setActiveStyle] = useState<Style>("positional");
+  const [activeElo, setActiveElo] = useState(1200);
   const [thinking, setThinking] = useState(false);
   const [resigned, setResigned] = useState(false);
+  const [overlayOff, setOverlayOff] = useState(false);
 
-  const strength = strengthFor(elo);
+  const strength = strengthFor(activeElo);
   const engineColorChar = userColor === "white" ? "b" : "w";
 
   // Avvio partita: imposta colore, semina l'apertura, passa a "play".
@@ -66,9 +88,19 @@ export function SparringBoard() {
     const color: Color =
       colorChoice === "random" ? (Math.random() < 0.5 ? "white" : "black") : colorChoice;
     setUserColor(color);
+
+    // Risolvi le scelte "casuale" una volta sola, all'avvio della partita.
+    const STYLES: Style[] = ["aggressive", "positional", "drawish"];
+    setActiveStyle(styleRandom ? STYLES[Math.floor(Math.random() * STYLES.length)] : style);
+    setActiveElo(eloRandom ? BOTS[Math.floor(Math.random() * BOTS.length)].elo : elo);
+
     setResigned(false);
+    setOverlayOff(false);
     game.reset();
-    const opening = OPENINGS.find((o) => o.key === openingKey);
+    const realOpeningKey = openingRandom
+      ? OPENINGS[Math.floor(Math.random() * OPENINGS.length)].key
+      : openingKey;
+    const opening = OPENINGS.find((o) => o.key === realOpeningKey);
     if (opening) {
       for (const uci of opening.moves) {
         const p = uciParts(uci);
@@ -76,7 +108,7 @@ export function SparringBoard() {
       }
     }
     setPhase("play");
-  }, [colorChoice, openingKey, game]);
+  }, [colorChoice, openingKey, openingRandom, style, styleRandom, elo, eloRandom, game]);
 
   // Mossa del motore quando tocca a lui.
   useEffect(() => {
@@ -94,7 +126,7 @@ export function SparringBoard() {
         const handle = engine.analyze(fen, { depth: strength.depth, multiPV: 4 });
         const result = await handle.result;
         if (cancelled) return;
-        const uci = chooseEngineMove(fen, result.lines, style, strength);
+        const uci = chooseEngineMove(fen, result.lines, activeStyle, strength);
         if (uci) {
           const p = uciParts(uci);
           game.move(p.from, p.to, p.promotion);
@@ -109,7 +141,7 @@ export function SparringBoard() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, game.fen, game.turn, game.isGameOver, resigned, engineColorChar, style, strength.depth]);
+  }, [phase, game.fen, game.turn, game.isGameOver, resigned, engineColorChar, activeStyle, strength.depth]);
 
   const onUserMove = useCallback(
     (from: Square, to: Square, promotion?: PieceSymbol) => {
@@ -124,27 +156,47 @@ export function SparringBoard() {
   // ---------- Setup ----------
   if (phase === "setup") {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Nuova sfida</CardTitle>
-        </CardHeader>
+      <div className="space-y-6">
+        <MobilePageHeader
+          eyebrow="Contro il motore"
+          title="Sparring"
+          desc="Partite intere contro una personalità e una forza scelte da te."
+        />
+        <div className="hidden md:block">
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Sparring</h1>
+          <p className="mt-2 max-w-2xl text-text-muted">
+            Gioca partite intere contro il motore con una <strong>personalità</strong> e una forza
+            scelte da te: aggressivo, posizionale o solido. Allena le tue aperture e affina il gioco
+            contro stili diversi.
+          </p>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Nuova sfida</CardTitle>
+          </CardHeader>
         <CardContent className="space-y-5">
           <Field label="Stile dell'avversario">
             <Group>
               {(["aggressive", "positional", "drawish"] as Style[]).map((s) => (
-                <Choice key={s} active={style === s} onClick={() => setStyle(s)}>
+                <Choice key={s} active={!styleRandom && style === s} onClick={() => { setStyleRandom(false); setStyle(s); }}>
                   {STYLE_LABEL[s]}
                 </Choice>
               ))}
+              <Choice active={styleRandom} onClick={() => setStyleRandom(true)}>
+                Casuale
+              </Choice>
             </Group>
           </Field>
           <Field label="Forza (Elo)">
             <Group>
-              {ELOS.map((e) => (
-                <Choice key={e} active={elo === e} onClick={() => setElo(e)}>
-                  {e}
+              {BOTS.map((b) => (
+                <Choice key={b.elo} active={!eloRandom && elo === b.elo} onClick={() => { setEloRandom(false); setElo(b.elo); }}>
+                  {b.name} · {b.elo}
                 </Choice>
               ))}
+              <Choice active={eloRandom} onClick={() => setEloRandom(true)}>
+                Casuale
+              </Choice>
             </Group>
           </Field>
           <Field label="Il tuo colore">
@@ -159,15 +211,19 @@ export function SparringBoard() {
           <Field label="Apertura di partenza">
             <Group>
               {OPENINGS.map((o) => (
-                <Choice key={o.key} active={openingKey === o.key} onClick={() => setOpeningKey(o.key)}>
+                <Choice key={o.key} active={!openingRandom && openingKey === o.key} onClick={() => { setOpeningRandom(false); setOpeningKey(o.key); }}>
                   {o.label}
                 </Choice>
               ))}
+              <Choice active={openingRandom} onClick={() => setOpeningRandom(true)}>
+                Casuale
+              </Choice>
             </Group>
           </Field>
           <Button onClick={start}>Inizia a giocare</Button>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     );
   }
 
@@ -176,19 +232,46 @@ export function SparringBoard() {
   const canMove =
     !thinking && !resigned && !game.isGameOver && game.turn === userColor[0] && atLive;
   const status = gameStatus(game, userColor, resigned);
+  const result = sparringResult(game, userColor, resigned);
 
   return (
     <div className="lg:grid lg:gap-6 lg:grid-cols-[minmax(0,1fr)_16rem] 2xl:grid-cols-[auto_16rem] 2xl:justify-center">
       <div className="board-sized mx-auto w-full max-w-xl space-y-3 lg:max-w-none">
-        <ChessBoard
-          fen={game.fen}
-          orientation={userColor}
-          mode={canMove ? "play" : "view"}
-          movableColor={userColor}
-          dests={canMove ? game.legalDests : new Map()}
-          lastMove={game.lastMove}
-          check={game.isCheck}
-          onMove={onUserMove}
+        <PlayerBar
+          name={`${NAME_FOR_ELO(activeElo)} · ${activeElo}`}
+          sub={STYLE_LABEL[activeStyle]}
+          active={!status && game.turn === engineColorChar}
+          note={thinking ? "pensa…" : undefined}
+        />
+        <div className="relative">
+          <ChessBoard
+            fen={game.fen}
+            orientation={userColor}
+            mode={canMove ? "play" : "view"}
+            movableColor={userColor}
+            dests={canMove ? game.legalDests : new Map()}
+            lastMove={game.lastMove}
+            check={game.isCheck}
+            onMove={onUserMove}
+          />
+          {result && !overlayOff && (
+            <GameOverOverlay
+              title={result.title}
+              subtitle={result.subtitle}
+              checkmate={result.checkmate}
+              onDismiss={() => setOverlayOff(true)}
+              actions={
+                <Button size="sm" onClick={start}>
+                  Rivincita
+                </Button>
+              }
+            />
+          )}
+        </div>
+        <PlayerBar
+          name="Tu"
+          sub={userColor === "white" ? "Bianco" : "Nero"}
+          active={!status && game.turn === userColor[0]}
         />
 
         {/* Mobile: striscia mosse orizzontale + controlli inizio/indietro/avanti/fine. */}
@@ -262,7 +345,6 @@ export function SparringBoard() {
       </div>
 
       <aside className="space-y-4">
-        <Info label="Avversario" value={`${STYLE_LABEL[style]} · ${elo}`} />
         {!status && (
           <ConfirmResignButton
             onConfirm={() => setResigned(true)}
@@ -290,6 +372,25 @@ function gameStatus(
   }
   if (game.isStalemate) return "Stallo — patta.";
   if (game.isDraw) return "Patta.";
+  return null;
+}
+
+/** Esito strutturato per la schermata finale (overlay sulla scacchiera). */
+function sparringResult(
+  game: ReturnType<typeof useChessGame>,
+  userColor: Color,
+  resigned: boolean,
+): { title: string; subtitle?: string; checkmate: boolean } | null {
+  if (resigned) return { title: "Hai perso", subtitle: "Hai abbandonato la partita.", checkmate: false };
+  if (game.isCheckmate) {
+    // Sotto matto perde chi deve muovere.
+    const loserIsUser = game.turn === userColor[0];
+    return loserIsUser
+      ? { title: "Hai perso", checkmate: true }
+      : { title: "Hai vinto", checkmate: true };
+  }
+  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false };
+  if (game.isDraw) return { title: "Patta", checkmate: false };
   return null;
 }
 
@@ -356,11 +457,37 @@ function Choice({
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+/** Barra giocatore (avversario sopra, tu sotto) come in "Gioca con un amico". */
+function PlayerBar({
+  name,
+  sub,
+  active,
+  note,
+}: {
+  name: string;
+  sub: string;
+  active: boolean;
+  note?: string;
+}) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-4">
-      <div className="text-xs uppercase tracking-wide text-text-muted">{label}</div>
-      <div className="mt-1 text-sm font-medium">{value}</div>
+    <div
+      className={cn(
+        "flex items-center justify-between rounded-md border px-3 py-2 transition-colors",
+        active ? "border-text bg-surface" : "border-border bg-surface-2",
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className={cn(
+            "h-2 w-2 rounded-full",
+            active ? "bg-text" : "bg-border",
+          )}
+          aria-hidden
+        />
+        <span className="text-sm font-medium">{name}</span>
+        <span className="text-xs text-text-muted">{sub}</span>
+      </div>
+      {note && <span className="text-xs text-text-muted">{note}</span>}
     </div>
   );
 }

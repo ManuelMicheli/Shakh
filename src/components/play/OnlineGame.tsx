@@ -22,6 +22,7 @@ import { BoardControls } from "@/components/chess/BoardControls";
 import { MoveList } from "@/components/chess/MoveList";
 import { MoveStripH } from "@/components/chess/MoveStripH";
 import { GameClock } from "./GameClock";
+import { GameOverOverlay } from "./GameOverOverlay";
 import { ConfirmResignButton } from "./ConfirmResignButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [overlayOff, setOverlayOff] = useState(false);
   const claimedRef = useRef(false);
   const boardWrapRef = useRef<HTMLDivElement>(null);
   const latestStampRef = useRef<string>(initialGame.updated_at);
@@ -358,7 +360,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
             <div
               ref={boardWrapRef}
               tabIndex={0}
-              className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+              className="relative rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
             >
               <ChessBoard
                 fen={viewFen}
@@ -370,6 +372,24 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                 check={viewInCheck}
                 onMove={onMove}
               />
+              {game.status === "finished" && !overlayOff && (() => {
+                const r = onlineResult(game, myColor);
+                return (
+                  <GameOverOverlay
+                    title={r.title}
+                    subtitle={r.subtitle}
+                    checkmate={r.checkmate}
+                    onDismiss={() => setOverlayOff(true)}
+                    actions={
+                      <Link href="/app/gioca">
+                        <Button size="sm" className="w-full">
+                          Nuova partita
+                        </Button>
+                      </Link>
+                    }
+                  />
+                );
+              })()}
             </div>
             <GameClock
               name={nameOf(bottomColor)}
@@ -562,4 +582,33 @@ function outcomeText(g: FriendGameRow): string {
   if (g.result === "0-1") return `Vince il Nero${r}`;
   if (g.result === "1/2-1/2") return `Patta${r}`;
   return "Conclusa";
+}
+
+/** Esito strutturato per la schermata finale (overlay sulla scacchiera). */
+function onlineResult(
+  g: FriendGameRow,
+  myColor: "w" | "b" | null,
+): { title: string; subtitle?: string; checkmate: boolean } {
+  const checkmate = g.end_reason === "checkmate";
+  // Sottotitolo col motivo, tranne il matto (mostrato come simbolo).
+  const reason: Record<string, string> = {
+    resign: "Abbandono.",
+    timeout: "Tempo scaduto.",
+    stalemate: "Stallo.",
+    agreement: "Patta concordata.",
+    aborted: "Partita annullata.",
+  };
+  const subtitle = g.end_reason && !checkmate ? reason[g.end_reason] : undefined;
+
+  if (g.result === "1/2-1/2") return { title: "Patta", subtitle, checkmate: false };
+
+  // Spettatore (non sei un giocatore): mostra il colore vincente.
+  if (!myColor) {
+    const title = g.result === "1-0" ? "Vince il Bianco" : g.result === "0-1" ? "Vince il Nero" : "Conclusa";
+    return { title, subtitle, checkmate };
+  }
+
+  const iWon =
+    (g.result === "1-0" && myColor === "w") || (g.result === "0-1" && myColor === "b");
+  return { title: iWon ? "Hai vinto" : "Hai perso", subtitle, checkmate };
 }

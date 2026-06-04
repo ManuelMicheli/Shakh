@@ -19,6 +19,7 @@ import { BoardControls } from "@/components/chess/BoardControls";
 import { MoveList } from "@/components/chess/MoveList";
 import { MoveStripH } from "@/components/chess/MoveStripH";
 import { GameClock } from "./GameClock";
+import { GameOverOverlay } from "./GameOverOverlay";
 import { TimeControlPicker } from "./TimeControlPicker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,7 @@ export function HotseatGame() {
   const [blackMs, setBlackMs] = useState<number | null>(null);
   const [flagged, setFlagged] = useState<null | "w" | "b">(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [overlayOff, setOverlayOff] = useState(false);
 
   const lastTick = useRef(0);
   const prevLen = useRef(0);
@@ -58,6 +60,7 @@ export function HotseatGame() {
     setWhiteMs(tc.initialMs);
     setBlackMs(tc.initialMs);
     setFlagged(null);
+    setOverlayOff(false);
     prevLen.current = 0;
     lastTick.current = Date.now();
     setOrientation("white");
@@ -165,6 +168,7 @@ export function HotseatGame() {
 
   // ---------- Play ----------
   const status = hotseatStatus(game, flagged);
+  const result = hotseatResult(game, flagged);
   const topColor: "w" | "b" = orientation === "white" ? "b" : "w";
   const bottomColor: "w" | "b" = orientation === "white" ? "w" : "b";
   const msOf = (c: "w" | "b") => (c === "w" ? whiteMs : blackMs);
@@ -185,7 +189,7 @@ export function HotseatGame() {
           <div
             ref={boardWrapRef}
             tabIndex={0}
-            className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+            className="relative rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
           >
             <ChessBoard
               fen={game.fen}
@@ -197,6 +201,19 @@ export function HotseatGame() {
               check={game.isCheck}
               onMove={onMove}
             />
+            {result && !overlayOff && (
+              <GameOverOverlay
+                title={result.title}
+                subtitle={result.subtitle}
+                checkmate={result.checkmate}
+                onDismiss={() => setOverlayOff(true)}
+                actions={
+                  <Button size="sm" onClick={() => setPhase("setup")}>
+                    Nuova partita
+                  </Button>
+                }
+              />
+            )}
           </div>
           <GameClock
             name={nameOf(bottomColor)}
@@ -387,4 +404,22 @@ function hotseatStatus(
   if (game.isDraw) return "Patta";
   const side = game.turn === "w" ? "Bianco" : "Nero";
   return game.isCheck ? `Scacco — muove il ${side}` : `Muove il ${side}`;
+}
+
+/** Esito strutturato per la schermata finale (hotseat: due giocatori, nessun "tu"). */
+function hotseatResult(
+  game: ReturnType<typeof useChessGame>,
+  flagged: null | "w" | "b",
+): { title: string; subtitle?: string; checkmate: boolean } | null {
+  if (flagged) {
+    const winner = flagged === "w" ? "Nero" : "Bianco";
+    return { title: `Vince il ${winner}`, subtitle: "Tempo scaduto.", checkmate: false };
+  }
+  if (game.isCheckmate) {
+    const winner = game.turn === "w" ? "Nero" : "Bianco";
+    return { title: `Vince il ${winner}`, checkmate: true };
+  }
+  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false };
+  if (game.isDraw) return { title: "Patta", checkmate: false };
+  return null;
 }
