@@ -10,7 +10,7 @@ export default function PreparazionePage() {
         eyebrow="Studia l'avversario"
         title="Preparazione"
         desc="Cosa gioca per colore, con che rendimento, e dove rende peggio."
-        glyph="♝"
+        piece="bishop"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">

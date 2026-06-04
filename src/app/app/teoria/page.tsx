@@ -3,6 +3,7 @@ import { ChevronRight, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PieceGlyph } from "@/components/chess/PieceGlyph";
 import type { TheoryType } from "@/lib/theory/types";
 
 export const metadata = { title: "Teoria — Shakh" };
@@ -73,12 +74,7 @@ export default async function TeoriaPage() {
             Capisci il <em>perché</em> delle mosse, coi dati reali.
           </p>
         </div>
-        <span
-          aria-hidden
-          className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
-        >
-          ♝
-        </span>
+        <PieceGlyph piece="bishop" className="-mt-1 h-24 w-24 shrink-0 opacity-25" />
       </div>
 
       {/* DESKTOP: testata classica. */}

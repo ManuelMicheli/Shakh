@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Menu, Bell, Upload, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PieceGlyph } from "@/components/chess/PieceGlyph";
 
 /**
  * SHOWCASE (dev-only): redesign mobile di "Le mie partite". Direzione editoriale
@@ -100,12 +101,10 @@ export default function PartiteShowcasePage() {
                     Importa, analizza, rivedi mossa per mossa.
                   </p>
                 </div>
-                <span
-                  aria-hidden
-                  className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
-                >
-                  ♜
-                </span>
+                <PieceGlyph
+                  piece="rook"
+                  className="-mt-1 h-24 w-24 shrink-0 opacity-25"
+                />
               </div>
 
               {/* Import: mini-tab + barra input */}

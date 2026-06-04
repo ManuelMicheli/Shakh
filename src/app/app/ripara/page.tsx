@@ -94,7 +94,7 @@ export default async function RiparaPage() {
         eyebrow="Dai tuoi sbagli"
         title="Ripara errori"
         desc="3 puzzle mirati per ogni errore grave: sbagli, alleni, ritesti."
-        glyph="♜"
+        piece="rook"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">

@@ -5,6 +5,7 @@ import { loadWeakest } from "@/lib/path/read";
 import { computeNextStep } from "@/lib/path/recommend";
 import { SkillTree } from "@/components/percorso/SkillTree";
 import { NextStep } from "@/components/percorso/NextStep";
+import { PieceGlyph } from "@/components/chess/PieceGlyph";
 
 export const metadata = { title: "Percorso — Shakh" };
 
@@ -42,12 +43,7 @@ export default async function PercorsoPage() {
             I nodi si sbloccano man mano che padroneggi i precedenti.
           </p>
         </div>
-        <span
-          aria-hidden
-          className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
-        >
-          ♚
-        </span>
+        <PieceGlyph piece="king" className="-mt-1 h-24 w-24 shrink-0 opacity-25" />
       </div>
 
       {/* DESKTOP: testata classica. */}

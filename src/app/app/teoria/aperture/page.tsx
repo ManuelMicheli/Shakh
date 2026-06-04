@@ -41,7 +41,7 @@ export default async function AperturePage() {
         eyebrow="Albero ECO"
         title="Aperture"
         desc="Famiglie, aperture e varianti. Apri una lezione per studiarla."
-        glyph="♝"
+        piece="bishop"
       />
       <div className="hidden items-center justify-between gap-3 md:flex">
         <div>

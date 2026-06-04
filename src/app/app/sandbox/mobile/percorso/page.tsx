@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PieceGlyph } from "@/components/chess/PieceGlyph";
 
 /**
  * SHOWCASE (dev-only): redesign mobile della pagina Percorso come timeline
@@ -101,12 +102,10 @@ export default function PercorsoShowcasePage() {
                     I nodi si sbloccano man mano che padroneggi i precedenti.
                   </p>
                 </div>
-                <span
-                  aria-hidden
-                  className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
-                >
-                  ♚
-                </span>
+                <PieceGlyph
+                  piece="king"
+                  className="-mt-1 h-24 w-24 shrink-0 opacity-25"
+                />
               </div>
 
               {/* Prossimo passo */}

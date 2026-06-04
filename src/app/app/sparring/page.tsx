@@ -10,7 +10,7 @@ export default function SparringPage() {
         eyebrow="Contro il motore"
         title="Sparring"
         desc="Partite intere contro una personalità e una forza scelte da te."
-        glyph="♞"
+        piece="knight"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-2xl font-semibold tracking-tight">Sparring</h1>

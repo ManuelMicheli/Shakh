@@ -36,7 +36,7 @@ export default async function RepertorioPage() {
         eyebrow="Le tue linee"
         title="Repertorio"
         desc="Costruisci le linee per colore, poi allenale con la ripetizione spaziata."
-        glyph="♝"
+        piece="bishop"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Il mio repertorio</h1>

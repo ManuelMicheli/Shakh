@@ -66,7 +66,7 @@ export default async function ProfiloPage() {
         eyebrow="Il tuo profilo"
         title={profile?.display_name ?? profile?.username ?? "Profilo"}
         desc={`${user.email}${profile?.elo_estimate != null ? ` · Elo ${profile.elo_estimate}` : ""} · livello ${profile?.current_level ?? 0}`}
-        glyph="♚"
+        piece="king"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">

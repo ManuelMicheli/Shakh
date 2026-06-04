@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { PieceGlyph } from "@/components/chess/PieceGlyph";
 
 /**
  * SHOWCASE (dev-only): redesign mobile del Hub Tattiche. Editoriale + texture
@@ -66,12 +67,10 @@ export default function TatticheShowcasePage() {
             <div className="space-y-5 p-4 pb-10">
               {/* Testata + glifo donna + rating hero */}
               <div className="relative">
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute right-0 top-1 select-none font-display text-[12rem] leading-[0.78] text-text opacity-[0.06]"
-                >
-                  ♛
-                </span>
+                <PieceGlyph
+                  piece="queen"
+                  className="absolute right-0 top-0 h-48 w-48 opacity-[0.08]"
+                />
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
                     Visione tattica

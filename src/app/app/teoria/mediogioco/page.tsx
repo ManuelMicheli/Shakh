@@ -31,7 +31,7 @@ export default async function MediogiocoPage() {
         eyebrow="Temi strategici"
         title="Mediogioco"
         desc="Piani per entrambi i lati ed esercizi “trova il piano”."
-        glyph="♞"
+        piece="knight"
       />
       <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">

@@ -1,6 +1,7 @@
 import { createClient, getUser } from "@/lib/supabase/server";
 import { ImportPanel } from "@/components/games/ImportPanel";
 import { GamesTable } from "@/components/games/GamesTable";
+import { PieceGlyph } from "@/components/chess/PieceGlyph";
 import type { GameRow } from "@/lib/games/types";
 
 export const metadata = { title: "Le mie partite — Shakh" };
@@ -37,12 +38,7 @@ export default async function PartitePage() {
             Importa, analizza, rivedi mossa per mossa.
           </p>
         </div>
-        <span
-          aria-hidden
-          className="-mt-4 shrink-0 select-none font-display text-[9rem] leading-none text-text opacity-20"
-        >
-          ♜
-        </span>
+        <PieceGlyph piece="rook" className="-mt-1 h-24 w-24 shrink-0 opacity-25" />
       </div>
 
       {/* DESKTOP: testata classica. */}

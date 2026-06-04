@@ -64,7 +64,7 @@ export default async function GruppiPage() {
         eyebrow="Circoli e classi"
         title="Gruppi"
         desc="Segui gli allievi e assegna attività, o unisciti con un codice."
-        glyph="♟"
+        piece="pawn"
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Circoli e gruppi</h1>
