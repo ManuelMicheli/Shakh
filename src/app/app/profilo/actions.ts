@@ -27,6 +27,27 @@ export interface UpdateResult {
   error?: string;
 }
 
+/**
+ * Toggle rapido della lingua dalla navbar: imposta il cookie di locale e, se
+ * l'utente è autenticato, allinea `profiles.locale`. Le pagine ri-renderizzano
+ * con i messaggi e i formati della nuova lingua dopo un `router.refresh()`.
+ */
+export async function setLocalePreference(locale: string): Promise<void> {
+  if (!isLocale(locale)) return;
+  (await cookies()).set(LOCALE_COOKIE, locale, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+  });
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) {
+    await supabase.from("profiles").update({ locale }).eq("id", user.id);
+  }
+}
+
 /** Aggiorna le impostazioni del profilo (nome, username, locale, tema preferito). */
 export async function updateProfile(input: UpdateProfileInput): Promise<UpdateResult> {
   const supabase = await createClient();

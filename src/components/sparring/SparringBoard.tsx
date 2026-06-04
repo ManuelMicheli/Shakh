@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import type { Square, PieceSymbol } from "chess.js";
+import { Chess, type Square, type PieceSymbol } from "chess.js";
 import {
   ChevronsLeft,
   ChevronLeft,
@@ -16,6 +16,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmResignButton } from "@/components/play/ConfirmResignButton";
 import { GameOverOverlay, type GameOutcome } from "@/components/play/GameOverOverlay";
 import { gameStatsFromFen } from "@/lib/chess/summary";
+import { CapturedMaterial } from "@/components/chess/CapturedMaterial";
+import { useGameBreakdown } from "@/lib/analysis/useGameBreakdown";
+import { useAnalyzePlayedGame } from "@/lib/play/useAnalyzePlayedGame";
 import { MoveStripH } from "@/components/chess/MoveStripH";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import { cn } from "@/lib/utils";
@@ -171,6 +174,24 @@ export function SparringBoard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [premove, game.turn, game.fen, phase, resigned, game.isGameOver, userColor]);
 
+  // Riepilogo qualità mosse a fine partita (analisi motore delle MIE mosse).
+  const over = resigned || game.isGameOver;
+  const pgn = useMemo(() => {
+    if (!over) return null;
+    const c = new Chess();
+    for (const m of game.history) {
+      try {
+        c.move({ from: m.from, to: m.to, promotion: m.promotion });
+      } catch {
+        /* mossa non ricostruibile: salta */
+      }
+    }
+    return c.pgn();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [over, game.history]);
+  const breakdown = useGameBreakdown(over, pgn, userColor[0] as "w" | "b");
+  const { analyze, loading: analyzeLoading } = useAnalyzePlayedGame();
+
   // ---------- Setup ----------
   if (phase === "setup") {
     return (
@@ -261,6 +282,7 @@ export function SparringBoard() {
           sub={STYLE_LABEL[activeStyle]}
           active={!status && game.turn === engineColorChar}
           note={thinking ? "thinking…" : undefined}
+          material={<CapturedMaterial fen={game.fen} color={engineColorChar} />}
         />
         <div className="relative">
           <ChessBoard
@@ -283,6 +305,33 @@ export function SparringBoard() {
               checkmate={result.checkmate}
               outcome={result.outcome}
               stats={gameStatsFromFen(game.fen)}
+              breakdown={breakdown.groups}
+              analyzing={breakdown.loading}
+              analyzeLoading={analyzeLoading}
+              onAnalyze={
+                pgn && result
+                  ? () => {
+                      const bot = `${NAME_FOR_ELO(activeElo)} ${activeElo}`;
+                      const res =
+                        result.outcome === "draw"
+                          ? "1/2-1/2"
+                          : result.outcome === "win"
+                            ? userColor === "white"
+                              ? "1-0"
+                              : "0-1"
+                            : userColor === "white"
+                              ? "0-1"
+                              : "1-0";
+                      analyze({
+                        pgn,
+                        white: userColor === "white" ? "You" : bot,
+                        black: userColor === "black" ? "You" : bot,
+                        result: res,
+                        userColor: userColor[0] as "w" | "b",
+                      });
+                    }
+                  : undefined
+              }
               onDismiss={() => setOverlayOff(true)}
               actions={
                 <Button size="sm" className="w-full" onClick={start}>
@@ -296,6 +345,7 @@ export function SparringBoard() {
           name="You"
           sub={userColor === "white" ? "White" : "Black"}
           active={!status && game.turn === userColor[0]}
+          material={<CapturedMaterial fen={game.fen} color={userColor[0] as "w" | "b"} />}
         />
 
         {/* Mobile: striscia mosse orizzontale + controlli inizio/indietro/avanti/fine. */}
@@ -488,11 +538,13 @@ function PlayerBar({
   sub,
   active,
   note,
+  material,
 }: {
   name: string;
   sub: string;
   active: boolean;
   note?: string;
+  material?: React.ReactNode;
 }) {
   return (
     <div
@@ -501,18 +553,19 @@ function PlayerBar({
         active ? "border-text bg-surface" : "border-border bg-surface-2",
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-2">
         <span
           className={cn(
-            "h-2 w-2 rounded-full",
+            "h-2 w-2 shrink-0 rounded-full",
             active ? "bg-text" : "bg-border",
           )}
           aria-hidden
         />
-        <span className="text-sm font-medium">{name}</span>
-        <span className="text-xs text-text-muted">{sub}</span>
+        <span className="truncate text-sm font-medium">{name}</span>
+        <span className="shrink-0 text-xs text-text-muted">{sub}</span>
+        {material}
       </div>
-      {note && <span className="text-xs text-text-muted">{note}</span>}
+      {note && <span className="shrink-0 text-xs text-text-muted">{note}</span>}
     </div>
   );
 }

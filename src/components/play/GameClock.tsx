@@ -21,6 +21,8 @@ export interface GameClockProps {
   active?: boolean;
   /** Chiamato una volta quando il tempo arriva a zero mentre scorre. */
   onFlag?: () => void;
+  /** Materiale catturato dal giocatore, mostrato accanto al nome. */
+  material?: React.ReactNode;
 }
 
 /**
@@ -35,6 +37,7 @@ export function GameClock({
   sinceTs,
   active = false,
   onFlag,
+  material,
 }: GameClockProps) {
   const [, force] = useState(0);
   const flagged = useRef(false);
@@ -68,7 +71,10 @@ export function GameClock({
         active ? "border-text bg-surface-2" : "border-border bg-surface",
       )}
     >
-      <span className="truncate text-xs text-text-muted lg:text-sm">{name}</span>
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="truncate text-xs text-text-muted lg:text-sm">{name}</span>
+        {material}
+      </div>
       <span
         className={cn(
           "font-mono text-base tabular-nums lg:text-xl",

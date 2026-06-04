@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ANALYSIS_DEPTH } from "@/lib/analysis/thresholds";
@@ -15,6 +15,8 @@ export interface AnalyzeRunnerProps {
   title?: string;
   /** Testo del pulsante (es. "Analizza" o "Rianalizza"). */
   label?: string;
+  /** Avvia l'analisi automaticamente al montaggio (es. arrivo da "Analyze game"). */
+  autoStart?: boolean;
 }
 
 /**
@@ -22,7 +24,13 @@ export interface AnalyzeRunnerProps {
  * prosegue anche cambiando pagina). Qui rispecchia l'avanzamento se il job
  * attivo è di QUESTA partita; se ne gira uno di un'altra, blocca l'avvio.
  */
-export function AnalyzeRunner({ gameId, pgn, title, label = "Analyze game" }: AnalyzeRunnerProps) {
+export function AnalyzeRunner({
+  gameId,
+  pgn,
+  title,
+  label = "Analyze game",
+  autoStart = false,
+}: AnalyzeRunnerProps) {
   const { job, start } = useAnalysisJob();
   const [depth, setDepth] = useState(ANALYSIS_DEPTH);
 
@@ -31,6 +39,16 @@ export function AnalyzeRunner({ gameId, pgn, title, label = "Analyze game" }: An
   const otherRunning = Boolean(job && job.gameId !== gameId && job.status === "running");
   const pct = thisJob && thisJob.total > 0 ? (thisJob.current / thisJob.total) * 100 : 0;
   const disabled = running || otherRunning;
+
+  // Auto-avvio una sola volta (arrivo da "Analyze game"): solo se nessun job
+  // è già attivo per questa o altre partite.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStart && !autoStarted.current && !job) {
+      autoStarted.current = true;
+      start(gameId, pgn, title ?? "Game", { depth });
+    }
+  }, [autoStart, job, gameId, pgn, title, depth, start]);
 
   return (
     <div className="space-y-4 rounded-md border border-border bg-surface p-5">

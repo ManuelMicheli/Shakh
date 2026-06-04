@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useChessGame } from "@/lib/chess/useChessGame";
 import { MoveList } from "@/components/chess/MoveList";
 import { MoveStripH } from "@/components/chess/MoveStripH";
@@ -51,6 +51,9 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
   const chess = useChessGame();
   const router = useRouter();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  // Arrivo da "Analyze game" (fine partita): avvia subito l'analisi.
+  const autoAnalyze = searchParams.get("analyze") === "1";
   const [orientation, setOrientation] = useState<"white" | "black">(
     game.userColor === "black" ? "black" : "white",
   );
@@ -242,7 +245,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
         {/* Pannello laterale a schede: tutto raggiungibile senza scrollare la pagina. */}
         <div className="flex min-h-0 flex-col gap-3 lg:overflow-hidden">
           {!game.analyzed && (
-            <AnalyzeRunner gameId={game.id} pgn={game.pgn} title={title} />
+            <AnalyzeRunner gameId={game.id} pgn={game.pgn} title={title} autoStart={autoAnalyze} />
           )}
 
           <Tabs defaultValue="moves" className="flex min-h-0 flex-1 flex-col">

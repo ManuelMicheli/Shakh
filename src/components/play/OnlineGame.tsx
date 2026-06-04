@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
@@ -24,6 +24,9 @@ import { MoveStripH } from "@/components/chess/MoveStripH";
 import { GameClock } from "./GameClock";
 import { GameOverOverlay, type GameOutcome } from "./GameOverOverlay";
 import { gameStatsFromFen, formatDuration } from "@/lib/chess/summary";
+import { CapturedMaterial } from "@/components/chess/CapturedMaterial";
+import { useGameBreakdown } from "@/lib/analysis/useGameBreakdown";
+import { useAnalyzePlayedGame } from "@/lib/play/useAnalyzePlayedGame";
 import { ConfirmResignButton } from "./ConfirmResignButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -297,6 +300,12 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     game.draw_offer_by != null &&
     game.draw_offer_by !== myColor;
 
+  // Riepilogo qualità mosse a fine partita (le MIE; spettatore = entrambi i lati).
+  const finished = game.status === "finished";
+  const breakdownPgn = useMemo(() => (finished ? game.pgn : null), [finished, game.pgn]);
+  const breakdown = useGameBreakdown(finished, breakdownPgn, myColor ?? "both");
+  const { analyze, loading: analyzeLoading } = useAnalyzePlayedGame();
+
   return (
     <div className="space-y-4">
       {/* Avvisi essenziali: visibili su ogni schermo (in cima su mobile). */}
@@ -384,6 +393,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               sinceTs={sinceTs}
               active={game.status === "ongoing" && game.turn === topColor}
               onFlag={onFlag}
+              material={<CapturedMaterial fen={game.fen} color={topColor} />}
             />
             <div
               ref={boardWrapRef}
@@ -427,6 +437,21 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                     checkmate={r.checkmate}
                     outcome={r.outcome}
                     stats={stats}
+                    breakdown={breakdown.groups}
+                    analyzing={breakdown.loading}
+                    analyzeLoading={analyzeLoading}
+                    onAnalyze={
+                      game.pgn
+                        ? () =>
+                            analyze({
+                              pgn: game.pgn,
+                              white: game.white_name ?? "White",
+                              black: game.black_name ?? "Black",
+                              result: game.result ?? "*",
+                              userColor: myColor ?? "w",
+                            })
+                        : undefined
+                    }
                     onDismiss={() => setOverlayOff(true)}
                     actions={
                       <Link href="/app/gioca">
@@ -446,6 +471,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               sinceTs={sinceTs}
               active={game.status === "ongoing" && game.turn === bottomColor}
               onFlag={onFlag}
+              material={<CapturedMaterial fen={game.fen} color={bottomColor} />}
             />
 
             {/* Desktop: controlli completi + stato. */}

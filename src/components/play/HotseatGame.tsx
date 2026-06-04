@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import type { Square, PieceSymbol } from "chess.js";
+import { Chess, type Square, type PieceSymbol } from "chess.js";
 import {
   Undo2,
   RotateCcw,
@@ -21,6 +21,9 @@ import { MoveStripH } from "@/components/chess/MoveStripH";
 import { GameClock } from "./GameClock";
 import { GameOverOverlay, type GameOutcome } from "./GameOverOverlay";
 import { gameStatsFromFen, formatDuration } from "@/lib/chess/summary";
+import { CapturedMaterial } from "@/components/chess/CapturedMaterial";
+import { useGameBreakdown } from "@/lib/analysis/useGameBreakdown";
+import { useAnalyzePlayedGame } from "@/lib/play/useAnalyzePlayedGame";
 import { TimeControlPicker } from "./TimeControlPicker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -134,6 +137,23 @@ export function HotseatGame() {
     lastTick.current = Date.now();
   }, [game]);
 
+  // Riepilogo qualità mosse a fine partita (analisi motore di entrambi i lati).
+  const pgn = useMemo(() => {
+    if (!over) return null;
+    const c = new Chess();
+    for (const m of game.history) {
+      try {
+        c.move({ from: m.from, to: m.to, promotion: m.promotion });
+      } catch {
+        /* mossa non ricostruibile: salta */
+      }
+    }
+    return c.pgn();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [over, game.history]);
+  const breakdown = useGameBreakdown(over, pgn, "both");
+  const { analyze, loading: analyzeLoading } = useAnalyzePlayedGame();
+
   // ---------- Setup ----------
   if (phase === "setup") {
     return (
@@ -199,6 +219,7 @@ export function HotseatGame() {
             name={nameOf(topColor)}
             ms={msOf(topColor)}
             active={!over && game.turn === topColor && atLive}
+            material={<CapturedMaterial fen={game.fen} color={topColor} />}
           />
           <div
             ref={boardWrapRef}
@@ -222,6 +243,25 @@ export function HotseatGame() {
                 checkmate={result.checkmate}
                 outcome={result.outcome}
                 stats={overStats}
+                breakdown={breakdown.groups}
+                analyzing={breakdown.loading}
+                analyzeLoading={analyzeLoading}
+                onAnalyze={
+                  pgn
+                    ? () => {
+                        const res = game.isCheckmate
+                          ? game.turn === "w"
+                            ? "0-1"
+                            : "1-0"
+                          : flagged
+                            ? flagged === "w"
+                              ? "0-1"
+                              : "1-0"
+                            : "1/2-1/2";
+                        analyze({ pgn, white: "White", black: "Black", result: res, userColor: "w" });
+                      }
+                    : undefined
+                }
                 onDismiss={() => setOverlayOff(true)}
                 actions={
                   <Button size="sm" className="w-full" onClick={() => setPhase("setup")}>
@@ -235,6 +275,7 @@ export function HotseatGame() {
             name={nameOf(bottomColor)}
             ms={msOf(bottomColor)}
             active={!over && game.turn === bottomColor && atLive}
+            material={<CapturedMaterial fen={game.fen} color={bottomColor} />}
           />
 
           {/* Desktop: controlli completi + stato. */}

@@ -2,6 +2,9 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { CLASSIFICATION_META } from "@/lib/analysis/labels";
+import type { BreakdownGroup } from "@/lib/analysis/useGameBreakdown";
+import { Button } from "@/components/ui/button";
 
 /**
  * Schermata finale di partita: copre la scacchiera annunciando l'esito
@@ -24,6 +27,10 @@ export function GameOverOverlay({
   checkmate = false,
   outcome,
   stats,
+  breakdown,
+  analyzing = false,
+  onAnalyze,
+  analyzeLoading = false,
   onDismiss,
   actions,
 }: {
@@ -35,8 +42,16 @@ export function GameOverOverlay({
   checkmate?: boolean;
   /** Esito dal punto di vista del giocatore: guida emblema e accento. */
   outcome?: GameOutcome;
-  /** Statistiche sintetiche della partita (mosse, catture, materiale). */
+  /** Statistiche sintetiche della partita (catture, durata). */
   stats?: GameStat[];
+  /** Riepilogo qualità mosse (per giocatore). Mostrato se presente. */
+  breakdown?: BreakdownGroup[] | null;
+  /** True mentre l'analisi del motore è in corso: mostra lo spinner. */
+  analyzing?: boolean;
+  /** Salva la partita e apre la review con analisi completa. */
+  onAnalyze?: () => void;
+  /** True mentre la partita viene salvata/aperta in review. */
+  analyzeLoading?: boolean;
   /** Chiudi l'overlay per rivedere la scacchiera. */
   onDismiss?: () => void;
   /** Pulsanti azione (rivincita, nuova partita, …). */
@@ -75,7 +90,30 @@ export function GameOverOverlay({
           </div>
         </div>
 
-        {/* Riepilogo statistiche */}
+        {/* Riepilogo qualità mosse (analisi motore) */}
+        {(analyzing || (breakdown && breakdown.length > 0)) && (
+          <div className="border-t border-border bg-bg/40 px-5 py-4">
+            {analyzing ? (
+              <div className="flex items-center justify-center gap-2 py-1 text-text-muted">
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-border border-t-text" />
+                <span className="text-xs">Analyzing your moves…</span>
+              </div>
+            ) : (
+              <div
+                className={cn(
+                  "grid gap-x-5 gap-y-4",
+                  breakdown!.length > 1 ? "grid-cols-2" : "grid-cols-1",
+                )}
+              >
+                {breakdown!.map((g, i) => (
+                  <BreakdownBlock key={g.label ?? i} group={g} showLabel={breakdown!.length > 1} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Statistiche secondarie */}
         {stats && stats.length > 0 && (
           <div
             className="grid divide-x divide-border border-y border-border bg-bg/40"
@@ -97,18 +135,68 @@ export function GameOverOverlay({
         {/* Azioni */}
         <div className="space-y-2 px-6 pb-6 pt-5">
           {actions}
+          {onAnalyze && (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full"
+              onClick={onAnalyze}
+              disabled={analyzeLoading}
+            >
+              {analyzeLoading ? "Opening…" : "Analyze game"}
+            </Button>
+          )}
           {onDismiss && (
             <button
               type="button"
               onClick={onDismiss}
               className="w-full pt-1 text-xs text-text-muted underline-offset-2 transition-colors hover:text-text hover:underline"
             >
-              Review the game
+              View the board
             </button>
           )}
         </div>
       </motion.div>
     </motion.div>
+  );
+}
+
+/** Conteggio mosse per classificazione di un giocatore (colori semantici eval). */
+function BreakdownBlock({
+  group,
+  showLabel,
+}: {
+  group: BreakdownGroup;
+  showLabel: boolean;
+}) {
+  return (
+    <div>
+      {showLabel && (
+        <div className="mb-2 font-mono text-[0.62rem] uppercase tracking-[0.15em] text-text-muted">
+          {group.label}
+        </div>
+      )}
+      {group.items.length === 0 ? (
+        <div className="text-xs text-text-muted">No moves</div>
+      ) : (
+        <ul className="space-y-1.5">
+          {group.items.map(({ c, n }) => {
+            const meta = CLASSIFICATION_META[c];
+            return (
+              <li key={c} className="flex items-center gap-2 text-sm">
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: meta.color }}
+                  aria-hidden
+                />
+                <span className="font-mono font-semibold tabular-nums text-text">{n}</span>
+                <span className="text-text-muted">{meta.label}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }
 

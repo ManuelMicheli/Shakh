@@ -78,6 +78,51 @@ export async function createOnlineGame(input: {
   return { ok: true, data: { id: data.id as string } };
 }
 
+/**
+ * Salva una partita appena giocata (sparring/hotseat/online) come riga `games`
+ * così da poterla aprire nella schermata di analisi/review. NON incide sul
+ * profilo (`counts_for_profile = false`): è materiale di studio su richiesta.
+ * Restituisce l'id da aprire su `/app/partite/[id]`.
+ */
+export async function saveGameForReview(input: {
+  pgn: string;
+  white: string;
+  black: string;
+  /** "1-0" | "0-1" | "1/2-1/2" | "*" */
+  result: string;
+  userColor: "w" | "b";
+}): Promise<ActionResult<{ id: string }>> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "You must sign in to analyze a game." };
+
+  if (!input.pgn.trim()) return { ok: false, error: "Empty game." };
+
+  const { data, error } = await supabase
+    .from("games")
+    .insert({
+      user_id: user.id,
+      source: "pgn",
+      external_id: null,
+      pgn: input.pgn,
+      white: input.white,
+      black: input.black,
+      result: input.result,
+      eco_code: null,
+      user_color: input.userColor,
+      played_at: new Date().toISOString(),
+      counts_for_profile: false,
+    })
+    .select("id")
+    .single();
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/app/partite");
+  return { ok: true, data: { id: data.id as string } };
+}
+
 /** Unisciti come avversario a una partita in attesa (via funzione SECURITY DEFINER). */
 export async function joinOnlineGame(
   id: string,
