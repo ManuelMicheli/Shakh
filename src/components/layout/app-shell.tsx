@@ -59,7 +59,10 @@ export function AppShell({
             avatarUrl={avatarUrl}
             onOpenMobile={() => setMobileOpen(true)}
           />
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+          {/* overflow-x-clip: nessun contenuto può far scorrere/zoomare la pagina
+              in orizzontale (es. striscia mosse che cresce su mobile). La scroll
+              verticale resta; gli scroller interni (tabelle, striscia) funzionano. */}
+          <main className="flex-1 overflow-x-clip overflow-y-auto p-4 sm:p-6">
             <div className="mx-auto w-full max-w-[1536px]">{children}</div>
           </main>
         </div>
