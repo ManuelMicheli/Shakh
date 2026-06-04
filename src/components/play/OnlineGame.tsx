@@ -22,7 +22,8 @@ import { BoardControls } from "@/components/chess/BoardControls";
 import { MoveList } from "@/components/chess/MoveList";
 import { MoveStripH } from "@/components/chess/MoveStripH";
 import { GameClock } from "./GameClock";
-import { GameOverOverlay } from "./GameOverOverlay";
+import { GameOverOverlay, type GameOutcome } from "./GameOverOverlay";
+import { gameStatsFromFen, formatDuration } from "@/lib/chess/summary";
 import { ConfirmResignButton } from "./ConfirmResignButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -374,11 +375,28 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               />
               {game.status === "finished" && !overlayOff && (() => {
                 const r = onlineResult(game, myColor);
+                // Base dalla FEN + durata se la partita ha orologio.
+                const stats =
+                  game.initial_ms != null && game.white_ms != null && game.black_ms != null
+                    ? [
+                        ...gameStatsFromFen(game.fen),
+                        {
+                          label: "Durata",
+                          value: formatDuration(
+                            game.initial_ms * 2 +
+                              game.increment_ms * game.moves.length -
+                              (game.white_ms + game.black_ms),
+                          ),
+                        },
+                      ]
+                    : gameStatsFromFen(game.fen);
                 return (
                   <GameOverOverlay
                     title={r.title}
                     subtitle={r.subtitle}
                     checkmate={r.checkmate}
+                    outcome={r.outcome}
+                    stats={stats}
                     onDismiss={() => setOverlayOff(true)}
                     actions={
                       <Link href="/app/gioca">
@@ -588,7 +606,7 @@ function outcomeText(g: FriendGameRow): string {
 function onlineResult(
   g: FriendGameRow,
   myColor: "w" | "b" | null,
-): { title: string; subtitle?: string; checkmate: boolean } {
+): { title: string; subtitle?: string; checkmate: boolean; outcome?: GameOutcome } {
   const checkmate = g.end_reason === "checkmate";
   // Sottotitolo col motivo, tranne il matto (mostrato come simbolo).
   const reason: Record<string, string> = {
@@ -600,15 +618,16 @@ function onlineResult(
   };
   const subtitle = g.end_reason && !checkmate ? reason[g.end_reason] : undefined;
 
-  if (g.result === "1/2-1/2") return { title: "Patta", subtitle, checkmate: false };
+  if (g.result === "1/2-1/2") return { title: "Patta", subtitle, checkmate: false, outcome: "draw" };
 
   // Spettatore (non sei un giocatore): mostra il colore vincente.
   if (!myColor) {
+    const decisive = g.result === "1-0" || g.result === "0-1";
     const title = g.result === "1-0" ? "Vince il Bianco" : g.result === "0-1" ? "Vince il Nero" : "Conclusa";
-    return { title, subtitle, checkmate };
+    return { title, subtitle, checkmate, outcome: decisive ? "win" : undefined };
   }
 
   const iWon =
     (g.result === "1-0" && myColor === "w") || (g.result === "0-1" && myColor === "b");
-  return { title: iWon ? "Hai vinto" : "Hai perso", subtitle, checkmate };
+  return { title: iWon ? "Hai vinto" : "Hai perso", subtitle, checkmate, outcome: iWon ? "win" : "loss" };
 }

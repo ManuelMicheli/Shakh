@@ -19,7 +19,8 @@ import { BoardControls } from "@/components/chess/BoardControls";
 import { MoveList } from "@/components/chess/MoveList";
 import { MoveStripH } from "@/components/chess/MoveStripH";
 import { GameClock } from "./GameClock";
-import { GameOverOverlay } from "./GameOverOverlay";
+import { GameOverOverlay, type GameOutcome } from "./GameOverOverlay";
+import { gameStatsFromFen, formatDuration } from "@/lib/chess/summary";
 import { TimeControlPicker } from "./TimeControlPicker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -169,6 +170,19 @@ export function HotseatGame() {
   // ---------- Play ----------
   const status = hotseatStatus(game, flagged);
   const result = hotseatResult(game, flagged);
+  // Statistiche finali: base dalla FEN + durata se la partita ha orologio.
+  const overStats =
+    tc.initialMs != null && whiteMs != null && blackMs != null
+      ? [
+          ...gameStatsFromFen(game.fen),
+          {
+            label: "Durata",
+            value: formatDuration(
+              tc.initialMs * 2 + tc.incMs * game.history.length - (whiteMs + blackMs),
+            ),
+          },
+        ]
+      : gameStatsFromFen(game.fen);
   const topColor: "w" | "b" = orientation === "white" ? "b" : "w";
   const bottomColor: "w" | "b" = orientation === "white" ? "w" : "b";
   const msOf = (c: "w" | "b") => (c === "w" ? whiteMs : blackMs);
@@ -206,9 +220,11 @@ export function HotseatGame() {
                 title={result.title}
                 subtitle={result.subtitle}
                 checkmate={result.checkmate}
+                outcome={result.outcome}
+                stats={overStats}
                 onDismiss={() => setOverlayOff(true)}
                 actions={
-                  <Button size="sm" onClick={() => setPhase("setup")}>
+                  <Button size="sm" className="w-full" onClick={() => setPhase("setup")}>
                     Nuova partita
                   </Button>
                 }
@@ -410,16 +426,16 @@ function hotseatStatus(
 function hotseatResult(
   game: ReturnType<typeof useChessGame>,
   flagged: null | "w" | "b",
-): { title: string; subtitle?: string; checkmate: boolean } | null {
+): { title: string; subtitle?: string; checkmate: boolean; outcome: GameOutcome } | null {
   if (flagged) {
     const winner = flagged === "w" ? "Nero" : "Bianco";
-    return { title: `Vince il ${winner}`, subtitle: "Tempo scaduto.", checkmate: false };
+    return { title: `Vince il ${winner}`, subtitle: "Tempo scaduto.", checkmate: false, outcome: "win" };
   }
   if (game.isCheckmate) {
     const winner = game.turn === "w" ? "Nero" : "Bianco";
-    return { title: `Vince il ${winner}`, checkmate: true };
+    return { title: `Vince il ${winner}`, checkmate: true, outcome: "win" };
   }
-  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false };
-  if (game.isDraw) return { title: "Patta", checkmate: false };
+  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false, outcome: "draw" };
+  if (game.isDraw) return { title: "Patta", checkmate: false, outcome: "draw" };
   return null;
 }

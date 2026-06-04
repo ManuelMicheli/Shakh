@@ -14,7 +14,8 @@ import { engine } from "@/lib/engine/engine";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmResignButton } from "@/components/play/ConfirmResignButton";
-import { GameOverOverlay } from "@/components/play/GameOverOverlay";
+import { GameOverOverlay, type GameOutcome } from "@/components/play/GameOverOverlay";
+import { gameStatsFromFen } from "@/lib/chess/summary";
 import { MoveStripH } from "@/components/chess/MoveStripH";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import { cn } from "@/lib/utils";
@@ -79,6 +80,8 @@ export function SparringBoard() {
   const [thinking, setThinking] = useState(false);
   const [resigned, setResigned] = useState(false);
   const [overlayOff, setOverlayOff] = useState(false);
+  // Pre-mossa: trattenuta mentre tocca all'avversario, giocata appena torna il turno.
+  const [premove, setPremove] = useState<{ from: Square; to: Square } | null>(null);
 
   const strength = strengthFor(activeElo);
   const engineColorChar = userColor === "white" ? "b" : "w";
@@ -96,6 +99,7 @@ export function SparringBoard() {
 
     setResigned(false);
     setOverlayOff(false);
+    setPremove(null);
     game.reset();
     const realOpeningKey = openingRandom
       ? OPENINGS[Math.floor(Math.random() * OPENINGS.length)].key
@@ -152,6 +156,20 @@ export function SparringBoard() {
     },
     [thinking, game, userColor],
   );
+
+  // Pre-mossa: appena torna il turno dell'utente, gioca quella prenotata.
+  // Se nel frattempo è diventata illegale (pezzo catturato, scacco…), la scarta.
+  useEffect(() => {
+    if (!premove) return;
+    if (phase !== "play" || resigned || game.isGameOver) return;
+    if (game.cursor < game.history.length - 1) return;
+    if (game.turn !== userColor[0]) return; // tocca ancora all'avversario
+    setPremove(null);
+    // chess.js esige la promozione: se la mossa senza promozione fallisce, riprova a Donna.
+    const ok = game.move(premove.from, premove.to);
+    if (!ok) game.move(premove.from, premove.to, "q");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [premove, game.turn, game.fen, phase, resigned, game.isGameOver, userColor]);
 
   // ---------- Setup ----------
   if (phase === "setup") {
@@ -229,8 +247,9 @@ export function SparringBoard() {
 
   // ---------- Play ----------
   const atLive = game.cursor >= game.history.length - 1;
-  const canMove =
-    !thinking && !resigned && !game.isGameOver && game.turn === userColor[0] && atLive;
+  // Partita "viva": posizione corrente, non finita, non abbandonata.
+  const liveOpen = atLive && !resigned && !game.isGameOver;
+  const canMove = liveOpen && !thinking && game.turn === userColor[0];
   const status = gameStatus(game, userColor, resigned);
   const result = sparringResult(game, userColor, resigned);
 
@@ -247,21 +266,26 @@ export function SparringBoard() {
           <ChessBoard
             fen={game.fen}
             orientation={userColor}
-            mode={canMove ? "play" : "view"}
+            mode={liveOpen ? "play" : "view"}
             movableColor={userColor}
             dests={canMove ? game.legalDests : new Map()}
             lastMove={game.lastMove}
             check={game.isCheck}
             onMove={onUserMove}
+            premovable={liveOpen}
+            onPremove={(from, to) => setPremove({ from, to })}
+            onPremoveCancel={() => setPremove(null)}
           />
           {result && !overlayOff && (
             <GameOverOverlay
               title={result.title}
               subtitle={result.subtitle}
               checkmate={result.checkmate}
+              outcome={result.outcome}
+              stats={gameStatsFromFen(game.fen)}
               onDismiss={() => setOverlayOff(true)}
               actions={
-                <Button size="sm" onClick={start}>
+                <Button size="sm" className="w-full" onClick={start}>
                   Rivincita
                 </Button>
               }
@@ -380,17 +404,18 @@ function sparringResult(
   game: ReturnType<typeof useChessGame>,
   userColor: Color,
   resigned: boolean,
-): { title: string; subtitle?: string; checkmate: boolean } | null {
-  if (resigned) return { title: "Hai perso", subtitle: "Hai abbandonato la partita.", checkmate: false };
+): { title: string; subtitle?: string; checkmate: boolean; outcome: GameOutcome } | null {
+  if (resigned)
+    return { title: "Hai perso", subtitle: "Hai abbandonato la partita.", checkmate: false, outcome: "loss" };
   if (game.isCheckmate) {
     // Sotto matto perde chi deve muovere.
     const loserIsUser = game.turn === userColor[0];
     return loserIsUser
-      ? { title: "Hai perso", checkmate: true }
-      : { title: "Hai vinto", checkmate: true };
+      ? { title: "Hai perso", checkmate: true, outcome: "loss" }
+      : { title: "Hai vinto", checkmate: true, outcome: "win" };
   }
-  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false };
-  if (game.isDraw) return { title: "Patta", checkmate: false };
+  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false, outcome: "draw" };
+  if (game.isDraw) return { title: "Patta", checkmate: false, outcome: "draw" };
   return null;
 }
 
