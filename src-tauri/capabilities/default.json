@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permessi base: solo visualizzazione del sito, nessuna IPC custom.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

@@ -1,0 +1,4 @@
+# Artefatti di build Rust/Tauri
+/target/
+# Schemi/codice generati da tauri-build
+/gen/

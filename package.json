@@ -9,6 +9,9 @@
     "lint": "next lint",
     "copy-engine": "node scripts/copy-engine.mjs",
     "import-puzzles": "npx --yes tsx scripts/import-puzzles.ts",
+    "tauri": "tauri",
+    "tauri:build": "tauri build",
+    "tauri:icon": "tauri icon src/app/icon.svg",
     "prebuild": "node scripts/copy-engine.mjs",
     "predev": "node scripts/copy-engine.mjs",
     "postinstall": "node scripts/copy-engine.mjs"
@@ -37,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@tauri-apps/cli": "^2.1.0",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "^25.9.1",
     "@types/react": "^19.2.16",
