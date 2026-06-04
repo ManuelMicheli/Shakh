@@ -22,7 +22,7 @@ export interface MonitorItem {
 function dueLabel(iso: string | null): string | null {
   if (!iso) return null;
   const d = new Date(iso);
-  return `scade il ${d.getDate()}/${d.getMonth() + 1}`;
+  return `due ${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 /** Monitoraggio assegnazioni con completamento derivato (prompt 09 §5). */
@@ -35,7 +35,7 @@ export function AssignmentMonitor({ groupId, items }: { groupId: string; items: 
     start(async () => {
       const res = await deleteAssignment(groupId, id);
       if (!res.ok) {
-        toast({ title: "Non eliminata", description: res.error, variant: "error" });
+        toast({ title: "Not deleted", description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -43,7 +43,7 @@ export function AssignmentMonitor({ groupId, items }: { groupId: string; items: 
   };
 
   if (items.length === 0) {
-    return <p className="text-sm text-text-muted">Nessuna assegnazione attiva.</p>;
+    return <p className="text-sm text-text-muted">No active assignments.</p>;
   }
 
   return (
@@ -56,13 +56,13 @@ export function AssignmentMonitor({ groupId, items }: { groupId: string; items: 
               <div className="flex items-center gap-2">
                 <span className="text-xs text-text-muted">{a.typeLabel}</span>
                 <Badge variant="muted">
-                  {a.targetType === "group" ? "Classe" : "Individuale"}
+                  {a.targetType === "group" ? "Class" : "Individual"}
                 </Badge>
               </div>
               <p className="truncate font-medium">{a.label}</p>
               <p className="text-xs text-text-muted">
-                {a.completed}/{a.total} completate
-                {a.inProgress > 0 ? ` · ${a.inProgress} in corso` : ""}
+                {a.completed}/{a.total} completed
+                {a.inProgress > 0 ? ` · ${a.inProgress} in progress` : ""}
                 {a.note ? ` · ${a.note}` : ""}
                 {due ? ` · ${due}` : ""}
               </p>
@@ -73,7 +73,7 @@ export function AssignmentMonitor({ groupId, items }: { groupId: string; items: 
               disabled={pending}
               onClick={() => onDelete(a.id)}
             >
-              Elimina
+              Delete
             </Button>
           </li>
         );

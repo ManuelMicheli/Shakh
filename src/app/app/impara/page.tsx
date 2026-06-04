@@ -27,21 +27,21 @@ export default function ImparaPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Un concetto alla volta"
-        title="Impara"
-        desc="Capisci l'idea, riconoscila, sfruttala. Poi partite spiegate."
+        eyebrow="One concept at a time"
+        title="Learn"
+        desc="Understand the idea, recognize it, exploit it. Then explained games."
       />
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Impara</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Learn</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          I fondamentali, un concetto alla volta. Prima capisci l&apos;idea, poi la riconosci
-          e la sfrutti in piccoli esercizi. Poi guarda partite spiegate mossa per mossa.
+          The fundamentals, one concept at a time. First you understand the idea, then you recognize
+          it and exploit it in small exercises. Then watch games explained move by move.
         </p>
       </div>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-xl font-semibold">Concetti</h2>
+          <h2 className="font-display text-xl font-semibold">Concepts</h2>
           <span className="font-mono text-sm text-text-muted">
             {completed}/{CONCEPTS.length}
           </span>
@@ -53,7 +53,7 @@ export default function ImparaPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-lg">{c.title}</CardTitle>
-                    {done.has(c.slug) && <Badge>fatto</Badge>}
+                    {done.has(c.slug) && <Badge>done</Badge>}
                   </div>
                   <CardDescription className="line-clamp-2">{c.intro}</CardDescription>
                 </CardHeader>
@@ -64,7 +64,7 @@ export default function ImparaPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-semibold">Partite spiegate</h2>
+        <h2 className="font-display text-xl font-semibold">Explained games</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {GUIDED_GAMES.map((g) => (
             <Link key={g.slug} href={`/app/impara/replay/${g.slug}`} className="group">

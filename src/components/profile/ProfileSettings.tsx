@@ -40,7 +40,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
     const res = await exportMyData();
     setExporting(false);
     if (!res.ok || !res.data) {
-      toast({ title: "Esportazione non riuscita", description: res.error, variant: "error" });
+      toast({ title: "Export failed", description: res.error, variant: "error" });
       return;
     }
     const blob = new Blob([JSON.stringify(res.data, null, 2)], {
@@ -49,7 +49,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "shakh-dati.json";
+    a.download = "shakh-data.json";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -59,7 +59,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
     const res = await deleteMyAccount();
     setDeleting(false);
     if (!res.ok) {
-      toast({ title: "Cancellazione non riuscita", description: res.error, variant: "error" });
+      toast({ title: "Deletion failed", description: res.error, variant: "error" });
       return;
     }
     setConfirmDelete(false);
@@ -69,7 +69,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
 
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [username, setUsername] = useState(initial.username);
-  const [locale, setLocale] = useState(initial.locale || "it");
+  const [locale, setLocale] = useState(initial.locale || "en");
   const [savingProfile, startSave] = useTransition();
 
   const [password, setPassword] = useState("");
@@ -85,20 +85,20 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
         themePreference: theme,
       });
       if (!res.ok) {
-        toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Save failed", description: res.error, variant: "error" });
         return;
       }
-      toast({ title: "Profilo aggiornato" });
+      toast({ title: "Profile updated" });
     });
   };
 
   const onChangePassword = async () => {
     if (password.length < 8) {
-      toast({ title: "Password troppo corta", description: "Almeno 8 caratteri.", variant: "error" });
+      toast({ title: "Password too short", description: "At least 8 characters.", variant: "error" });
       return;
     }
     if (password !== password2) {
-      toast({ title: "Le password non coincidono", variant: "error" });
+      toast({ title: "Passwords don't match", variant: "error" });
       return;
     }
     setChangingPwd(true);
@@ -106,12 +106,12 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
     const { error } = await supabase.auth.updateUser({ password });
     setChangingPwd(false);
     if (error) {
-      toast({ title: "Cambio password non riuscito", description: error.message, variant: "error" });
+      toast({ title: "Password change failed", description: error.message, variant: "error" });
       return;
     }
     setPassword("");
     setPassword2("");
-    toast({ title: "Password aggiornata" });
+    toast({ title: "Password updated" });
   };
 
   return (
@@ -119,17 +119,17 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Dati profilo */}
       <Card>
         <CardHeader>
-          <CardTitle>Profilo</CardTitle>
-          <CardDescription>Come ti presentiamo nell&apos;app.</CardDescription>
+          <CardTitle>Profile</CardTitle>
+          <CardDescription>How we present you in the app.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="displayName">Nome visualizzato</Label>
+            <Label htmlFor="displayName">Display name</Label>
             <Input
               id="displayName"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Il tuo nome"
+              placeholder="Your name"
             />
           </div>
           <div className="space-y-1.5">
@@ -143,7 +143,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
           </div>
           <div className="flex justify-end">
             <Button onClick={onSaveProfile} disabled={savingProfile}>
-              {savingProfile ? "Salvataggio…" : "Salva"}
+              {savingProfile ? "Saving…" : "Save"}
             </Button>
           </div>
         </CardContent>
@@ -152,29 +152,29 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Aspetto */}
       <Card>
         <CardHeader>
-          <CardTitle>Aspetto e lingua</CardTitle>
-          <CardDescription>Il tema viene applicato subito; salva per ricordarlo.</CardDescription>
+          <CardTitle>Appearance and language</CardTitle>
+          <CardDescription>The theme applies right away; save to remember it.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Tema</Label>
+            <Label>Theme</Label>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant={theme === "dark" ? "primary" : "secondary"}
                 onClick={() => setTheme("dark")}
               >
-                Scuro
+                Dark
               </Button>
               <Button
                 variant={theme === "light" ? "primary" : "secondary"}
                 onClick={() => setTheme("light")}
               >
-                Chiaro
+                Light
               </Button>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Lingua</Label>
+            <Label>Language</Label>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant={locale === "it" ? "primary" : "secondary"}
@@ -192,7 +192,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
           </div>
           <div className="flex justify-end">
             <Button onClick={onSaveProfile} disabled={savingProfile}>
-              {savingProfile ? "Salvataggio…" : "Salva preferenze"}
+              {savingProfile ? "Saving…" : "Save preferences"}
             </Button>
           </div>
         </CardContent>
@@ -202,11 +202,11 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       <Card>
         <CardHeader>
           <CardTitle>Account</CardTitle>
-          <CardDescription>Cambia la password di accesso.</CardDescription>
+          <CardDescription>Change your sign-in password.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="pwd">Nuova password</Label>
+            <Label htmlFor="pwd">New password</Label>
             <Input
               id="pwd"
               type="password"
@@ -216,7 +216,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="pwd2">Conferma password</Label>
+            <Label htmlFor="pwd2">Confirm password</Label>
             <Input
               id="pwd2"
               type="password"
@@ -227,7 +227,7 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
           </div>
           <div className="flex justify-end">
             <Button onClick={onChangePassword} disabled={changingPwd}>
-              {changingPwd ? "…" : "Aggiorna password"}
+              {changingPwd ? "…" : "Update password"}
             </Button>
           </div>
         </CardContent>
@@ -236,15 +236,15 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Gruppi e circoli (attivati nel 09) */}
       <Card>
         <CardHeader>
-          <CardTitle>Gruppi e circoli</CardTitle>
-          <CardDescription>Unisciti a un circolo o una classe, o creane uno tuo.</CardDescription>
+          <CardTitle>Groups and clubs</CardTitle>
+          <CardDescription>Join a club or a class, or create your own.</CardDescription>
         </CardHeader>
         <CardContent>
           <Link
             href="/app/gruppi"
             className="inline-flex h-9 items-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-surface-2"
           >
-            Gestisci i tuoi gruppi
+            Manage your groups
           </Link>
         </CardContent>
       </Card>
@@ -252,33 +252,33 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       {/* Privacy e dati (diritti dell'interessato, prompt 10 §1) */}
       <Card>
         <CardHeader>
-          <CardTitle>Privacy e dati</CardTitle>
+          <CardTitle>Privacy and data</CardTitle>
           <CardDescription>
-            Esporta i tuoi dati o elimina definitivamente l&apos;account.
+            Export your data or permanently delete your account.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium">Esporta i miei dati</p>
+              <p className="text-sm font-medium">Export my data</p>
               <p className="text-xs text-text-muted">
-                Profilo, partite, progressi e repertori in formato JSON.
+                Profile, games, progress, and repertoires in JSON format.
               </p>
             </div>
             <Button variant="secondary" onClick={onExport} disabled={exporting}>
-              {exporting ? "Preparo…" : "Esporta"}
+              {exporting ? "Preparing…" : "Export"}
             </Button>
           </div>
 
           <div className="flex items-center justify-between gap-4 border-t border-border pt-4">
             <div>
-              <p className="text-sm font-medium">Elimina account</p>
+              <p className="text-sm font-medium">Delete account</p>
               <p className="text-xs text-text-muted">
-                Rimozione definitiva di account e dati collegati. Irreversibile.
+                Permanent removal of your account and linked data. Irreversible.
               </p>
             </div>
             <Button variant="danger" onClick={() => setConfirmDelete(true)}>
-              Elimina
+              Delete
             </Button>
           </div>
         </CardContent>
@@ -287,15 +287,15 @@ export function ProfileSettings({ initial }: ProfileSettingsProps) {
       <Dialog
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title="Eliminare l'account?"
-        description="Questa azione è irreversibile: profilo, partite, progressi e repertori verranno cancellati per sempre."
+        title="Delete your account?"
+        description="This action is irreversible: your profile, games, progress, and repertoires will be deleted forever."
       >
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
-            Annulla
+            Cancel
           </Button>
           <Button variant="danger" onClick={onDelete} disabled={deleting}>
-            {deleting ? "Elimino…" : "Elimina definitivamente"}
+            {deleting ? "Deleting…" : "Delete permanently"}
           </Button>
         </div>
       </Dialog>

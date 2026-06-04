@@ -45,10 +45,10 @@ function directQuality(category: TbCategory): MoveQuality {
 }
 
 const QUALITY_LABEL: Record<MoveQuality, string> = {
-  win: "vinta",
-  draw: "patta",
-  loss: "persa",
-  unknown: "ignota",
+  win: "winning",
+  draw: "drawn",
+  loss: "lost",
+  unknown: "unknown",
 };
 
 function turnOf(fen: string): "white" | "black" {
@@ -206,8 +206,8 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
         setStatus("blunder");
         setMessage(
           practice.goal === "win"
-            ? `Così butti via la vittoria: la posizione ora è ${QUALITY_LABEL[userQ]}. Torna indietro e riprova.`
-            : `Attento: questa mossa perde la patta (posizione ${QUALITY_LABEL[userQ]}). Torna indietro e riprova.`,
+            ? `That throws away the win: the position is now ${QUALITY_LABEL[userQ]}. Go back and try again.`
+            : `Careful: this move loses the draw (position ${QUALITY_LABEL[userQ]}). Go back and try again.`,
         );
         setBusy(false);
         return;
@@ -217,14 +217,14 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
       const afterChess = new Chess(afterUser);
       if (afterChess.isCheckmate()) {
         setHistory((h) => [...h, afterUser]);
-        finish("won", "Matto! Finale convertito alla perfezione.", true);
+        finish("won", "Mate! Endgame converted perfectly.", true);
         setBusy(false);
         return;
       }
       if (afterChess.isStalemate() || afterChess.isInsufficientMaterial() || afterChess.isDraw()) {
         setHistory((h) => [...h, afterUser]);
-        if (practice.goal === "draw") finish("drawn", "Patta raggiunta. Difesa corretta.", true);
-        else finish("lost", "Stallo: la vittoria è sfumata in patta.", false);
+        if (practice.goal === "draw") finish("drawn", "Draw reached. Correct defense.", true);
+        else finish("lost", "Stalemate: the win slipped into a draw.", false);
         setBusy(false);
         return;
       }
@@ -241,14 +241,14 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
       setLastUci(reply.uci);
 
       if (afterOppChess.isCheckmate()) {
-        finish("lost", "L'avversario ti ha dato matto.", false);
+        finish("lost", "The opponent checkmated you.", false);
       } else if (
         afterOppChess.isStalemate() ||
         afterOppChess.isInsufficientMaterial() ||
         afterOppChess.isDraw()
       ) {
-        if (practice.goal === "draw") finish("drawn", "Patta raggiunta. Difesa corretta.", true);
-        else finish("lost", "Finita in patta: la vittoria è sfumata.", false);
+        if (practice.goal === "draw") finish("drawn", "Draw reached. Correct defense.", true);
+        else finish("lost", "Ended in a draw: the win slipped away.", false);
       }
       setBusy(false);
     },
@@ -279,22 +279,22 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
     const res = await fetchTablebase(current);
     setBusy(false);
     if (res.ok && directQuality(res.data.category) === "draw") {
-      finish("drawn", "Patta tenuta: hai dimostrato la difesa. Esito confermato dalla tablebase.", true);
+      finish("drawn", "Draw held: you proved the defense. Result confirmed by the tablebase.", true);
     } else {
-      setMessage("La posizione non è ancora una patta sicura: continua a difendere.");
+      setMessage("The position isn't a safe draw yet: keep defending.");
     }
   }, [status, userTurn, history.length, current, finish]);
 
-  const goalText = practice.goal === "win" ? "Vinci la posizione" : "Pattala";
+  const goalText = practice.goal === "win" ? "Win the position" : "Hold the draw";
   const canClaimDraw = practice.goal === "draw" && status === "playing" && userTurn && history.length > 1;
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
-          <CardTitle>Pratica del finale</CardTitle>
+          <CardTitle>Endgame practice</CardTitle>
           <span className="text-xs text-text-muted">
-            {goalText} · giochi il {practice.userColor === "white" ? "Bianco" : "Nero"}
+            {goalText} · you play {practice.userColor === "white" ? "White" : "Black"}
           </span>
         </div>
       </CardHeader>
@@ -316,13 +316,13 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
           <div className="space-y-3">
             {/* Esito teorico corrente (verità della tablebase). */}
             <div className="rounded-md border border-border bg-surface p-3">
-              <p className="text-xs text-text-muted">Esito teorico</p>
+              <p className="text-xs text-text-muted">Theoretical result</p>
               <p className="mt-0.5 text-sm font-medium">
                 {estimate ? (
-                  "Stima del motore (posizione fuori dalla tablebase)"
+                  "Engine estimate (position outside the tablebase)"
                 ) : outcome ? (
                   <>
-                    Posizione{" "}
+                    Position{" "}
                     <span
                       className={cn(
                         "font-semibold",
@@ -333,11 +333,11 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
                     >
                       {QUALITY_LABEL[outcome]}
                     </span>{" "}
-                    per te
+                    for you
                   </>
                 ) : busy ? (
                   <span className="flex items-center gap-2 text-text-muted">
-                    <Spinner /> Verifico con la tablebase…
+                    <Spinner /> Checking with the tablebase…
                   </span>
                 ) : (
                   "—"
@@ -347,7 +347,7 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
 
             {busy && (
               <p className="flex items-center gap-2 text-xs text-text-muted">
-                <Spinner /> L&apos;avversario difende…
+                <Spinner /> The opponent is defending…
               </p>
             )}
 
@@ -371,22 +371,22 @@ export function EndgamePractice({ practice }: EndgamePracticeProps) {
             <div className="flex flex-wrap gap-2">
               {status === "blunder" && (
                 <Button size="sm" onClick={retry}>
-                  ← Riprova
+                  ← Try again
                 </Button>
               )}
               {canClaimDraw && (
                 <Button size="sm" variant="secondary" onClick={() => void claimDraw()} disabled={busy}>
-                  Patta raggiunta
+                  Claim the draw
                 </Button>
               )}
               <Button size="sm" variant="ghost" onClick={restart}>
-                Ricomincia
+                Restart
               </Button>
             </div>
 
             <p className="text-[11px] leading-relaxed text-text-muted">
-              L&apos;avversario gioca la difesa perfetta della tablebase Lichess. Dopo
-              ogni tua mossa l&apos;esito viene verificato: niente approssimazioni.
+              The opponent plays the Lichess tablebase&apos;s perfect defense. After
+              each of your moves the result is verified: no approximations.
             </p>
           </div>
         </div>

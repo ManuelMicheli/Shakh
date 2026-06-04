@@ -16,7 +16,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      aria-label={isDark ? "Passa al tema chiaro" : "Passa al tema scuro"}
+      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
     >
       {/* Evita mismatch SSR: icona neutra finché non montato */}
       {mounted && isDark ? (

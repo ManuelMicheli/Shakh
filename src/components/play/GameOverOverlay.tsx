@@ -64,7 +64,7 @@ export function GameOverOverlay({
             </h2>
             {checkmate && (
               <p className="mt-2 font-mono text-[0.68rem] uppercase tracking-[0.2em] text-text-muted">
-                Scacco matto
+                Checkmate
               </p>
             )}
             {subtitle && (
@@ -103,7 +103,7 @@ export function GameOverOverlay({
               onClick={onDismiss}
               className="w-full pt-1 text-xs text-text-muted underline-offset-2 transition-colors hover:text-text hover:underline"
             >
-              Rivedi la partita
+              Review the game
             </button>
           )}
         </div>

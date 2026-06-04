@@ -115,11 +115,11 @@ export interface DashboardData {
 // ============================================================
 
 const AREA_LABEL: Record<AreaKey, string> = {
-  tattica: "Tattica",
-  aperture: "Aperture",
-  mediogioco: "Mediogioco",
-  finali: "Finali",
-  trappole: "Trappole",
+  tattica: "Tactics",
+  aperture: "Openings",
+  mediogioco: "Middlegame",
+  finali: "Endgames",
+  trappole: "Traps",
 };
 
 const ENDGAME_SLUG: Record<string, string> = {
@@ -147,32 +147,32 @@ function describeWeakness(row: ProgressRow): Weakness | null {
         area: "tattica",
         score,
         attempts,
-        action: { label: "Allena", href: "/app/tattiche" },
+        action: { label: "Train", href: "/app/tattiche" },
       };
     case "opening":
       return {
-        label: `Apertura: ${key.replace(/_/g, " ")}`,
+        label: `Opening: ${key.replace(/_/g, " ")}`,
         area: "aperture",
         score,
         attempts,
-        action: { label: "Ripassa", href: "/app/repertorio" },
+        action: { label: "Review", href: "/app/repertorio" },
       };
     case "middlegame_theme":
       return {
-        label: `Mediogioco: ${key.replace(/_/g, " ")}`,
+        label: `Middlegame: ${key.replace(/_/g, " ")}`,
         area: "mediogioco",
         score,
         attempts,
-        action: { label: "Esercizio", href: "/app/teoria/mediogioco" },
+        action: { label: "Exercise", href: "/app/teoria/mediogioco" },
       };
     case "endgame":
       return {
-        label: `Finale: ${key.replace(/_/g, " ")}`,
+        label: `Endgame: ${key.replace(/_/g, " ")}`,
         area: "finali",
         score,
         attempts,
         action: {
-          label: "Pratica",
+          label: "Practice",
           href: `/app/teoria/${ENDGAME_SLUG[key] ?? "matti-elementari"}`,
         },
       };
@@ -523,7 +523,7 @@ async function loadRecent(supabase: DB, userId: string): Promise<RecentItem[]> {
     items.push({
       kind: "game",
       label: `${g.white ?? "?"} – ${g.black ?? "?"}`,
-      detail: g.result ?? "analizzata",
+      detail: g.result ?? "analyzed",
       at: g.played_at ?? g.created_at,
       href: `/app/partite/${g.id}`,
     });
@@ -532,8 +532,8 @@ async function loadRecent(supabase: DB, userId: string): Promise<RecentItem[]> {
   for (const p of (puzzles.data as { success: boolean; attempted_at: string }[] | null) ?? []) {
     items.push({
       kind: "puzzle",
-      label: "Puzzle tattico",
-      detail: p.success ? "risolto" : "fallito",
+      label: "Tactic puzzle",
+      detail: p.success ? "solved" : "failed",
       at: p.attempted_at,
       href: "/app/tattiche",
     });
@@ -546,7 +546,7 @@ async function loadRecent(supabase: DB, userId: string): Promise<RecentItem[]> {
     items.push({
       kind: "lesson",
       label: l.content_items.title,
-      detail: "lezione completata",
+      detail: "lesson completed",
       at: l.completed_at,
       href: `/app/teoria/${l.content_items.slug}`,
     });

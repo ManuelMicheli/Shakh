@@ -21,7 +21,7 @@ export function ConfirmResignButton({
   onConfirm,
   disabled,
   className,
-  label = "Abbandona",
+  label = "Resign",
   size = "sm",
 }: ConfirmResignButtonProps) {
   const [open, setOpen] = useState(false);
@@ -41,12 +41,12 @@ export function ConfirmResignButton({
       <Dialog
         open={open}
         onOpenChange={setOpen}
-        title="Abbandonare la partita?"
-        description="Perderai la partita. L'azione non si può annullare."
+        title="Resign the game?"
+        description="You'll lose the game. This action can't be undone."
       >
         <div className="flex justify-end gap-2">
           <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>
-            Annulla
+            Cancel
           </Button>
           <Button
             variant="danger"
@@ -56,7 +56,7 @@ export function ConfirmResignButton({
               onConfirm();
             }}
           >
-            Sì, abbandona
+            Yes, resign
           </Button>
         </div>
       </Dialog>

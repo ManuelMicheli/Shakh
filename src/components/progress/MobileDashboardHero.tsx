@@ -19,16 +19,16 @@ import type { OverallRating } from "@/lib/rating/aggregate";
 
 const QUICK: { label: string; detail: string; href: string; icon: LucideIcon }[] =
   [
-    { label: "Tattiche", detail: "Il tuo set di puzzle", href: "/app/tattiche", icon: Target },
+    { label: "Tactics", detail: "Your puzzle set", href: "/app/tattiche", icon: Target },
     {
-      label: "Punti deboli",
-      detail: "Allena le aree fragili",
+      label: "Weaknesses",
+      detail: "Train your weak areas",
       href: "/app/debolezze",
       icon: Crosshair,
     },
     {
-      label: "Ripara errori",
-      detail: "Dai blunder delle partite",
+      label: "Fix mistakes",
+      detail: "From your game blunders",
       href: "/app/ripara",
       icon: Wrench,
     },
@@ -36,7 +36,7 @@ const QUICK: { label: string; detail: string; href: string; icon: LucideIcon }[]
 
 function todayLabel(): string {
   try {
-    return new Intl.DateTimeFormat("it-IT", {
+    return new Intl.DateTimeFormat("en-US", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -67,20 +67,20 @@ export function MobileDashboardHero({
             {todayLabel()}
           </p>
           <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-            Ciao, {name}
+            Hi, {name}
           </h1>
           {rating?.rating != null ? (
             <>
               <div className="mt-6 flex items-center gap-2">
                 <span className="text-xs uppercase tracking-wider text-text-muted">
-                  Rating Shakh
+                  Shakh Rating
                 </span>
                 <span className="text-[10px] uppercase tracking-wide text-text-muted/70">
                   · OTB
                 </span>
                 {rating.provisional && (
                   <span className="text-[10px] uppercase tracking-wide text-text-muted/70">
-                    · non calibrato
+                    · not calibrated
                   </span>
                 )}
               </div>
@@ -101,7 +101,7 @@ export function MobileDashboardHero({
                         {b.provisional && (
                           <span
                             className="inline-block h-1 w-1 rounded-full bg-text-muted"
-                            title="non calibrato"
+                            title="not calibrated"
                           />
                         )}
                       </p>
@@ -113,7 +113,7 @@ export function MobileDashboardHero({
             </>
           ) : (
             <p className="mt-4 text-sm text-text-muted">
-              Il quadro dei tuoi progressi.
+              An overview of your progress.
             </p>
           )}
         </div>
@@ -128,7 +128,7 @@ export function MobileDashboardHero({
 
         <div className="space-y-2">
           <p className="px-0.5 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-            Allenati ora
+            Train now
           </p>
           <div className="space-y-2">
             {QUICK.map((it) => {

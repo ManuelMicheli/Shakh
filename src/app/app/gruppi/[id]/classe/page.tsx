@@ -54,27 +54,27 @@ export default async function ClassePage({ params }: PageProps) {
           ← {group.name}
         </Link>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">
-          Dashboard di classe
+          Class dashboard
         </h1>
         <p className="mt-1 text-text-muted">
-          {roster.length} allievi. Vista aggregata in sola lettura: ogni accesso ai dati
-          passa dai controlli di sicurezza.
+          {roster.length} students. Read-only aggregated view: every data access
+          goes through the security checks.
         </p>
       </div>
 
       {roster.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-sm text-text-muted">
-            Nessun allievo nel gruppo. Genera un invito per far entrare i tuoi studenti.
+            No students in the group. Generate an invite to bring your students in.
           </CardContent>
         </Card>
       ) : (
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Allievi</CardTitle>
+              <CardTitle>Students</CardTitle>
               <CardDescription>
-                Ordina per colonna per vedere chi è avanti e chi è indietro.
+                Sort by column to see who&apos;s ahead and who&apos;s behind.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -85,8 +85,8 @@ export default async function ClassePage({ params }: PageProps) {
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Competenza media di classe</CardTitle>
-                <CardDescription>Profilo medio sulle cinque aree.</CardDescription>
+                <CardTitle>Average class proficiency</CardTitle>
+                <CardDescription>Average profile across the five areas.</CardDescription>
               </CardHeader>
               <CardContent>
                 <CompetenceRadar areas={radarAreas} />
@@ -95,13 +95,13 @@ export default async function ClassePage({ params }: PageProps) {
 
             <Card>
               <CardHeader>
-                <CardTitle>Punti deboli comuni</CardTitle>
-                <CardDescription>I temi in cui più allievi sono sotto soglia.</CardDescription>
+                <CardTitle>Common weaknesses</CardTitle>
+                <CardDescription>The themes where more students fall below the threshold.</CardDescription>
               </CardHeader>
               <CardContent>
                 {data.commonWeaknesses.length === 0 ? (
                   <p className="py-6 text-sm text-text-muted">
-                    Nessun punto debole condiviso marcato.
+                    No marked shared weaknesses.
                   </p>
                 ) : (
                   <ul className="divide-y divide-border">
@@ -112,7 +112,7 @@ export default async function ClassePage({ params }: PageProps) {
                       >
                         <span className="min-w-0 truncate">{w.label}</span>
                         <Badge variant="muted">
-                          {w.count} {w.count === 1 ? "allievo" : "allievi"}
+                          {w.count} {w.count === 1 ? "student" : "students"}
                         </Badge>
                       </li>
                     ))}
@@ -124,8 +124,8 @@ export default async function ClassePage({ params }: PageProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Riassunto di classe</CardTitle>
-              <CardDescription>Sintesi del coach sui dati aggregati.</CardDescription>
+              <CardTitle>Class summary</CardTitle>
+              <CardDescription>Coach summary of the aggregated data.</CardDescription>
             </CardHeader>
             <CardContent>
               <ClassSynthesis groupId={id} />

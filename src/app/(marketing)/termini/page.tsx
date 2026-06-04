@@ -2,55 +2,53 @@ import type { Metadata } from "next";
 import { LegalShell } from "@/components/legal/LegalShell";
 
 export const metadata: Metadata = {
-  title: "Termini di servizio",
-  description: "Termini e condizioni d'uso della piattaforma Shakh.",
+  title: "Terms of Service",
+  description: "Terms and conditions of use for the Shakh platform.",
 };
 
 // Bozza strutturata da validare legalmente.
 export default function TerminiPage() {
   return (
-    <LegalShell title="Termini di servizio" updated="giugno 2026">
+    <LegalShell title="Terms of Service" updated="June 2026">
       <p>
-        Utilizzando Shakh accetti i presenti termini. Bozza da sottoporre a
-        revisione legale.
+        By using Shakh, you agree to these terms. Draft pending legal review.
       </p>
 
-      <h2>Il servizio</h2>
+      <h2>The service</h2>
       <p>
-        Shakh è una piattaforma di apprendimento scacchistico con analisi
-        assistita da intelligenza artificiale. Le spiegazioni del coach hanno
-        finalità didattica e sono ancorate ai dati del motore: non costituiscono
-        garanzia di risultato.
+        Shakh is a chess learning platform with AI-assisted analysis. The
+        coach&apos;s explanations are for educational purposes and are anchored to
+        engine data: they do not constitute a guarantee of results.
       </p>
 
       <h2>Account</h2>
       <p>
-        Sei responsabile della riservatezza delle credenziali. Gli utenti sotto i
-        14 anni necessitano del consenso di un genitore o tutore.
+        You are responsible for keeping your credentials confidential. Users
+        under 14 require the consent of a parent or guardian.
       </p>
 
-      <h2>Uso accettabile</h2>
+      <h2>Acceptable use</h2>
       <ul>
-        <li>Non tentare di aggirare i limiti tecnici o di abusare delle API.</li>
-        <li>Non usare il servizio per scopi illeciti o lesivi di terzi.</li>
+        <li>Do not attempt to circumvent technical limits or abuse the APIs.</li>
+        <li>Do not use the service for unlawful purposes or to harm third parties.</li>
       </ul>
 
-      <h2>Contenuti di terze parti</h2>
+      <h2>Third-party content</h2>
       <p>
-        Le statistiche e i dati di gioco provengono da Lichess secondo i relativi
-        termini. L&apos;analisi AI è fornita tramite Anthropic.
+        Statistics and play data come from Lichess under its respective terms.
+        AI analysis is provided through Anthropic.
       </p>
 
-      <h2>Limitazione di responsabilità</h2>
+      <h2>Limitation of liability</h2>
       <p>
-        Il servizio è fornito &quot;così com&apos;è&quot;. Nei limiti di legge, è
-        esclusa ogni responsabilità per danni indiretti derivanti dall&apos;uso.
+        The service is provided &quot;as is.&quot; To the extent permitted by law,
+        all liability for indirect damages arising from use is excluded.
       </p>
 
-      <h2>Modifiche</h2>
+      <h2>Changes</h2>
       <p>
-        Possiamo aggiornare questi termini; le modifiche rilevanti saranno
-        comunicate agli utenti.
+        We may update these terms; material changes will be communicated to
+        users.
       </p>
     </LegalShell>
   );

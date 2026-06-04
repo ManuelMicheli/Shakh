@@ -23,13 +23,13 @@ export default function ResetPasswordPage() {
     });
     setLoading(false);
     if (error) {
-      toast({ title: "Errore", description: error.message, variant: "error" });
+      toast({ title: "Error", description: error.message, variant: "error" });
       return;
     }
     setSent(true);
     toast({
-      title: "Email inviata",
-      description: "Controlla la posta per reimpostare la password.",
+      title: "Email sent",
+      description: "Check your inbox to reset your password.",
       variant: "success",
     });
   };
@@ -38,17 +38,17 @@ export default function ResetPasswordPage() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold">
-          Reimposta la password
+          Reset your password
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Ti invieremo un link per scegliere una nuova password.
+          We&apos;ll send you a link to choose a new password.
         </p>
       </div>
 
       {sent ? (
         <p className="text-sm text-text-muted">
-          Se esiste un account per <span className="text-text">{email}</span>,
-          riceverai un&apos;email a breve.
+          If an account exists for <span className="text-text">{email}</span>,
+          you&apos;ll receive an email shortly.
         </p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-4">
@@ -64,14 +64,14 @@ export default function ResetPasswordPage() {
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Attendi…" : "Invia link"}
+            {loading ? "Please wait…" : "Send link"}
           </Button>
         </form>
       )}
 
       <p className="text-center text-sm text-text-muted">
         <Link href="/login" className="text-text underline underline-offset-4">
-          Torna all&apos;accesso
+          Back to sign in
         </Link>
       </p>
     </div>

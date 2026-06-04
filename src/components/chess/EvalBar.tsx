@@ -48,7 +48,7 @@ export function EvalBar({
         className,
       )}
       role="img"
-      aria-label={`Valutazione ${label}: ${verdict.headline}`}
+      aria-label={`Evaluation ${label}: ${verdict.headline}`}
       title={`${label} — ${verdict.headline}. ${verdict.detail}`}
     >
       {/* Sfondo = lato Nero. Riempimento animato = lato Bianco. */}

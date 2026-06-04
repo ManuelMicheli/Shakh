@@ -37,14 +37,14 @@ export async function createOnlineGame(input: {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Devi accedere per giocare." };
+  if (!user) return { ok: false, error: "You must sign in to play." };
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("display_name")
     .eq("id", user.id)
     .maybeSingle();
-  const name = (profile?.display_name as string | null) ?? "Giocatore";
+  const name = (profile?.display_name as string | null) ?? "Player";
 
   const color: "w" | "b" =
     input.color === "random" ? (Math.random() < 0.5 ? "w" : "b") : input.color;
@@ -98,25 +98,25 @@ export async function makeOnlineMove(
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "Devi accedere." };
+  if (!uid) return { ok: false, error: "You must sign in." };
 
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Partita non trovata." };
-  if (g.status !== "ongoing") return { ok: false, error: "Partita non in corso." };
+  if (!g) return { ok: false, error: "Game not found." };
+  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
 
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "Non sei un giocatore di questa partita." };
-  if (g.turn !== myColor) return { ok: false, error: "Non è il tuo turno." };
+  if (!myColor) return { ok: false, error: "You are not a player in this game." };
+  if (g.turn !== myColor) return { ok: false, error: "It's not your turn." };
 
   const chess = new Chess(g.fen);
   let mv;
   try {
     mv = chess.move({ from, to, promotion: promotion as PieceSymbol | undefined });
   } catch {
-    return { ok: false, error: "Mossa illegale." };
+    return { ok: false, error: "Illegal move." };
   }
-  if (!mv) return { ok: false, error: "Mossa illegale." };
+  if (!mv) return { ok: false, error: "Illegal move." };
 
   const now = Date.now();
   let white_ms = g.white_ms;
@@ -205,13 +205,13 @@ export async function resignOnlineGame(
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "Devi accedere." };
+  if (!uid) return { ok: false, error: "You must sign in." };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Partita non trovata." };
-  if (g.status !== "ongoing") return { ok: false, error: "Partita non in corso." };
+  if (!g) return { ok: false, error: "Game not found." };
+  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "Non sei un giocatore." };
+  if (!myColor) return { ok: false, error: "You are not a player." };
 
   const result = myColor === "w" ? "0-1" : "1-0";
   const { data, error } = await supabase
@@ -231,13 +231,13 @@ export async function offerDrawOnline(
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "Devi accedere." };
+  if (!uid) return { ok: false, error: "You must sign in." };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Partita non trovata." };
-  if (g.status !== "ongoing") return { ok: false, error: "Partita non in corso." };
+  if (!g) return { ok: false, error: "Game not found." };
+  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "Non sei un giocatore." };
+  if (!myColor) return { ok: false, error: "You are not a player." };
 
   const { data, error } = await supabase
     .from("friend_games")
@@ -257,13 +257,13 @@ export async function respondDrawOnline(
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "Devi accedere." };
+  if (!uid) return { ok: false, error: "You must sign in." };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Partita non trovata." };
-  if (g.status !== "ongoing") return { ok: false, error: "Partita non in corso." };
+  if (!g) return { ok: false, error: "Game not found." };
+  if (g.status !== "ongoing") return { ok: false, error: "Game is not in progress." };
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
-  if (!myColor) return { ok: false, error: "Non sei un giocatore." };
+  if (!myColor) return { ok: false, error: "You are not a player." };
 
   if (accept && g.draw_offer_by && g.draw_offer_by !== myColor) {
     const { data, error } = await supabase
@@ -304,14 +304,14 @@ export async function claimTimeoutOnline(
 ): Promise<ActionResult<FriendGameRow>> {
   const supabase = await createClient();
   const uid = await getUserId();
-  if (!uid) return { ok: false, error: "Devi accedere." };
+  if (!uid) return { ok: false, error: "You must sign in." };
   const g = await loadGame(id);
-  if (!g) return { ok: false, error: "Partita non trovata." };
+  if (!g) return { ok: false, error: "Game not found." };
   if (g.status !== "ongoing" || g.initial_ms == null) {
     return { ok: true, data: g };
   }
   if (g.white_user_id !== uid && g.black_user_id !== uid) {
-    return { ok: false, error: "Non sei un giocatore." };
+    return { ok: false, error: "You are not a player." };
   }
 
   const mover = g.turn;

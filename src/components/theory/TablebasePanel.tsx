@@ -19,9 +19,9 @@ export interface TablebasePanelProps {
 }
 
 const OUTCOME_LABEL: Record<MoveQuality, string> = {
-  win: "Vince",
-  draw: "Mantiene la patta",
-  loss: "Perde",
+  win: "Wins",
+  draw: "Holds the draw",
+  loss: "Loses",
   unknown: "—",
 };
 
@@ -30,18 +30,18 @@ function positionOutcome(category: TbCategory): { label: string; quality: MoveQu
   switch (category) {
     case "win":
     case "maybe-win":
-      return { label: "Posizione vinta", quality: "win" };
+      return { label: "Winning position", quality: "win" };
     case "cursed-win":
-      return { label: "Vinta (ma regola delle 50 mosse)", quality: "win" };
+      return { label: "Winning (but 50-move rule)", quality: "win" };
     case "draw":
-      return { label: "Posizione patta", quality: "draw" };
+      return { label: "Drawn position", quality: "draw" };
     case "blessed-loss":
-      return { label: "Persa (salvata dalla regola delle 50 mosse)", quality: "loss" };
+      return { label: "Lost (saved by the 50-move rule)", quality: "loss" };
     case "loss":
     case "maybe-loss":
-      return { label: "Posizione persa", quality: "loss" };
+      return { label: "Losing position", quality: "loss" };
     default:
-      return { label: "Esito sconosciuto", quality: "unknown" };
+      return { label: "Unknown result", quality: "unknown" };
   }
 }
 
@@ -65,18 +65,18 @@ export function TablebasePanel({ fen, onPlayMove, className }: TablebasePanelPro
 
   return (
     <div className={cn("space-y-3", className)}>
-      <h3 className="text-sm font-medium">Finale esatto (tablebase)</h3>
+      <h3 className="text-sm font-medium">Exact endgame (tablebase)</h3>
 
       {loading && (
         <p className="flex items-center gap-2 text-sm text-text-muted">
-          <Spinner /> Interrogo la tablebase…
+          <Spinner /> Querying the tablebase…
         </p>
       )}
 
       {!loading && state && !state.ok && (
         <p className="text-sm text-text-muted">
           {state.error}
-          {state.tooManyPieces && " La valutazione qui è quella del motore (vedi pannello Motore)."}
+          {state.tooManyPieces && " The evaluation here is the engine's (see the Engine panel)."}
         </p>
       )}
 
@@ -86,7 +86,7 @@ export function TablebasePanel({ fen, onPlayMove, className }: TablebasePanelPro
 }
 
 function dtLabel(m: { dtm: number | null; dtz: number | null }): string {
-  if (m.dtm != null && m.dtm !== 0) return `matto in ${Math.abs(m.dtm)}`;
+  if (m.dtm != null && m.dtm !== 0) return `mate in ${Math.abs(m.dtm)}`;
   if (m.dtz != null && m.dtz !== 0) return `DTZ ${Math.abs(m.dtz)}`;
   return "";
 }

@@ -3,7 +3,7 @@ import { RepertoireList, type RepertoireItem } from "@/components/theory/Reperto
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { PieceColor } from "@/lib/theory/repertoire";
 
-export const metadata = { title: "Repertorio — Shakh" };
+export const metadata = { title: "Repertoire — Shakh" };
 
 interface RepRow {
   id: string;
@@ -33,15 +33,15 @@ export default async function RepertorioPage() {
   return (
     <div className="space-y-6">
       <MobilePageHeader
-        eyebrow="Le tue linee"
-        title="Repertorio"
-        desc="Costruisci le linee per colore, poi allenale con la ripetizione spaziata."
+        eyebrow="Your lines"
+        title="Repertoire"
+        desc="Build lines by color, then drill them with spaced repetition."
       />
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Il mio repertorio</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">My repertoire</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Costruisci le tue linee per colore, poi allenale con la ripetizione spaziata.
-          Aggiungi mosse muovendo sulla scacchiera o dall&apos;explorer.
+          Build your lines by color, then drill them with spaced repetition.
+          Add moves by playing on the board or from the explorer.
         </p>
       </div>
       <RepertoireList items={items} />

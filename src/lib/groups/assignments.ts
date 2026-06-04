@@ -32,11 +32,11 @@ const ENDGAME_SLUG: Record<string, string> = {
 };
 
 const ENDGAME_LABEL: Record<string, string> = {
-  kq_vs_k: "Re+Donna contro Re",
-  kp_vs_k: "Re e pedone contro Re",
-  q_vs_p: "Donna contro pedone",
-  lucena: "Posizione di Lucena",
-  philidor: "Posizione di Philidor",
+  kq_vs_k: "King+Queen vs King",
+  kp_vs_k: "King and pawn vs King",
+  q_vs_p: "Queen vs pawn",
+  lucena: "Lucena position",
+  philidor: "Philidor position",
 };
 
 export interface AssignmentRow {
@@ -164,7 +164,7 @@ export async function deriveAssignmentStatus(
 
 /** Costruisce etichetta + href della risorsa assegnata (risolve gli slug). */
 export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<AssignmentView> {
-  const typeLabel = a.ref_type ? REF_TYPE_LABEL[a.ref_type] : "Attività";
+  const typeLabel = a.ref_type ? REF_TYPE_LABEL[a.ref_type] : "Activity";
   let label = typeLabel;
   let href = "/app";
 
@@ -176,7 +176,7 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("title, slug")
           .eq("id", a.ref_id)
           .maybeSingle<{ title: string; slug: string }>();
-        label = data?.title ?? "Lezione";
+        label = data?.title ?? "Lesson";
         href = data ? `/app/teoria/${data.slug}` : "/app/teoria";
       }
       break;
@@ -184,13 +184,13 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
     case "puzzle_set": {
       const theme = a.params?.theme;
       const count = a.params?.count ?? 10;
-      label = theme ? `Puzzle: ${themeLabel(theme)} ×${count}` : "Set di puzzle";
+      label = theme ? `Puzzles: ${themeLabel(theme)} ×${count}` : "Puzzle set";
       href = "/app/tattiche";
       break;
     }
     case "endgame": {
       const key = a.params?.key ?? "";
-      label = ENDGAME_LABEL[key] ?? "Finale";
+      label = ENDGAME_LABEL[key] ?? "Endgame";
       href = `/app/teoria/${ENDGAME_SLUG[key] ?? "matti-elementari"}`;
       break;
     }
@@ -201,7 +201,7 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("name, slug")
           .eq("id", a.ref_id)
           .maybeSingle<{ name: string; slug: string }>();
-        label = data?.name ?? "Trappola";
+        label = data?.name ?? "Trap";
         href = data ? `/app/trappole/${data.slug}` : "/app/trappole";
       }
       break;
@@ -213,7 +213,7 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("name")
           .eq("id", a.ref_id)
           .maybeSingle<{ name: string }>();
-        label = data?.name ? `Repertorio: ${data.name}` : "Repertorio";
+        label = data?.name ? `Repertoire: ${data.name}` : "Repertoire";
         href = `/app/repertorio/${a.ref_id}/training`;
       }
       break;
@@ -225,7 +225,7 @@ export async function enrichAssignment(supabase: DB, a: AssignmentRow): Promise<
           .select("title")
           .eq("id", a.ref_id)
           .maybeSingle<{ title: string }>();
-        label = data?.title ? `Percorso: ${data.title}` : "Nodo del percorso";
+        label = data?.title ? `Path: ${data.title}` : "Path node";
         href = "/app/percorso";
       }
       break;

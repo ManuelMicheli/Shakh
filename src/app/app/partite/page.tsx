@@ -4,7 +4,7 @@ import { GamesTable } from "@/components/games/GamesTable";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { GameRow } from "@/lib/games/types";
 
-export const metadata = { title: "Le mie partite — Shakh" };
+export const metadata = { title: "My games — Shakh" };
 
 export default async function PartitePage() {
   const supabase = await createClient();
@@ -28,18 +28,18 @@ export default async function PartitePage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Archivio"
-        title="Le mie partite"
-        desc="Importa, analizza, rivedi mossa per mossa."
+        eyebrow="Archive"
+        title="My games"
+        desc="Import, analyze, review move by move."
       />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          Le mie partite
+          My games
         </h1>
         <p className="mt-2 text-text-muted">
-          Importa le tue partite, analizzale col motore e rivedile mossa per mossa.
+          Import your games, analyze them with the engine, and review them move by move.
         </p>
       </div>
 

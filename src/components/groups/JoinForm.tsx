@@ -18,11 +18,11 @@ export function JoinForm() {
     start(async () => {
       const res = await joinByCode(code);
       if (!res.ok || !res.data) {
-        toast({ title: "Join non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Couldn't join", description: res.error, variant: "error" });
         return;
       }
       setCode("");
-      toast({ title: "Sei entrato nel gruppo" });
+      toast({ title: "You joined the group" });
       router.push(`/app/gruppi/${res.data.groupId}`);
     });
   };
@@ -37,18 +37,18 @@ export function JoinForm() {
     >
       <div className="min-w-[12rem] flex-1 space-y-1">
         <label className="text-xs text-text-muted" htmlFor="join-code">
-          Codice d&apos;invito
+          Invite code
         </label>
         <Input
           id="join-code"
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
-          placeholder="es. K7P2M9QX"
+          placeholder="e.g. K7P2M9QX"
           className="font-mono"
         />
       </div>
       <Button type="submit" variant="secondary" disabled={pending || !code.trim()}>
-        Unisciti
+        Join
       </Button>
     </form>
   );

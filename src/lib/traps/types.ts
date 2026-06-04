@@ -68,44 +68,44 @@ export interface TrapProgress {
 // ───────────────────────────────── Etichette IT ──────────────────────────────
 
 export const CATEGORY_LABEL: Record<TrapCategory, string> = {
-  opening_trap: "Trappola d'apertura",
-  gambit: "Gambetto",
-  sacrifice: "Sacrificio",
-  swindle: "Astuzia (swindle)",
-  tactical_motif: "Motivo tattico",
+  opening_trap: "Opening trap",
+  gambit: "Gambit",
+  sacrifice: "Sacrifice",
+  swindle: "Swindle",
+  tactical_motif: "Tactical motif",
 };
 
 export const FAME_LABEL: Record<TrapFame, string> = {
-  famous: "Famosa",
-  known: "Conosciuta",
-  niche: "Di nicchia",
-  obscure: "Oscura",
+  famous: "Famous",
+  known: "Known",
+  niche: "Niche",
+  obscure: "Obscure",
 };
 
 /** Ordine crescente di notorietà → per la manopola famose ↔ di nicchia. */
 export const FAME_ORDER: TrapFame[] = ["famous", "known", "niche", "obscure"];
 
 export const SIDE_LABEL: Record<TrapSide, string> = {
-  white: "Bianco",
-  black: "Nero",
+  white: "White",
+  black: "Black",
 };
 
 /** Etichette italiane dei motivi tattici (fallback alla chiave grezza). */
 const MOTIF_LABEL: Record<string, string> = {
-  sacrifice: "Sacrificio",
-  fork: "Forchetta",
-  pin: "Inchiodatura",
-  skewer: "Infilata",
-  discoveredAttack: "Scoperta",
-  doubleCheck: "Doppio scacco",
-  deflection: "Deviazione",
-  smotheredMate: "Matto affogato",
-  backRankMate: "Matto del corridoio",
-  mate: "Matto",
-  attack: "Attacco",
-  trap: "Trappola",
-  underPromotion: "Sottopromozione",
-  hangingPiece: "Pezzo in presa",
+  sacrifice: "Sacrifice",
+  fork: "Fork",
+  pin: "Pin",
+  skewer: "Skewer",
+  discoveredAttack: "Discovered attack",
+  doubleCheck: "Double check",
+  deflection: "Deflection",
+  smotheredMate: "Smothered mate",
+  backRankMate: "Back-rank mate",
+  mate: "Mate",
+  attack: "Attack",
+  trap: "Trap",
+  underPromotion: "Underpromotion",
+  hangingPiece: "Hanging piece",
 };
 
 export function motifLabel(key: string): string {

@@ -31,27 +31,27 @@ type ColorChoice = Color | "random";
 
 /** Avversari selezionabili: nome + Elo. Coprono dal principiante assoluto al forte. */
 const BOTS: { elo: number; name: string }[] = [
-  { elo: 400, name: "Pulcino" },
-  { elo: 600, name: "Novellino" },
-  { elo: 800, name: "Esordiente" },
-  { elo: 1000, name: "Amatore" },
-  { elo: 1200, name: "Dilettante" },
-  { elo: 1400, name: "Circolo" },
-  { elo: 1600, name: "Esperto" },
-  { elo: 2000, name: "Candidato Maestro" },
-  { elo: 2400, name: "Maestro" },
+  { elo: 400, name: "Hatchling" },
+  { elo: 600, name: "Novice" },
+  { elo: 800, name: "Beginner" },
+  { elo: 1000, name: "Amateur" },
+  { elo: 1200, name: "Casual" },
+  { elo: 1400, name: "Club" },
+  { elo: 1600, name: "Expert" },
+  { elo: 2000, name: "Candidate Master" },
+  { elo: 2400, name: "Master" },
 ];
 
 const NAME_FOR_ELO = (e: number) => BOTS.find((b) => b.elo === e)?.name ?? `${e}`;
 
 /** Aperture seme (UCI): danno una posizione di partenza tematica. */
 const OPENINGS: { key: string; label: string; moves: string[] }[] = [
-  { key: "normale", label: "Partita normale", moves: [] },
-  { key: "italiana", label: "Italiana", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4"] },
-  { key: "spagnola", label: "Spagnola", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5"] },
-  { key: "siciliana", label: "Siciliana", moves: ["e2e4", "c7c5"] },
-  { key: "francese", label: "Francese", moves: ["e2e4", "e7e6"] },
-  { key: "gambetto-donna", label: "Gambetto di Donna", moves: ["d2d4", "d7d5", "c2c4"] },
+  { key: "normale", label: "Standard game", moves: [] },
+  { key: "italiana", label: "Italian", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4"] },
+  { key: "spagnola", label: "Ruy Lopez", moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1b5"] },
+  { key: "siciliana", label: "Sicilian", moves: ["e2e4", "c7c5"] },
+  { key: "francese", label: "French", moves: ["e2e4", "e7e6"] },
+  { key: "gambetto-donna", label: "Queen's Gambit", moves: ["d2d4", "d7d5", "c2c4"] },
 ];
 
 function uciParts(uci: string): { from: Square; to: Square; promotion?: PieceSymbol } {
@@ -176,24 +176,24 @@ export function SparringBoard() {
     return (
       <div className="space-y-6">
         <MobilePageHeader
-          eyebrow="Contro il motore"
+          eyebrow="Against the engine"
           title="Sparring"
-          desc="Partite intere contro una personalità e una forza scelte da te."
+          desc="Full games against a personality and a strength you choose."
         />
         <div className="hidden md:block">
           <h1 className="font-display text-2xl font-semibold tracking-tight">Sparring</h1>
           <p className="mt-2 max-w-2xl text-text-muted">
-            Gioca partite intere contro il motore con una <strong>personalità</strong> e una forza
-            scelte da te: aggressivo, posizionale o solido. Allena le tue aperture e affina il gioco
-            contro stili diversi.
+            Play full games against the engine with a <strong>personality</strong> and a strength
+            you choose: aggressive, positional, or solid. Drill your openings and sharpen your play
+            against different styles.
           </p>
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Nuova sfida</CardTitle>
+            <CardTitle>New challenge</CardTitle>
           </CardHeader>
         <CardContent className="space-y-5">
-          <Field label="Stile dell'avversario">
+          <Field label="Opponent style">
             <Group>
               {(["aggressive", "positional", "drawish"] as Style[]).map((s) => (
                 <Choice key={s} active={!styleRandom && style === s} onClick={() => { setStyleRandom(false); setStyle(s); }}>
@@ -201,11 +201,11 @@ export function SparringBoard() {
                 </Choice>
               ))}
               <Choice active={styleRandom} onClick={() => setStyleRandom(true)}>
-                Casuale
+                Random
               </Choice>
             </Group>
           </Field>
-          <Field label="Forza (Elo)">
+          <Field label="Strength (Elo)">
             <Group>
               {BOTS.map((b) => (
                 <Choice key={b.elo} active={!eloRandom && elo === b.elo} onClick={() => { setEloRandom(false); setElo(b.elo); }}>
@@ -213,20 +213,20 @@ export function SparringBoard() {
                 </Choice>
               ))}
               <Choice active={eloRandom} onClick={() => setEloRandom(true)}>
-                Casuale
+                Random
               </Choice>
             </Group>
           </Field>
-          <Field label="Il tuo colore">
+          <Field label="Your color">
             <Group>
               {(["white", "black", "random"] as ColorChoice[]).map((c) => (
                 <Choice key={c} active={colorChoice === c} onClick={() => setColorChoice(c)}>
-                  {c === "white" ? "Bianco" : c === "black" ? "Nero" : "Casuale"}
+                  {c === "white" ? "White" : c === "black" ? "Black" : "Random"}
                 </Choice>
               ))}
             </Group>
           </Field>
-          <Field label="Apertura di partenza">
+          <Field label="Starting opening">
             <Group>
               {OPENINGS.map((o) => (
                 <Choice key={o.key} active={!openingRandom && openingKey === o.key} onClick={() => { setOpeningRandom(false); setOpeningKey(o.key); }}>
@@ -234,11 +234,11 @@ export function SparringBoard() {
                 </Choice>
               ))}
               <Choice active={openingRandom} onClick={() => setOpeningRandom(true)}>
-                Casuale
+                Random
               </Choice>
             </Group>
           </Field>
-          <Button onClick={start}>Inizia a giocare</Button>
+          <Button onClick={start}>Start playing</Button>
         </CardContent>
         </Card>
       </div>
@@ -260,7 +260,7 @@ export function SparringBoard() {
           name={`${NAME_FOR_ELO(activeElo)} · ${activeElo}`}
           sub={STYLE_LABEL[activeStyle]}
           active={!status && game.turn === engineColorChar}
-          note={thinking ? "pensa…" : undefined}
+          note={thinking ? "thinking…" : undefined}
         />
         <div className="relative">
           <ChessBoard
@@ -286,15 +286,15 @@ export function SparringBoard() {
               onDismiss={() => setOverlayOff(true)}
               actions={
                 <Button size="sm" className="w-full" onClick={start}>
-                  Rivincita
+                  Rematch
                 </Button>
               }
             />
           )}
         </div>
         <PlayerBar
-          name="Tu"
-          sub={userColor === "white" ? "Bianco" : "Nero"}
+          name="You"
+          sub={userColor === "white" ? "White" : "Black"}
           active={!status && game.turn === userColor[0]}
         />
 
@@ -315,7 +315,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.first}
             disabled={game.cursor < 0}
-            aria-label="Prima mossa"
+            aria-label="First move"
           >
             <ChevronsLeft className="h-5 w-5" />
           </Button>
@@ -325,7 +325,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.prev}
             disabled={game.cursor < 0}
-            aria-label="Mossa precedente"
+            aria-label="Previous move"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -335,7 +335,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.next}
             disabled={atLive}
-            aria-label="Mossa successiva"
+            aria-label="Next move"
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
@@ -345,7 +345,7 @@ export function SparringBoard() {
             className="flex-1"
             onClick={game.last}
             disabled={atLive}
-            aria-label="Ultima mossa"
+            aria-label="Last move"
           >
             <ChevronsRight className="h-5 w-5" />
           </Button>
@@ -353,16 +353,16 @@ export function SparringBoard() {
 
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm text-text-muted">
-            {status ?? (thinking ? "L'avversario pensa…" : `Muovi tu (${userColor === "white" ? "Bianco" : "Nero"})`)}
+            {status ?? (thinking ? "Opponent is thinking…" : `Your move (${userColor === "white" ? "White" : "Black"})`)}
           </span>
           <div className="flex gap-2">
             {status && (
               <Button size="sm" onClick={start}>
-                Rivincita
+                Rematch
               </Button>
             )}
             <Button variant="secondary" size="sm" onClick={() => setPhase("setup")}>
-              Nuova sfida
+              New challenge
             </Button>
           </div>
         </div>
@@ -388,14 +388,14 @@ function gameStatus(
   userColor: Color,
   resigned: boolean,
 ): string | null {
-  if (resigned) return "Hai abbandonato.";
+  if (resigned) return "You resigned.";
   if (game.isCheckmate) {
     // Sotto matto perde chi deve muovere.
     const loserIsUser = game.turn === userColor[0];
-    return loserIsUser ? "Scacco matto — hai perso." : "Scacco matto — hai vinto!";
+    return loserIsUser ? "Checkmate — you lost." : "Checkmate — you won!";
   }
-  if (game.isStalemate) return "Stallo — patta.";
-  if (game.isDraw) return "Patta.";
+  if (game.isStalemate) return "Stalemate — draw.";
+  if (game.isDraw) return "Draw.";
   return null;
 }
 
@@ -406,16 +406,16 @@ function sparringResult(
   resigned: boolean,
 ): { title: string; subtitle?: string; checkmate: boolean; outcome: GameOutcome } | null {
   if (resigned)
-    return { title: "Hai perso", subtitle: "Hai abbandonato la partita.", checkmate: false, outcome: "loss" };
+    return { title: "You lost", subtitle: "You resigned the game.", checkmate: false, outcome: "loss" };
   if (game.isCheckmate) {
     // Sotto matto perde chi deve muovere.
     const loserIsUser = game.turn === userColor[0];
     return loserIsUser
-      ? { title: "Hai perso", checkmate: true, outcome: "loss" }
-      : { title: "Hai vinto", checkmate: true, outcome: "win" };
+      ? { title: "You lost", checkmate: true, outcome: "loss" }
+      : { title: "You won", checkmate: true, outcome: "win" };
   }
-  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false, outcome: "draw" };
-  if (game.isDraw) return { title: "Patta", checkmate: false, outcome: "draw" };
+  if (game.isStalemate) return { title: "Draw", subtitle: "Stalemate.", checkmate: false, outcome: "draw" };
+  if (game.isDraw) return { title: "Draw", checkmate: false, outcome: "draw" };
   return null;
 }
 
@@ -428,7 +428,7 @@ function MoveList({ history }: { history: ReturnType<typeof useChessGame>["histo
   });
   return (
     <div className="rounded-lg border border-border bg-surface p-3">
-      <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">Mosse</div>
+      <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">Moves</div>
       <div className="max-h-72 overflow-y-auto font-mono text-sm">
         {rows.length === 0 ? (
           <span className="text-text-muted">—</span>

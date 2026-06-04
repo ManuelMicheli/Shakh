@@ -7,7 +7,7 @@ import { decodeEval, toMoverCp } from "@/lib/analysis/evalScore";
 import { moverFromPly } from "@/lib/ai/format";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Ripara i tuoi errori — Shakh" };
+export const metadata = { title: "Fix your mistakes — Shakh" };
 
 interface GameRow {
   id: string;
@@ -80,7 +80,7 @@ export default async function RiparaPage() {
         gameId: r.game_id,
         ply: r.ply,
         moveNo: Math.ceil(r.ply / 2),
-        label: labelOf.get(r.game_id) ?? "Partita",
+        label: labelOf.get(r.game_id) ?? "Game",
         cpLoss,
         classification: r.classification === "blunder" ? "blunder" : "mistake",
       });
@@ -91,17 +91,17 @@ export default async function RiparaPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Dai tuoi sbagli"
-        title="Ripara errori"
-        desc="3 puzzle mirati per ogni errore grave: sbagli, alleni, ritesti."
+        eyebrow="From your mistakes"
+        title="Fix mistakes"
+        desc="3 targeted puzzles for each blunder: you slip, you train, you retest."
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          Ripara i tuoi errori
+          Fix your mistakes
         </h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          I tuoi sbagli più gravi nelle partite analizzate. Per ognuno generiamo
-          3 puzzle mirati sullo stesso motivo: sbagli, alleni, ritesti.
+          Your worst mistakes in analyzed games. For each one we generate
+          3 targeted puzzles on the same motif: you slip, you train, you retest.
         </p>
       </div>
 
@@ -109,10 +109,10 @@ export default async function RiparaPage() {
         <Card>
           <CardContent className="space-y-3 py-6 text-center">
             <p className="text-text-muted">
-              Nessun errore da riparare: analizza qualche partita per popolare l&apos;elenco.
+              No mistakes to fix: analyze a few games to populate the list.
             </p>
             <Link href="/app/partite">
-              <Button>Vai alle partite</Button>
+              <Button>Go to games</Button>
             </Link>
           </CardContent>
         </Card>
@@ -126,17 +126,17 @@ export default async function RiparaPage() {
                     variant="muted"
                     className="shrink-0"
                   >
-                    {m.classification === "blunder" ? "blunder" : "errore"}
+                    {m.classification === "blunder" ? "blunder" : "mistake"}
                   </Badge>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{m.label}</p>
                     <p className="text-xs text-text-muted">
-                      Mossa {m.moveNo} · perso{" "}
+                      Move {m.moveNo} · lost{" "}
                       <span className="font-mono">−{(m.cpLoss / 100).toFixed(1)}</span>
                     </p>
                   </div>
                   <Link href={`/app/ripara/${m.gameId}/${m.ply}`} className="shrink-0">
-                    <Button size="sm">Allena</Button>
+                    <Button size="sm">Train</Button>
                   </Link>
                 </CardContent>
               </Card>

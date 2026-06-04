@@ -3,7 +3,7 @@ import Link from "next/link";
 import { GuidedReplay } from "@/components/learn/GuidedReplay";
 import { findGuided } from "@/lib/learn/guided";
 
-export const metadata = { title: "Partita spiegata — Impara — Shakh" };
+export const metadata = { title: "Explained game — Learn — Shakh" };
 
 export default async function ReplayPage({
   params,
@@ -19,7 +19,7 @@ export default async function ReplayPage({
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">{game.title}</h1>
         <Link href="/app/impara" className="text-sm text-text-muted hover:text-text">
-          ← Impara
+          ← Learn
         </Link>
       </div>
       <GuidedReplay

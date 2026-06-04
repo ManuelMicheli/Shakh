@@ -46,23 +46,23 @@ export const lichessProvider: GameProvider = {
         signal: AbortSignal.timeout(15_000),
       });
     } catch {
-      throw new ProviderError("network", "Errore di rete o timeout contattando Lichess.");
+      throw new ProviderError("network", "Network error or timeout while contacting Lichess.");
     }
 
     if (res.status === 404) {
       throw new ProviderError(
         "not_found",
-        `Utente Lichess "${username}" non trovato.`,
+        `Lichess user "${username}" not found.`,
       );
     }
     if (res.status === 429) {
       throw new ProviderError(
         "rate_limit",
-        "Troppe richieste a Lichess. Attendi qualche secondo e riprova.",
+        "Too many requests to Lichess. Wait a few seconds and try again.",
       );
     }
     if (!res.ok) {
-      throw new ProviderError("network", `Lichess ha risposto con stato ${res.status}.`);
+      throw new ProviderError("network", `Lichess responded with status ${res.status}.`);
     }
     return res.text();
   },
@@ -95,7 +95,7 @@ async function chesscomFetch(url: string): Promise<Response> {
       signal: AbortSignal.timeout(15_000),
     });
   } catch {
-    throw new ProviderError("network", "Errore di rete o timeout contattando Chess.com.");
+    throw new ProviderError("network", "Network error or timeout while contacting Chess.com.");
   }
 }
 
@@ -109,16 +109,16 @@ export const chesscomProvider: GameProvider = {
       `https://api.chess.com/pub/player/${user}/games/archives`,
     );
     if (listRes.status === 404) {
-      throw new ProviderError("not_found", `Utente Chess.com "${username}" non trovato.`);
+      throw new ProviderError("not_found", `Chess.com user "${username}" not found.`);
     }
     if (listRes.status === 429) {
       throw new ProviderError(
         "rate_limit",
-        "Troppe richieste a Chess.com. Attendi qualche secondo e riprova.",
+        "Too many requests to Chess.com. Wait a few seconds and try again.",
       );
     }
     if (!listRes.ok) {
-      throw new ProviderError("network", `Chess.com ha risposto con stato ${listRes.status}.`);
+      throw new ProviderError("network", `Chess.com responded with status ${listRes.status}.`);
     }
 
     const { archives } = (await listRes.json()) as ChesscomArchivesResponse;
@@ -131,7 +131,7 @@ export const chesscomProvider: GameProvider = {
       if (monthRes.status === 429) {
         throw new ProviderError(
           "rate_limit",
-          "Troppe richieste a Chess.com. Attendi qualche secondo e riprova.",
+          "Too many requests to Chess.com. Wait a few seconds and try again.",
         );
       }
       if (!monthRes.ok) continue; // salta un mese non leggibile, prova il precedente

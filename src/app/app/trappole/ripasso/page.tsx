@@ -4,7 +4,7 @@ import { listDueTraps, bodyAsLesson } from "@/lib/traps/query";
 import type { TrapMode } from "@/lib/traps/types";
 
 export const metadata = {
-  title: "Ripasso trappole · Shakh",
+  title: "Trap review · Shakh",
 };
 
 export default async function TrapReviewPage() {
@@ -33,7 +33,7 @@ export default async function TrapReviewPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-semibold tracking-tight">Ripasso trappole</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">Trap review</h1>
       <TrapReview items={items} />
     </div>
   );

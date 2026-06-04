@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { TheoryType } from "@/lib/theory/types";
 
-export const metadata = { title: "Teoria — Shakh" };
+export const metadata = { title: "Theory — Shakh" };
 
 const RAMI: {
   type: TheoryType;
@@ -17,24 +17,24 @@ const RAMI: {
 }[] = [
   {
     type: "opening",
-    title: "Aperture",
-    desc: "Idee e piani delle aperture, ancorati a cosa si gioca davvero.",
+    title: "Openings",
+    desc: "Opening ideas and plans, anchored to what's really played.",
     browseHref: "/app/teoria/aperture",
-    browseLabel: "Sfoglia l'albero ECO",
+    browseLabel: "Browse the ECO tree",
   },
   {
     type: "middlegame",
-    title: "Mediogioco",
-    desc: "Temi strategici: struttura di pedoni, pezzi forti, piani.",
+    title: "Middlegame",
+    desc: "Strategic themes: pawn structure, strong pieces, plans.",
     browseHref: "/app/teoria/mediogioco",
-    browseLabel: "Sfoglia i temi",
+    browseLabel: "Browse the themes",
   },
   {
     type: "endgame",
-    title: "Finali",
-    desc: "Tecnica dei finali, con la verità esatta della tablebase.",
+    title: "Endgames",
+    desc: "Endgame technique, with the exact truth of the tablebase.",
     browseHref: "/app/teoria/finali",
-    browseLabel: "Sfoglia tutti i finali",
+    browseLabel: "Browse all endgames",
   },
 ];
 
@@ -62,17 +62,17 @@ export default async function TeoriaPage() {
   return (
     <div className="space-y-10">
       <MobilePageHeader
-        eyebrow="Studio guidato"
-        title="Teoria"
-        desc="Capisci il perché delle mosse, coi dati reali."
+        eyebrow="Guided study"
+        title="Theory"
+        desc="Understand the why of moves, with real data."
       />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Teoria</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Theory</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Lezioni guidate sopra la scacchiera: capisci il <em>perché</em> delle mosse,
-          con i dati reali dell&apos;explorer e la verità esatta dei finali.
+          Guided lessons over the board: understand the <em>why</em> of moves,
+          with real explorer data and the exact truth of endgames.
         </p>
       </div>
 
@@ -102,7 +102,7 @@ export default async function TeoriaPage() {
             {items.length === 0 ? (
               <Card>
                 <CardContent className="py-6 text-center text-sm text-text-muted">
-                  Lezioni in arrivo. <Badge className="ml-1">presto</Badge>
+                  Lessons coming soon. <Badge className="ml-1">soon</Badge>
                 </CardContent>
               </Card>
             ) : (

@@ -35,7 +35,7 @@ function opponentScore(result: string | null, color: "white" | "black"): number 
 export async function scoutOpponent(input: ScoutInput): Promise<ScoutResult> {
   const username = input.username.trim();
   if (!username || username.length > 40) {
-    return { ok: false, error: "Inserisci uno username valido." };
+    return { ok: false, error: "Enter a valid username." };
   }
   const provider: Record<GameSource, typeof lichessProvider | null> = {
     pgn: null,
@@ -43,14 +43,14 @@ export async function scoutOpponent(input: ScoutInput): Promise<ScoutResult> {
     chesscom: chesscomProvider,
   };
   const p = provider[input.source];
-  if (!p) return { ok: false, error: "Sorgente non supportata." };
+  if (!p) return { ok: false, error: "Unsupported source." };
 
   let pgnText: string;
   try {
     pgnText = await p.fetchUserGamesPgn(username, MAX_GAMES);
   } catch (e) {
     if (e instanceof ProviderError) return { ok: false, error: e.message };
-    return { ok: false, error: "Errore imprevisto contattando la piattaforma." };
+    return { ok: false, error: "Unexpected error contacting the platform." };
   }
 
   const blocks = splitPgn(pgnText);
@@ -64,14 +64,14 @@ export async function scoutOpponent(input: ScoutInput): Promise<ScoutResult> {
     if (score == null) continue;
     entries.push({
       color,
-      key: game.opening ?? game.ecoCode ?? "Apertura sconosciuta",
+      key: game.opening ?? game.ecoCode ?? "Unknown opening",
       eco: game.ecoCode,
       score,
     });
   }
 
   if (entries.length === 0) {
-    return { ok: false, error: "Nessuna partita conclusa trovata per questo username." };
+    return { ok: false, error: "No finished games found for this username." };
   }
 
   return { ok: true, report: buildScoutReport(entries), username };

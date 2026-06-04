@@ -37,7 +37,7 @@ export function OpeningTree({ nodes }: OpeningTreeProps) {
   if (nodes.length === 0) {
     return (
       <p className="text-sm text-text-muted">
-        Nessuna apertura pubblicata. I contenuti arrivano con i seed.
+        No published openings. Content comes with the seeds.
       </p>
     );
   }
@@ -74,7 +74,7 @@ function TreeRow({
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Comprimi" : "Espandi"}
+            aria-label={open ? "Collapse" : "Expand"}
             className="text-text-muted"
           >
             <ChevronRight className={cn("h-4 w-4 transition-transform", open && "rotate-90")} />

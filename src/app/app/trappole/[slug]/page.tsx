@@ -32,7 +32,7 @@ export default async function TrapViewerPage({
     return (
       <div className="mx-auto max-w-2xl py-12 text-center">
         <h1 className="font-display text-2xl font-semibold">{trap.name}</h1>
-        <p className="mt-2 text-text-muted">Questa trappola non è ancora disponibile.</p>
+        <p className="mt-2 text-text-muted">This trap isn&apos;t available yet.</p>
       </div>
     );
   }
@@ -49,11 +49,11 @@ export default async function TrapViewerPage({
       {/* Metadati */}
       <div className="space-y-3">
         <Link href="/app/trappole" className="text-sm text-text-muted hover:text-text">
-          ← Tutte le trappole
+          ← All traps
         </Link>
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge>{CATEGORY_LABEL[trap.category]}</Badge>
-          <Badge variant="muted">La tende il {SIDE_LABEL[trap.side]}</Badge>
+          <Badge variant="muted">Set by {SIDE_LABEL[trap.side]}</Badge>
           <Badge variant="muted">{FAME_LABEL[trap.fame]}</Badge>
           {(trap.eco_code || trap.opening_name) && (
             <span className="font-mono text-xs text-text-muted">
@@ -64,7 +64,7 @@ export default async function TrapViewerPage({
         </div>
         {trap.motif.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs uppercase tracking-wide text-text-muted">Motivi:</span>
+            <span className="text-xs uppercase tracking-wide text-text-muted">Motifs:</span>
             {trap.motif.map((m) => {
               const theme = motifTacticTheme(m);
               return theme ? (
@@ -95,13 +95,13 @@ export default async function TrapViewerPage({
       <div className="grid gap-4 sm:grid-cols-2">
         <TrainLink
           href={`/app/trappole/${trap.slug}/allena?mode=tendi`}
-          title="Tendi la trappola"
-          desc="L'avversario gioca l'esca: trova tu la punizione."
+          title="Set the trap"
+          desc="The opponent plays the lure: find the punishment yourself."
         />
         <TrainLink
           href={`/app/trappole/${trap.slug}/allena?mode=evita`}
-          title="Evita la trappola"
-          desc="Sei dalla parte di chi rischia: trova la mossa sicura."
+          title="Avoid the trap"
+          desc="You're the one at risk: find the safe move."
         />
       </div>
 
@@ -109,7 +109,7 @@ export default async function TrapViewerPage({
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Quanto scatta davvero</CardTitle>
+            <CardTitle>How often it really springs</CardTitle>
           </CardHeader>
           <CardContent>
             <TrapFrequency triggerFen={trap.trigger_fen} lureSan={lure} />
@@ -118,15 +118,15 @@ export default async function TrapViewerPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Chiedi al coach</CardTitle>
+            <CardTitle>Ask the coach</CardTitle>
           </CardHeader>
           <CardContent>
             {coachConfigured ? (
               <PositionChat fen={trap.trigger_fen} turn={turn} />
             ) : (
               <p className="text-sm text-text-muted">
-                Coach non configurato. Imposta <span className="font-mono">ANTHROPIC_API_KEY</span>{" "}
-                per chiedere, ad esempio, «perché non posso semplicemente prendere il pezzo?».
+                Coach not configured. Set <span className="font-mono">ANTHROPIC_API_KEY</span>{" "}
+                to ask, for example, &quot;why can&apos;t I just take the piece?&quot;.
               </p>
             )}
           </CardContent>

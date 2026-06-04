@@ -47,7 +47,7 @@ function NavRow({
           <span className={cn(collapsed && "hidden")}>{item.label}</span>
         </span>
         <Badge variant="muted" className={cn(collapsed && "hidden")}>
-          presto
+          soon
         </Badge>
       </span>
     );
@@ -160,7 +160,7 @@ export function Sidebar({
 
       <nav
         className="flex-1 space-y-4 overflow-y-auto px-3 py-2"
-        aria-label="Navigazione principale"
+        aria-label="Main navigation"
       >
         {navGroups.map((group, gi) => {
           // Rail ridotto: niente accordion, voci piatte come icone (divider tra gruppi).
@@ -222,8 +222,8 @@ export function Sidebar({
         <button
           type="button"
           onClick={onToggleCollapsed}
-          aria-label={collapsed ? "Espandi barra laterale" : "Riduci barra laterale"}
-          title={collapsed ? "Espandi" : "Riduci"}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? "Expand" : "Collapse"}
           className={cn(
             "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-2 hover:text-text",
             collapsed && "justify-center px-2",
@@ -234,7 +234,7 @@ export function Sidebar({
           ) : (
             <PanelLeftClose className="h-4 w-4 shrink-0" aria-hidden />
           )}
-          <span className={cn(collapsed && "hidden")}>Riduci</span>
+          <span className={cn(collapsed && "hidden")}>Collapse</span>
         </button>
       </div>
     </aside>

@@ -21,51 +21,51 @@ export interface Concept {
 export const CONCEPTS: Concept[] = [
   {
     slug: "forchetta",
-    title: "La forchetta",
+    title: "The fork",
     theme: "fork",
     intro:
-      "Una forchetta è quando un solo pezzo attacca due (o più) bersagli nello stesso momento. L'avversario può salvarne uno solo: l'altro è tuo. Il cavallo è il maestro delle forchette, perché colpisce dove gli altri pezzi non arrivano.",
-    goal: "Trova la mossa che attacca due pezzi insieme.",
+      "A fork is when a single piece attacks two (or more) targets at the same time. Your opponent can save only one: the other is yours. The knight is the master of forks, because it strikes where other pieces can't reach.",
+    goal: "Find the move that attacks two pieces at once.",
   },
   {
     slug: "inchiodatura",
-    title: "L'inchiodatura",
+    title: "The pin",
     theme: "pin",
     intro:
-      "Un pezzo è inchiodato quando non può muoversi perché dietro di lui c'è un pezzo più prezioso (spesso il Re). Inchiodare significa paralizzare un pezzo avversario e poi attaccarlo con calma.",
-    goal: "Inchioda un pezzo avversario o sfrutta un'inchiodatura.",
+      "A piece is pinned when it can't move because a more valuable piece (often the king) is behind it. Pinning means paralyzing an opponent's piece and then attacking it at your leisure.",
+    goal: "Pin an opponent's piece or exploit a pin.",
   },
   {
     slug: "infilzata",
-    title: "L'infilzata",
+    title: "The skewer",
     theme: "skewer",
     intro:
-      "L'infilzata è l'inchiodatura al contrario: davanti c'è il pezzo prezioso, che è costretto a spostarsi, lasciando catturare quello dietro. Funziona benissimo con pezzi che agiscono in linea: Donna, Torre e Alfiere.",
-    goal: "Attacca un pezzo prezioso per vincere quello dietro.",
+      "The skewer is the pin in reverse: the valuable piece is in front, forced to move, leaving the piece behind it to be captured. It works beautifully with pieces that act along lines: queen, rook and bishop.",
+    goal: "Attack a valuable piece to win the one behind it.",
   },
   {
     slug: "pezzo-in-presa",
-    title: "Il pezzo in presa",
+    title: "The hanging piece",
     theme: "hangingPiece",
     intro:
-      "Prima di ogni mossa, chiediti: c'è un pezzo avversario non difeso? Catturare materiale gratis è il modo più semplice di vincere una partita. L'occhio per i pezzi in presa è la prima abilità del giocatore.",
-    goal: "Cattura il pezzo non difeso.",
+      "Before every move, ask yourself: is there an undefended opponent piece? Capturing free material is the simplest way to win a game. An eye for hanging pieces is a player's first skill.",
+    goal: "Capture the undefended piece.",
   },
   {
     slug: "matto-in-uno",
-    title: "Matto in una mossa",
+    title: "Mate in one move",
     theme: "mateIn1",
     intro:
-      "Lo scacco matto è scacco al Re senza via di scampo: la partita finisce. Imparare a vedere il matto in una mossa allena l'occhio a riconoscere quando il Re avversario è in trappola.",
-    goal: "Dai scacco matto in una mossa.",
+      "Checkmate is check on the king with no escape: the game is over. Learning to see mate in one move trains your eye to recognize when the opponent's king is trapped.",
+    goal: "Deliver checkmate in one move.",
   },
   {
     slug: "matto-corridoio",
-    title: "Il matto del corridoio",
+    title: "The back-rank mate",
     theme: "backRankMate",
     intro:
-      "Il Re arroccato dietro ai suoi pedoni può restare intrappolato sull'ultima traversa: una Torre o una Donna che arriva in fondo dà matto perché il Re non ha caselle di fuga. Per questo si gioca spesso 'la presa d'aria' al pedone.",
-    goal: "Sfrutta l'ultima traversa per dare matto.",
+      "A king castled behind its pawns can get trapped on the back rank: a rook or queen reaching the end delivers mate because the king has no escape squares. That's why players often make 'luft' for the king by pushing a pawn.",
+    goal: "Exploit the back rank to deliver mate.",
   },
 ];
 

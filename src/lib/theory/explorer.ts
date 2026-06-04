@@ -59,13 +59,13 @@ export async function fetchOpeningExplorer(
     try {
       res = await fetch(proxyUrl(db, fen), { headers: { Accept: "application/json" } });
     } catch {
-      return { ok: false, error: "Errore di rete. Riprova tra poco." };
+      return { ok: false, error: "Network error. Try again shortly." };
     }
     let body: ExplorerResult;
     try {
       body = (await res.json()) as ExplorerResult;
     } catch {
-      return { ok: false, error: "Database aperture non disponibile al momento." };
+      return { ok: false, error: "Opening database unavailable right now." };
     }
     if (body.ok) cache.set(key, body.data);
     return body;

@@ -32,7 +32,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
   /** Interroga il motore sulla posizione (e su un'eventuale mossa citata). */
   const buildFacts = async (question: string): Promise<PositionFacts> => {
     await engine.init();
-    setPhase("Interrogo il motore…");
+    setPhase("Querying the engine…");
     const evaluation = await engine.analyze(fen, { depth: LINES_DEPTH, multiPV: 3 }).result;
 
     const lines: EngineLineFact[] = evaluation.lines
@@ -49,7 +49,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
     for (const raw of extractMoveTokens(question).slice(0, 4)) {
       const played = tryPlaySan(fen, italianToEnglishSan(raw));
       if (!played) continue;
-      setPhase(`Valuto ${played.san}…`);
+      setPhase(`Evaluating ${played.san}…`);
       const afterTurn = (played.fen.split(" ")[1] as "w" | "b") ?? "w";
       const afterEval = await engine.analyze(played.fen, { depth: MOVE_DEPTH }).result;
       const top = afterEval.lines[0];
@@ -75,7 +75,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
 
     try {
       const facts = await buildFacts(question);
-      setPhase("Il coach sta rispondendo…");
+      setPhase("The coach is responding…");
 
       const res = await fetch("/api/coach/ask", {
         method: "POST",
@@ -90,8 +90,8 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
         }),
       });
       if (!res.ok || !res.body) {
-        const msg = await res.text().catch(() => "Errore del coach.");
-        setMessages((prev) => [...prev, { role: "assistant", content: `Spiacente: ${msg}` }]);
+        const msg = await res.text().catch(() => "Coach error.");
+        setMessages((prev) => [...prev, { role: "assistant", content: `Sorry: ${msg}` }]);
         return;
       }
 
@@ -114,7 +114,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Non sono riuscito a rispondere. Riprova." },
+        { role: "assistant", content: "I couldn't answer. Try again." },
       ]);
     } finally {
       setBusy(false);
@@ -127,7 +127,7 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
       <div ref={scrollRef} className="max-h-64 space-y-3 overflow-y-auto">
         {messages.length === 0 ? (
           <p className="text-sm text-text-muted">
-            Chiedi qualcosa sulla posizione, es. «qual è il piano per il Bianco?» o «perché non Cd4?».
+            Ask something about the position, e.g. &quot;what&apos;s the plan for White?&quot; or &quot;why not Nd4?&quot;.
           </p>
         ) : (
           messages.map((m, i) => (
@@ -160,12 +160,12 @@ export function PositionChat({ fen, turn }: { fen: string; turn: "w" | "b" }) {
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Fai una domanda…"
+          placeholder="Ask a question…"
           disabled={busy}
-          aria-label="Domanda sulla posizione"
+          aria-label="Question about the position"
         />
         <Button type="submit" size="sm" disabled={busy || !input.trim()}>
-          Invia
+          Send
         </Button>
       </form>
     </div>

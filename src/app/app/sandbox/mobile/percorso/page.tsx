@@ -21,10 +21,10 @@ import { cn } from "@/lib/utils";
 type Status = "locked" | "available" | "in_progress" | "completed";
 
 const STATUS: Record<Status, { label: string; Icon: LucideIcon }> = {
-  locked: { label: "Bloccato", Icon: Lock },
-  available: { label: "Disponibile", Icon: Circle },
-  in_progress: { label: "In corso", Icon: CircleDot },
-  completed: { label: "Completato", Icon: CheckCircle2 },
+  locked: { label: "Locked", Icon: Lock },
+  available: { label: "Available", Icon: Circle },
+  in_progress: { label: "In progress", Icon: CircleDot },
+  completed: { label: "Completed", Icon: CheckCircle2 },
 };
 
 type Node = {
@@ -37,34 +37,34 @@ type Node = {
 
 const LEVELS: { title: string; nodes: Node[] }[] = [
   {
-    title: "Livello 1 — Tattica di base",
+    title: "Level 1 — Basic tactics",
     nodes: [
       {
-        title: "Forchetta e infilata",
-        description: "I doppi attacchi che vincono materiale.",
+        title: "Fork and skewer",
+        description: "The double attacks that win material.",
         status: "completed",
-        activities: ["Allena"],
+        activities: ["Train"],
       },
       {
-        title: "Inchiodatura",
-        description: "Bloccare un pezzo contro uno più prezioso.",
+        title: "Pin",
+        description: "Trapping a piece against a more valuable one.",
         status: "in_progress",
         progress: 0.45,
-        activities: ["Allena", "Teoria"],
+        activities: ["Train", "Theory"],
       },
     ],
   },
   {
-    title: "Livello 2 — Apertura e finali chiave",
+    title: "Level 2 — Openings and key endgames",
     nodes: [
       {
-        title: "Principi d'apertura",
-        description: "Centro, sviluppo, sicurezza del re.",
+        title: "Opening principles",
+        description: "Center, development, king safety.",
         status: "available",
-        activities: ["Studia"],
+        activities: ["Study"],
       },
       {
-        title: "Finali di re e pedone",
+        title: "King and pawn endgames",
         status: "locked",
       },
     ],
@@ -76,10 +76,10 @@ export default function PercorsoShowcasePage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Redesign mobile · Percorso
+          Mobile redesign · Path
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Timeline verticale a tappe. Guarda e conferma.
+          Vertical milestone timeline. Take a look and confirm.
         </p>
       </header>
 
@@ -92,13 +92,13 @@ export default function PercorsoShowcasePage() {
               <div className="relative">
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
-                    Da principiante a club
+                    From beginner to club level
                   </p>
                   <h2 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-                    Percorso
+                    Path
                   </h2>
                   <p className="mt-2 text-sm text-text-muted">
-                    I nodi si sbloccano man mano che padroneggi i precedenti.
+                    Nodes unlock as you master the previous ones.
                   </p>
                 </div>
               </div>
@@ -106,16 +106,16 @@ export default function PercorsoShowcasePage() {
               {/* Prossimo passo */}
               <div className="rounded-xl border border-border bg-surface p-4">
                 <span className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-text-muted">
-                  <Compass className="h-3.5 w-3.5" /> Prossimo passo
+                  <Compass className="h-3.5 w-3.5" /> Next step
                 </span>
                 <h3 className="mt-2 font-display text-lg font-semibold">
-                  Inchiodatura
+                  Pin
                 </h3>
                 <p className="mt-1 text-sm text-text-muted">
-                  Sei a metà: un set mirato fissa lo schema.
+                  You&apos;re halfway: a focused set drills the pattern.
                 </p>
                 <button className="mt-3 inline-flex h-10 w-full items-center justify-center gap-1 rounded-lg bg-text text-sm font-medium text-bg">
-                  Continua <ChevronRight className="h-4 w-4" />
+                  Continue <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
 
@@ -224,7 +224,7 @@ function NodeRow({ node }: { node: Node }) {
 
         {locked && (
           <p className="mt-2 text-xs text-text-muted">
-            Sblocca completando i passi precedenti.
+            Unlock it by completing the previous steps.
           </p>
         )}
       </div>
@@ -253,7 +253,7 @@ function PhoneChrome() {
         </button>
         <span className="font-display text-lg font-semibold tracking-tight">Shakh</span>
         <div className="flex items-center gap-1">
-          <button type="button" aria-label="Notifiche" className="rounded-md p-1.5 text-text-muted">
+          <button type="button" aria-label="Notifications" className="rounded-md p-1.5 text-text-muted">
             <Bell className="h-5 w-5" />
           </button>
           <div className="grid h-8 w-8 place-items-center rounded-full bg-text text-xs font-semibold text-bg">

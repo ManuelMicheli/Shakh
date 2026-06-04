@@ -25,24 +25,24 @@ const MODES: {
   badge?: string;
 }[] = [
   {
-    title: "Adattivo",
-    desc: "Flusso continuo al tuo livello. Aggiorna rating e serie.",
+    title: "Adaptive",
+    desc: "Continuous flow at your level. Updates rating and streak.",
     icon: InfinityIcon,
   },
   {
-    title: "Per tema",
-    desc: "Allena un motivo: forchetta, inchiodatura, finali…",
+    title: "By theme",
+    desc: "Drill a motif: fork, pin, endgames…",
     icon: Target,
   },
   {
-    title: "Ripasso",
-    desc: "Rivedi i puzzle sbagliati in scadenza.",
+    title: "Review",
+    desc: "Revisit the missed puzzles that are due.",
     icon: RotateCcw,
-    badge: "5 in scadenza",
+    badge: "5 due",
   },
   {
-    title: "Sfida a tempo",
-    desc: "3 minuti, difficoltà crescente: quanti ne risolvi?",
+    title: "Timed challenge",
+    desc: "3 minutes, rising difficulty: how many can you solve?",
     icon: Timer,
   },
 ];
@@ -52,10 +52,10 @@ export default function TatticheShowcasePage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Redesign mobile · Tattiche
+          Mobile redesign · Tactics
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Rating hero + modalità a list-card. Guarda e conferma.
+          Rating hero + modes as list cards. Take a look and confirm.
         </p>
       </header>
 
@@ -68,24 +68,24 @@ export default function TatticheShowcasePage() {
               <div className="relative">
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
-                    Visione tattica
+                    Tactical vision
                   </p>
                   <h2 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-                    Tattiche
+                    Tactics
                   </h2>
 
                   <div className="mt-6 flex items-center gap-2">
                     <span className="text-xs uppercase tracking-wider text-text-muted">
-                      Rating tattico
+                      Tactics rating
                     </span>
                   </div>
                   <div className="mt-1 font-mono text-5xl font-semibold tabular-nums tracking-tight">
                     {STATS.rating}
                   </div>
                   <div className="mt-4 grid grid-cols-3 gap-x-3">
-                    <Mini label="Serie" value={STATS.currentStreak} />
-                    <Mini label="Record" value={STATS.bestStreak} />
-                    <Mini label="Risolti" value={STATS.solved} />
+                    <Mini label="Streak" value={STATS.currentStreak} />
+                    <Mini label="Best" value={STATS.bestStreak} />
+                    <Mini label="Solved" value={STATS.solved} />
                   </div>
                 </div>
               </div>
@@ -95,7 +95,7 @@ export default function TatticheShowcasePage() {
               {/* Modalità */}
               <section className="space-y-2">
                 <p className="px-0.5 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-                  Allenati
+                  Train
                 </p>
                 <div className="space-y-2">
                   {MODES.map((m) => {
@@ -166,7 +166,7 @@ function PhoneChrome() {
         </button>
         <span className="font-display text-lg font-semibold tracking-tight">Shakh</span>
         <div className="flex items-center gap-1">
-          <button type="button" aria-label="Notifiche" className="rounded-md p-1.5 text-text-muted">
+          <button type="button" aria-label="Notifications" className="rounded-md p-1.5 text-text-muted">
             <Bell className="h-5 w-5" />
           </button>
           <div className="grid h-8 w-8 place-items-center rounded-full bg-text text-xs font-semibold text-bg">

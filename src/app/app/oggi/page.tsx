@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { buildDailyPlan, type PlanBlock, type BlockKind } from "@/lib/daily/plan";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "Allenamento di oggi — Shakh" };
+export const metadata = { title: "Today's training — Shakh" };
 
 /** Icona per tipo di blocco (testata card su mobile). */
 const BLOCK_ICON: Record<BlockKind, LucideIcon> = {
@@ -28,7 +28,7 @@ const BLOCK_ICON: Record<BlockKind, LucideIcon> = {
 
 function todayLabel(): string {
   try {
-    return new Intl.DateTimeFormat("it-IT", {
+    return new Intl.DateTimeFormat("en-US", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -55,7 +55,7 @@ export default async function OggiPage() {
               {todayLabel()}
             </p>
             <h1 className="mt-0.5 font-display text-2xl font-semibold tracking-tight">
-              Oggi
+              Today
             </h1>
             <div className="mt-6 flex items-end gap-2">
               <span className="font-mono text-5xl font-semibold tabular-nums tracking-tight">
@@ -64,7 +64,7 @@ export default async function OggiPage() {
               </span>
             </div>
             <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
-              durata stimata · {doneCount}/{plan.blocks.length} completati
+              estimated time · {doneCount}/{plan.blocks.length} completed
             </p>
           </div>
         </div>
@@ -73,16 +73,16 @@ export default async function OggiPage() {
 
         {plan.completed && (
           <div className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3">
-            <Badge>fatto</Badge>
+            <Badge>done</Badge>
             <p className="text-sm">
-              Sessione di oggi completata. Torna domani per il prossimo piano.
+              Today&apos;s session complete. Come back tomorrow for your next plan.
             </p>
           </div>
         )}
 
         <section className="space-y-2">
           <p className="px-0.5 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-            Il piano
+            The plan
           </p>
           <div className="space-y-2">
             {plan.blocks.map((b) => (
@@ -98,25 +98,25 @@ export default async function OggiPage() {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h1 className="font-display text-3xl font-semibold tracking-tight">
-                Allenamento di oggi
+                Today&apos;s training
               </h1>
               <p className="mt-2 max-w-2xl text-text-muted">
-                Una sessione breve e mirata, costruita dai tuoi dati: ripasso, punti deboli,
-                tattica e finali. Siediti e allenati.
+                A short, focused session built from your data: review, weaknesses,
+                tactics, and endgames. Sit down and train.
               </p>
             </div>
             <div className="text-right">
               <div className="font-mono text-2xl tabular-nums">~{plan.totalMin}′</div>
-              <div className="text-xs uppercase tracking-wide text-text-muted">durata stimata</div>
+              <div className="text-xs uppercase tracking-wide text-text-muted">estimated time</div>
             </div>
           </div>
 
           {plan.completed && (
             <Card>
               <CardContent className="flex items-center gap-3 py-4">
-                <Badge>fatto</Badge>
+                <Badge>done</Badge>
                 <p className="text-sm">
-                  Sessione di oggi completata. Ottimo lavoro — torna domani per il prossimo piano.
+                  Today&apos;s session complete. Great work — come back tomorrow for your next plan.
                 </p>
               </CardContent>
             </Card>

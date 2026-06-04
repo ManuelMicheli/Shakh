@@ -54,10 +54,10 @@ export function formatDuration(ms: number): string {
 export function gameStatsFromFen(fen: string): { label: string; value: string }[] {
   const s = summaryFromFen(fen);
   const material =
-    s.balance === 0 ? "Pari" : s.balance > 0 ? `♔ +${s.balance}` : `♚ +${-s.balance}`;
+    s.balance === 0 ? "Even" : s.balance > 0 ? `♔ +${s.balance}` : `♚ +${-s.balance}`;
   return [
-    { label: "Mosse", value: String(s.moves) },
-    { label: "Catture", value: String(s.captures) },
-    { label: "Materiale", value: material },
+    { label: "Moves", value: String(s.moves) },
+    { label: "Captures", value: String(s.captures) },
+    { label: "Material", value: material },
   ];
 }

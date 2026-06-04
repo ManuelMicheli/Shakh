@@ -15,96 +15,96 @@ interface Section {
 
 /** Termini delle statistiche mostrate nella dashboard. */
 const METRICS: Section = {
-  title: "Statistiche e analisi",
+  title: "Statistics and analysis",
   terms: [
     {
-      term: "Accuratezza",
-      def: "Quanto le tue mosse si avvicinano a quelle migliori del motore, in percentuale. Più è alta, meglio hai giocato.",
+      term: "Accuracy",
+      def: "How close your moves are to the engine's best ones, as a percentage. The higher it is, the better you played.",
     },
     {
-      term: "Rating tattico",
-      def: "Un numero che misura la tua forza nei puzzle: sale se risolvi, scende se sbagli (come un punteggio Elo).",
+      term: "Tactical rating",
+      def: "A number measuring your strength in puzzles: it goes up when you solve them, down when you miss (like an Elo score).",
     },
     {
       term: "Streak",
-      def: "Quanti puzzle hai risolto di fila senza errori. Il record è la striscia più lunga raggiunta.",
+      def: "How many puzzles you've solved in a row without mistakes. The best is the longest streak you've reached.",
     },
     {
-      term: "Pedone / centipawn",
-      def: "L'unità di misura del vantaggio. 1 pedone = avere un pezzo leggero in più, all'incirca. Il motore lo misura in centesimi (centipawn).",
+      term: "Pawn / centipawn",
+      def: "The unit for measuring an advantage. 1 pawn ≈ having one extra minor piece, roughly. The engine measures it in hundredths (centipawns).",
     },
     {
-      term: "Punto critico",
-      def: "La fase di gioco in cui commetti più errori: è lì che conviene allenarsi di più.",
+      term: "Critical area",
+      def: "The phase of the game where you make the most mistakes: that's where it pays to train more.",
     },
   ],
 };
 
 /** Fasi della partita. */
 const PHASES: Section = {
-  title: "Fasi della partita",
+  title: "Phases of the game",
   terms: [
     {
-      term: "Apertura",
-      def: "Le prime mosse: si sviluppano i pezzi, si controlla il centro e si mette al sicuro il re (arrocco).",
+      term: "Opening",
+      def: "The first moves: you develop your pieces, control the center, and get your king to safety (castling).",
     },
     {
-      term: "Mediogioco",
-      def: "Il cuore della partita: piani, attacchi e combinazioni con molti pezzi ancora in gioco.",
+      term: "Middlegame",
+      def: "The heart of the game: plans, attacks, and combinations with many pieces still on the board.",
     },
     {
-      term: "Finale",
-      def: "La fase con pochi pezzi rimasti, dove i pedoni e il re diventano protagonisti.",
+      term: "Endgame",
+      def: "The phase with few pieces left, where the pawns and the king take center stage.",
     },
   ],
 };
 
 /** Motivi tattici ricorrenti. */
 const TACTICS: Section = {
-  title: "Tattiche",
+  title: "Tactics",
   terms: [
     {
-      term: "Forchetta",
-      def: "Un pezzo attacca due bersagli contemporaneamente: l'avversario ne può salvare uno solo.",
+      term: "Fork",
+      def: "One piece attacks two targets at once: your opponent can only save one of them.",
     },
     {
-      term: "Inchiodatura",
-      def: "Un pezzo non si può muovere perché dietro di lui c'è un pezzo più prezioso (spesso il re).",
+      term: "Pin",
+      def: "A piece can't move because behind it sits a more valuable piece (often the king).",
     },
     {
-      term: "Infilata",
-      def: "Come l'inchiodatura al contrario: il pezzo prezioso è davanti e, spostandosi, lascia prendere quello dietro.",
+      term: "Skewer",
+      def: "Like a pin in reverse: the valuable piece is in front and, when it moves, leaves the one behind it to be captured.",
     },
     {
-      term: "Scoperta",
-      def: "Sposti un pezzo e ne liberi un altro che dà scacco o attacca: due minacce in una mossa.",
+      term: "Discovered attack",
+      def: "You move one piece and free another that gives check or attacks: two threats in one move.",
     },
     {
-      term: "Sacrificio",
-      def: "Cedi materiale di proposito per ottenere un vantaggio maggiore (attacco al re, matto, promozione).",
+      term: "Sacrifice",
+      def: "You give up material on purpose to gain a bigger advantage (an attack on the king, mate, promotion).",
     },
   ],
 };
 
 /** Termini generali utili. */
 const GENERAL: Section = {
-  title: "Concetti di base",
+  title: "Basic concepts",
   terms: [
     {
-      term: "Arrocco",
-      def: "Mossa speciale che muove insieme re e torre, per mettere il re al sicuro.",
+      term: "Castling",
+      def: "A special move that moves the king and rook together, to bring the king to safety.",
     },
     {
-      term: "Sviluppo",
-      def: "Portare i pezzi (cavalli e alfieri) fuori dalla posizione iniziale verso caselle attive.",
+      term: "Development",
+      def: "Bringing your pieces (knights and bishops) out of their starting squares to active ones.",
     },
     {
-      term: "Iniziativa",
-      def: "Avere il controllo del gioco: sei tu a creare minacce e l'avversario deve difendersi.",
+      term: "Initiative",
+      def: "Having control of the game: you're the one creating threats and your opponent has to defend.",
     },
     {
-      term: "Repertorio",
-      def: "L'insieme di aperture che scegli di giocare e impari a memoria.",
+      term: "Repertoire",
+      def: "The set of openings you choose to play and learn by heart.",
     },
   ],
 };
@@ -120,16 +120,16 @@ export function Glossary() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Legenda dei termini</CardTitle>
+        <CardTitle>Glossary of terms</CardTitle>
         <CardDescription>
-          Cosa significano le parole che trovi nella dashboard e nell&apos;analisi.
+          What the words you see in the dashboard and the analysis mean.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Qualità delle mosse: riusa le stesse etichette/colori dell'analisi. */}
         <details className="rounded-md border border-border bg-surface px-3 py-2">
           <summary className="cursor-pointer text-sm font-medium text-text">
-            Qualità delle mosse
+            Move quality
           </summary>
           <ul className="mt-3 space-y-1.5">
             {CLASSIFICATION_ORDER.map((k) => {

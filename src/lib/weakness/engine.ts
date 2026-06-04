@@ -161,11 +161,11 @@ export function detectWeaknesses(
   push(
     build(
       "squander_advantage",
-      "Sprechi le posizioni vinte",
+      "You squander winning positions",
       errors.filter((e) => e.cpBefore >= 150 && e.cpLoss >= 150),
       (occ, gms, avg) =>
-        `${occ} volte in ${gms} partite hai gettato un vantaggio chiaro (in media −${pawns(avg)}). Allena la conversione e il calcolo.`,
-      { label: "Allena tattica", href: "/app/tattiche?mode=adaptive" },
+        `${occ} times across ${gms} games you threw away a clear advantage (−${pawns(avg)} on average). Train conversion and calculation.`,
+      { label: "Train tactics", href: "/app/tattiche?mode=adaptive" },
     ),
   );
 
@@ -173,11 +173,11 @@ export function detectWeaknesses(
   push(
     build(
       "defense_collapse",
-      "Affondi quando sei sotto pressione",
+      "You sink under pressure",
       errors.filter((e) => e.cpBefore <= -30 && e.cpBefore >= -300 && e.cpLoss >= 150),
       (occ, gms, avg) =>
-        `${occ} volte in ${gms} partite, da posizione un po' peggiore sei sprofondato (−${pawns(avg)}). Lavora sulla difesa e sulla calma.`,
-      { label: "Allena tattica", href: "/app/tattiche?mode=adaptive" },
+        `${occ} times across ${gms} games, from a slightly worse position you collapsed (−${pawns(avg)}). Work on defense and staying calm.`,
+      { label: "Train tactics", href: "/app/tattiche?mode=adaptive" },
     ),
   );
 
@@ -185,11 +185,11 @@ export function detectWeaknesses(
   push(
     build(
       "time_pressure",
-      "Errori dopo la mossa 30",
+      "Mistakes after move 30",
       errors.filter((e) => e.ply >= 61 && e.cpLoss >= 120),
       (occ, gms, avg) =>
-        `${occ} errori gravi in ${gms} partite oltre la mossa 30 (−${pawns(avg)}). Spesso è gestione del tempo: prova le sfide a tempo.`,
-      { label: "Sfida a tempo", href: "/app/tattiche?mode=timed" },
+        `${occ} serious mistakes across ${gms} games past move 30 (−${pawns(avg)}). Often it's time management: try the timed challenges.`,
+      { label: "Timed challenge", href: "/app/tattiche?mode=timed" },
     ),
   );
 
@@ -197,19 +197,19 @@ export function detectWeaknesses(
   push(
     build(
       "missed_tactic",
-      "Ti sfuggono i colpi tattici",
+      "You miss tactical shots",
       errors.filter((e) => e.cpLoss >= 200 && isForcing(e.bestSan)),
       (occ, gms, avg) =>
-        `${occ} volte in ${gms} partite c'era un colpo forzante che non hai visto (−${pawns(avg)}). Più puzzle di visione tattica.`,
-      { label: "Allena tattica", href: "/app/tattiche?mode=adaptive" },
+        `${occ} times across ${gms} games there was a forcing shot you didn't see (−${pawns(avg)}). More tactical-vision puzzles.`,
+      { label: "Train tactics", href: "/app/tattiche?mode=adaptive" },
     ),
   );
 
   // 5) Fase debole (per tasso d'errore, non solo conteggio).
   const PHASE_INFO: Record<GamePhase, { label: string; href: string }> = {
-    opening: { label: "in apertura", href: "/app/teoria/aperture" },
-    middlegame: { label: "nel mediogioco", href: "/app/teoria/mediogioco" },
-    endgame: { label: "nei finali", href: "/app/teoria/finali" },
+    opening: { label: "in the opening", href: "/app/teoria/aperture" },
+    middlegame: { label: "in the middlegame", href: "/app/teoria/mediogioco" },
+    endgame: { label: "in endgames", href: "/app/teoria/finali" },
   };
   (Object.keys(phaseMoves) as GamePhase[]).forEach((ph) => {
     const moves = phaseMoves[ph];
@@ -221,11 +221,11 @@ export function detectWeaknesses(
     push(
       build(
         `phase_${ph}`,
-        `Fragile ${info.label}`,
+        `Shaky ${info.label}`,
         errs,
         (occ, gms) =>
-          `Tasso d'errore ${Math.round(rate * 100)}% ${info.label} (${occ} errori in ${gms} partite). Ripassa la teoria della fase.`,
-        { label: "Ripassa", href: info.href },
+          `${Math.round(rate * 100)}% error rate ${info.label} (${occ} mistakes across ${gms} games). Review the theory for this phase.`,
+        { label: "Review", href: info.href },
       ),
     );
   });
@@ -243,11 +243,11 @@ export function detectWeaknesses(
     push(
       build(
         `opening_eco_${fam}`,
-        `Apertura ${fam}: esci male`,
+        `Opening ${fam}: you come out badly`,
         errs,
         (occ, gms) =>
-          `${occ} errori in apertura nella famiglia ${fam} (${gms} partite). Costruisci o ripassa il repertorio.`,
-        { label: "Repertorio", href: "/app/repertorio" },
+          `${occ} opening mistakes in the ${fam} family (${gms} games). Build or review your repertoire.`,
+        { label: "Repertoire", href: "/app/repertorio" },
       ),
     );
   }

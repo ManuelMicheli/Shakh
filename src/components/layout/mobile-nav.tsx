@@ -35,7 +35,7 @@ function MobileRow({
           <Icon className="h-5 w-5 shrink-0" aria-hidden />
           {item.label}
         </span>
-        <Badge variant="muted">presto</Badge>
+        <Badge variant="muted">soon</Badge>
       </span>
     );
   }
@@ -92,7 +92,7 @@ export function MobileNav({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Menu di navigazione"
+        aria-label="Navigation menu"
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex w-[85%] max-w-sm flex-col border-r border-border bg-surface transition-transform duration-200",
           open ? "translate-x-0" : "-translate-x-full",
@@ -111,7 +111,7 @@ export function MobileNav({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Chiudi menu"
+            aria-label="Close menu"
             className="ml-auto rounded-md p-1.5 text-text-muted hover:bg-surface-2 hover:text-text"
           >
             <X className="h-5 w-5" aria-hidden />
@@ -120,7 +120,7 @@ export function MobileNav({
 
         <div className="flex-1 overflow-y-auto px-3 pb-4 pt-2">
           {/* Menu completo a gruppi (stesse macrocategorie del desktop). */}
-          <nav className="space-y-4" aria-label="Navigazione completa">
+          <nav className="space-y-4" aria-label="Full navigation">
             {navGroups.map((group, gi) => (
               <div key={group.label ?? `group-${gi}`} className="space-y-1">
                 {group.label && (

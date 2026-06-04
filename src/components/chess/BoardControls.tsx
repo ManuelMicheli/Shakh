@@ -74,7 +74,7 @@ export function BoardControls({
         size="icon"
         onClick={onFirst}
         disabled={atStart}
-        aria-label="Prima mossa"
+        aria-label="First move"
       >
         <ChevronFirst className="h-5 w-5" />
       </Button>
@@ -83,7 +83,7 @@ export function BoardControls({
         size="icon"
         onClick={onPrev}
         disabled={atStart}
-        aria-label="Mossa precedente"
+        aria-label="Previous move"
       >
         <ChevronLeft className="h-5 w-5" />
       </Button>
@@ -92,7 +92,7 @@ export function BoardControls({
         size="icon"
         onClick={onNext}
         disabled={atEnd}
-        aria-label="Mossa successiva"
+        aria-label="Next move"
       >
         <ChevronRight className="h-5 w-5" />
       </Button>
@@ -101,7 +101,7 @@ export function BoardControls({
         size="icon"
         onClick={onLast}
         disabled={atEnd}
-        aria-label="Ultima mossa"
+        aria-label="Last move"
       >
         <ChevronLast className="h-5 w-5" />
       </Button>
@@ -109,7 +109,7 @@ export function BoardControls({
         variant="ghost"
         size="icon"
         onClick={onFlip}
-        aria-label="Gira la scacchiera"
+        aria-label="Flip the board"
         className="ml-1"
       >
         <FlipVertical2 className="h-5 w-5" />

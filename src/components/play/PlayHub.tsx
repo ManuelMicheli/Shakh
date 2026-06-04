@@ -27,8 +27,8 @@ export function PlayHub({
   return (
     <Tabs defaultValue="local">
       <TabsList>
-        <TabsTrigger value="local">Stesso dispositivo</TabsTrigger>
-        <TabsTrigger value="online">Online (in differita)</TabsTrigger>
+        <TabsTrigger value="local">Same device</TabsTrigger>
+        <TabsTrigger value="online">Online (turn-based)</TabsTrigger>
       </TabsList>
 
       <TabsContent value="local">
@@ -64,24 +64,24 @@ function CreateOnlineForm() {
   };
 
   const colors: { id: ColorChoice; label: string }[] = [
-    { id: "w", label: "Bianco" },
-    { id: "b", label: "Nero" },
-    { id: "random", label: "Casuale" },
+    { id: "w", label: "White" },
+    { id: "b", label: "Black" },
+    { id: "random", label: "Random" },
   ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Nuova partita online</CardTitle>
+        <CardTitle>New online game</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <p className="text-sm text-text-muted">
-          Crea la partita, condividi il link con un amico e giocate quando
-          volete: le mosse si sincronizzano in tempo reale.
+          Create the game, share the link with a friend, and play whenever you
+          like: moves sync in real time.
         </p>
         <div>
           <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-            Il tuo colore
+            Your color
           </div>
           <div className="flex flex-wrap gap-2">
             {colors.map((c) => (
@@ -104,12 +104,12 @@ function CreateOnlineForm() {
         </div>
         <div>
           <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-            Tempo
+            Time control
           </div>
           <TimeControlPicker value={tcId} onChange={setTcId} />
         </div>
         <Button onClick={create} disabled={pending}>
-          {pending ? "Creazione…" : "Crea e ottieni il link"}
+          {pending ? "Creating…" : "Create and get the link"}
         </Button>
       </CardContent>
     </Card>
@@ -126,12 +126,12 @@ function MyGames({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Le tue partite online</CardTitle>
+        <CardTitle>Your online games</CardTitle>
       </CardHeader>
       <CardContent>
         {games.length === 0 ? (
           <p className="text-sm text-text-muted">
-            Nessuna partita online. Creane una per iniziare.
+            No online games yet. Create one to get started.
           </p>
         ) : (
           <ul className="divide-y divide-border">
@@ -148,10 +148,10 @@ function MyGames({
                   >
                     <span className="min-w-0">
                       <span className="block truncate text-sm">
-                        vs {oppName ?? "in attesa…"}
+                        vs {oppName ?? "waiting…"}
                       </span>
                       <span className="block font-mono text-xs text-text-muted">
-                        {myColor === "w" ? "Bianco" : "Nero"} · {tc.label}
+                        {myColor === "w" ? "White" : "Black"} · {tc.label}
                       </span>
                     </span>
                     <StatusBadge g={g} />
@@ -167,9 +167,9 @@ function MyGames({
 }
 
 function StatusBadge({ g }: { g: FriendGameRow }) {
-  if (g.status === "waiting") return <Badge variant="muted">in attesa</Badge>;
-  if (g.status === "ongoing") return <Badge>in corso</Badge>;
-  return <Badge variant="muted">{g.result ?? "conclusa"}</Badge>;
+  if (g.status === "waiting") return <Badge variant="muted">waiting</Badge>;
+  if (g.status === "ongoing") return <Badge>in progress</Badge>;
+  return <Badge variant="muted">{g.result ?? "over"}</Badge>;
 }
 
 /** Ricostruisce l'id del controllo di tempo dai ms salvati (best-effort per la label). */

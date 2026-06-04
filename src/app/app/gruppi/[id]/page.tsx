@@ -98,11 +98,11 @@ export default async function GroupPage({ params }: PageProps) {
     <div className="space-y-8">
       <div>
         <Link href="/app/gruppi" className="text-sm text-text-muted hover:text-text">
-          ← Tutti i gruppi
+          ← All groups
         </Link>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">{group.name}</h1>
         <p className="mt-1 text-text-muted">
-          {GROUP_TYPE_LABEL[group.type]} · {members.length} membri
+          {GROUP_TYPE_LABEL[group.type]} · {members.length} members
         </p>
       </div>
 
@@ -113,8 +113,8 @@ export default async function GroupPage({ params }: PageProps) {
               <CardContent className="flex items-center gap-3 py-4">
                 <Users className="h-5 w-5" aria-hidden />
                 <div>
-                  <p className="font-medium">Dashboard di classe</p>
-                  <p className="text-xs text-text-muted">Progressi aggregati degli allievi</p>
+                  <p className="font-medium">Class dashboard</p>
+                  <p className="text-xs text-text-muted">Aggregated student progress</p>
                 </div>
               </CardContent>
             </Card>
@@ -124,8 +124,8 @@ export default async function GroupPage({ params }: PageProps) {
               <CardContent className="flex items-center gap-3 py-4">
                 <ClipboardList className="h-5 w-5" aria-hidden />
                 <div>
-                  <p className="font-medium">Assegnazioni</p>
-                  <p className="text-xs text-text-muted">Crea e monitora le attività</p>
+                  <p className="font-medium">Assignments</p>
+                  <p className="text-xs text-text-muted">Create and track activities</p>
                 </div>
               </CardContent>
             </Card>
@@ -135,13 +135,13 @@ export default async function GroupPage({ params }: PageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Membri</CardTitle>
+          <CardTitle>Members</CardTitle>
           <CardDescription>
             {isOwner
-              ? "Promuovi a istruttore, rimuovi o apri i progressi di un allievo."
+              ? "Promote to instructor, remove, or open a student's progress."
               : instructor
-                ? "Apri i progressi di un allievo."
-                : "Le persone in questo gruppo."}
+                ? "Open a student's progress."
+                : "The people in this group."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -153,9 +153,9 @@ export default async function GroupPage({ params }: PageProps) {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Inviti</CardTitle>
+              <CardTitle>Invites</CardTitle>
               <CardDescription>
-                Genera un codice/link con ruolo e scadenza. Ogni invito vale per un ingresso.
+                Generate a code/link with a role and expiry. Each invite is valid for one entry.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -165,9 +165,9 @@ export default async function GroupPage({ params }: PageProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Repertori di gruppo</CardTitle>
+              <CardTitle>Group repertoires</CardTitle>
               <CardDescription>
-                «Nel nostro circolo giochiamo così». Gli allievi li allenano con il trainer.
+                &quot;This is how we play in our club.&quot; Students train them with the trainer.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -182,8 +182,8 @@ export default async function GroupPage({ params }: PageProps) {
                       <div>
                         <p className="font-medium">{r.name}</p>
                         <p className="text-xs text-text-muted">
-                          {r.color === "white" ? "Bianco" : "Nero"} ·{" "}
-                          {r.repertoire_moves?.[0]?.count ?? 0} mosse
+                          {r.color === "white" ? "White" : "Black"} ·{" "}
+                          {r.repertoire_moves?.[0]?.count ?? 0} moves
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -197,7 +197,7 @@ export default async function GroupPage({ params }: PageProps) {
                           href={`/app/repertorio/${r.id}/training`}
                           className="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm font-medium text-text hover:bg-surface"
                         >
-                          Allena
+                          Train
                         </Link>
                       </div>
                     </li>

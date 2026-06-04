@@ -6,7 +6,7 @@
 export const locales = ["it", "en"] as const;
 export type Locale = (typeof locales)[number];
 
-export const defaultLocale: Locale = "it";
+export const defaultLocale: Locale = "en";
 
 /** Cookie convenzione next-intl: sincronizzato con profiles.locale. */
 export const LOCALE_COOKIE = "NEXT_LOCALE";

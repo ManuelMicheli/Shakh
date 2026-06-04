@@ -51,7 +51,7 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
         viewBox={`0 0 ${SIZE} ${SIZE}`}
         className="h-auto w-full max-w-[280px]"
         role="img"
-        aria-label="Mappa delle competenze"
+        aria-label="Skills map"
       >
         {/* Anelli della griglia. */}
         {RINGS.map((t) => (

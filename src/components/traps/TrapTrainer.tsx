@@ -81,7 +81,7 @@ function TendiTrainer({
         fromReview: Boolean(fromReview),
       });
       if (!res.ok) {
-        toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Save failed", description: res.error, variant: "error" });
       }
       onComplete?.(success);
     },
@@ -89,7 +89,7 @@ function TendiTrainer({
   );
 
   if (puzzle.moves.length < 2) {
-    return <p className="text-sm text-text-muted">Linea della trappola incompleta.</p>;
+    return <p className="text-sm text-text-muted">Incomplete trap line.</p>;
   }
 
   return (
@@ -164,7 +164,7 @@ function EvitaTrainer({
         fromReview: Boolean(fromReview),
       });
       if (!res.ok) {
-        toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Save failed", description: res.error, variant: "error" });
       }
       onComplete?.(success);
     },
@@ -193,15 +193,15 @@ function EvitaTrainer({
         setDone({
           success: false,
           text: punishment
-            ? `${san}? Ci sei cascato: la punizione è ${punishment}.`
-            : `${san}? Ci sei cascato nella trappola.`,
+            ? `${san}? You fell for it: the punishment is ${punishment}.`
+            : `${san}? You fell into the trap.`,
         });
         void record(false);
         return;
       }
       if (safes.has(san)) {
         setShapes([{ orig: from, dest: to, brush: "green" }]);
-        setDone({ success: true, text: `${san} — corretto: hai evitato la trappola.` });
+        setDone({ success: true, text: `${san} — correct: you avoided the trap.` });
         void record(true);
         return;
       }
@@ -227,15 +227,15 @@ function EvitaTrainer({
 
       {!done && (
         <p className="text-center text-sm text-text-muted">
-          Muove il {victim === "white" ? "Bianco" : "Nero"}: trova la mossa che{" "}
-          <strong>non</strong> casca nella trappola.
+          {victim === "white" ? "White" : "Black"} to move: find the move that does{" "}
+          <strong>not</strong> fall into the trap.
         </p>
       )}
 
       {done && (
         <Card>
           <CardHeader>
-            <CardTitle>{done.success ? "Trappola evitata" : "Ci sei cascato"}</CardTitle>
+            <CardTitle>{done.success ? "Trap avoided" : "You fell for it"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p
@@ -285,7 +285,7 @@ function Feedback({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{done ? "Punizione trovata" : "Quasi!"}</CardTitle>
+        <CardTitle>{done ? "Punishment found" : "Almost!"}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <p
@@ -293,8 +293,8 @@ function Feedback({
           style={{ color: done ? "var(--eval-best)" : "var(--eval-mistake)" }}
         >
           {done
-            ? "Hai eseguito la trappola correttamente."
-            : "Hai sbagliato qualche mossa: ritornerà al ripasso."}
+            ? "You executed the trap correctly."
+            : "You missed some moves: it'll come back for review."}
         </p>
         <FeedbackButtons
           slug={slug}
@@ -326,11 +326,11 @@ function FeedbackButtons({
   return (
     <div className="flex flex-wrap gap-2">
       <Button size="sm" onClick={onReplay}>
-        Rigioca
+        Replay
       </Button>
       <Link href={`/app/trappole/${slug}/allena?mode=${other}`}>
         <Button size="sm" variant="secondary">
-          {other === "tendi" ? "Prova a tenderla" : "Prova a evitarla"}
+          {other === "tendi" ? "Try setting it" : "Try avoiding it"}
         </Button>
       </Link>
       <Link href={`/app/trappole/${slug}`}>

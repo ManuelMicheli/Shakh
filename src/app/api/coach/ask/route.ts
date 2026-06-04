@@ -27,27 +27,27 @@ interface Body {
  */
 export async function POST(req: Request) {
   if (!isCoachConfigured()) {
-    return new Response("Coach AI non configurato.", { status: 503 });
+    return new Response("AI coach not configured.", { status: 503 });
   }
 
   let body: Body;
   try {
     body = (await req.json()) as Body;
   } catch {
-    return new Response("Body non valido.", { status: 400 });
+    return new Response("Invalid body.", { status: 400 });
   }
 
   const { fen, turn } = body;
   const question = clampQuestion(body.question);
   if (!isPlausibleFen(fen) || (turn !== "w" && turn !== "b") || !question) {
-    return new Response("fen, turn e question richiesti.", { status: 400 });
+    return new Response("fen, turn and question are required.", { status: 400 });
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return new Response("Non autenticato.", { status: 401 });
+  if (!user) return new Response("Not authenticated.", { status: 401 });
 
   // Rate limit per-IP e per-utente: le chiamate ad Anthropic sono costose (§6).
   const rl = await limitCoach(user.id, clientIp(req));
@@ -84,8 +84,8 @@ export async function POST(req: Request) {
         );
         controller.close();
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Errore del coach.";
-        controller.enqueue(encoder.encode(`\n[Errore: ${msg}]`));
+        const msg = e instanceof Error ? e.message : "Coach error.";
+        controller.enqueue(encoder.encode(`\n[Error: ${msg}]`));
         controller.close();
       }
     },

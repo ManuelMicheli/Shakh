@@ -1,24 +1,24 @@
 import { PrepLab } from "@/components/prep/PrepLab";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Preparazione avversario — Shakh" };
+export const metadata = { title: "Opponent preparation — Shakh" };
 
 export default function PreparazionePage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Studia l'avversario"
-        title="Preparazione"
-        desc="Cosa gioca per colore, con che rendimento, e dove rende peggio."
+        eyebrow="Study your opponent"
+        title="Preparation"
+        desc="What they play by color, how well, and where they do worst."
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          Preparazione avversario
+          Opponent preparation
         </h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Inserisci lo username del tuo avversario: analizziamo le sue partite pubbliche
-          e ti mostriamo cosa gioca per colore, con che rendimento, e dove rende peggio —
-          le aperture da puntare.
+          Enter your opponent&apos;s username: we analyze their public games
+          and show you what they play by color, how well, and where they do worst —
+          the openings to target.
         </p>
       </div>
       <PrepLab />

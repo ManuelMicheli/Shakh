@@ -27,7 +27,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
     start(async () => {
       const res = await updateMemberRole(groupId, userId, role);
       if (!res.ok) {
-        toast({ title: "Non aggiornato", description: res.error, variant: "error" });
+        toast({ title: "Not updated", description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -38,7 +38,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
     start(async () => {
       const res = await removeMember(groupId, userId);
       if (!res.ok) {
-        toast({ title: "Non rimosso", description: res.error, variant: "error" });
+        toast({ title: "Not removed", description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -62,7 +62,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
                 href={`/app/gruppi/${groupId}/allievi/${m.userId}`}
                 className="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm font-medium text-text hover:bg-surface"
               >
-                Progressi
+                Progress
               </Link>
             )}
             {isOwner && m.role !== "owner" && (
@@ -75,7 +75,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
                     onRole(m.userId, m.role === "instructor" ? "member" : "instructor")
                   }
                 >
-                  {m.role === "instructor" ? "Rendi allievo" : "Promuovi istruttore"}
+                  {m.role === "instructor" ? "Make student" : "Promote to instructor"}
                 </Button>
                 <Button
                   variant="ghost"
@@ -83,7 +83,7 @@ export function MemberList({ groupId, members, isOwner, canDrill }: MemberListPr
                   disabled={pending}
                   onClick={() => onRemove(m.userId)}
                 >
-                  Rimuovi
+                  Remove
                 </Button>
               </>
             )}

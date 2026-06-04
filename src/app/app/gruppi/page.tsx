@@ -15,7 +15,7 @@ import {
 import { isInstructorRole } from "@/lib/groups/access";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Gruppi — Shakh" };
+export const metadata = { title: "Groups — Shakh" };
 
 interface MembershipRow {
   role_in_group: GroupRole;
@@ -61,21 +61,21 @@ export default async function GruppiPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Circoli e classi"
-        title="Gruppi"
-        desc="Segui gli allievi e assegna attività, o unisciti con un codice."
+        eyebrow="Clubs and classes"
+        title="Groups"
+        desc="Follow your students and assign activities, or join with a code."
       />
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Circoli e gruppi</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Clubs and groups</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Crea un circolo o una classe per seguire i progressi dei tuoi allievi e
-          assegnare attività, oppure unisciti a un gruppo con un codice d&apos;invito.
+          Create a club or a class to follow your students&apos; progress and
+          assign activities, or join a group with an invite code.
         </p>
       </div>
 
       {groups.length === 0 ? (
         <p className="text-sm text-text-muted">
-          Non fai ancora parte di alcun gruppo. Creane uno o unisciti con un codice.
+          You&apos;re not part of any group yet. Create one or join with a code.
         </p>
       ) : (
         <ul className="space-y-2">
@@ -92,7 +92,7 @@ export default async function GruppiPage() {
                         )}
                       </div>
                       <p className="text-xs text-text-muted">
-                        {GROUP_TYPE_LABEL[g.type]} · {g.memberCount} membri
+                        {GROUP_TYPE_LABEL[g.type]} · {g.memberCount} members
                       </p>
                     </div>
                   </CardContent>
@@ -105,8 +105,8 @@ export default async function GruppiPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Crea un gruppo</CardTitle>
-          <CardDescription>Diventi istruttore del gruppo che crei.</CardDescription>
+          <CardTitle>Create a group</CardTitle>
+          <CardDescription>You become the instructor of the group you create.</CardDescription>
         </CardHeader>
         <CardContent>
           <CreateGroupForm />
@@ -115,8 +115,8 @@ export default async function GruppiPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Unisciti con un codice</CardTitle>
-          <CardDescription>Hai ricevuto un invito? Incolla qui il codice.</CardDescription>
+          <CardTitle>Join with a code</CardTitle>
+          <CardDescription>Got an invite? Paste the code here.</CardDescription>
         </CardHeader>
         <CardContent>
           <JoinForm />

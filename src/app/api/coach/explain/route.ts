@@ -23,25 +23,25 @@ interface Body {
  */
 export async function POST(req: Request) {
   if (!isCoachConfigured()) {
-    return new Response("Coach AI non configurato.", { status: 503 });
+    return new Response("AI coach not configured.", { status: 503 });
   }
 
   let body: Body;
   try {
     body = (await req.json()) as Body;
   } catch {
-    return new Response("Body non valido.", { status: 400 });
+    return new Response("Invalid body.", { status: 400 });
   }
   const { gameId, ply } = body;
   if (!gameId || typeof ply !== "number") {
-    return new Response("gameId e ply richiesti.", { status: 400 });
+    return new Response("gameId and ply are required.", { status: 400 });
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return new Response("Non autenticato.", { status: 401 });
+  if (!user) return new Response("Not authenticated.", { status: 401 });
 
   // Carica la mossa e la precedente (per la FEN "prima"). RLS filtra alle proprie partite.
   const { data: rows, error } = await supabase
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 
   if (error) return new Response(error.message, { status: 500 });
   const row = rows?.find((r) => r.ply === ply);
-  if (!row) return new Response("Mossa non trovata.", { status: 404 });
+  if (!row) return new Response("Move not found.", { status: 404 });
 
   const encoder = new TextEncoder();
 
@@ -109,8 +109,8 @@ export async function POST(req: Request) {
         }
         controller.close();
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Errore del coach.";
-        controller.enqueue(encoder.encode(`\n[Errore: ${msg}]`));
+        const msg = e instanceof Error ? e.message : "Coach error.";
+        controller.enqueue(encoder.encode(`\n[Error: ${msg}]`));
         controller.close();
       }
     },

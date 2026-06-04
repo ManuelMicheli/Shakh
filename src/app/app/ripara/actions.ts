@@ -49,7 +49,7 @@ export async function getRepairPuzzles(gameId: string, ply: number): Promise<Rep
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   // Riga d'analisi dell'errore (RLS: solo partite dell'utente).
   const { data: row } = await supabase
@@ -64,7 +64,7 @@ export async function getRepairPuzzles(gameId: string, ply: number): Promise<Rep
       best_move_san: string | null;
       classification: string | null;
     }>();
-  if (!row) return { ok: false, error: "Mossa non trovata." };
+  if (!row) return { ok: false, error: "Move not found." };
 
   const { data: game } = await supabase
     .from("games")
@@ -118,7 +118,7 @@ export async function getRepairPuzzles(gameId: string, ply: number): Promise<Rep
     .order("popularity", { ascending: false })
     .limit(60);
   const pool = (fbData as PuzzleRow[] | null) ?? [];
-  if (pool.length === 0) return { ok: false, error: "Nessun puzzle disponibile." };
+  if (pool.length === 0) return { ok: false, error: "No puzzles available." };
   return {
     ok: true,
     motif,

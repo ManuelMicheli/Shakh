@@ -37,10 +37,10 @@ export default function GiocaShowcasePage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Redesign mobile · Partita
+          Mobile redesign · Game
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Board piena, barre giocatore, mosse a striscia, controlli in basso.
+          Full board, player bars, move strip, controls at the bottom.
         </p>
       </header>
 
@@ -51,8 +51,8 @@ export default function GiocaShowcasePage() {
             {/* Avversario */}
             <div className="px-3 pt-3">
               <PlayerBar
-                name="Avversario"
-                meta="Nero"
+                name="Opponent"
+                meta="Black"
                 clock="4:32"
                 active
                 captured="♟♟♝"
@@ -67,8 +67,8 @@ export default function GiocaShowcasePage() {
             {/* Io */}
             <div className="px-3">
               <PlayerBar
-                name="Tu"
-                meta="Bianco"
+                name="You"
+                meta="White"
                 clock="5:00"
                 active={false}
                 captured="♙♙♞"
@@ -230,33 +230,33 @@ function ControlBar({
     "grid h-11 flex-1 place-items-center rounded-lg bg-surface-2 text-text disabled:opacity-40";
   return (
     <div className="relative mt-auto flex items-center gap-2 border-t border-border bg-surface px-3 py-3">
-      <button className={btn} onClick={onFirst} disabled={cursor < 0} aria-label="Inizio">
+      <button className={btn} onClick={onFirst} disabled={cursor < 0} aria-label="Start">
         <ChevronsLeft className="h-5 w-5" />
       </button>
-      <button className={btn} onClick={onPrev} disabled={cursor < 0} aria-label="Indietro">
+      <button className={btn} onClick={onPrev} disabled={cursor < 0} aria-label="Previous">
         <ChevronLeft className="h-5 w-5" />
       </button>
-      <button className={btn} onClick={onNext} disabled={cursor >= max} aria-label="Avanti">
+      <button className={btn} onClick={onNext} disabled={cursor >= max} aria-label="Next">
         <ChevronRight className="h-5 w-5" />
       </button>
-      <button className={btn} onClick={onLast} disabled={cursor >= max} aria-label="Fine">
+      <button className={btn} onClick={onLast} disabled={cursor >= max} aria-label="End">
         <ChevronsRight className="h-5 w-5" />
       </button>
       <div className="relative">
         <button
           className="grid h-11 w-11 place-items-center rounded-lg bg-surface-2 text-text"
           onClick={() => setMenu((v) => !v)}
-          aria-label="Azioni"
+          aria-label="Actions"
         >
           <MoreVertical className="h-5 w-5" />
         </button>
         {menu && (
           <div className="absolute bottom-full right-0 z-50 mb-2 w-44 space-y-1 rounded-lg border border-border bg-surface p-1 shadow-lg">
             <button className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm hover:bg-surface-2">
-              <Handshake className="h-4 w-4" /> Proponi patta
+              <Handshake className="h-4 w-4" /> Offer draw
             </button>
             <button className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm text-eval-blunder hover:bg-surface-2">
-              <Flag className="h-4 w-4" /> Abbandona
+              <Flag className="h-4 w-4" /> Resign
             </button>
           </div>
         )}
@@ -371,7 +371,7 @@ function PhoneChrome() {
         </button>
         <span className="font-display text-lg font-semibold tracking-tight">Shakh</span>
         <div className="flex items-center gap-1">
-          <button type="button" aria-label="Notifiche" className="rounded-md p-1.5 text-text-muted">
+          <button type="button" aria-label="Notifications" className="rounded-md p-1.5 text-text-muted">
             <Bell className="h-5 w-5" />
           </button>
           <div className="grid h-8 w-8 place-items-center rounded-full bg-text text-xs font-semibold text-bg">

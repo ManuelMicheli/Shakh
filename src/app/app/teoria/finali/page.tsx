@@ -6,7 +6,7 @@ import { hasPractice } from "@/lib/theory/endgame";
 import { loadDomainRatings } from "@/lib/rating/store";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Finali — Teoria — Shakh" };
+export const metadata = { title: "Endgames — Theory — Shakh" };
 
 interface Row {
   slug: string;
@@ -77,32 +77,32 @@ export default async function FinaliPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow={endgameRating != null ? `Rating finali · ${endgameRating}` : "Tecnica esatta"}
-        title="Finali"
-        desc="Converti l'esito contro la difesa perfetta della tablebase."
+        eyebrow={endgameRating != null ? `Endgame rating · ${endgameRating}` : "Exact technique"}
+        title="Endgames"
+        desc="Convert the result against the tablebase's perfect defense."
       />
       <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">
-          ← Teoria
+          ← Theory
         </Link>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Finali</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">Endgames</h1>
           <div className="text-right">
             <div className="font-mono text-2xl tabular-nums">{endgameRating ?? "—"}</div>
-            <div className="text-xs uppercase tracking-wide text-text-muted">rating finali</div>
+            <div className="text-xs uppercase tracking-wide text-text-muted">endgame rating</div>
           </div>
         </div>
         <p className="mt-2 max-w-2xl text-text-muted">
-          La tecnica dei finali, lezione e <em>pratica</em>: converti l&apos;esito contro
-          la difesa perfetta della tablebase. Niente approssimazioni — la tablebase
-          è verità assoluta. Ogni conversione aggiorna il tuo rating finali.
+          Endgame technique, lesson and <em>practice</em>: convert the result against
+          the tablebase&apos;s perfect defense. No approximations — the tablebase
+          is absolute truth. Every conversion updates your endgame rating.
         </p>
       </div>
 
       {lessons.length === 0 ? (
         <Card>
           <CardContent className="py-6 text-center text-sm text-text-muted">
-            Lezioni in arrivo.
+            Lessons coming soon.
           </CardContent>
         </Card>
       ) : (
@@ -113,7 +113,7 @@ export default async function FinaliPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle>{l.title}</CardTitle>
-                    {l.slug === recommended && <Badge>consigliato</Badge>}
+                    {l.slug === recommended && <Badge>recommended</Badge>}
                   </div>
                   {l.summary && <CardDescription>{l.summary}</CardDescription>}
                 </CardHeader>
@@ -134,7 +134,7 @@ export default async function FinaliPage() {
 /** Etichetta di competenza per una pratica di finale. */
 function CompetenceTag({ score, attempts }: { score: number | null; attempts: number }) {
   if (attempts === 0) {
-    return <span className="text-xs text-text-muted">Mai praticato</span>;
+    return <span className="text-xs text-text-muted">Never practiced</span>;
   }
   const pct = Math.round((score ?? 0) * 100);
   return (

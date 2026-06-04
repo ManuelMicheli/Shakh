@@ -17,9 +17,9 @@ export interface EvalVerdict {
 }
 
 /** Lato in vantaggio, o null se la posizione è in equilibrio. */
-function leader(score: number): "Bianco" | "Nero" | null {
-  if (score > 0) return "Bianco";
-  if (score < 0) return "Nero";
+function leader(score: number): "White" | "Black" | null {
+  if (score > 0) return "White";
+  if (score < 0) return "Black";
   return null;
 }
 
@@ -30,45 +30,45 @@ function leader(score: number): "Bianco" | "Nero" | null {
 export function evalVerdict(score: number, scoreType: ScoreType): EvalVerdict {
   if (scoreType === "mate") {
     const n = Math.abs(score);
-    if (n === 0) return { headline: "Re sotto scacco matto", detail: "La partita è finita." };
-    const who = score > 0 ? "il Bianco" : "il Nero";
+    if (n === 0) return { headline: "King in checkmate", detail: "The game is over." };
+    const who = score > 0 ? "White" : "Black";
     return {
-      headline: `Matto forzato per ${who} in ${n}`,
-      detail: `Con il gioco migliore ${who} dà scacco matto entro ${n} mosse: la partita è decisa.`,
+      headline: `Forced mate for ${who} in ${n}`,
+      detail: `With best play ${who} delivers checkmate within ${n} moves: the game is decided.`,
     };
   }
 
   const side = leader(score);
   const abs = Math.abs(score);
-  const pawns = (abs / 100).toFixed(1).replace(".", ",");
+  const pawns = (abs / 100).toFixed(1);
 
   if (abs <= 30) {
     return {
-      headline: "Posizione equilibrata",
-      detail: "Nessuno dei due ha un vantaggio reale: la partita è in bilico.",
+      headline: "Balanced position",
+      detail: "Neither side has a real advantage: the game is in the balance.",
     };
   }
 
   let strength: string;
-  if (abs <= 90) strength = "in leggero vantaggio";
-  else if (abs <= 200) strength = "in chiaro vantaggio";
-  else if (abs <= 500) strength = "in netto vantaggio";
-  else strength = "in posizione vinta";
+  if (abs <= 90) strength = "slightly better";
+  else if (abs <= 200) strength = "clearly better";
+  else if (abs <= 500) strength = "winning";
+  else strength = "completely winning";
 
   return {
     headline: `${side} ${strength}`,
-    detail: `Il numero vale circa ${pawns} pedoni a favore del ${side}: più è alto, più il vantaggio è grande.`,
+    detail: `The number is worth about ${pawns} pawns in ${side}'s favor: the higher it is, the bigger the advantage.`,
   };
 }
 
 /** Testi d'aiuto riutilizzabili (tooltip) sui termini del motore. */
 export const ENGINE_HELP = {
   eval:
-    "Valutazione del motore in pedoni. Un valore positivo (+) favorisce il Bianco, negativo (−) il Nero. Vicino a 0 = posizione pari.",
+    "Engine evaluation in pawns. A positive value (+) favors White, a negative one (−) favors Black. Near 0 = level position.",
   bestMove:
-    "La mossa che il motore considera migliore nella posizione attuale.",
+    "The move the engine considers best in the current position.",
   lines:
-    "Quante mosse alternative mostrare. 1 = solo la migliore; 2–3 per confrontare le opzioni.",
+    "How many alternative moves to show. 1 = the best only; 2–3 to compare the options.",
   depth:
-    "Profondità: quante mosse in avanti ha calcolato il motore. Più è alta, più l'analisi è affidabile.",
+    "Depth: how many moves ahead the engine has calculated. The higher it is, the more reliable the analysis.",
 } as const;

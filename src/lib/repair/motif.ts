@@ -43,11 +43,11 @@ export function motifThemes(motif: MotifClass): string[] {
 export function motifLabel(motif: MotifClass): string {
   switch (motif) {
     case "mate":
-      return "Matto mancato";
+      return "Missed mate";
     case "tactic":
-      return "Colpo tattico mancato";
+      return "Missed tactic";
     case "conversion":
-      return "Vantaggio non convertito";
+      return "Unconverted advantage";
   }
 }
 

@@ -68,7 +68,7 @@ export function ReelPlayer({ data }: { data: ReelData }) {
           {data.evalText && <span className="ml-2 text-text-muted">{data.evalText}</span>}
         </div>
         <Button size="sm" variant="secondary" onClick={() => setStep(0)} disabled={!atEnd}>
-          ↻ Rivedi
+          ↻ Replay
         </Button>
       </div>
     </div>

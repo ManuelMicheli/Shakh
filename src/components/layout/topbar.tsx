@@ -19,14 +19,14 @@ export function Topbar({
         <button
           type="button"
           onClick={onOpenMobile}
-          aria-label="Apri menu"
+          aria-label="Open menu"
           className="-ml-1 rounded-md p-1.5 text-text-muted hover:bg-surface-2 hover:text-text md:hidden"
         >
           <Menu className="h-5 w-5" aria-hidden />
         </button>
         <BackButton />
         <div className="truncate text-sm text-text-muted">
-          {displayName ? `Ciao, ${displayName}` : " "}
+          {displayName ? `Hi, ${displayName}` : " "}
         </div>
       </div>
       <div className="flex items-center gap-2">

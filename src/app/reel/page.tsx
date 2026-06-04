@@ -23,20 +23,20 @@ export default async function PublicReelPage({
         <>
           <ReelPlayer data={reel} />
           <div className="text-center">
-            <p className="text-sm text-text-muted">Una bella mossa, catturata su Shakh.</p>
+            <p className="text-sm text-text-muted">A great move, captured on Shakh.</p>
             <Link href="/" className="mt-2 inline-block">
               <Button variant="secondary" size="sm">
-                Scopri Shakh
+                Discover Shakh
               </Button>
             </Link>
           </div>
         </>
       ) : (
         <div className="text-center">
-          <h1 className="font-display text-2xl font-semibold">Reel non disponibile</h1>
-          <p className="mt-2 text-text-muted">Il link non è valido o è incompleto.</p>
+          <h1 className="font-display text-2xl font-semibold">Reel unavailable</h1>
+          <p className="mt-2 text-text-muted">The link is invalid or incomplete.</p>
           <Link href="/" className="mt-4 inline-block">
-            <Button>Vai a Shakh</Button>
+            <Button>Go to Shakh</Button>
           </Link>
         </div>
       )}

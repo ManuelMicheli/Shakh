@@ -3,41 +3,40 @@ import { LegalShell } from "@/components/legal/LegalShell";
 import { ConsentPreferencesButton } from "@/components/consent/ConsentPreferencesButton";
 
 export const metadata: Metadata = {
-  title: "Cookie policy",
+  title: "Cookie Policy",
   description:
-    "I cookie usati da Shakh: tecnici necessari e di preferenza. Nessun tracciamento pubblicitario né profilazione.",
+    "The cookies Shakh uses: strictly necessary technical and preference cookies. No advertising tracking or profiling.",
 };
 
 export default function CookiePolicyPage() {
   return (
-    <LegalShell title="Cookie policy" updated="giugno 2026">
+    <LegalShell title="Cookie Policy" updated="June 2026">
       <p>
-        Shakh usa un numero minimo di cookie. Non utilizziamo cookie di
-        profilazione pubblicitaria né strumenti di tracciamento di terze parti.
+        Shakh uses a minimal number of cookies. We do not use advertising
+        profiling cookies or third-party tracking tools.
       </p>
 
-      <h2>Cookie tecnici (necessari)</h2>
+      <h2>Technical cookies (necessary)</h2>
       <p>
-        Indispensabili al funzionamento: sessione di autenticazione (Supabase),
-        sicurezza, preferenza di tema e di lingua. Non richiedono consenso e sono
-        sempre attivi.
+        Essential to operation: authentication session (Supabase), security,
+        theme preference, and language preference. They do not require consent
+        and are always on.
       </p>
 
-      <h2>Cookie di preferenza</h2>
+      <h2>Preference cookies</h2>
       <p>
-        Ricordano scelte non essenziali per migliorare l&apos;esperienza. Vengono
-        installati solo previo tuo consenso esplicito e possono essere revocati
-        in qualsiasi momento.
+        They remember non-essential choices to improve your experience. They are
+        only set after your explicit consent and can be withdrawn at any time.
       </p>
 
-      <h2>Gestione del consenso</h2>
+      <h2>Managing consent</h2>
       <p>
-        Al primo accesso un banner ti consente di accettare o rifiutare i cookie
-        non necessari con pari evidenza e in un solo click. Puoi rivedere la tua
-        scelta quando vuoi:
+        On your first visit, a banner lets you accept or reject non-necessary
+        cookies with equal prominence and in a single click. You can review your
+        choice at any time:
       </p>
       <p>
-        <ConsentPreferencesButton label="Gestisci le preferenze cookie" />
+        <ConsentPreferencesButton label="Manage cookie preferences" />
       </p>
     </LegalShell>
   );

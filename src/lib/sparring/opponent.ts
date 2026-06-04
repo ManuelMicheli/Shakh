@@ -130,7 +130,7 @@ export function chooseEngineMove(
 }
 
 export const STYLE_LABEL: Record<Style, string> = {
-  aggressive: "Aggressivo",
-  positional: "Posizionale",
-  drawish: "Solido",
+  aggressive: "Aggressive",
+  positional: "Positional",
+  drawish: "Solid",
 };

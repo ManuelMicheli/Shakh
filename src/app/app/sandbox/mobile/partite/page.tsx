@@ -14,7 +14,7 @@ type Outcome = "win" | "draw" | "loss";
 
 const GAMES: {
   opponent: string;
-  youColor: "Bianco" | "Nero";
+  youColor: "White" | "Black";
   outcome: Outcome;
   result: string;
   source: string;
@@ -24,50 +24,50 @@ const GAMES: {
 }[] = [
   {
     opponent: "M. Rossi",
-    youColor: "Bianco",
+    youColor: "White",
     outcome: "win",
     result: "1–0",
     source: "Lichess",
-    date: "2 giu 2026",
+    date: "Jun 2, 2026",
     eco: "B90",
     analyzed: true,
   },
   {
     opponent: "A. Bianchi",
-    youColor: "Nero",
+    youColor: "Black",
     outcome: "loss",
     result: "1–0",
     source: "Chess.com",
-    date: "1 giu 2026",
+    date: "Jun 1, 2026",
     eco: "C65",
     analyzed: true,
   },
   {
     opponent: "L. Verdi",
-    youColor: "Bianco",
+    youColor: "White",
     outcome: "draw",
     result: "½–½",
     source: "PGN",
-    date: "30 mag 2026",
+    date: "May 30, 2026",
     eco: "D37",
     analyzed: false,
   },
   {
     opponent: "G. Neri",
-    youColor: "Nero",
+    youColor: "Black",
     outcome: "win",
     result: "0–1",
     source: "Lichess",
-    date: "28 mag 2026",
+    date: "May 28, 2026",
     eco: "B22",
     analyzed: false,
   },
 ];
 
 const OUTCOME: Record<Outcome, { letter: string; label: string; cls: string }> = {
-  win: { letter: "V", label: "Vittoria", cls: "bg-text text-bg" },
-  draw: { letter: "½", label: "Patta", cls: "border border-border text-text" },
-  loss: { letter: "S", label: "Sconfitta", cls: "bg-surface-2 text-text-muted" },
+  win: { letter: "W", label: "Win", cls: "bg-text text-bg" },
+  draw: { letter: "½", label: "Draw", cls: "border border-border text-text" },
+  loss: { letter: "L", label: "Loss", cls: "bg-surface-2 text-text-muted" },
 };
 
 export default function PartiteShowcasePage() {
@@ -75,10 +75,11 @@ export default function PartiteShowcasePage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Redesign mobile · Le mie partite
+          Mobile redesign · My games
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Esito derivato (V/P/S), avversario, stato analisi. Guarda e conferma.
+          Derived outcome (W/D/L), opponent, analysis status. Take a look and
+          confirm.
         </p>
       </header>
 
@@ -91,13 +92,13 @@ export default function PartiteShowcasePage() {
               <div className="relative">
                 <div className="relative">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
-                    Archivio
+                    Archive
                   </p>
                   <h2 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-                    Le mie partite
+                    My games
                   </h2>
                   <p className="mt-2 text-sm text-text-muted">
-                    Importa, analizza, rivedi mossa per mossa.
+                    Import, analyze, review move by move.
                   </p>
                 </div>
               </div>
@@ -112,7 +113,7 @@ export default function PartiteShowcasePage() {
               <section className="space-y-2">
                 <div className="flex items-center justify-between px-0.5">
                   <p className="text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-                    {GAMES.length} partite
+                    {GAMES.length} games
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -134,7 +135,7 @@ type ImportSource = "chesscom" | "lichess" | "import";
 const IMPORT_TABS: { id: ImportSource; label: string }[] = [
   { id: "chesscom", label: "Chess.com" },
   { id: "lichess", label: "Lichess" },
-  { id: "import", label: "Importa" },
+  { id: "import", label: "Import" },
 ];
 
 function ImportTabs() {
@@ -168,7 +169,7 @@ function ImportTabs() {
             type="button"
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-surface-2 px-3 py-2.5 text-sm font-medium text-text"
           >
-            <Upload className="h-4 w-4" /> Incolla PGN o carica file .pgn
+            <Upload className="h-4 w-4" /> Paste PGN or upload a .pgn file
           </button>
         </div>
       ) : (
@@ -177,8 +178,8 @@ function ImportTabs() {
             readOnly
             placeholder={
               tab === "chesscom"
-                ? "Username Chess.com"
-                : "Username Lichess"
+                ? "Chess.com username"
+                : "Lichess username"
             }
             className="min-w-0 flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-sm text-text placeholder:text-text-muted/70"
           />
@@ -186,7 +187,7 @@ function ImportTabs() {
             type="button"
             className="shrink-0 rounded-lg bg-text px-4 py-2.5 text-sm font-medium text-bg"
           >
-            Importa
+            Import
           </button>
         </div>
       )}
@@ -234,12 +235,12 @@ function GameCard({
               : "bg-text text-bg",
           )}
         >
-          {game.analyzed ? "Rivedi" : "Analizza"}
+          {game.analyzed ? "Review" : "Analyze"}
         </button>
 
         <button
           type="button"
-          aria-label="Elimina"
+          aria-label="Delete"
           className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-text-muted hover:bg-surface-2"
         >
           <Trash2 className="h-4 w-4" />
@@ -270,7 +271,7 @@ function PhoneChrome() {
         </button>
         <span className="font-display text-lg font-semibold tracking-tight">Shakh</span>
         <div className="flex items-center gap-1">
-          <button type="button" aria-label="Notifiche" className="rounded-md p-1.5 text-text-muted">
+          <button type="button" aria-label="Notifications" className="rounded-md p-1.5 text-text-muted">
             <Bell className="h-5 w-5" />
           </button>
           <div className="grid h-8 w-8 place-items-center rounded-full bg-text text-xs font-semibold text-bg">

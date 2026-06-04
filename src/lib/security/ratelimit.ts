@@ -66,7 +66,7 @@ export async function limitCoach(userId: string, ip: string): Promise<RateResult
 
 /** Risposta 429 standard con header Retry-After. */
 export function tooMany(retryAfter?: number): Response {
-  return new Response("Troppe richieste al coach. Riprova tra poco.", {
+  return new Response("Too many coach requests. Please try again shortly.", {
     status: 429,
     headers: retryAfter ? { "Retry-After": String(retryAfter) } : undefined,
   });

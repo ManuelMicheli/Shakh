@@ -82,31 +82,31 @@ export function TrapCatalog({ traps }: TrapCatalogProps) {
       <Input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Cerca per nome o apertura (es. «Siciliana», «Légal», «B10»)…"
-        aria-label="Cerca trappola"
+        placeholder='Search by name or opening (e.g. "Sicilian", "Légal", "B10")…'
+        aria-label="Search trap"
       />
 
       {/* Filtri */}
       <div className="space-y-3">
-        <FilterRow label="Categoria">
+        <FilterRow label="Category">
           {CATEGORIES.map((c) => (
             <Chip key={c} active={category === c} onClick={() => setCategory(c)}>
-              {c === "all" ? "Tutte" : CATEGORY_LABEL[c]}
+              {c === "all" ? "All" : CATEGORY_LABEL[c]}
             </Chip>
           ))}
         </FilterRow>
 
-        <FilterRow label="Lato (chi la tende)">
+        <FilterRow label="Side (who sets it)">
           {(["all", "white", "black"] as SideFilter[]).map((s) => (
             <Chip key={s} active={side === s} onClick={() => setSide(s)}>
-              {s === "all" ? "Tutti" : SIDE_LABEL[s]}
+              {s === "all" ? "All" : SIDE_LABEL[s]}
             </Chip>
           ))}
         </FilterRow>
 
-        <FilterRow label="Notorietà">
+        <FilterRow label="Notoriety">
           <Chip active={fameDepth === -1} onClick={() => setFameDepth(-1)}>
-            Tutte
+            All
           </Chip>
           {FAME_ORDER.map((f, i) => (
             <Chip key={f} active={fameDepth === i} onClick={() => setFameDepth(i)}>
@@ -116,7 +116,7 @@ export function TrapCatalog({ traps }: TrapCatalogProps) {
         </FilterRow>
 
         {allMotifs.length > 0 && (
-          <FilterRow label="Motivo tattico">
+          <FilterRow label="Tactical motif">
             {allMotifs.map((m) => (
               <Chip key={m} active={motifs.has(m)} onClick={() => toggleMotif(m)}>
                 {motifLabel(m)}
@@ -129,8 +129,8 @@ export function TrapCatalog({ traps }: TrapCatalogProps) {
       {/* Risultati */}
       <p className="text-sm text-text-muted">
         {filtered.length === 0
-          ? "Nessuna trappola con questi filtri."
-          : `${filtered.length} ${filtered.length === 1 ? "trappola" : "trappole"}`}
+          ? "No traps match these filters."
+          : `${filtered.length} ${filtered.length === 1 ? "trap" : "traps"}`}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -169,7 +169,7 @@ function TrapCard({ trap }: { trap: TrapSummary }) {
           </div>
 
           <p className="text-xs text-text-muted">
-            {FAME_LABEL[trap.fame]} · livello{" "}
+            {FAME_LABEL[trap.fame]} · level{" "}
             <span className="font-mono text-text">{trap.level}</span>
           </p>
         </CardContent>

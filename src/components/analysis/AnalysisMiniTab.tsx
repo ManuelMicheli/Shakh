@@ -32,15 +32,15 @@ export function AnalysisMiniTab() {
         >
           <div className="flex items-start justify-between gap-2">
             <p className="text-sm font-medium text-text">
-              {job.status === "running" && "Analisi in corso"}
-              {job.status === "done" && "Analisi completata"}
-              {job.status === "error" && "Analisi non riuscita"}
+              {job.status === "running" && "Analyzing"}
+              {job.status === "done" && "Analysis complete"}
+              {job.status === "error" && "Analysis failed"}
             </p>
             {job.status !== "running" && (
               <button
                 type="button"
                 onClick={dismiss}
-                aria-label="Chiudi"
+                aria-label="Close"
                 className="-mr-1 -mt-1 rounded p-1 text-text-muted hover:text-text"
               >
                 ✕
@@ -54,7 +54,7 @@ export function AnalysisMiniTab() {
 
           {queueLength > 0 && (
             <p className="mt-0.5 font-mono text-xs text-text-muted">
-              ancora {queueLength} in coda
+              {queueLength} still queued
             </p>
           )}
 
@@ -70,14 +70,14 @@ export function AnalysisMiniTab() {
               </div>
               <div className="flex items-center justify-between">
                 <p className="font-mono text-xs text-text-muted">
-                  {job.total > 0 ? `posizione ${job.current}/${job.total}` : "avvio…"}
+                  {job.total > 0 ? `position ${job.current}/${job.total}` : "starting…"}
                 </p>
                 <button
                   type="button"
                   onClick={cancel}
                   className="text-xs text-text-muted underline-offset-2 hover:text-text hover:underline"
                 >
-                  Annulla
+                  Cancel
                 </button>
               </div>
             </div>
@@ -93,7 +93,7 @@ export function AnalysisMiniTab() {
                   "bg-text text-bg hover:opacity-90",
                 )}
               >
-                Apri
+                Open
               </Link>
             </div>
           )}
@@ -104,7 +104,7 @@ export function AnalysisMiniTab() {
           {job.status === "error" && (
             <div className="mt-3">
               <Button variant="secondary" size="sm" onClick={dismiss} className="w-full">
-                Chiudi
+                Close
               </Button>
             </div>
           )}

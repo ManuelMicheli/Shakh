@@ -42,7 +42,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
     setAnswer("");
     try {
       await engine.init();
-      setPhase("Interrogo il motore…");
+      setPhase("Querying the engine…");
       const evaluation = await engine.analyze(fenBefore, { depth: LINES_DEPTH, multiPV: 3 }).result;
       const lines: EngineLineFact[] = evaluation.lines.slice(0, 3).map((l) => ({
         evalText: whiteEvalText(l.score, l.scoreType, turn),
@@ -54,7 +54,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
       // Valuta la mossa di deviazione concreta.
       const played = tryPlaySan(fenBefore, deviationSan);
       if (played) {
-        setPhase(`Valuto ${played.san}…`);
+        setPhase(`Evaluating ${played.san}…`);
         const afterTurn = (played.fen.split(" ")[1] as "w" | "b") ?? "w";
         const afterEval = await engine.analyze(played.fen, { depth: MOVE_DEPTH }).result;
         const top = afterEval.lines[0];
@@ -67,21 +67,21 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
         }
       }
 
-      setPhase("Il coach sta rispondendo…");
+      setPhase("The coach is replying…");
       const res = await fetch("/api/coach/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fen: facts.fen,
           turn: facts.turn,
-          question: `Perché non ${deviationSan}?`,
+          question: `Why not ${deviationSan}?`,
           lines: facts.lines,
           askedMove: facts.askedMove,
         }),
       });
       if (!res.ok || !res.body) {
-        const msg = await res.text().catch(() => "Errore del coach.");
-        setAnswer(`Spiacente: ${msg}`);
+        const msg = await res.text().catch(() => "Coach error.");
+        setAnswer(`Sorry: ${msg}`);
         return;
       }
       const reader = res.body.getReader();
@@ -94,7 +94,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
         setAnswer(acc);
       }
     } catch {
-      setAnswer("Non sono riuscito a rispondere. Riprova.");
+      setAnswer("I couldn't answer. Try again.");
     } finally {
       setBusy(false);
       setPhase(null);
@@ -104,7 +104,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
   if (!coachConfigured) {
     return (
       <p className="text-xs text-text-muted">
-        Coach non configurato: puoi comunque valutare la deviazione con il motore.
+        Coach not configured: you can still evaluate the deviation with the engine.
       </p>
     );
   }
@@ -112,7 +112,7 @@ export function DeviationCoach({ fenBefore, deviationSan, coachConfigured }: Dev
   return (
     <div className="space-y-2">
       <Button variant="secondary" size="sm" onClick={() => void ask()} disabled={busy}>
-        Perché non <span className="ml-1 font-mono">{deviationSan}</span>?
+        Why not <span className="ml-1 font-mono">{deviationSan}</span>?
       </Button>
       {busy && phase && (
         <p className="flex items-center gap-2 text-xs text-text-muted">

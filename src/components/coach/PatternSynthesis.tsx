@@ -27,7 +27,7 @@ export function PatternSynthesis({
     start(async () => {
       const res = await refreshProgressAndSynthesize();
       if (!res.ok) {
-        toast({ title: "Sintesi non disponibile", description: res.error, variant: "error" });
+        toast({ title: "Summary unavailable", description: res.error, variant: "error" });
         return;
       }
       setSynthesis(res.synthesis ?? null);
@@ -38,19 +38,19 @@ export function PatternSynthesis({
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <Button onClick={onGenerate} disabled={pending || !coachConfigured || !hasData}>
-          {pending ? "…" : synthesis ? "Rigenera sintesi" : "Genera sintesi del coach"}
+          {pending ? "…" : synthesis ? "Regenerate summary" : "Generate coach summary"}
         </Button>
         {pending && (
           <span className="flex items-center gap-2 text-sm text-text-muted">
-            <Spinner /> Il coach sta analizzando i tuoi pattern…
+            <Spinner /> The coach is analyzing your patterns…
           </span>
         )}
       </div>
 
       {!coachConfigured && (
         <p className="text-sm text-text-muted">
-          Il coach AI non è configurato (manca <code className="font-mono">ANTHROPIC_API_KEY</code>).
-          Le metriche qui sopra restano comunque disponibili.
+          The AI coach isn&apos;t configured (<code className="font-mono">ANTHROPIC_API_KEY</code> is missing).
+          The metrics above remain available.
         </p>
       )}
 
@@ -66,7 +66,7 @@ export function PatternSynthesis({
           )}
           {synthesis.suggestion && (
             <p className="text-sm text-text-muted">
-              <span className="font-medium text-text">Consiglio: </span>
+              <span className="font-medium text-text">Tip: </span>
               {synthesis.suggestion}
             </p>
           )}

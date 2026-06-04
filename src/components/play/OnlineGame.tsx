@@ -57,6 +57,8 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [overlayOff, setOverlayOff] = useState(false);
+  // Pre-mossa: trattenuta mentre tocca all'avversario, giocata appena torna il turno.
+  const [premove, setPremove] = useState<{ from: Square; to: Square } | null>(null);
   const claimedRef = useRef(false);
   const boardWrapRef = useRef<HTMLDivElement>(null);
   const latestStampRef = useRef<string>(initialGame.updated_at);
@@ -164,6 +166,9 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
 
   const canMove =
     game.status === "ongoing" && isPlayer && game.turn === myColor && atLive;
+  // Partita "viva" per me: posizione corrente, in corso, sono un giocatore.
+  // Vale anche mentre tocca all'avversario (è quando si imposta la pre-mossa).
+  const liveOpen = game.status === "ongoing" && isPlayer && atLive;
 
   const onMove = useCallback(
     async (from: Square, to: Square, promotion?: PieceSymbol) => {
@@ -178,6 +183,28 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     },
     [canMove, initialGame.id, toast, applyRow],
   );
+
+  // Pre-mossa: appena torna il mio turno, la gioco (con validazione locale per
+  // scartarla in silenzio se nel frattempo è diventata illegale).
+  useEffect(() => {
+    if (!premove) return;
+    if (!liveOpen) return; // partita finita o non al vivo: la tengo in attesa
+    if (game.turn !== myColor) return; // tocca ancora all'avversario
+    const pm = premove;
+    setPremove(null);
+    try {
+      const chess = new Chess(game.fen);
+      const piece = chess.get(pm.from);
+      const promo =
+        piece?.type === "p" && (pm.to[1] === "8" || pm.to[1] === "1") ? "q" : undefined;
+      const legal = chess
+        .moves({ square: pm.from, verbose: true })
+        .some((m) => m.to === pm.to);
+      if (legal) onMove(pm.from, pm.to, promo);
+    } catch {
+      /* posizione non valida: scarta la pre-mossa */
+    }
+  }, [premove, liveOpen, game.turn, game.fen, myColor, onMove]);
 
   const onJoin = async () => {
     const res = await joinOnlineGame(initialGame.id);
@@ -199,7 +226,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     if (!res.ok) toast({ title: res.error, variant: "error" });
     else {
       applyRow(res.data);
-      toast({ title: "Patta proposta" });
+      toast({ title: "Draw offered" });
     }
   };
 
@@ -223,7 +250,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      toast({ title: "Copia non riuscita", variant: "error" });
+      toast({ title: "Copy failed", variant: "error" });
     }
   };
 
@@ -261,7 +288,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
     game.status === "ongoing" && bothJoined && game.turn === c && game.initial_ms != null;
   const sinceTs = game.last_move_at ? Date.parse(game.last_move_at) : null;
   const nameOf = (c: "w" | "b") =>
-    c === "w" ? game.white_name ?? "Bianco" : game.black_name ?? "Nero";
+    c === "w" ? game.white_name ?? "White" : game.black_name ?? "Black";
   const msOf = (c: "w" | "b") => (c === "w" ? game.white_ms : game.black_ms);
 
   const drawOfferToMe =
@@ -277,15 +304,15 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              {isPlayer ? "In attesa dell'avversario" : "Unisciti alla partita"}
+              {isPlayer ? "Waiting for opponent" : "Join the game"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {isPlayer ? (
               <>
                 <p className="text-sm text-text-muted">
-                  Condividi questo link con il tuo amico. Dovrà accedere per
-                  giocare.
+                  Share this link with your friend. They&apos;ll need to sign in to
+                  play.
                 </p>
                 <div className="flex gap-2">
                   <input
@@ -295,17 +322,17 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                   />
                   <Button variant="secondary" size="sm" onClick={copyLink}>
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    {copied ? "Copiato" : "Copia"}
+                    {copied ? "Copied" : "Copy"}
                   </Button>
                 </div>
               </>
             ) : (
               <>
                 <p className="text-sm text-text-muted">
-                  Sei stato invitato a giocare. Entra come{" "}
-                  {game.white_user_id ? "Nero" : "Bianco"}.
+                  You&apos;ve been invited to play. Join as{" "}
+                  {game.white_user_id ? "Black" : "White"}.
                 </p>
-                <Button onClick={onJoin}>Unisciti</Button>
+                <Button onClick={onJoin}>Join</Button>
               </>
             )}
           </CardContent>
@@ -315,14 +342,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       {drawOfferToMe && (
         <Card>
           <CardHeader>
-            <CardTitle>Proposta di patta</CardTitle>
+            <CardTitle>Draw offer</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-2">
             <Button size="sm" onClick={() => onRespondDraw(true)}>
-              Accetta
+              Accept
             </Button>
             <Button variant="secondary" size="sm" onClick={() => onRespondDraw(false)}>
-              Rifiuta
+              Decline
             </Button>
           </CardContent>
         </Card>
@@ -331,14 +358,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
       {game.status === "finished" && (
         <Card>
           <CardHeader>
-            <CardTitle>Partita conclusa</CardTitle>
+            <CardTitle>Game over</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Badge variant="muted">{outcomeText(game)}</Badge>
             <div>
               <Link href="/app/gioca">
                 <Button variant="secondary" size="sm">
-                  Nuova partita
+                  New game
                 </Button>
               </Link>
             </div>
@@ -366,12 +393,15 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               <ChessBoard
                 fen={viewFen}
                 orientation={orientation}
-                mode={canMove ? "play" : "view"}
+                mode={liveOpen ? "play" : "view"}
                 movableColor={myColor === "b" ? "black" : "white"}
                 dests={canMove ? legalDestsForFen(game.fen) : new Map()}
                 lastMove={lastMove}
                 check={viewInCheck}
                 onMove={onMove}
+                premovable={liveOpen}
+                onPremove={(from, to) => setPremove({ from, to })}
+                onPremoveCancel={() => setPremove(null)}
               />
               {game.status === "finished" && !overlayOff && (() => {
                 const r = onlineResult(game, myColor);
@@ -381,7 +411,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                     ? [
                         ...gameStatsFromFen(game.fen),
                         {
-                          label: "Durata",
+                          label: "Duration",
                           value: formatDuration(
                             game.initial_ms * 2 +
                               game.increment_ms * game.moves.length -
@@ -401,7 +431,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                     actions={
                       <Link href="/app/gioca">
                         <Button size="sm" className="w-full">
-                          Nuova partita
+                          New game
                         </Button>
                       </Link>
                     }
@@ -451,7 +481,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={first}
               disabled={cursor < 0}
-              aria-label="Prima mossa"
+              aria-label="First move"
             >
               <ChevronsLeft className="h-5 w-5" />
             </Button>
@@ -461,7 +491,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={prev}
               disabled={cursor < 0}
-              aria-label="Mossa precedente"
+              aria-label="Previous move"
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
@@ -471,7 +501,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={next}
               disabled={atLive}
-              aria-label="Mossa successiva"
+              aria-label="Next move"
             >
               <ChevronRight className="h-5 w-5" />
             </Button>
@@ -481,7 +511,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
               className="flex-1"
               onClick={last}
               disabled={atLive}
-              aria-label="Ultima mossa"
+              aria-label="Last move"
             >
               <ChevronsRight className="h-5 w-5" />
             </Button>
@@ -492,7 +522,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                   variant="secondary"
                   size="icon"
                   onClick={() => setMenuOpen((v) => !v)}
-                  aria-label="Azioni partita"
+                  aria-label="Game actions"
                   aria-expanded={menuOpen}
                 >
                   <MoreVertical className="h-5 w-5" />
@@ -516,8 +546,8 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                       >
                         <Handshake className="h-4 w-4" />
                         {game.draw_offer_by === myColor
-                          ? "Patta proposta"
-                          : "Proponi patta"}
+                          ? "Draw offered"
+                          : "Offer draw"}
                       </button>
                       <ConfirmResignButton
                         onConfirm={() => {
@@ -546,14 +576,14 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                 disabled={game.draw_offer_by === myColor}
               >
                 <Handshake className="h-4 w-4" />
-                {game.draw_offer_by === myColor ? "Patta proposta" : "Proponi patta"}
+                {game.draw_offer_by === myColor ? "Draw offered" : "Offer draw"}
               </Button>
             </div>
           )}
 
           <Card>
             <CardHeader>
-              <CardTitle>Mosse</CardTitle>
+              <CardTitle>Moves</CardTitle>
             </CardHeader>
             <CardContent>
               <MoveList
@@ -579,27 +609,27 @@ function inCheck(fen: string): boolean {
 }
 
 function statusText(g: FriendGameRow): string {
-  if (g.status === "waiting") return "In attesa…";
+  if (g.status === "waiting") return "Waiting…";
   if (g.status === "finished") return outcomeText(g);
-  const side = g.turn === "w" ? "Bianco" : "Nero";
-  return `Muove il ${side}`;
+  const side = g.turn === "w" ? "White" : "Black";
+  return `${side} to move`;
 }
 
 function outcomeText(g: FriendGameRow): string {
   const reason: Record<string, string> = {
-    checkmate: "scacco matto",
-    resign: "abbandono",
-    timeout: "tempo scaduto",
-    stalemate: "stallo",
-    draw: "patta",
-    agreement: "patta concordata",
-    aborted: "annullata",
+    checkmate: "checkmate",
+    resign: "resignation",
+    timeout: "time out",
+    stalemate: "stalemate",
+    draw: "draw",
+    agreement: "draw by agreement",
+    aborted: "aborted",
   };
   const r = g.end_reason ? ` (${reason[g.end_reason] ?? g.end_reason})` : "";
-  if (g.result === "1-0") return `Vince il Bianco${r}`;
-  if (g.result === "0-1") return `Vince il Nero${r}`;
-  if (g.result === "1/2-1/2") return `Patta${r}`;
-  return "Conclusa";
+  if (g.result === "1-0") return `White wins${r}`;
+  if (g.result === "0-1") return `Black wins${r}`;
+  if (g.result === "1/2-1/2") return `Draw${r}`;
+  return "Over";
 }
 
 /** Esito strutturato per la schermata finale (overlay sulla scacchiera). */
@@ -610,24 +640,24 @@ function onlineResult(
   const checkmate = g.end_reason === "checkmate";
   // Sottotitolo col motivo, tranne il matto (mostrato come simbolo).
   const reason: Record<string, string> = {
-    resign: "Abbandono.",
-    timeout: "Tempo scaduto.",
-    stalemate: "Stallo.",
-    agreement: "Patta concordata.",
-    aborted: "Partita annullata.",
+    resign: "Resignation.",
+    timeout: "Time's up.",
+    stalemate: "Stalemate.",
+    agreement: "Draw by agreement.",
+    aborted: "Game aborted.",
   };
   const subtitle = g.end_reason && !checkmate ? reason[g.end_reason] : undefined;
 
-  if (g.result === "1/2-1/2") return { title: "Patta", subtitle, checkmate: false, outcome: "draw" };
+  if (g.result === "1/2-1/2") return { title: "Draw", subtitle, checkmate: false, outcome: "draw" };
 
   // Spettatore (non sei un giocatore): mostra il colore vincente.
   if (!myColor) {
     const decisive = g.result === "1-0" || g.result === "0-1";
-    const title = g.result === "1-0" ? "Vince il Bianco" : g.result === "0-1" ? "Vince il Nero" : "Conclusa";
+    const title = g.result === "1-0" ? "White wins" : g.result === "0-1" ? "Black wins" : "Over";
     return { title, subtitle, checkmate, outcome: decisive ? "win" : undefined };
   }
 
   const iWon =
     (g.result === "1-0" && myColor === "w") || (g.result === "0-1" && myColor === "b");
-  return { title: iWon ? "Hai vinto" : "Hai perso", subtitle, checkmate, outcome: iWon ? "win" : "loss" };
+  return { title: iWon ? "You won" : "You lost", subtitle, checkmate, outcome: iWon ? "win" : "loss" };
 }

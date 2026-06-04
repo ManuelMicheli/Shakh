@@ -85,7 +85,7 @@ export function Dialog({
         <button
           type="button"
           onClick={() => onOpenChange(false)}
-          aria-label="Chiudi"
+          aria-label="Close"
           className="absolute right-4 top-4 rounded-md p-1 text-text-muted hover:bg-surface-2 hover:text-text"
         >
           <X className="h-4 w-4" />

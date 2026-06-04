@@ -75,9 +75,9 @@ async function importParsed(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Sign in again." };
   if (games.length === 0)
-    return { ok: false, error: "Nessuna partita valida trovata nel PGN." };
+    return { ok: false, error: "No valid game found in the PGN." };
 
   // Le partite incidono sul profilo solo se sono del proprio account verificato.
   const countsForProfile = await isVerifiedOwner(supabase, user.id, source, username);
@@ -151,11 +151,11 @@ const MAX_GAMES_PER_IMPORT = 200;
 
 /** Import da PGN incollato o da file (.pgn letto come testo). */
 export async function importPgnText(text: string): Promise<ImportResult> {
-  if (!text.trim()) return { ok: false, error: "Incolla un PGN." };
+  if (!text.trim()) return { ok: false, error: "Paste a PGN." };
   if (text.length > MAX_PGN_CHARS)
     return {
       ok: false,
-      error: "PGN troppo grande (max ~500KB). Importa meno partite per volta.",
+      error: "PGN too large (max ~500KB). Import fewer games at a time.",
     };
   const games = splitPgn(text)
     .slice(0, MAX_GAMES_PER_IMPORT)
@@ -170,7 +170,7 @@ export async function importLichess(
   max: number,
 ): Promise<ImportResult> {
   const u = username.trim();
-  if (!u) return { ok: false, error: "Inserisci uno username Lichess." };
+  if (!u) return { ok: false, error: "Enter a Lichess username." };
   const n = Math.max(1, Math.min(100, Math.floor(max) || 10));
 
   let pgnText: string;
@@ -178,7 +178,7 @@ export async function importLichess(
     pgnText = await lichessProvider.fetchUserGamesPgn(u, n);
   } catch (e) {
     if (e instanceof ProviderError) return { ok: false, error: e.message };
-    return { ok: false, error: "Errore imprevisto durante l'import da Lichess." };
+    return { ok: false, error: "Unexpected error while importing from Lichess." };
   }
 
   const games = splitPgn(pgnText)
@@ -193,7 +193,7 @@ export async function importChesscom(
   max: number,
 ): Promise<ImportResult> {
   const u = username.trim();
-  if (!u) return { ok: false, error: "Inserisci uno username Chess.com." };
+  if (!u) return { ok: false, error: "Enter a Chess.com username." };
   const n = Math.max(1, Math.min(100, Math.floor(max) || 10));
 
   let pgnText: string;
@@ -201,7 +201,7 @@ export async function importChesscom(
     pgnText = await chesscomProvider.fetchUserGamesPgn(u, n);
   } catch (e) {
     if (e instanceof ProviderError) return { ok: false, error: e.message };
-    return { ok: false, error: "Errore imprevisto durante l'import da Chess.com." };
+    return { ok: false, error: "Unexpected error while importing from Chess.com." };
   }
 
   const games = splitPgn(pgnText)
@@ -362,13 +362,13 @@ export async function generateKeyErrorComments(
   gameId: string,
 ): Promise<GenerateCommentsResult> {
   if (!isCoachConfigured())
-    return { ok: false, error: "Il coach AI non è configurato." };
+    return { ok: false, error: "The AI coach is not configured." };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Sign in again." };
 
   // RLS garantisce che si vedano solo le righe delle proprie partite.
   const { data: rows, error } = await supabase
@@ -424,7 +424,7 @@ export async function generateKeyErrorComments(
       generated++;
     } catch (e) {
       // Interrompi al primo errore API (rate limit/timeout): salva il parziale.
-      const msg = e instanceof Error ? e.message : "Errore del coach AI.";
+      const msg = e instanceof Error ? e.message : "AI coach error.";
       return { ok: false, error: msg, generated };
     }
   }

@@ -31,11 +31,11 @@ export default function SvgEmblemShowcase() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Esempio · Emblema in pezzo SVG realistico
+          Example · Emblem as a realistic SVG piece
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Cavallo cburnett (lo stesso della scacchiera) come emblema, al posto del
-          glifo unicode. Theme-aware. Confronta con il glifo attuale.
+          Cburnett knight (the same as the board) as the emblem, in place of the
+          unicode glyph. Theme-aware. Compare it with the current glyph.
         </p>
       </header>
 
@@ -49,17 +49,17 @@ export default function SvgEmblemShowcase() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-xs uppercase tracking-wider text-text-muted">
-                      Mercoledì 4 giugno
+                      Wednesday, June 4
                     </p>
                     <h2 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-                      Ciao, Manuel
+                      Hi, Manuel
                     </h2>
                   </div>
                   <PieceEmblem />
                 </div>
 
                 <p className="mt-5 text-xs uppercase tracking-wider text-text-muted">
-                  Rating Shakh · OTB
+                  Shakh rating · OTB
                 </p>
                 <div className="mt-1 flex items-baseline gap-2">
                   <span className="font-mono text-5xl font-semibold tabular-nums tracking-tight">
@@ -69,10 +69,10 @@ export default function SvgEmblemShowcase() {
                 </div>
                 <div className="mt-4 grid grid-cols-4 gap-x-3">
                   {[
-                    ["1520", "Tattica"],
-                    ["1410", "Finali"],
-                    ["1455", "Calcolo"],
-                    ["1490", "Gioco"],
+                    ["1520", "Tactics"],
+                    ["1410", "Endgames"],
+                    ["1455", "Calculation"],
+                    ["1490", "Play"],
                   ].map(([v, l]) => (
                     <div key={l}>
                       <p className="font-mono text-sm tabular-nums">{v}</p>
@@ -86,22 +86,22 @@ export default function SvgEmblemShowcase() {
 
               <div className="rounded-xl border border-border bg-surface p-4">
                 <span className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-text-muted">
-                  <Compass className="h-3.5 w-3.5" /> Prossimo passo
+                  <Compass className="h-3.5 w-3.5" /> Next step
                 </span>
-                <h3 className="mt-2 font-display text-lg font-semibold">Inchiodatura sul re</h3>
+                <h3 className="mt-2 font-display text-lg font-semibold">Pin on the king</h3>
                 <p className="mt-1 text-sm text-text-muted">
-                  Un set mirato fissa lo schema.
+                  A focused set drills the pattern.
                 </p>
                 <button className="mt-3 inline-flex h-10 w-full items-center justify-center gap-1 rounded-lg bg-text text-sm font-medium text-bg">
-                  Allenati ora <ChevronRight className="h-4 w-4" />
+                  Train now <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
 
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  ["Tattiche", Target],
-                  ["Punti deboli", Crosshair],
-                  ["Ripara", Wrench],
+                  ["Tactics", Target],
+                  ["Weaknesses", Crosshair],
+                  ["Fix", Wrench],
                 ].map(([label, Icon]) => {
                   const I = Icon as typeof Target;
                   return (
@@ -144,7 +144,7 @@ function PhoneChrome() {
         </button>
         <span className="font-display text-lg font-semibold tracking-tight">Shakh</span>
         <div className="flex items-center gap-1">
-          <button type="button" aria-label="Notifiche" className="rounded-md p-1.5 text-text-muted">
+          <button type="button" aria-label="Notifications" className="rounded-md p-1.5 text-text-muted">
             <Bell className="h-5 w-5" />
           </button>
           <div className="grid h-8 w-8 place-items-center rounded-full bg-text text-xs font-semibold text-bg">

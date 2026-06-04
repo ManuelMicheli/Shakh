@@ -18,24 +18,24 @@ export type AssignmentRefType =
 export type AssignmentStatus = "assigned" | "in_progress" | "completed" | "skipped";
 
 export const GROUP_TYPE_LABEL: Record<GroupType, string> = {
-  circolo: "Circolo",
-  classe: "Classe",
-  scuola: "Scuola",
+  circolo: "Club",
+  classe: "Class",
+  scuola: "School",
 };
 
 export const GROUP_ROLE_LABEL: Record<GroupRole, string> = {
-  member: "Allievo",
-  instructor: "Istruttore",
-  owner: "Proprietario",
+  member: "Student",
+  instructor: "Instructor",
+  owner: "Owner",
 };
 
 export const REF_TYPE_LABEL: Record<AssignmentRefType, string> = {
-  lesson: "Lezione",
-  puzzle_set: "Set di puzzle",
-  endgame: "Finale",
-  trap: "Trappola",
-  repertoire: "Repertorio",
-  path_node: "Nodo del percorso",
+  lesson: "Lesson",
+  puzzle_set: "Puzzle set",
+  endgame: "Endgame",
+  trap: "Trap",
+  repertoire: "Repertoire",
+  path_node: "Path node",
 };
 
 /** Parametri opzionali di un'assegnazione (es. set di puzzle per tema). */

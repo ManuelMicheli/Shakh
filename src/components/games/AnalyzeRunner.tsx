@@ -22,7 +22,7 @@ export interface AnalyzeRunnerProps {
  * prosegue anche cambiando pagina). Qui rispecchia l'avanzamento se il job
  * attivo è di QUESTA partita; se ne gira uno di un'altra, blocca l'avvio.
  */
-export function AnalyzeRunner({ gameId, pgn, title, label = "Analizza partita" }: AnalyzeRunnerProps) {
+export function AnalyzeRunner({ gameId, pgn, title, label = "Analyze game" }: AnalyzeRunnerProps) {
   const { job, start } = useAnalysisJob();
   const [depth, setDepth] = useState(ANALYSIS_DEPTH);
 
@@ -35,15 +35,15 @@ export function AnalyzeRunner({ gameId, pgn, title, label = "Analizza partita" }
   return (
     <div className="space-y-4 rounded-md border border-border bg-surface p-5">
       <div>
-        <h2 className="font-display text-lg font-semibold">Analisi col motore</h2>
+        <h2 className="font-display text-lg font-semibold">Engine analysis</h2>
         <p className="mt-1 text-sm text-text-muted">
-          L&apos;analisi gira in parallelo nel browser e prosegue anche se cambi
-          pagina: ogni mossa viene valutata e classificata.
+          The analysis runs in parallel in your browser and keeps going even if you
+          switch pages: every move is evaluated and classified.
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm text-text-muted">Profondità</span>
+        <span className="text-sm text-text-muted">Depth</span>
         <div className="flex items-center gap-1">
           {DEPTH_OPTIONS.map((d) => (
             <button
@@ -62,50 +62,50 @@ export function AnalyzeRunner({ gameId, pgn, title, label = "Analizza partita" }
           ))}
         </div>
         <Button
-          onClick={() => start(gameId, pgn, title ?? "Partita", { depth })}
+          onClick={() => start(gameId, pgn, title ?? "Game", { depth })}
           disabled={disabled}
           className="ml-auto"
         >
-          {running ? "Analisi in corso…" : label}
+          {running ? "Analyzing…" : label}
         </Button>
       </div>
 
       <details className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm">
         <summary className="cursor-pointer font-medium text-text">
-          Cos&apos;è la profondità?
+          What is depth?
         </summary>
         <div className="mt-2 space-y-2 text-xs leading-snug text-text-muted">
           <p>
-            È quante <span className="text-text">mezze mosse avanti</span> il
-            motore calcola da ogni posizione prima di dare il giudizio. Più alta
-            = analisi più affidabile, ma più lenta (il tempo cresce in modo quasi
-            esponenziale, non lineare).
+            It&apos;s how many <span className="text-text">half-moves ahead</span> the
+            engine calculates from each position before judging it. Higher =
+            more reliable analysis, but slower (the time grows almost
+            exponentially, not linearly).
           </p>
           <ul className="space-y-1">
             <li>
-              <span className="font-mono text-text">12</span> — veloce, per un
-              ripasso rapido o partite blitz.
+              <span className="font-mono text-text">12</span> — fast, for a quick
+              review or blitz games.
             </li>
             <li>
-              <span className="font-mono text-text">15</span> — equilibrio tra
-              precisione e tempo (consigliata).
+              <span className="font-mono text-text">15</span> — a balance of
+              precision and time (recommended).
             </li>
             <li>
-              <span className="font-mono text-text">18</span> — più precisa (coglie
-              tattiche e sacrifici profondi), ma può richiedere 3–5× il tempo di 12.
+              <span className="font-mono text-text">18</span> — more precise (catches
+              deep tactics and sacrifices), but can take 3–5× the time of 12.
             </li>
           </ul>
           <p>
-            Sotto i ~2000 Elo, 15 e 18 raramente cambiano il verdetto sugli errori
-            grossi: tieni 15 di norma, sali a 18 solo per partite importanti da
-            studiare a fondo.
+            Below ~2000 Elo, 15 and 18 rarely change the verdict on big blunders:
+            keep 15 by default, and go to 18 only for important games you want to
+            study in depth.
           </p>
         </div>
       </details>
 
       {otherRunning && (
         <p className="text-xs text-text-muted">
-          Analisi in corso su un&apos;altra partita: attendi che finisca.
+          Analysis running on another game: wait for it to finish.
         </p>
       )}
 
@@ -120,7 +120,7 @@ export function AnalyzeRunner({ gameId, pgn, title, label = "Analizza partita" }
             />
           </div>
           <p className="font-mono text-xs text-text-muted">
-            posizione {thisJob.current}/{thisJob.total}
+            position {thisJob.current}/{thisJob.total}
           </p>
         </div>
       )}

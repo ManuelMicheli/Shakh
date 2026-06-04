@@ -14,7 +14,7 @@ export interface TimeControl {
 }
 
 export const TIME_CONTROLS: TimeControl[] = [
-  { id: "unlimited", label: "Illimitato", group: "Senza orologio", initialMs: null, incMs: 0 },
+  { id: "unlimited", label: "Unlimited", group: "No clock", initialMs: null, incMs: 0 },
   { id: "1+0", label: "1+0", group: "Bullet", initialMs: 60_000, incMs: 0 },
   { id: "2+1", label: "2+1", group: "Bullet", initialMs: 120_000, incMs: 1_000 },
   { id: "3+0", label: "3+0", group: "Blitz", initialMs: 180_000, incMs: 0 },
@@ -24,7 +24,7 @@ export const TIME_CONTROLS: TimeControl[] = [
   { id: "10+0", label: "10+0", group: "Rapid", initialMs: 600_000, incMs: 0 },
   { id: "10+5", label: "10+5", group: "Rapid", initialMs: 600_000, incMs: 5_000 },
   { id: "15+10", label: "15+10", group: "Rapid", initialMs: 900_000, incMs: 10_000 },
-  { id: "30+0", label: "30+0", group: "Classica", initialMs: 1_800_000, incMs: 0 },
+  { id: "30+0", label: "30+0", group: "Classical", initialMs: 1_800_000, incMs: 0 },
 ];
 
 export function findTimeControl(id: string): TimeControl {

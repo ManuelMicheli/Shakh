@@ -9,9 +9,9 @@ export interface DistributionBarProps {
 
 // Eccezione monocromatica ammessa: i colori --eval-* comunicano un esito.
 const SEGMENTS = [
-  { key: "inaccuracies", label: "Imprecisioni", color: "var(--eval-inaccuracy)" },
-  { key: "mistakes", label: "Errori", color: "var(--eval-mistake)" },
-  { key: "blunders", label: "Gravi errori", color: "var(--eval-blunder)" },
+  { key: "inaccuracies", label: "Inaccuracies", color: "var(--eval-inaccuracy)" },
+  { key: "mistakes", label: "Mistakes", color: "var(--eval-mistake)" },
+  { key: "blunders", label: "Blunders", color: "var(--eval-blunder)" },
 ] as const;
 
 /** Distribuzione degli errori (imprecisioni/errori/gravi errori) in barra segmentata. */
@@ -27,7 +27,7 @@ export function DistributionBar({
   if (total === 0) {
     return (
       <p className={cn("text-sm text-text-muted", className)}>
-        Nessun errore registrato: ottimo, o pochi dati ancora.
+        No errors recorded: great, or not much data yet.
       </p>
     );
   }

@@ -24,9 +24,9 @@ export function classificationLabel(c: Classification | null): string {
 }
 
 const PHASE_LABEL: Record<GamePhase, string> = {
-  opening: "apertura",
-  middlegame: "mediogioco",
-  endgame: "finale",
+  opening: "opening",
+  middlegame: "middlegame",
+  endgame: "endgame",
 };
 
 export function phaseLabel(phase: GamePhase): string {

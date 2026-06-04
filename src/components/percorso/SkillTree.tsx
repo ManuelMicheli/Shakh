@@ -5,21 +5,21 @@ import { cn } from "@/lib/utils";
 import type { PathNodeStatus, PathNodeView } from "@/lib/path/types";
 
 const LEVEL_TITLES: Record<number, string> = {
-  0: "Livello 0 — Fondamenta",
-  1: "Livello 1 — Tattica di base",
-  2: "Livello 2 — Apertura e finali chiave",
-  3: "Livello 3 — Mediogioco",
-  4: "Livello 4 — Verso il club",
+  0: "Level 0 — Foundations",
+  1: "Level 1 — Basic tactics",
+  2: "Level 2 — Openings and key endgames",
+  3: "Level 3 — Middlegame",
+  4: "Level 4 — Toward the club",
 };
 
 const STATUS_META: Record<
   PathNodeStatus,
   { label: string; Icon: typeof Circle }
 > = {
-  locked: { label: "Bloccato", Icon: Lock },
-  available: { label: "Disponibile", Icon: Circle },
-  in_progress: { label: "In corso", Icon: CircleDot },
-  completed: { label: "Completato", Icon: CheckCircle2 },
+  locked: { label: "Locked", Icon: Lock },
+  available: { label: "Available", Icon: Circle },
+  in_progress: { label: "In progress", Icon: CircleDot },
+  completed: { label: "Completed", Icon: CheckCircle2 },
 };
 
 const ACTIVITY_LINK =
@@ -82,7 +82,7 @@ function NodeCard({ node }: { node: PathNodeView }) {
 
       {locked && node.prerequisites.length > 0 && (
         <p className="mt-3 text-xs text-text-muted">
-          Sblocca completando i passi precedenti.
+          Unlock by completing the previous steps.
         </p>
       )}
     </div>
@@ -147,7 +147,7 @@ function NodeRow({ node }: { node: PathNodeView }) {
 
         {locked && node.prerequisites.length > 0 && (
           <p className="mt-2 text-xs text-text-muted">
-            Sblocca completando i passi precedenti.
+            Unlock by completing the previous steps.
           </p>
         )}
       </div>
@@ -166,7 +166,7 @@ export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
           .filter((n) => n.level === level)
           .sort((a, b) => a.order_index - b.order_index);
         const done = ofLevel.filter((n) => n.status === "completed").length;
-        const title = LEVEL_TITLES[level] ?? `Livello ${level}`;
+        const title = LEVEL_TITLES[level] ?? `Level ${level}`;
         return (
           <section key={level} className="space-y-3">
             {/* MOBILE: intestazione con regola damier. */}

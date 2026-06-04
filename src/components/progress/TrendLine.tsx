@@ -32,7 +32,7 @@ const PAD = 16;
 export function TrendLine({
   points,
   suffix = "",
-  dataNoun = { one: "dato", many: "dati" },
+  dataNoun = { one: "data point", many: "data points" },
   className,
 }: TrendLineProps) {
   const geom = useMemo(() => {
@@ -55,8 +55,8 @@ export function TrendLine({
     return (
       <p className={cn("py-8 text-center text-sm text-text-muted", className)}>
         {missing === 1
-          ? `Serve ancora 1 ${dataNoun.one} per disegnare l'andamento.`
-          : `Servono ancora ${missing} ${dataNoun.many} per disegnare l'andamento.`}
+          ? `1 more ${dataNoun.one} needed to draw the trend.`
+          : `${missing} more ${dataNoun.many} needed to draw the trend.`}
       </p>
     );
   }
@@ -78,7 +78,7 @@ export function TrendLine({
         preserveAspectRatio="none"
         className="h-36 w-full select-none"
         role="img"
-        aria-label="Andamento nel tempo"
+        aria-label="Trend over time"
       >
         <motion.path
           d={geom.line}

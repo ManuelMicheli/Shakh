@@ -68,7 +68,7 @@ export async function loadMembers(
   const rows = (data as MemberRecord[] | null) ?? [];
   return rows.map((m) => ({
     userId: m.user_id,
-    name: m.profiles?.display_name ?? m.profiles?.username ?? "Allievo",
+    name: m.profiles?.display_name ?? m.profiles?.username ?? "Student",
     username: m.profiles?.username ?? null,
     role: m.role_in_group,
   }));
@@ -115,11 +115,11 @@ export async function loadClassData(supabase: DB, groupId: string): Promise<Clas
 
   // Competenza media per area fra gli allievi con dati.
   const AREAS: { area: AreaKey; label: string }[] = [
-    { area: "tattica", label: "Tattica" },
-    { area: "aperture", label: "Aperture" },
-    { area: "mediogioco", label: "Mediogioco" },
-    { area: "finali", label: "Finali" },
-    { area: "trappole", label: "Trappole" },
+    { area: "tattica", label: "Tactics" },
+    { area: "aperture", label: "Openings" },
+    { area: "mediogioco", label: "Middlegame" },
+    { area: "finali", label: "Endgames" },
+    { area: "trappole", label: "Traps" },
   ];
   const competenceByArea: ClassAreaCompetence[] = AREAS.map(({ area, label }) => {
     const scores = students

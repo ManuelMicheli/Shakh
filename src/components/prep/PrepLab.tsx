@@ -57,7 +57,7 @@ export function PrepLab() {
             className="flex-1"
           />
           <Button type="submit" disabled={loading || !username.trim()}>
-            {loading ? "Analizzo…" : "Analizza"}
+            {loading ? "Analyzing…" : "Analyze"}
           </Button>
         </div>
       </form>
@@ -71,15 +71,15 @@ export function PrepLab() {
       {report && (
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-3">
-            <Stat label="Partite" value={report.total} />
-            <Stat label="Col Bianco" value={report.whiteGames} />
-            <Stat label="Col Nero" value={report.blackGames} />
+            <Stat label="Games" value={report.total} />
+            <Stat label="As White" value={report.whiteGames} />
+            <Stat label="As Black" value={report.blackGames} />
           </div>
 
           {report.weakest.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Punti deboli da puntare</CardTitle>
+                <CardTitle className="text-lg">Weak spots to target</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {report.weakest.map((w) => (
@@ -90,8 +90,8 @@ export function PrepLab() {
           )}
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <OpeningColumn title="Gioca col Bianco" stats={report.asWhite} />
-            <OpeningColumn title="Gioca col Nero" stats={report.asBlack} />
+            <OpeningColumn title="Plays as White" stats={report.asWhite} />
+            <OpeningColumn title="Plays as Black" stats={report.asBlack} />
           </div>
         </div>
       )}
@@ -107,7 +107,7 @@ function OpeningColumn({ title, stats }: { title: string; stats: OpeningStat[] }
       </CardHeader>
       <CardContent className="space-y-2">
         {stats.length === 0 ? (
-          <p className="text-sm text-text-muted">Nessun dato.</p>
+          <p className="text-sm text-text-muted">No data.</p>
         ) : (
           stats.map((o) => <OpeningRow key={o.key} o={o} />)
         )}
@@ -125,7 +125,7 @@ function OpeningRow({ o }: { o: OpeningStat }) {
           {o.eco && <span className="ml-1 font-mono text-xs text-text-muted">{o.eco}</span>}
         </p>
       </div>
-      <span className="shrink-0 text-xs text-text-muted">{o.games} p.</span>
+      <span className="shrink-0 text-xs text-text-muted">{o.games} g.</span>
       <span className="shrink-0 font-mono text-xs tabular-nums">{o.scorePct}%</span>
     </div>
   );
@@ -135,14 +135,14 @@ function WeakRow({ w }: { w: WeakOpening }) {
   return (
     <div className="flex items-center gap-3">
       <Badge variant="muted" className="shrink-0">
-        {w.color === "white" ? "B" : "N"}
+        {w.color === "white" ? "W" : "B"}
       </Badge>
       <p className="min-w-0 flex-1 truncate text-sm">
         {w.key}
         {w.eco && <span className="ml-1 font-mono text-xs text-text-muted">{w.eco}</span>}
       </p>
-      <span className="shrink-0 text-xs text-text-muted">{w.games} p.</span>
-      <span className="shrink-0 font-mono text-xs tabular-nums">rende {w.scorePct}%</span>
+      <span className="shrink-0 text-xs text-text-muted">{w.games} g.</span>
+      <span className="shrink-0 font-mono text-xs tabular-nums">scores {w.scorePct}%</span>
     </div>
   );
 }

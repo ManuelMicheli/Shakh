@@ -30,8 +30,8 @@ function OutcomeBar({ white, draws, black }: { white: number; draws: number; bla
     <div
       className="flex h-3 w-full overflow-hidden rounded-sm border border-border"
       role="img"
-      aria-label={`Bianco ${pct(w)}, patte ${pct(d)}, Nero ${pct(b)}`}
-      title={`Bianco ${pct(w)} · Patte ${pct(d)} · Nero ${pct(b)}`}
+      aria-label={`White ${pct(w)}, draws ${pct(d)}, Black ${pct(b)}`}
+      title={`White ${pct(w)} · Draws ${pct(d)} · Black ${pct(b)}`}
     >
       <span className="bg-neutral-100" style={{ width: `${w}%` }} />
       <span className="bg-neutral-400" style={{ width: `${d}%` }} />
@@ -62,7 +62,7 @@ export function OpeningExplorer({ fen, onPlayMove, className }: OpeningExplorerP
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">Cosa si gioca davvero</h3>
+        <h3 className="text-sm font-medium">What&apos;s really played</h3>
         <div className="inline-flex rounded-md border border-border bg-surface p-0.5 text-xs">
           {(["masters", "lichess"] as ExplorerDb[]).map((d) => (
             <button
@@ -74,7 +74,7 @@ export function OpeningExplorer({ fen, onPlayMove, className }: OpeningExplorerP
                 db === d ? "bg-text text-bg" : "text-text-muted hover:text-text",
               )}
             >
-              {d === "masters" ? "Maestri" : "Online"}
+              {d === "masters" ? "Masters" : "Online"}
             </button>
           ))}
         </div>
@@ -82,7 +82,7 @@ export function OpeningExplorer({ fen, onPlayMove, className }: OpeningExplorerP
 
       {loading && (
         <p className="flex items-center gap-2 text-sm text-text-muted">
-          <Spinner /> Interrogo l&apos;explorer…
+          <Spinner /> Querying the explorer…
         </p>
       )}
 
@@ -103,7 +103,7 @@ function ExplorerTable({
   onPlayMove?: (san: string) => void;
 }) {
   if (data.moves.length === 0) {
-    return <p className="text-sm text-text-muted">Nessuna partita per questa posizione.</p>;
+    return <p className="text-sm text-text-muted">No games for this position.</p>;
   }
   const totalGames = data.moves.reduce((s, m) => s + moveGames(m), 0);
   return (
@@ -116,9 +116,9 @@ function ExplorerTable({
       <table className="w-full text-sm">
         <thead>
           <tr className="text-text-muted">
-            <th className="py-1 text-left font-normal">Mossa</th>
-            <th className="px-2 py-1 text-right font-normal">Partite</th>
-            <th className="py-1 text-left font-normal">Esito (B / patta / N)</th>
+            <th className="py-1 text-left font-normal">Move</th>
+            <th className="px-2 py-1 text-right font-normal">Games</th>
+            <th className="py-1 text-left font-normal">Result (W / draw / B)</th>
           </tr>
         </thead>
         <tbody>
@@ -137,7 +137,7 @@ function ExplorerTable({
                   </button>
                 </td>
                 <td className="px-2 py-1.5 text-right font-mono tabular-nums text-text-muted">
-                  {games.toLocaleString("it-IT")}
+                  {games.toLocaleString("en-US")}
                   <span className="ml-1 text-xs">({share}%)</span>
                 </td>
                 <td className="w-1/2 py-1.5">

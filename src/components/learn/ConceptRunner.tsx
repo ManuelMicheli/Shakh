@@ -56,7 +56,7 @@ export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunn
         fromReview: false,
       });
       if (!res.ok) {
-        toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Save failed", description: res.error, variant: "error" });
       }
       window.setTimeout(() => {
         if (index + 1 >= total) setStage("done");
@@ -75,14 +75,14 @@ export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunn
         <CardContent className="space-y-4">
           <p className="leading-relaxed text-text-muted">{intro}</p>
           <p className="text-sm">
-            <span className="font-medium">Obiettivo:</span> {goal}
+            <span className="font-medium">Goal:</span> {goal}
           </p>
           {total === 0 ? (
             <p className="text-sm text-text-muted">
-              Nessun esercizio disponibile al momento per questo concetto.
+              No exercises available right now for this concept.
             </p>
           ) : (
-            <Button onClick={() => setStage("solve")}>Inizia ({total} esercizi)</Button>
+            <Button onClick={() => setStage("solve")}>Start ({total} exercises)</Button>
           )}
         </CardContent>
       </Card>
@@ -93,19 +93,19 @@ export function ConceptRunner({ slug, title, intro, goal, puzzles }: ConceptRunn
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Concetto completato</CardTitle>
+          <CardTitle>Concept completed</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-text-muted">
-            Hai risolto puliti <span className="font-mono text-text">{solved}</span> di {total}.
-            Concetto <strong>{title}</strong> sbloccato.
+            You solved <span className="font-mono text-text">{solved}</span> of {total} cleanly.
+            Concept <strong>{title}</strong> unlocked.
           </p>
           <div className="flex flex-wrap gap-2">
             <Link href="/app/impara">
-              <Button>Altri concetti</Button>
+              <Button>More concepts</Button>
             </Link>
             <Link href="/app/tattiche?mode=adaptive">
-              <Button variant="secondary">Allenati ancora</Button>
+              <Button variant="secondary">Keep training</Button>
             </Link>
           </div>
         </CardContent>

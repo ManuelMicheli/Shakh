@@ -22,7 +22,7 @@ import type {
 } from "@/lib/theory/explorer";
 
 const BASE = "https://explorer.lichess.ovh";
-const UA = "Shakh/1.0 (+https://shakh.app; piattaforma didattica scacchi)";
+const UA = "Shakh/1.0 (+https://shakh.app; chess learning platform)";
 const TTL_MS = 60 * 60 * 1000; // 1h di freschezza in memoria
 
 /** Cache server (per istanza) e dedup delle richieste in volo, per `db|fen`. */
@@ -97,13 +97,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   if (db !== "masters" && db !== "lichess") {
     return NextResponse.json(
-      { ok: false, error: "Database non valido." } satisfies ExplorerResult,
+      { ok: false, error: "Invalid database." } satisfies ExplorerResult,
       { status: 400 },
     );
   }
   if (!fen || fen.length > 120) {
     return NextResponse.json(
-      { ok: false, error: "Posizione non valida." } satisfies ExplorerResult,
+      { ok: false, error: "Invalid position." } satisfies ExplorerResult,
       { status: 400 },
     );
   }
@@ -138,7 +138,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   return json({
     ok: false,
     error:
-      "Database aperture momentaneamente non disponibile (servizio Lichess). Riprova tra poco.",
+      "Opening database temporarily unavailable (Lichess service). Try again shortly.",
     rateLimited: true,
   });
 }

@@ -36,7 +36,7 @@ export default async function StudentDrilldownPage({ params }: PageProps) {
     .select("display_name, username")
     .eq("id", userId)
     .maybeSingle<{ display_name: string | null; username: string | null }>();
-  const name = profile?.display_name ?? profile?.username ?? "Allievo";
+  const name = profile?.display_name ?? profile?.username ?? "Student";
 
   // Stesse aggregazioni dell'08, applicate all'allievo via RLS (sola lettura).
   const data = await loadDashboard(supabase, userId);
@@ -45,21 +45,21 @@ export default async function StudentDrilldownPage({ params }: PageProps) {
     <div className="space-y-8">
       <div>
         <Link href={`/app/gruppi/${id}/classe`} className="text-sm text-text-muted hover:text-text">
-          ← Dashboard di classe
+          ← Class dashboard
         </Link>
         <div className="mt-2 flex items-center gap-3">
           <h1 className="font-display text-3xl font-semibold tracking-tight">{name}</h1>
-          <Badge variant="muted">sola lettura</Badge>
+          <Badge variant="muted">read-only</Badge>
         </div>
         <p className="mt-1 text-text-muted">
-          Contesto didattico: i progressi dell&apos;allievo come li vede lui, in sola lettura.
+          Teaching context: the student&apos;s progress as they see it, read-only.
         </p>
       </div>
 
       {data.empty ? (
         <Card>
           <CardContent className="py-8 text-center text-sm text-text-muted">
-            L&apos;allievo non ha ancora dati sufficienti per la dashboard.
+            This student doesn&apos;t have enough data for the dashboard yet.
           </CardContent>
         </Card>
       ) : (

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Mediogioco — Teoria — Shakh" };
+export const metadata = { title: "Middlegame — Theory — Shakh" };
 
 interface Row {
   slug: string;
@@ -28,25 +28,25 @@ export default async function MediogiocoPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Temi strategici"
-        title="Mediogioco"
-        desc="Piani per entrambi i lati ed esercizi “trova il piano”."
+        eyebrow="Strategic themes"
+        title="Middlegame"
+        desc="Plans for both sides and “find the plan” exercises."
       />
       <div className="hidden md:block">
         <Link href="/app/teoria" className="text-sm text-text-muted hover:text-text">
-          ← Teoria
+          ← Theory
         </Link>
-        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Mediogioco</h1>
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Middlegame</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Temi strategici su posizioni-tipo: piani per entrambi i lati ed esercizi
-          &quot;trova il piano&quot;, valutati dal motore e commentati dal coach.
+          Strategic themes on typical positions: plans for both sides and
+          &quot;find the plan&quot; exercises, evaluated by the engine and commented by the coach.
         </p>
       </div>
 
       {lessons.length === 0 ? (
         <Card>
           <CardContent className="py-6 text-center text-sm text-text-muted">
-            Lezioni in arrivo.
+            Lessons coming soon.
           </CardContent>
         </Card>
       ) : (

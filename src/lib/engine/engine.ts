@@ -98,7 +98,7 @@ export class EngineService {
         };
         worker.onerror = (e) => {
           this._state = "error";
-          reject(new Error(`Worker motore: ${e.message ?? "errore"}`));
+          reject(new Error(`Engine worker: ${e.message ?? "error"}`));
         };
 
         this.send("uci");

@@ -103,16 +103,16 @@ async function fetchLichessUser(username: string): Promise<LichessUser> {
       { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(15_000) },
     );
   } catch {
-    throw new ProviderError("network", "Errore di rete o timeout contattando Lichess.");
+    throw new ProviderError("network", "Network error or timeout contacting Lichess.");
   }
   if (res.status === 404) {
-    throw new ProviderError("not_found", `Utente Lichess "${username}" non trovato.`);
+    throw new ProviderError("not_found", `Lichess user "${username}" not found.`);
   }
   if (res.status === 429) {
-    throw new ProviderError("rate_limit", "Troppe richieste a Lichess. Riprova fra poco.");
+    throw new ProviderError("rate_limit", "Too many requests to Lichess. Try again shortly.");
   }
   if (!res.ok) {
-    throw new ProviderError("network", `Lichess ha risposto con stato ${res.status}.`);
+    throw new ProviderError("network", `Lichess responded with status ${res.status}.`);
   }
   return (await res.json()) as LichessUser;
 }
@@ -149,16 +149,16 @@ async function fetchChesscomStats(username: string): Promise<ChesscomStats> {
       signal: AbortSignal.timeout(15_000),
     });
   } catch {
-    throw new ProviderError("network", "Errore di rete o timeout contattando Chess.com.");
+    throw new ProviderError("network", "Network error or timeout contacting Chess.com.");
   }
   if (res.status === 404) {
-    throw new ProviderError("not_found", `Utente Chess.com "${username}" non trovato.`);
+    throw new ProviderError("not_found", `Chess.com user "${username}" not found.`);
   }
   if (res.status === 429) {
-    throw new ProviderError("rate_limit", "Troppe richieste a Chess.com. Riprova fra poco.");
+    throw new ProviderError("rate_limit", "Too many requests to Chess.com. Try again shortly.");
   }
   if (!res.ok) {
-    throw new ProviderError("network", `Chess.com ha risposto con stato ${res.status}.`);
+    throw new ProviderError("network", `Chess.com responded with status ${res.status}.`);
   }
   return (await res.json()) as ChesscomStats;
 }
@@ -177,16 +177,16 @@ async function fetchChesscomPlayer(username: string): Promise<ChesscomPlayer> {
       signal: AbortSignal.timeout(15_000),
     });
   } catch {
-    throw new ProviderError("network", "Errore di rete o timeout contattando Chess.com.");
+    throw new ProviderError("network", "Network error or timeout contacting Chess.com.");
   }
   if (res.status === 404) {
-    throw new ProviderError("not_found", `Utente Chess.com "${username}" non trovato.`);
+    throw new ProviderError("not_found", `Chess.com user "${username}" not found.`);
   }
   if (res.status === 429) {
-    throw new ProviderError("rate_limit", "Troppe richieste a Chess.com. Riprova fra poco.");
+    throw new ProviderError("rate_limit", "Too many requests to Chess.com. Try again shortly.");
   }
   if (!res.ok) {
-    throw new ProviderError("network", `Chess.com ha risposto con stato ${res.status}.`);
+    throw new ProviderError("network", `Chess.com responded with status ${res.status}.`);
   }
   return (await res.json()) as ChesscomPlayer;
 }
@@ -229,7 +229,7 @@ export async function fetchExternalRating(
 
   if (source === "lichess") {
     const u = await fetchLichessUser(trimmed);
-    if (u.disabled) throw new ProviderError("not_found", "Account Lichess chiuso.");
+    if (u.disabled) throw new ProviderError("not_found", "Lichess account closed.");
     const perfs = u.perfs ?? {};
     controls = LICHESS_CONTROLS.map((control) => {
       const p = perfs[control] ?? {};
@@ -260,7 +260,7 @@ export async function fetchExternalRating(
   if (!rep) {
     throw new ProviderError(
       "unsupported",
-      "Nessun controllo con partite valutate sufficienti per stimare un rating.",
+      "No time control with enough rated games to estimate a rating.",
     );
   }
 

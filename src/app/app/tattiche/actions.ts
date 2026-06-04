@@ -36,7 +36,7 @@ export async function recordAttempt(input: AttemptInput): Promise<RecordResult> 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const nowMs = Date.now();
   const won = input.clean;

@@ -24,21 +24,21 @@ export async function refreshProgressAndSynthesize(): Promise<SynthesisResult> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Sign in again." };
 
   const metrics = await loadUserMetrics(supabase, user.id);
   await upsertProgress(supabase, user.id, metrics);
   revalidatePath("/app/coach");
 
   if (metrics.userMoves === 0)
-    return { ok: false, error: "Analizza qualche partita prima: non ci sono ancora dati." };
+    return { ok: false, error: "Analyze a few games first: there's no data yet." };
   if (!isCoachConfigured())
-    return { ok: false, error: "Il coach AI non è configurato (manca ANTHROPIC_API_KEY)." };
+    return { ok: false, error: "The AI coach isn't configured (ANTHROPIC_API_KEY is missing)." };
 
   try {
     const synthesis = await synthesizePatterns(metrics);
     if (!synthesis)
-      return { ok: false, error: "Risposta del coach non interpretabile. Riprova." };
+      return { ok: false, error: "Coach response couldn't be parsed. Try again." };
     // Cache dell'ultima sintesi: la dashboard (08) la mostra senza rigenerarla.
     await supabase.from("coach_synthesis").upsert(
       {
@@ -53,7 +53,7 @@ export async function refreshProgressAndSynthesize(): Promise<SynthesisResult> {
     revalidatePath("/app");
     return { ok: true, synthesis };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Errore del coach AI." };
+    return { ok: false, error: e instanceof Error ? e.message : "AI coach error." };
   }
 }
 

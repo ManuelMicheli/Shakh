@@ -26,12 +26,12 @@ function ShakhRatingCard({ rating }: { rating: OverallRating }) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
-          <CardTitle>Rating Shakh</CardTitle>
-          {rating.provisional && <Badge variant="muted">non calibrato</Badge>}
+          <CardTitle>Shakh Rating</CardTitle>
+          {rating.provisional && <Badge variant="muted">not calibrated</Badge>}
         </div>
         <CardDescription>
-          Stima di forza su scala reale (OTB), da puzzle, partite, finali, calcolo, qualità di gioco
-          e — se collegato — dal rating del tuo account online.
+          A strength estimate on the real-world (OTB) scale, from puzzles, games, endgames,
+          calculation, play quality, and — if linked — your online account&apos;s rating.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -45,13 +45,13 @@ function ShakhRatingCard({ rating }: { rating: OverallRating }) {
           <p className="text-xs leading-relaxed text-text-muted">
             {missing > 0 ? (
               <>
-                Stima non ancora calibrata: <span className="font-mono">{collected}</span>/
-                <span className="font-mono">{MIN_TOTAL_SAMPLES}</span> dati raccolti, ne mancano{" "}
-                <span className="font-mono">{missing}</span>. Ogni puzzle risolto, partita analizzata
-                o finale giocato conta.
+                Estimate not yet calibrated: <span className="font-mono">{collected}</span>/
+                <span className="font-mono">{MIN_TOTAL_SAMPLES}</span> data points collected,{" "}
+                <span className="font-mono">{missing}</span> still needed. Every puzzle solved, game
+                analyzed, or endgame played counts.
               </>
             ) : (
-              "Stima in affinamento: hai abbastanza dati, continua ad allenarti e il margine d'errore (±) calerà."
+              "Estimate is being refined: you have enough data, keep training and the margin of error (±) will shrink."
             )}
           </p>
         )}
@@ -68,7 +68,7 @@ function ShakhRatingCard({ rating }: { rating: OverallRating }) {
                   {b.provisional && (
                     <span
                       className="inline-block h-1.5 w-1.5 rounded-full bg-text-muted"
-                      title="non calibrato"
+                      title="not calibrated"
                     />
                   )}
                 </p>
@@ -82,7 +82,7 @@ function ShakhRatingCard({ rating }: { rating: OverallRating }) {
 }
 
 function kindLabel(kind: "game" | "puzzle" | "lesson"): string {
-  return kind === "game" ? "Partita" : kind === "puzzle" ? "Puzzle" : "Lezione";
+  return kind === "game" ? "Game" : kind === "puzzle" ? "Puzzle" : "Lesson";
 }
 
 export interface DashboardViewProps {
@@ -136,25 +136,25 @@ export function DashboardView({
       {/* 1. Sintesi in alto */}
       <div className={cn("grid grid-cols-2 gap-3 sm:grid-cols-4", topHidden)}>
         <StatTile
-          label="Livello percorso"
+          label="Path level"
           value={String(data.path.currentLevel)}
-          sub={`${data.path.completedNodes}/${data.path.totalNodes} nodi`}
+          sub={`${data.path.completedNodes}/${data.path.totalNodes} nodes`}
         />
         <StatTile
-          label="Rating tattico"
+          label="Tactical rating"
           value={data.tactic.rating != null ? String(data.tactic.rating) : "—"}
           delta={data.tactic.delta}
-          sub={`${data.tactic.solved} risolti`}
+          sub={`${data.tactic.solved} solved`}
         />
         <StatTile
           label="Streak"
           value={String(data.tactic.currentStreak)}
-          sub={`record ${data.tactic.bestStreak}`}
+          sub={`best ${data.tactic.bestStreak}`}
         />
         <StatTile
-          label="Accuratezza"
+          label="Accuracy"
           value={pct(data.game.accuracy)}
-          sub={`${data.game.analyzed} partite`}
+          sub={`${data.game.analyzed} games`}
         />
       </div>
 
@@ -162,8 +162,8 @@ export function DashboardView({
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
-              <CardTitle>Il coach dice</CardTitle>
-              <Badge variant="muted">ultima sintesi</Badge>
+              <CardTitle>The coach says</CardTitle>
+              <Badge variant="muted">latest summary</Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -177,7 +177,7 @@ export function DashboardView({
             )}
             {data.synthesis.suggestion && (
               <p className="text-sm text-text-muted">
-                <span className="font-medium text-text">Consiglio: </span>
+                <span className="font-medium text-text">Advice: </span>
                 {data.synthesis.suggestion}
               </p>
             )}
@@ -189,8 +189,8 @@ export function DashboardView({
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Mappa delle competenze</CardTitle>
-            <CardDescription>Profilo sulle cinque aree.</CardDescription>
+            <CardTitle>Skills map</CardTitle>
+            <CardDescription>Your profile across the five areas.</CardDescription>
           </CardHeader>
           <CardContent>
             <CompetenceRadar areas={radarAreas} />
@@ -199,17 +199,17 @@ export function DashboardView({
 
         <Card>
           <CardHeader>
-            <CardTitle>Punti deboli prioritari</CardTitle>
+            <CardTitle>Priority weaknesses</CardTitle>
             {!readOnly && (
-              <CardDescription>Ognuno con l&apos;allenamento giusto.</CardDescription>
+              <CardDescription>Each with the right training.</CardDescription>
             )}
           </CardHeader>
           <CardContent>
             {data.weaknesses.length === 0 ? (
               <p className="py-6 text-sm text-text-muted">
                 {data.weaknessCoverage.attempts === 0
-                  ? `Nessun dato ancora: servono almeno ${data.weaknessCoverage.minAttempts} tentativi su uno stesso tema perché venga valutato.`
-                  : `Nessun punto debole marcato: finora ${data.weaknessCoverage.attempts} tentativi su ${data.weaknessCoverage.trackedThemes} ${data.weaknessCoverage.trackedThemes === 1 ? "tema" : "temi"}, ma ne servono almeno ${data.weaknessCoverage.minAttempts} per tema per segnalarne uno.`}
+                  ? `No data yet: at least ${data.weaknessCoverage.minAttempts} attempts on the same theme are needed for it to be evaluated.`
+                  : `No weakness flagged: so far ${data.weaknessCoverage.attempts} attempts across ${data.weaknessCoverage.trackedThemes} ${data.weaknessCoverage.trackedThemes === 1 ? "theme" : "themes"}, but at least ${data.weaknessCoverage.minAttempts} per theme are needed to flag one.`}
               </p>
             ) : readOnly ? (
               <div className="divide-y divide-border">
@@ -217,7 +217,7 @@ export function DashboardView({
                   <div key={w.label} className="flex items-center justify-between gap-3 py-2.5">
                     <span className="min-w-0 truncate text-sm">{w.label}</span>
                     <span className="shrink-0 font-mono text-xs text-text-muted">
-                      {Math.round(w.score * 100)}% · {w.attempts} tent.
+                      {Math.round(w.score * 100)}% · {w.attempts} att.
                     </span>
                   </div>
                 ))}
@@ -244,8 +244,8 @@ export function DashboardView({
       {/* 5. Statistiche di gioco */}
       <Card>
         <CardHeader>
-          <CardTitle>Statistiche di gioco</CardTitle>
-          <CardDescription>Dalle partite analizzate.</CardDescription>
+          <CardTitle>Game statistics</CardTitle>
+          <CardDescription>From your analyzed games.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <DistributionBar
@@ -260,9 +260,9 @@ export function DashboardView({
               .map((c) => (
                 <StatTile
                   key={c.color}
-                  label={c.color === "white" ? "Col Bianco" : "Col Nero"}
+                  label={c.color === "white" ? "As White" : "As Black"}
                   value={pct(c.accuracy)}
-                  sub={`${c.games} partite · ${c.moves} mosse`}
+                  sub={`${c.games} games · ${c.moves} moves`}
                 />
               ))}
           </div>
@@ -270,7 +270,7 @@ export function DashboardView({
           {data.game.byPhase.some((p) => p.moves > 0) && (
             <div>
               <p className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-                Accuratezza per fase
+                Accuracy by phase
               </p>
               <div className="grid grid-cols-3 gap-3">
                 {data.game.byPhase.map((p) => (
@@ -280,7 +280,7 @@ export function DashboardView({
                       {p.moves > 0 ? `${Math.round(p.score * 100)}%` : "—"}
                     </p>
                     {data.game.worstPhase === p.phase && (
-                      <span className="text-[10px] text-text-muted">punto critico</span>
+                      <span className="text-[10px] text-text-muted">critical area</span>
                     )}
                   </div>
                 ))}
@@ -294,26 +294,26 @@ export function DashboardView({
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Rating tattico</CardTitle>
-            <CardDescription>Andamento nel tempo.</CardDescription>
+            <CardTitle>Tactical rating</CardTitle>
+            <CardDescription>Trend over time.</CardDescription>
           </CardHeader>
           <CardContent>
             <TrendLine
               points={data.trends.rating}
-              dataNoun={{ one: "puzzle risolto", many: "puzzle risolti" }}
+              dataNoun={{ one: "puzzle solved", many: "puzzles solved" }}
             />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Accuratezza partite</CardTitle>
-            <CardDescription>Una percentuale per partita.</CardDescription>
+            <CardTitle>Game accuracy</CardTitle>
+            <CardDescription>One percentage per game.</CardDescription>
           </CardHeader>
           <CardContent>
             <TrendLine
               points={data.trends.accuracy}
               suffix="%"
-              dataNoun={{ one: "partita analizzata", many: "partite analizzate" }}
+              dataNoun={{ one: "game analyzed", many: "games analyzed" }}
             />
           </CardContent>
         </Card>
@@ -323,7 +323,7 @@ export function DashboardView({
       {data.recent.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Attività recente</CardTitle>
+            <CardTitle>Recent activity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="divide-y divide-border">

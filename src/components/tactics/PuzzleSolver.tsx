@@ -214,10 +214,10 @@ export function PuzzleSolver({ puzzle, onSolved }: PuzzleSolverProps) {
 
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm text-text-muted">
-          Muove il {solverColor === "white" ? "Bianco" : "Nero"}
+          {solverColor === "white" ? "White" : "Black"} to move
         </span>
         <Button variant="ghost" size="sm" onClick={onHint} disabled={busy || solved}>
-          Suggerimento
+          Hint
         </Button>
       </div>
     </div>

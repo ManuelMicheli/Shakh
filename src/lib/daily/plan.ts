@@ -72,8 +72,8 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     const target = Math.min(dueReview, 10);
     blocks.push({
       kind: "review",
-      title: "Ripasso",
-      detail: `${dueReview} puzzle in scadenza da rivedere`,
+      title: "Review",
+      detail: `${dueReview} puzzles due for review`,
       href: "/app/tattiche?mode=review",
       target,
       done: Math.min(target, puzzlesToday),
@@ -89,8 +89,8 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     ).length;
     blocks.push({
       kind: "weakness",
-      title: `Punto debole: ${themeLabel(weakTheme.key)}`,
-      detail: `Competenza ${Math.round(weakTheme.score * 100)}% — alleniamola`,
+      title: `Weak spot: ${themeLabel(weakTheme.key)}`,
+      detail: `Proficiency ${Math.round(weakTheme.score * 100)}% — let's train it`,
       href: `/app/tattiche?mode=theme&theme=${weakTheme.key}`,
       target,
       done: Math.min(target, themeDone),
@@ -103,8 +103,8 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     const target = 8;
     blocks.push({
       kind: "tactics",
-      title: "Tattica adattiva",
-      detail: "Puzzle calibrati sul tuo livello (zona di flusso)",
+      title: "Adaptive tactics",
+      detail: "Puzzles calibrated to your level (flow zone)",
       href: "/app/tattiche?mode=adaptive",
       target,
       done: Math.min(target, puzzlesToday),
@@ -116,8 +116,8 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
   if (endgame) {
     blocks.push({
       kind: "endgame",
-      title: `Finale: ${endgame.title}`,
-      detail: "Converti la posizione contro la difesa perfetta",
+      title: `Endgame: ${endgame.title}`,
+      detail: "Convert the position against perfect defense",
       href: `/app/teoria/${endgame.slug}`,
       target: 1,
       done: endgame.doneToday ? 1 : 0,
@@ -130,8 +130,8 @@ export async function buildDailyPlan(supabase: DB, userId: string): Promise<Dail
     const target = Math.min(repertoire.due, 15);
     blocks.push({
       kind: "repertoire",
-      title: "Ripasso repertorio",
-      detail: `${repertoire.due} mosse in scadenza`,
+      title: "Repertoire review",
+      detail: `${repertoire.due} moves due`,
       href: repertoire.href,
       target,
       done: Math.min(target, repertoire.reviewedToday),

@@ -27,31 +27,31 @@ const MOCK = {
   rd: 62,
   provisional: false,
   breakdown: [
-    { label: "Tattica", value: 1520 },
-    { label: "Finali", value: 1410 },
-    { label: "Calcolo", value: 1455 },
-    { label: "Gioco", value: 1490 },
+    { label: "Tactics", value: 1520 },
+    { label: "Endgames", value: 1410 },
+    { label: "Calculation", value: 1455 },
+    { label: "Play", value: 1490 },
   ],
   stats: [
-    { label: "Livello", value: "7", sub: "12/40 nodi" },
-    { label: "Rating tattico", value: "1520", sub: "+18 · 340 risolti" },
-    { label: "Streak", value: "9", sub: "record 14" },
-    { label: "Accuratezza", value: "82%", sub: "23 partite" },
+    { label: "Level", value: "7", sub: "12/40 nodes" },
+    { label: "Tactics rating", value: "1520", sub: "+18 · 340 solved" },
+    { label: "Streak", value: "9", sub: "best 14" },
+    { label: "Accuracy", value: "82%", sub: "23 games" },
   ],
   step: {
-    title: "Inchiodatura sul re",
+    title: "Pin on the king",
     reason:
-      "Nelle ultime partite hai mancato 3 inchiodature vincenti. Un set mirato fissa lo schema.",
-    cta: "Allenati ora",
+      "You missed 3 winning pins in your last games. A focused set drills the pattern.",
+    cta: "Train now",
   },
 };
 
 type Variant = "tabellone" | "editoriale" | "diagramma";
 
 const VARIANTS: { id: Variant; name: string; tag: string }[] = [
-  { id: "tabellone", name: "A · Tabellone", tag: "telaio da torneo" },
-  { id: "editoriale", name: "B · Editoriale", tag: "masthead serif" },
-  { id: "diagramma", name: "C · Diagramma", tag: "glifo + dati" },
+  { id: "tabellone", name: "A · Board", tag: "tournament frame" },
+  { id: "editoriale", name: "B · Editorial", tag: "serif masthead" },
+  { id: "diagramma", name: "C · Diagram", tag: "glyph + data" },
 ];
 
 export default function MobileShowcasePage() {
@@ -61,11 +61,11 @@ export default function MobileShowcasePage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Redesign mobile · Dashboard
+          Mobile redesign · Dashboard
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Tre direzioni dal vivo nella cornice telefono. Scegli quella giusta:
-          la applico poi alla pagina reale.
+          Three live directions in the phone frame. Pick the right one and
+          I&apos;ll apply it to the real page.
         </p>
       </header>
 
@@ -126,7 +126,7 @@ function PhoneChrome() {
       <div className="flex h-14 items-center justify-between bg-surface px-4 pt-2">
         <button
           type="button"
-          aria-label="Apri menu"
+          aria-label="Open menu"
           className="-ml-1 rounded-md p-1.5 text-text-muted"
         >
           <Menu className="h-5 w-5" />
@@ -137,7 +137,7 @@ function PhoneChrome() {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            aria-label="Notifiche"
+            aria-label="Notifications"
             className="rounded-md p-1.5 text-text-muted"
           >
             <Bell className="h-5 w-5" />
@@ -168,15 +168,15 @@ function VariantTabellone() {
 
         <div className="relative">
           <p className="text-xs uppercase tracking-wider text-text-muted">
-            Mercoledì 3 giugno
+            Wednesday, June 3
           </p>
           <h2 className="mt-0.5 font-display text-2xl font-semibold tracking-tight">
-            Ciao, {MOCK.name}
+            Hi, {MOCK.name}
           </h2>
 
           <div className="mt-6 flex items-center gap-2">
             <span className="text-xs uppercase tracking-wider text-text-muted">
-              Rating Shakh
+              Shakh rating
             </span>
             <span className="text-[10px] uppercase tracking-wide text-text-muted/70">
               · OTB
@@ -210,7 +210,7 @@ function VariantTabellone() {
 
         <div className="space-y-2">
           <p className="px-0.5 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-            Allenati ora
+            Train now
           </p>
           <QuickList />
         </div>
@@ -229,10 +229,10 @@ function VariantEditoriale() {
     <div className="space-y-6 p-5 pb-10">
       <div>
         <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
-          Il quadro dei tuoi progressi
+          The picture of your progress
         </p>
         <h2 className="mt-2 font-display text-4xl font-semibold leading-[1.05] tracking-tight">
-          Ciao,
+          Hi,
           <br />
           {MOCK.name}.
         </h2>
@@ -243,7 +243,7 @@ function VariantEditoriale() {
       {/* Rating inline editoriale */}
       <div>
         <p className="text-xs uppercase tracking-wider text-text-muted">
-          Rating Shakh
+          Shakh rating
         </p>
         <div className="mt-1 flex items-baseline gap-3">
           <span className="font-mono text-6xl font-semibold tabular-nums tracking-tighter">
@@ -300,7 +300,7 @@ function VariantDiagramma() {
     <div className="space-y-6 p-5 pb-10">
       <div className="text-center">
         <p className="text-xs uppercase tracking-wider text-text-muted">
-          Ciao, {MOCK.name}
+          Hi, {MOCK.name}
         </p>
       </div>
 
@@ -308,13 +308,13 @@ function VariantDiagramma() {
       <div className="relative overflow-hidden rounded-2xl border border-border bg-surface px-6 py-8 text-center">
         <GlyphWatermark glyph="♞" />
         <p className="text-xs uppercase tracking-wider text-text-muted">
-          Rating Shakh
+          Shakh rating
         </p>
         <p className="mt-2 font-mono text-6xl font-semibold tabular-nums tracking-tight">
           {MOCK.rating}
         </p>
         <p className="mt-1 font-mono text-sm text-text-muted">
-          ± {MOCK.rd} · scala OTB
+          ± {MOCK.rd} · OTB scale
         </p>
         <div className="mx-auto mt-5 chess-rule h-1 w-24 opacity-70" />
         <div className="mt-5 grid grid-cols-4 gap-2">
@@ -372,7 +372,7 @@ function NextStepBlock({
     >
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-text-muted">
-          <Compass className="h-3.5 w-3.5" /> Prossimo passo
+          <Compass className="h-3.5 w-3.5" /> Next step
         </span>
       </div>
       <h3 className="mt-2 font-display text-lg font-semibold">
@@ -394,18 +394,18 @@ function NextStepBlock({
 function QuickList() {
   const items = [
     {
-      label: "Tattiche",
-      detail: "Set quotidiano · 8 puzzle",
+      label: "Tactics",
+      detail: "Daily set · 8 puzzles",
       icon: Target,
     },
     {
-      label: "Punti deboli",
-      detail: "Inchiodature, finali di torre",
+      label: "Weaknesses",
+      detail: "Pins, rook endgames",
       icon: Crosshair,
     },
     {
-      label: "Ripara errori",
-      detail: "3 blunder dalle ultime partite",
+      label: "Fix mistakes",
+      detail: "3 blunders from recent games",
       icon: Wrench,
     },
   ];
@@ -438,9 +438,9 @@ function QuickList() {
 
 function QuickRow({ bare = false }: { bare?: boolean }) {
   const items = [
-    { label: "Tattiche", icon: Target },
-    { label: "Punti deboli", icon: Crosshair },
-    { label: "Ripara", icon: Wrench },
+    { label: "Tactics", icon: Target },
+    { label: "Weaknesses", icon: Crosshair },
+    { label: "Fix", icon: Wrench },
   ];
   return (
     <div className="grid grid-cols-3 gap-2">

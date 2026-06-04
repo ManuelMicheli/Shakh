@@ -7,7 +7,7 @@ import { SkillTree } from "@/components/percorso/SkillTree";
 import { NextStep } from "@/components/percorso/NextStep";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Percorso — Shakh" };
+export const metadata = { title: "Path — Shakh" };
 
 export default async function PercorsoPage() {
   const supabase = await createClient();
@@ -31,17 +31,17 @@ export default async function PercorsoPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Da principiante a club"
-        title="Percorso"
-        desc="I nodi si sbloccano man mano che padroneggi i precedenti."
+        eyebrow="From beginner to club"
+        title="Path"
+        desc="Nodes unlock as you master the previous ones."
       />
 
       {/* DESKTOP: testata classica. */}
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Percorso</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Path</h1>
         <p className="mt-2 text-text-muted">
-          Da principiante a giocatore di club. I nodi si sbloccano man mano che
-          dimostri di padroneggiare i precedenti.
+          From beginner to club player. Nodes unlock as you prove you&apos;ve
+          mastered the previous ones.
         </p>
       </div>
 
@@ -50,8 +50,8 @@ export default async function PercorsoPage() {
       <SkillTree nodes={nodes} />
 
       <p className="text-xs text-text-muted">
-        Il curriculum è una bozza di design didattico: un punto di partenza, non
-        una verità definitiva.
+        The curriculum is an instructional-design draft: a starting point, not a
+        definitive truth.
       </p>
     </div>
   );

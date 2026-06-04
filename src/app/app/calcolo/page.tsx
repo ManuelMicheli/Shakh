@@ -3,7 +3,7 @@ import { CalculationTrainer } from "@/components/calc/CalculationTrainer";
 import { getCalcPuzzle } from "./actions";
 import { loadDomainRatings } from "@/lib/rating/store";
 
-export const metadata = { title: "Calcolo — Shakh" };
+export const metadata = { title: "Calculation — Shakh" };
 
 export default async function CalcoloPage() {
   const supabase = await createClient();

@@ -32,7 +32,7 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
     start(async () => {
       const res = await createRepertoire(name, color);
       if (!res.ok || !res.data) {
-        toast({ title: "Non creato", description: res.error, variant: "error" });
+        toast({ title: "Not created", description: res.error, variant: "error" });
         return;
       }
       setName("");
@@ -44,7 +44,7 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
     start(async () => {
       const res = await deleteRepertoire(id);
       if (!res.ok) {
-        toast({ title: "Non eliminato", description: res.error, variant: "error" });
+        toast({ title: "Not deleted", description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -64,17 +64,17 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
           >
             <div className="flex-1 min-w-[12rem] space-y-1">
               <label className="text-xs text-text-muted" htmlFor="rep-name">
-                Nome
+                Name
               </label>
               <Input
                 id="rep-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="es. Bianco — Italiana"
+                placeholder="e.g. White — Italian"
               />
             </div>
             <div className="space-y-1">
-              <span className="block text-xs text-text-muted">Colore</span>
+              <span className="block text-xs text-text-muted">Color</span>
               <div className="inline-flex rounded-md border border-border bg-surface p-0.5">
                 {(["white", "black"] as PieceColor[]).map((c) => (
                   <button
@@ -86,13 +86,13 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
                       (color === c ? "bg-text text-bg" : "text-text-muted hover:text-text")
                     }
                   >
-                    {c === "white" ? "Bianco" : "Nero"}
+                    {c === "white" ? "White" : "Black"}
                   </button>
                 ))}
               </div>
             </div>
             <Button type="submit" disabled={pending || !name.trim()}>
-              Crea repertorio
+              Create repertoire
             </Button>
           </form>
         </CardContent>
@@ -100,7 +100,7 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
 
       {items.length === 0 ? (
         <p className="text-sm text-text-muted">
-          Nessun repertorio. Creane uno per iniziare a costruire le tue linee.
+          No repertoires. Create one to start building your lines.
         </p>
       ) : (
         <ul className="space-y-2">
@@ -117,7 +117,7 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
                     <div>
                       <p className="font-medium">{r.name}</p>
                       <p className="text-xs text-text-muted">
-                        {r.color === "white" ? "Bianco" : "Nero"} · {r.moves} mosse
+                        {r.color === "white" ? "White" : "Black"} · {r.moves} moves
                       </p>
                     </div>
                   </div>
@@ -126,14 +126,14 @@ export function RepertoireList({ items }: { items: RepertoireItem[] }) {
                       <Pencil className="mr-1 h-4 w-4" /> Editor
                     </Link>
                     <Link href={`/app/repertorio/${r.id}/training`} className={LINK_BTN}>
-                      <Dumbbell className="mr-1 h-4 w-4" /> Allena
+                      <Dumbbell className="mr-1 h-4 w-4" /> Train
                     </Link>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(r.id)}
                       disabled={pending}
-                      aria-label="Elimina repertorio"
+                      aria-label="Delete repertoire"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

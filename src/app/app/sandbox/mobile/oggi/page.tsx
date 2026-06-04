@@ -30,45 +30,45 @@ const ICON: Record<Kind, LucideIcon> = {
 };
 
 const PLAN = {
-  date: "Mercoledì 3 giugno",
+  date: "Wednesday, June 3",
   totalMin: 25,
   blocks: [
     {
       kind: "review" as Kind,
-      title: "Ripasso",
-      detail: "8 puzzle in scadenza da rivedere",
+      title: "Review",
+      detail: "8 puzzles due for review",
       done: 8,
       target: 8,
       estMin: 5,
     },
     {
       kind: "weakness" as Kind,
-      title: "Punto debole: Inchiodatura",
-      detail: "Competenza 41% — alleniamola",
+      title: "Weakness: Pin",
+      detail: "41% mastery — let's drill it",
       done: 2,
       target: 6,
       estMin: 5,
     },
     {
       kind: "tactics" as Kind,
-      title: "Tattica adattiva",
-      detail: "Puzzle calibrati sul tuo livello",
+      title: "Adaptive tactics",
+      detail: "Puzzles calibrated to your level",
       done: 0,
       target: 8,
       estMin: 5,
     },
     {
       kind: "endgame" as Kind,
-      title: "Finale: Re e pedone",
-      detail: "Converti contro la difesa perfetta",
+      title: "Endgame: King and pawn",
+      detail: "Convert against perfect defense",
       done: 0,
       target: 1,
       estMin: 5,
     },
     {
       kind: "repertoire" as Kind,
-      title: "Ripasso repertorio",
-      detail: "12 mosse in scadenza",
+      title: "Repertoire review",
+      detail: "12 moves due",
       done: 0,
       target: 12,
       estMin: 5,
@@ -83,11 +83,11 @@ export default function OggiShowcasePage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Redesign mobile · Oggi
+          Mobile redesign · Today
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Stessa direzione della Dashboard. Guarda, poi la applico alla pagina
-          reale.
+          Same direction as the Dashboard. Take a look, then I&apos;ll apply it
+          to the real page.
         </p>
       </header>
 
@@ -103,7 +103,7 @@ export default function OggiShowcasePage() {
                     {PLAN.date}
                   </p>
                   <h2 className="mt-0.5 font-display text-2xl font-semibold tracking-tight">
-                    Oggi
+                    Today
                   </h2>
 
                   <div className="mt-6 flex items-end gap-2">
@@ -113,7 +113,7 @@ export default function OggiShowcasePage() {
                     </span>
                   </div>
                   <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
-                    durata stimata · {doneCount}/{PLAN.blocks.length} completati
+                    estimated time · {doneCount}/{PLAN.blocks.length} done
                   </p>
                 </div>
               </div>
@@ -124,7 +124,7 @@ export default function OggiShowcasePage() {
               {/* Il piano */}
               <section className="space-y-2">
                 <p className="px-0.5 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-                  Il piano
+                  The plan
                 </p>
                 <div className="space-y-2">
                   {PLAN.blocks.map((b) => (
@@ -226,7 +226,7 @@ function PhoneChrome() {
       <div className="flex h-14 items-center justify-between bg-surface px-4 pt-2">
         <button
           type="button"
-          aria-label="Apri menu"
+          aria-label="Open menu"
           className="-ml-1 rounded-md p-1.5 text-text-muted"
         >
           <Menu className="h-5 w-5" />
@@ -237,7 +237,7 @@ function PhoneChrome() {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            aria-label="Notifiche"
+            aria-label="Notifications"
             className="rounded-md p-1.5 text-text-muted"
           >
             <Bell className="h-5 w-5" />

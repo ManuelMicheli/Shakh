@@ -33,12 +33,12 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdateRe
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const username = input.username.trim();
   const displayName = input.displayName.trim();
   if (username && !/^[a-zA-Z0-9_]{3,30}$/.test(username))
-    return { ok: false, error: "Username: 3–30 caratteri, lettere/numeri/underscore." };
+    return { ok: false, error: "Username: 3–30 characters, letters/numbers/underscore." };
 
   const { error } = await supabase
     .from("profiles")
@@ -51,7 +51,7 @@ export async function updateProfile(input: UpdateProfileInput): Promise<UpdateRe
     .eq("id", user.id);
 
   if (error) {
-    if (error.code === "23505") return { ok: false, error: "Username già in uso." };
+    if (error.code === "23505") return { ok: false, error: "Username already taken." };
     return { ok: false, error: error.message };
   }
 
@@ -97,7 +97,7 @@ export async function exportMyData(): Promise<ExportResult> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const out: Record<string, unknown> = {
     exported_at: new Date().toISOString(),
@@ -134,14 +134,14 @@ export async function deleteMyAccount(): Promise<DeleteResult> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   try {
     const admin = createAdminClient();
     const { error } = await admin.auth.admin.deleteUser(user.id);
     if (error) return { ok: false, error: error.message };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Errore." };
+    return { ok: false, error: e instanceof Error ? e.message : "Error." };
   }
 
   // Chiude la sessione locale (i cookie vengono invalidati).
@@ -189,7 +189,7 @@ function isExternalSource(s: string): s is ExternalSource {
 /** Messaggio leggibile da un ProviderError (rete/non trovato/rate limit/insufficiente). */
 function providerMessage(e: unknown): string {
   if (e instanceof ProviderError) return e.message;
-  return e instanceof Error ? e.message : "Errore imprevisto.";
+  return e instanceof Error ? e.message : "Unexpected error.";
 }
 
 /** Validità del token di verifica (minuti). */
@@ -385,16 +385,16 @@ export async function beginLinkExternalAccount(
   source: string,
   username: string,
 ): Promise<LinkResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
   const handle = username.trim();
   if (!/^[a-zA-Z0-9_-]{2,30}$/.test(handle))
-    return { ok: false, error: "Username non valido (2–30 caratteri)." };
+    return { ok: false, error: "Invalid username (2–30 characters)." };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   let report;
   try {
@@ -450,12 +450,12 @@ export async function beginLinkExternalAccount(
  * il token. Se sì, marca l'account come verificato e alimenta il Rating Shakh.
  */
 export async function verifyExternalAccount(source: string): Promise<LinkResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const { data: row } = await supabase
     .from("external_accounts")
@@ -470,10 +470,10 @@ export async function verifyExternalAccount(source: string): Promise<LinkResult>
       rating_otb: number | null;
       n_games: number;
     }>();
-  if (!row) return { ok: false, error: "Account non collegato." };
-  if (!row.verify_token) return { ok: false, error: "Nessuna verifica in corso." };
+  if (!row) return { ok: false, error: "Account not linked." };
+  if (!row.verify_token) return { ok: false, error: "No verification in progress." };
   if (row.verify_expires_at && new Date(row.verify_expires_at) < new Date())
-    return { ok: false, error: "Token scaduto. Ricollega l'account per generarne uno nuovo." };
+    return { ok: false, error: "Token expired. Relink the account to generate a new one." };
 
   let profileText: string;
   try {
@@ -485,7 +485,7 @@ export async function verifyExternalAccount(source: string): Promise<LinkResult>
   if (!profileText.includes(row.verify_token)) {
     return {
       ok: false,
-      error: "Token non trovato nel profilo. Salva il token e attendi qualche secondo, poi riprova.",
+      error: "Token not found in your profile. Save the token, wait a few seconds, then try again.",
     };
   }
 
@@ -530,12 +530,12 @@ export async function verifyExternalAccount(source: string): Promise<LinkResult>
 
 /** Aggiorna il rating di un account già VERIFICATO (rilettura dall'API). */
 export async function refreshExternalAccount(source: string): Promise<LinkResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const { data: existing } = await supabase
     .from("external_accounts")
@@ -543,8 +543,8 @@ export async function refreshExternalAccount(source: string): Promise<LinkResult
     .eq("user_id", user.id)
     .eq("source", source)
     .maybeSingle<{ username: string; verified: boolean }>();
-  if (!existing) return { ok: false, error: "Account non collegato." };
-  if (!existing.verified) return { ok: false, error: "Verifica prima l'account." };
+  if (!existing) return { ok: false, error: "Account not linked." };
+  if (!existing.verified) return { ok: false, error: "Verify the account first." };
 
   let report;
   try {
@@ -588,12 +588,12 @@ export async function refreshExternalAccount(source: string): Promise<LinkResult
 
 /** Scollega un account online e azzera (o ricalcola) il dominio 'external'. */
 export async function unlinkExternalAccount(source: string): Promise<UpdateResult> {
-  if (!isExternalSource(source)) return { ok: false, error: "Piattaforma non supportata." };
+  if (!isExternalSource(source)) return { ok: false, error: "Unsupported platform." };
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const { error } = await supabase
     .from("external_accounts")

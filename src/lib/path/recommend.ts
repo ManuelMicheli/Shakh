@@ -47,47 +47,47 @@ function weakSpotToStep(w: WeakSpot): NextStep {
     case "tactic_theme":
       return {
         mode: "autonomous",
-        title: `Allena: ${themeLabel(w.key)}`,
-        reason: `È il tuo tema tattico più debole (${pct}% di riuscita). Qualche puzzle mirato.`,
-        activity: { label: "Vai ai puzzle", href: "/app/tattiche" },
+        title: `Train: ${themeLabel(w.key)}`,
+        reason: `It's your weakest tactical theme (${pct}% success). A few targeted puzzles.`,
+        activity: { label: "Go to puzzles", href: "/app/tattiche" },
       };
     case "endgame":
       return {
         mode: "autonomous",
-        title: "Rinforza i finali",
-        reason: `I tuoi finali sono deboli (${pct}%): 15 minuti di pratica contro la tablebase.`,
+        title: "Shore up your endgames",
+        reason: `Your endgames are weak (${pct}%): 15 minutes of practice against the tablebase.`,
         activity: {
-          label: "Pratica il finale",
+          label: "Practice the endgame",
           href: `/app/teoria/${ENDGAME_SLUG[w.key] ?? "matti-elementari"}`,
         },
       };
     case "middlegame_theme":
       return {
         mode: "autonomous",
-        title: "Lavora sui piani",
-        reason: `Le strutture di mediogioco ti costano (${pct}%): rivedi un esercizio posizionale.`,
-        activity: { label: "Vai alla teoria", href: "/app/teoria/mediogioco" },
+        title: "Work on your plans",
+        reason: `Middlegame structures cost you (${pct}%): review a positional exercise.`,
+        activity: { label: "Go to theory", href: "/app/teoria/mediogioco" },
       };
     case "opening":
       return {
         mode: "autonomous",
-        title: "Stringi il repertorio",
-        reason: `La precisione in apertura cala (${pct}%): un drill di ripasso.`,
-        activity: { label: "Allena il repertorio", href: "/app/repertorio" },
+        title: "Tighten your repertoire",
+        reason: `Your opening accuracy is dropping (${pct}%): a review drill.`,
+        activity: { label: "Train the repertoire", href: "/app/repertorio" },
       };
     case "phase":
       return {
         mode: "autonomous",
-        title: `Migliora il tuo ${w.key === "opening" ? "gioco d'apertura" : w.key === "endgame" ? "finale" : "mediogioco"}`,
-        reason: `Dalle tue partite, è la fase dove perdi più valutazione. Allenala.`,
-        activity: { label: "Le mie partite", href: "/app/partite" },
+        title: `Improve your ${w.key === "opening" ? "opening play" : w.key === "endgame" ? "endgame" : "middlegame"}`,
+        reason: `From your games, it's the phase where you lose the most evaluation. Train it.`,
+        activity: { label: "My games", href: "/app/partite" },
       };
     default:
       return {
         mode: "autonomous",
-        title: "Allenamento libero",
-        reason: "Scegli dove migliorare: il percorso resta come riferimento.",
-        activity: { label: "Vai ai puzzle", href: "/app/tattiche" },
+        title: "Free training",
+        reason: "Choose where to improve: the path stays as a reference.",
+        activity: { label: "Go to puzzles", href: "/app/tattiche" },
       };
   }
 }
@@ -118,7 +118,7 @@ export function computeNextStep(
       return {
         mode: "guided",
         title: node.title,
-        reason: node.description ?? "Il prossimo passo del tuo percorso.",
+        reason: node.description ?? "The next step on your path.",
         activity: node.activities[0] ?? null,
       };
     }
@@ -133,7 +133,7 @@ export function computeNextStep(
     return {
       mode: guided ? "guided" : "autonomous",
       title: node.title,
-      reason: node.description ?? "Continua il percorso o esplora liberamente.",
+      reason: node.description ?? "Continue the path or explore freely.",
       activity: node.activities[0] ?? null,
     };
   }

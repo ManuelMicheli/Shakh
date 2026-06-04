@@ -19,40 +19,40 @@ export interface GuidedGame {
 export const GUIDED_GAMES: GuidedGame[] = [
   {
     slug: "matto-del-barbiere",
-    title: "Il matto del barbiere",
+    title: "Scholar's mate",
     intro:
-      "La trappola più famosa per chi inizia: il Bianco punta tutto su un matto rapido. Vediamo perché funziona contro chi non sta attento… e come si previene.",
+      "The most famous trap for beginners: White bets everything on a quick mate. Let's see why it works against an inattentive opponent… and how to prevent it.",
     pgn: "1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7#",
     comments: [
-      "Il Bianco apre il centro e libera Donna e Alfiere: mossa naturale.",
-      "Il Nero risponde simmetrico, anch'egli apre le linee.",
-      "L'Alfiere punta dritto su f7: la casella più debole nella posizione del Nero, difesa solo dal Re.",
-      "Sviluppo corretto del Nero, ma ignora la minaccia che sta arrivando.",
-      "La Donna minaccia matto in f7 (Donna + Alfiere sullo stesso bersaglio). Il Nero DEVE difendere f7.",
-      "Errore decisivo: il Nero attacca la Donna ma dimentica la minaccia di matto. Andava giocato g6 o Qe7.",
-      "Donna prende f7: scacco matto. Il Re non può fuggire e nessuno può catturare la Donna. Lezione: controlla sempre le minacce su f7.",
+      "White opens the center and frees the queen and bishop: a natural move.",
+      "Black responds symmetrically, also opening lines.",
+      "The bishop aims straight at f7: the weakest square in Black's position, defended only by the king.",
+      "Correct development by Black, but it ignores the threat that's coming.",
+      "The queen threatens mate on f7 (queen + bishop on the same target). Black MUST defend f7.",
+      "A decisive mistake: Black attacks the queen but forgets the mate threat. g6 or Qe7 was needed.",
+      "Queen takes f7: checkmate. The king can't flee and no one can capture the queen. Lesson: always watch threats on f7.",
     ],
   },
   {
     slug: "matto-di-legal",
-    title: "Il matto di Légal",
+    title: "Légal's mate",
     intro:
-      "Una combinazione classica: il Bianco sacrifica la Donna per dare matto con i pezzi minori. Mostra la potenza dei pezzi che collaborano.",
+      "A classic combination: White sacrifices the queen to deliver mate with the minor pieces. It shows the power of pieces working together.",
     pgn: "1. e4 e5 2. Nf3 d6 3. Bc4 Bg4 4. Nc3 g6 5. Nxe5 Bxd1 6. Bxf7+ Ke7 7. Nd5#",
     comments: [
-      "Apertura di Re: il Bianco controlla il centro.", // 1. e4
-      "Risposta simmetrica del Nero.", // 1... e5
-      "Il Cavallo sviluppa e attacca il pedone e5.", // 2. Nf3
-      "Difesa Philidor: il Nero difende e5, ma in modo passivo.", // 2... d6
-      "L'Alfiere punta a f7, la casella debole del Nero.", // 3. Bc4
-      "Il Nero inchioda il Cavallo alla Donna: sembra fastidioso, ma è un'illusione.", // 3... Bg4
-      "Il Bianco sviluppa e prepara la combinazione.", // 4. Nc3
-      "Il Nero indebolisce la casa del Re.", // 4... g6
-      "Sacrificio! Il Cavallo prende e5 ignorando l'inchiodatura: se il Nero prende la Donna, arriva il matto.", // 5. Nxe5
-      "Il Nero abbocca e cattura la Donna: ora la trappola scatta.", // 5... Bxd1
-      "Alfiere prende f7 con scacco: il Re è costretto a uscire.", // 6. Bxf7+
-      "Il Re deve avanzare, allo scoperto.", // 6... Ke7
-      "Cavallo in d5: scacco matto con due soli pezzi minori. La collaborazione vale più della Donna.", // 7. Nd5#
+      "King's pawn opening: White controls the center.", // 1. e4
+      "A symmetrical response from Black.", // 1... e5
+      "The knight develops and attacks the e5 pawn.", // 2. Nf3
+      "Philidor Defense: Black defends e5, but passively.", // 2... d6
+      "The bishop aims at f7, Black's weak square.", // 3. Bc4
+      "Black pins the knight to the queen: it looks annoying, but it's an illusion.", // 3... Bg4
+      "White develops and prepares the combination.", // 4. Nc3
+      "Black weakens the king's home.", // 4... g6
+      "Sacrifice! The knight takes e5 ignoring the pin: if Black takes the queen, mate follows.", // 5. Nxe5
+      "Black takes the bait and captures the queen: now the trap springs.", // 5... Bxd1
+      "Bishop takes f7 with check: the king is forced out.", // 6. Bxf7+
+      "The king must advance, into the open.", // 6... Ke7
+      "Knight to d5: checkmate with just two minor pieces. Teamwork is worth more than the queen.", // 7. Nd5#
     ],
   },
 ];

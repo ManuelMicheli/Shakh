@@ -16,11 +16,11 @@ export interface RosterStudent {
 type SortKey = "name" | "level" | "tacticRating" | "accuracy" | "lastActivity";
 
 const HEADERS: { key: SortKey; label: string; numeric: boolean }[] = [
-  { key: "name", label: "Allievo", numeric: false },
-  { key: "level", label: "Livello", numeric: true },
+  { key: "name", label: "Student", numeric: false },
+  { key: "level", label: "Level", numeric: true },
   { key: "tacticRating", label: "Rating", numeric: true },
-  { key: "accuracy", label: "Accuratezza", numeric: true },
-  { key: "lastActivity", label: "Ultima attività", numeric: true },
+  { key: "accuracy", label: "Accuracy", numeric: true },
+  { key: "lastActivity", label: "Last activity", numeric: true },
 ];
 
 function fmtAccuracy(v: number | null): string {
@@ -30,7 +30,7 @@ function fmtAccuracy(v: number | null): string {
 function fmtDate(iso: string | null): string {
   if (!iso) return "—";
   const d = new Date(iso);
-  return d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
+  return d.toLocaleDateString("en-US", { day: "2-digit", month: "2-digit" });
 }
 
 /** Elenco allievi ordinabile (prompt 09 §4): chi è avanti, chi è indietro. */

@@ -15,13 +15,13 @@ import { ensureStats, selectNextPuzzle, dueReviewCount } from "@/lib/tactics/que
 import { TACTIC_THEMES, themeLabel } from "@/lib/tactics/themes";
 import type { TacticMode, TacticStats } from "@/lib/tactics/types";
 
-export const metadata = { title: "Tattiche — Shakh" };
+export const metadata = { title: "Tactics — Shakh" };
 
 const MODES: { mode: TacticMode; title: string; desc: string; icon: LucideIcon }[] = [
-  { mode: "adaptive", title: "Adattivo", desc: "Flusso continuo di puzzle al tuo livello. Aggiorna rating e serie.", icon: InfinityIcon },
-  { mode: "theme", title: "Per tema", desc: "Allena un motivo specifico: forchetta, inchiodatura, finali…", icon: Target },
-  { mode: "review", title: "Ripasso", desc: "Rivedi i puzzle sbagliati in scadenza (ripetizione spaziata).", icon: RotateCcw },
-  { mode: "timed", title: "Sfida a tempo", desc: "3 minuti, difficoltà crescente: quanti ne risolvi?", icon: Timer },
+  { mode: "adaptive", title: "Adaptive", desc: "A continuous flow of puzzles at your level. Updates rating and streak.", icon: InfinityIcon },
+  { mode: "theme", title: "By theme", desc: "Train a specific motif: fork, pin, endgames…", icon: Target },
+  { mode: "review", title: "Review", desc: "Revisit due missed puzzles (spaced repetition).", icon: RotateCcw },
+  { mode: "timed", title: "Timed challenge", desc: "3 minutes, rising difficulty: how many can you solve?", icon: Timer },
 ];
 
 const VALID_MODES: TacticMode[] = ["adaptive", "theme", "review", "timed"];
@@ -69,22 +69,22 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
         <div className="relative">
           <div className="relative">
             <p className="text-xs uppercase tracking-wider text-text-muted">
-              Visione tattica
+              Tactical vision
             </p>
             <h1 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-              Tattiche
+              Tactics
             </h1>
 
             <p className="mt-6 text-xs uppercase tracking-wider text-text-muted">
-              Rating tattico
+              Tactical rating
             </p>
             <div className="mt-1 font-mono text-5xl font-semibold tabular-nums tracking-tight">
               {stats.rating}
             </div>
             <div className="mt-4 grid grid-cols-3 gap-x-3">
-              <Mini label="Serie" value={stats.currentStreak} />
-              <Mini label="Record" value={stats.bestStreak} />
-              <Mini label="Risolti" value={stats.puzzlesSolved} />
+              <Mini label="Streak" value={stats.currentStreak} />
+              <Mini label="Best" value={stats.bestStreak} />
+              <Mini label="Solved" value={stats.puzzlesSolved} />
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
 
         <section className="space-y-2">
           <p className="px-0.5 text-[0.7rem] font-medium uppercase tracking-wider text-text-muted/70">
-            Allenati
+            Train
           </p>
           <div className="space-y-2">
             {MODES.map((m) => {
@@ -112,7 +112,7 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
                       <span className="text-sm font-medium">{m.title}</span>
                       {m.mode === "review" && reviewCount > 0 && (
                         <span className="shrink-0 rounded-full bg-text px-2 py-0.5 text-[10px] font-medium text-bg">
-                          {reviewCount} in scadenza
+                          {reviewCount} due
                         </span>
                       )}
                     </span>
@@ -131,18 +131,18 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
       {/* ===== DESKTOP: layout esistente ===== */}
       <div className="hidden space-y-8 md:block">
         <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Tattiche</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">Tactics</h1>
           <p className="mt-2 text-text-muted">
-            Allena la visione tattica con i puzzle. Il rating si adatta a te e i puzzle
-            sbagliati tornano da rivedere.
+            Train your tactical vision with puzzles. The rating adapts to you and missed
+            puzzles come back for review.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label="Rating tattico" value={stats.rating} />
-          <Stat label="Serie attuale" value={stats.currentStreak} />
-          <Stat label="Miglior serie" value={stats.bestStreak} />
-          <Stat label="Risolti" value={stats.puzzlesSolved} />
+          <Stat label="Tactical rating" value={stats.rating} />
+          <Stat label="Current streak" value={stats.currentStreak} />
+          <Stat label="Best streak" value={stats.bestStreak} />
+          <Stat label="Solved" value={stats.puzzlesSolved} />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -153,7 +153,7 @@ function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }
                   <div className="flex items-center justify-between">
                     <CardTitle>{m.title}</CardTitle>
                     {m.mode === "review" && reviewCount > 0 && (
-                      <Badge>{reviewCount} in scadenza</Badge>
+                      <Badge>{reviewCount} due</Badge>
                     )}
                   </div>
                   <CardDescription>{m.desc}</CardDescription>
@@ -181,10 +181,10 @@ function ThemePicker() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Per tema — scegli un motivo
+          By theme — pick a motif
         </h1>
         <Link href="/app/tattiche" className="text-sm text-text-muted hover:text-text">
-          ← Tattiche
+          ← Tactics
         </Link>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

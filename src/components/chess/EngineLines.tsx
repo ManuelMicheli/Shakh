@@ -103,7 +103,7 @@ export function EngineLines({
       </div>
 
       <div className="flex items-center gap-1.5 text-xs text-text-muted">
-        <span>Migliori mosse del motore</span>
+        <span>Top engine moves</span>
         <Tooltip content={ENGINE_HELP.eval} className="max-w-xs whitespace-normal">
           <span className="flex h-4 w-4 cursor-help items-center justify-center rounded-full border border-border text-[10px] font-medium">
             ?
@@ -115,7 +115,7 @@ export function EngineLines({
         {rendered.map(({ line, evalLabel, sans }, lineIndex) => (
           <li key={line.multipv} className="flex items-start gap-2 text-sm">
             <Tooltip
-              content={lineIndex === 0 ? `Mossa migliore. ${ENGINE_HELP.eval}` : ENGINE_HELP.eval}
+              content={lineIndex === 0 ? `Best move. ${ENGINE_HELP.eval}` : ENGINE_HELP.eval}
               side="right"
               className="max-w-xs whitespace-normal"
             >
@@ -133,7 +133,7 @@ export function EngineLines({
             <p className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 font-mono leading-relaxed">
               {lineIndex === 0 && (
                 <span className="rounded bg-surface-2 px-1 text-[10px] font-sans font-medium uppercase tracking-wide text-text-muted">
-                  migliore
+                  best
                 </span>
               )}
             {sans.map((m, ply) => {

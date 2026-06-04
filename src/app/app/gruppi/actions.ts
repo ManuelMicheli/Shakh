@@ -21,8 +21,8 @@ export interface ActionResult<T = undefined> {
   error?: string;
 }
 
-const AUTH_ERR = "Sessione scaduta. Accedi di nuovo.";
-const PERM_ERR = "Non hai i permessi per questa azione.";
+const AUTH_ERR = "Session expired. Sign in again.";
+const PERM_ERR = "You don't have permission for this action.";
 
 /** Slug url-friendly con suffisso casuale per garantire l'unicità. */
 function makeSlug(name: string): string {
@@ -61,7 +61,7 @@ export async function createGroup(
   if (!user) return { ok: false, error: AUTH_ERR };
 
   const trimmed = name.trim();
-  if (!trimmed) return { ok: false, error: "Dai un nome al gruppo." };
+  if (!trimmed) return { ok: false, error: "Give the group a name." };
 
   const { data: group, error } = await supabase
     .from("groups")
@@ -168,7 +168,7 @@ export async function updateMemberRole(
   // Solo l'owner gestisce i ruoli (coerente con la policy group_members_owner_write).
   const myRole = await getMyGroupRole(supabase, groupId, user.id);
   if (myRole !== "owner") return { ok: false, error: PERM_ERR };
-  if (role === "owner") return { ok: false, error: "Il ruolo owner non è assegnabile qui." };
+  if (role === "owner") return { ok: false, error: "The owner role can't be assigned here." };
 
   const { error } = await supabase
     .from("group_members")
@@ -190,7 +190,7 @@ export async function removeMember(groupId: string, userId: string): Promise<Act
 
   const myRole = await getMyGroupRole(supabase, groupId, user.id);
   if (myRole !== "owner") return { ok: false, error: PERM_ERR };
-  if (userId === user.id) return { ok: false, error: "Non puoi rimuovere te stesso (owner)." };
+  if (userId === user.id) return { ok: false, error: "You can't remove yourself (owner)." };
 
   const { error } = await supabase
     .from("group_members")
@@ -221,7 +221,7 @@ export async function createGroupRepertoire(
   if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
 
   const trimmed = name.trim();
-  if (!trimmed) return { ok: false, error: "Dai un nome al repertorio." };
+  if (!trimmed) return { ok: false, error: "Give the repertoire a name." };
 
   // RLS repertoires_write consente l'insert di gruppo agli istruttori/owner.
   const { data, error } = await supabase
@@ -259,12 +259,12 @@ export async function createAssignment(input: CreateAssignmentInput): Promise<Ac
   if (!isInstructorRole(role)) return { ok: false, error: PERM_ERR };
 
   if (input.targetType === "user") {
-    if (!input.targetUserId) return { ok: false, error: "Scegli un allievo." };
+    if (!input.targetUserId) return { ok: false, error: "Choose a student." };
     // L'allievo deve far parte del gruppo: la RLS su assignments controlla solo
     // assigned_by, non il target, quindi senza questo check un istruttore
     // potrebbe assegnare a un utente qualsiasi della piattaforma.
     const targetRole = await getMyGroupRole(supabase, input.groupId, input.targetUserId);
-    if (!targetRole) return { ok: false, error: "L'allievo non fa parte di questo gruppo." };
+    if (!targetRole) return { ok: false, error: "The student isn't part of this group." };
   }
 
   const { error } = await supabase.from("assignments").insert({
@@ -340,7 +340,7 @@ export async function refreshClassSynthesis(
 
   const data = await loadClassData(supabase, groupId);
   if (data.students.length === 0)
-    return { ok: false, error: "Nessun allievo nel gruppo." };
+    return { ok: false, error: "No students in the group." };
 
   const synthesis = await synthesizeClass({
     studentCount: data.students.length,
@@ -353,7 +353,7 @@ export async function refreshClassSynthesis(
       .filter((w) => w.count >= 2)
       .map((w) => ({ label: w.label, count: w.count })),
   });
-  if (!synthesis) return { ok: false, error: "Sintesi non disponibile, riprova." };
+  if (!synthesis) return { ok: false, error: "Summary unavailable, try again." };
 
   return { ok: true, data: { synthesis } };
 }

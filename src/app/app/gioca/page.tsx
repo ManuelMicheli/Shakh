@@ -3,7 +3,7 @@ import { PlayHub } from "@/components/play/PlayHub";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { FriendGameRow } from "@/lib/play/types";
 
-export const metadata = { title: "Gioca con un amico — Shakh" };
+export const metadata = { title: "Play a friend — Shakh" };
 
 export default async function GiocaPage() {
   const supabase = await createClient();
@@ -19,17 +19,17 @@ export default async function GiocaPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Con un amico"
-        title="Gioca"
-        desc="Stesso dispositivo o online in differita con un link condivisibile."
+        eyebrow="With a friend"
+        title="Play"
+        desc="Same device or asynchronous online with a shareable link."
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          Gioca con un amico
+          Play a friend
         </h1>
         <p className="mt-2 text-text-muted">
-          Sfida un amico sullo stesso dispositivo, oppure online in differita con
-          un link condivisibile. Scegli il tempo, rivedi le mosse, torna indietro.
+          Challenge a friend on the same device, or play asynchronously online with
+          a shareable link. Pick the time control, review the moves, step back.
         </p>
       </div>
 

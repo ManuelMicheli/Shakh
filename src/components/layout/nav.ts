@@ -50,42 +50,42 @@ export const navGroups: NavGroup[] = [
     // Ancore: orientamento e guida quotidiana. Il percorso è la spina dorsale.
     items: [
       { label: "Dashboard", href: "/app", icon: LayoutDashboard },
-      { label: "Oggi", href: "/app/oggi", icon: CalendarCheck },
-      { label: "Percorso", href: "/app/percorso", icon: Route },
+      { label: "Today", href: "/app/oggi", icon: CalendarCheck },
+      { label: "Path", href: "/app/percorso", icon: Route },
       { label: "Coach", href: "/app/coach", icon: Bot },
     ],
   },
   {
-    label: "Studia",
+    label: "Study",
     items: [
-      { label: "Impara", href: "/app/impara", icon: GraduationCap },
-      { label: "Teoria", href: "/app/teoria", icon: BookOpen },
-      { label: "Repertorio", href: "/app/repertorio", icon: Library },
-      { label: "Preparazione", href: "/app/preparazione", icon: Radar },
+      { label: "Learn", href: "/app/impara", icon: GraduationCap },
+      { label: "Theory", href: "/app/teoria", icon: BookOpen },
+      { label: "Repertoire", href: "/app/repertorio", icon: Library },
+      { label: "Preparation", href: "/app/preparazione", icon: Radar },
     ],
   },
   {
-    label: "Allenati",
+    label: "Train",
     items: [
-      { label: "Tattiche", href: "/app/tattiche", icon: Target },
-      { label: "Calcolo", href: "/app/calcolo", icon: Brain },
-      { label: "Trappole", href: "/app/trappole", icon: Zap },
+      { label: "Tactics", href: "/app/tattiche", icon: Target },
+      { label: "Calculation", href: "/app/calcolo", icon: Brain },
+      { label: "Traps", href: "/app/trappole", icon: Zap },
       { label: "Sparring", href: "/app/sparring", icon: Cpu },
     ],
   },
   {
-    label: "Gioca e analizza",
+    label: "Play & analyze",
     items: [
-      { label: "Gioca con un amico", href: "/app/gioca", icon: Gamepad2 },
-      { label: "Le mie partite", href: "/app/partite", icon: Swords },
-      { label: "Punti deboli", href: "/app/debolezze", icon: Crosshair },
-      { label: "Ripara errori", href: "/app/ripara", icon: Wrench },
+      { label: "Play a friend", href: "/app/gioca", icon: Gamepad2 },
+      { label: "My games", href: "/app/partite", icon: Swords },
+      { label: "Weaknesses", href: "/app/debolezze", icon: Crosshair },
+      { label: "Fix mistakes", href: "/app/ripara", icon: Wrench },
     ],
   },
 ];
 
 /** Voci ancorate in fondo alla sidebar: gestione e account. */
 export const navFooter: NavItem[] = [
-  { label: "Gruppi", href: "/app/gruppi", icon: Users },
-  { label: "Profilo", href: "/app/profilo", icon: User },
+  { label: "Groups", href: "/app/gruppi", icon: Users },
+  { label: "Profile", href: "/app/profilo", icon: User },
 ];

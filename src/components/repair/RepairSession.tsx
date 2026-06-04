@@ -43,7 +43,7 @@ export function RepairSession({ puzzles, motifLabel, gameId }: RepairSessionProp
         fromReview: false,
       });
       if (!res.ok) {
-        toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Save failed", description: res.error, variant: "error" });
       }
 
       window.setTimeout(() => {
@@ -59,20 +59,20 @@ export function RepairSession({ puzzles, motifLabel, gameId }: RepairSessionProp
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Mini-lezione completata</CardTitle>
+          <CardTitle>Mini-lesson complete</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-text-muted">
-            Risolti puliti <span className="font-mono text-text">{solved}</span> di {total} puzzle
-            sul motivo <strong>{motifLabel}</strong>.
+            Solved cleanly <span className="font-mono text-text">{solved}</span> of {total} puzzles
+            on the <strong>{motifLabel}</strong> motif.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => window.location.reload()}>Ritenta con nuovi puzzle</Button>
+            <Button onClick={() => window.location.reload()}>Retry with new puzzles</Button>
             <Link href={`/app/partite/${gameId}`}>
-              <Button variant="secondary">Torna alla partita</Button>
+              <Button variant="secondary">Back to game</Button>
             </Link>
             <Link href="/app/ripara">
-              <Button variant="ghost">Altri errori</Button>
+              <Button variant="ghost">Other mistakes</Button>
             </Link>
           </div>
         </CardContent>
@@ -85,7 +85,7 @@ export function RepairSession({ puzzles, motifLabel, gameId }: RepairSessionProp
       <div className="flex items-center justify-between gap-3">
         <Badge variant="muted">{motifLabel}</Badge>
         <span className="font-mono text-sm text-text-muted">
-          puzzle {index + 1} di {total}
+          puzzle {index + 1} of {total}
         </span>
       </div>
       <div className="mx-auto w-full max-w-xl lg:max-w-2xl xl:max-w-4xl">

@@ -9,7 +9,7 @@
 export default function AppLoading() {
   return (
     <div className="space-y-8" aria-busy="true" aria-live="polite">
-      <span className="sr-only">Caricamento…</span>
+      <span className="sr-only">Loading…</span>
 
       {/* Testata */}
       <div className="space-y-3">

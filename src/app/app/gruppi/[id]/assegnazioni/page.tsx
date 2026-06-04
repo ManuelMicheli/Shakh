@@ -83,17 +83,17 @@ export default async function AssegnazioniPage({ params }: PageProps) {
         <Link href={`/app/gruppi/${id}`} className="text-sm text-text-muted hover:text-text">
           ← {group.name}
         </Link>
-        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Assegnazioni</h1>
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Assignments</h1>
         <p className="mt-1 text-text-muted">
-          Assegna attività a un allievo o all&apos;intera classe. Il completamento è derivato
-          dai progressi reali; dove non possibile, l&apos;allievo la segna fatta.
+          Assign activities to a student or the whole class. Completion is derived
+          from real progress; where that&apos;s not possible, the student marks it done.
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Nuova assegnazione</CardTitle>
-          <CardDescription>Lezione, puzzle, finale, trappola, repertorio o nodo.</CardDescription>
+          <CardTitle>New assignment</CardTitle>
+          <CardDescription>Lesson, puzzle, endgame, trap, repertoire, or node.</CardDescription>
         </CardHeader>
         <CardContent>
           <AssignmentForm groupId={id} data={formData} />
@@ -102,8 +102,8 @@ export default async function AssegnazioniPage({ params }: PageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Monitoraggio</CardTitle>
-          <CardDescription>Stato di completamento fra gli allievi.</CardDescription>
+          <CardTitle>Monitoring</CardTitle>
+          <CardDescription>Completion status across students.</CardDescription>
         </CardHeader>
         <CardContent>
           <AssignmentMonitor groupId={id} items={monitorItems} />

@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { OpeningTree, type OpeningNode } from "@/components/theory/OpeningTree";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Aperture — Shakh" };
+export const metadata = { title: "Openings — Shakh" };
 
 interface Row {
   id: string;
@@ -38,20 +38,20 @@ export default async function AperturePage() {
   return (
     <div className="space-y-6">
       <MobilePageHeader
-        eyebrow="Albero ECO"
-        title="Aperture"
-        desc="Famiglie, aperture e varianti. Apri una lezione per studiarla."
+        eyebrow="ECO tree"
+        title="Openings"
+        desc="Families, openings and variations. Open a lesson to study it."
       />
       <div className="hidden items-center justify-between gap-3 md:flex">
         <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">Aperture</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">Openings</h1>
           <p className="mt-2 text-text-muted">
-            Naviga l&apos;albero ECO: famiglie, aperture e varianti. Apri una lezione
-            per studiarla sulla scacchiera.
+            Browse the ECO tree: families, openings and variations. Open a lesson
+            to study it on the board.
           </p>
         </div>
         <Link href="/app/repertorio" className="text-sm text-text-muted hover:text-text">
-          Il mio repertorio →
+          My repertoire →
         </Link>
       </div>
 

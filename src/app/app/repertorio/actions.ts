@@ -29,10 +29,10 @@ export async function createRepertoire(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const trimmed = name.trim();
-  if (!trimmed) return { ok: false, error: "Dai un nome al repertorio." };
+  if (!trimmed) return { ok: false, error: "Give the repertoire a name." };
 
   const { data, error } = await supabase
     .from("repertoires")
@@ -65,7 +65,7 @@ export async function saveRepertoire(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   // La RLS garantisce la proprietà; verifichiamo l'esistenza per un errore chiaro.
   const { data: rep } = await supabase
@@ -73,13 +73,13 @@ export async function saveRepertoire(
     .select("id")
     .eq("id", repertoireId)
     .maybeSingle<{ id: string }>();
-  if (!rep) return { ok: false, error: "Repertorio non trovato." };
+  if (!rep) return { ok: false, error: "Repertoire not found." };
 
   let parsed;
   try {
     parsed = deserializeTree(tree);
   } catch {
-    return { ok: false, error: "Albero non valido." };
+    return { ok: false, error: "Invalid tree." };
   }
 
   const { data: existingRows, error: loadErr } = await supabase
@@ -122,7 +122,7 @@ export async function recordRepertoireAttempt(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta." };
+  if (!user) return { ok: false, error: "Session expired." };
 
   const nowMs = Date.now();
 

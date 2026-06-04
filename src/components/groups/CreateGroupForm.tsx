@@ -21,7 +21,7 @@ export function CreateGroupForm() {
     start(async () => {
       const res = await createGroup(name, type);
       if (!res.ok || !res.data) {
-        toast({ title: "Non creato", description: res.error, variant: "error" });
+        toast({ title: "Not created", description: res.error, variant: "error" });
         return;
       }
       setName("");
@@ -39,17 +39,17 @@ export function CreateGroupForm() {
     >
           <div className="min-w-[14rem] flex-1 space-y-1">
             <label className="text-xs text-text-muted" htmlFor="group-name">
-              Nome
+              Name
             </label>
             <Input
               id="group-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="es. Circolo Scacchi Milano"
+              placeholder="e.g. Milan Chess Club"
             />
           </div>
           <div className="space-y-1">
-            <span className="block text-xs text-text-muted">Tipo</span>
+            <span className="block text-xs text-text-muted">Type</span>
             <div className="inline-flex rounded-md border border-border bg-surface p-0.5">
               {TYPES.map((t) => (
                 <button
@@ -67,7 +67,7 @@ export function CreateGroupForm() {
             </div>
           </div>
           <Button type="submit" disabled={pending || !name.trim()}>
-            Crea gruppo
+            Create group
           </Button>
     </form>
   );

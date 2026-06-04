@@ -47,13 +47,13 @@ export function CoachPanel(props: CoachPanelProps) {
       <CardContent>
         {!coachConfigured ? (
           <p className="text-sm text-text-muted">
-            Il coach AI non è configurato (manca <code className="font-mono">ANTHROPIC_API_KEY</code>).
+            The AI coach isn&apos;t configured (<code className="font-mono">ANTHROPIC_API_KEY</code> is missing).
           </p>
         ) : (
           <Tabs defaultValue="move">
             <TabsList>
-              <TabsTrigger value="move">Mossa</TabsTrigger>
-              <TabsTrigger value="chat">Domande</TabsTrigger>
+              <TabsTrigger value="move">Move</TabsTrigger>
+              <TabsTrigger value="chat">Questions</TabsTrigger>
             </TabsList>
             <TabsContent value="move">
               <MoveExplain
@@ -110,7 +110,7 @@ function MoveExplain({
   if (!analyzed) {
     return (
       <p className="text-sm text-text-muted">
-        Analizza prima la partita con il motore: il coach spiega i dati che il motore calcola.
+        Analyze the game first with the engine: the coach explains the data the engine computes.
       </p>
     );
   }
@@ -118,7 +118,7 @@ function MoveExplain({
   if (currentPly == null) {
     return (
       <p className="text-sm text-text-muted">
-        Seleziona una mossa per farti spiegare cosa è successo.
+        Select a move to have it explained.
       </p>
     );
   }
@@ -141,8 +141,8 @@ function MoveExplain({
         signal: ac.signal,
       });
       if (!res.ok || !res.body) {
-        const msg = await res.text().catch(() => "Errore del coach.");
-        toast({ title: "Spiegazione non riuscita", description: msg, variant: "error" });
+        const msg = await res.text().catch(() => "Coach error.");
+        toast({ title: "Explanation failed", description: msg, variant: "error" });
         setStreamingPly(null);
         return;
       }
@@ -157,7 +157,7 @@ function MoveExplain({
       }
     } catch (e) {
       if (!(e instanceof DOMException && e.name === "AbortError")) {
-        toast({ title: "Spiegazione non riuscita", variant: "error" });
+        toast({ title: "Explanation failed", variant: "error" });
       }
     } finally {
       setStreamingPly((p) => (p === ply ? null : p));
@@ -168,12 +168,12 @@ function MoveExplain({
     startBatch(async () => {
       const res = await generateKeyErrorComments(gameId);
       if (!res.ok) {
-        toast({ title: "Generazione interrotta", description: res.error, variant: "error" });
+        toast({ title: "Generation interrupted", description: res.error, variant: "error" });
       } else {
         toast({
           title: res.generated
-            ? `Generati ${res.generated} commenti`
-            : "Nessun nuovo errore da commentare",
+            ? `Generated ${res.generated} comments`
+            : "No new errors to comment on",
           variant: "success",
         });
       }
@@ -185,7 +185,7 @@ function MoveExplain({
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm">
-          Mossa <span className="font-mono">{currentSan ?? "—"}</span>
+          Move <span className="font-mono">{currentSan ?? "—"}</span>
           {meta && currentClassification && (
             <span className="ml-2 inline-flex items-center gap-1 align-middle font-medium">
               <MoveBadge classification={currentClassification} size={15} />
@@ -194,7 +194,7 @@ function MoveExplain({
           )}
         </span>
         <Button variant="ghost" size="sm" onClick={onBatch} disabled={batching}>
-          {batching ? "…" : "Spiega errori"}
+          {batching ? "…" : "Explain errors"}
         </Button>
       </div>
 
@@ -205,16 +205,16 @@ function MoveExplain({
         </p>
       ) : isStreaming ? (
         <p className="flex items-center gap-2 text-sm text-text-muted">
-          <Spinner /> Il coach sta scrivendo…
+          <Spinner /> The coach is writing…
         </p>
       ) : (
         <Button variant="secondary" size="sm" onClick={() => explain(currentPly)}>
-          Spiega questa mossa
+          Explain this move
         </Button>
       )}
 
       <p className="text-xs text-text-muted">
-        Le spiegazioni si basano sui dati del motore (valutazioni e mossa migliore), non li ricalcolano.
+        Explanations are based on the engine&apos;s data (evaluations and best move), they don&apos;t recompute it.
       </p>
     </div>
   );

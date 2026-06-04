@@ -12,10 +12,10 @@ import { themeLabel } from "@/lib/tactics/themes";
 import type { Puzzle, SolveResult, TacticMode, TacticStats } from "@/lib/tactics/types";
 
 const MODE_TITLE: Record<TacticMode, string> = {
-  adaptive: "Adattivo",
-  theme: "Per tema",
-  review: "Ripasso",
-  timed: "Sfida a tempo",
+  adaptive: "Adaptive",
+  theme: "By theme",
+  review: "Review",
+  timed: "Timed challenge",
 };
 
 /** Durata della sfida a tempo (secondi). */
@@ -105,7 +105,7 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
       });
       if (res.ok && res.stats) setStats(res.stats);
       else if (!res.ok) {
-        toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Save failed", description: res.error, variant: "error" });
       }
 
       // Passaggio fluido al puzzle successivo.
@@ -132,21 +132,21 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
       <Shell mode={mode} theme={theme}>
         <Card>
           <CardHeader>
-            <CardTitle>Tempo scaduto</CardTitle>
+            <CardTitle>Time&apos;s up</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-text-muted">
-              Hai risolto <span className="font-mono text-text">{sessionSolved}</span> puzzle in{" "}
-              {TIMED_DURATION / 60} minuti.
+              You solved <span className="font-mono text-text">{sessionSolved}</span> puzzles in{" "}
+              {TIMED_DURATION / 60} minutes.
             </p>
             <p className="text-sm text-text-muted">
-              Miglior serie: <span className="font-mono text-text">{stats.bestStreak}</span> ·
-              Rating tattico: <span className="font-mono text-text">{stats.rating}</span>
+              Best streak: <span className="font-mono text-text">{stats.bestStreak}</span> ·
+              Tactical rating: <span className="font-mono text-text">{stats.rating}</span>
             </p>
             <div className="flex gap-2">
-              <Button onClick={() => window.location.reload()}>Rigioca</Button>
+              <Button onClick={() => window.location.reload()}>Play again</Button>
               <Link href="/app/tattiche">
-                <Button variant="secondary">Altre modalità</Button>
+                <Button variant="secondary">Other modes</Button>
               </Link>
             </div>
           </CardContent>
@@ -161,17 +161,17 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
         <Card>
           <CardHeader>
             <CardTitle>
-              {mode === "review" ? "Ripasso completato" : "Nessun puzzle disponibile"}
+              {mode === "review" ? "Review complete" : "No puzzles available"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-text-muted">
               {mode === "review"
-                ? "Non hai puzzle in scadenza. Torna più tardi o allenati in modalità adattiva."
-                : "Non sono stati trovati puzzle per questi criteri. Importa il dataset o cambia modalità."}
+                ? "You have no due puzzles. Come back later or train in adaptive mode."
+                : "No puzzles found for these criteria. Import the dataset or change mode."}
             </p>
             <Link href="/app/tattiche">
-              <Button variant="secondary">Torna alle tattiche</Button>
+              <Button variant="secondary">Back to tactics</Button>
             </Link>
           </CardContent>
         </Card>
@@ -195,12 +195,12 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
             <div className="flex gap-2">
               {justSolved && (
                 <Button size="sm" onClick={advanceNow} disabled={loading}>
-                  {loading ? "…" : "Prossimo"}
+                  {loading ? "…" : "Next"}
                 </Button>
               )}
               {!justSolved && (
                 <Button size="sm" variant="ghost" onClick={skip} disabled={loading}>
-                  Salta
+                  Skip
                 </Button>
               )}
             </div>
@@ -209,13 +209,13 @@ export function TacticsTrainer({ mode, theme, initialPuzzle, initialStats }: Tac
 
         <aside className="space-y-4">
           {isTimed && (
-            <Stat label="Tempo" value={formatTime(timeLeft)} highlight={timeLeft <= 15} />
+            <Stat label="Time" value={formatTime(timeLeft)} highlight={timeLeft <= 15} />
           )}
-          <Stat label="Rating tattico" value={stats.rating} />
-          <Stat label="Serie attuale" value={stats.currentStreak} />
-          <Stat label={isTimed ? "Risolti (sfida)" : "Risolti (sessione)"} value={sessionSolved} />
+          <Stat label="Tactical rating" value={stats.rating} />
+          <Stat label="Current streak" value={stats.currentStreak} />
+          <Stat label={isTimed ? "Solved (challenge)" : "Solved (session)"} value={sessionSolved} />
           <p className="text-xs text-text-muted">
-            Difficoltà puzzle:{" "}
+            Puzzle difficulty:{" "}
             <span className="font-mono text-text">{puzzle.rating}</span>
           </p>
         </aside>

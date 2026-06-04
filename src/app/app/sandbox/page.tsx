@@ -56,28 +56,28 @@ export default function SandboxPage() {
 
   const topLine = evaluation?.lines[0];
   const engineLabel: Record<string, string> = {
-    idle: "spento",
-    loading: "caricamento…",
-    ready: isThinking ? "analisi…" : "pronto",
-    error: "errore",
+    idle: "off",
+    loading: "loading…",
+    ready: isThinking ? "analyzing…" : "ready",
+    error: "error",
   };
 
   const status = (() => {
     if (game.isCheckmate)
-      return `Scaccomatto — vince il ${game.turn === "w" ? "Nero" : "Bianco"}`;
-    if (game.isStalemate) return "Stallo (patta)";
-    if (game.isDraw) return "Patta";
-    const side = game.turn === "w" ? "Bianco" : "Nero";
-    return game.isCheck ? `Scacco — muove il ${side}` : `Muove il ${side}`;
+      return `Checkmate — ${game.turn === "w" ? "Black" : "White"} wins`;
+    if (game.isStalemate) return "Stalemate (draw)";
+    if (game.isDraw) return "Draw";
+    const side = game.turn === "w" ? "White" : "Black";
+    return game.isCheck ? `Check — ${side} to move` : `${side} to move`;
   })();
 
   const loadFen = () => {
     const value = fenInput.trim();
     if (!value) return;
     if (game.reset(value)) {
-      toast({ title: "Posizione caricata" });
+      toast({ title: "Position loaded" });
     } else {
-      toast({ title: "FEN non valida", variant: "error" });
+      toast({ title: "Invalid FEN", variant: "error" });
     }
   };
 
@@ -85,9 +85,9 @@ export default function SandboxPage() {
     const value = pgnInput.trim();
     if (!value) return;
     if (game.loadPgn(value)) {
-      toast({ title: "Partita caricata" });
+      toast({ title: "Game loaded" });
     } else {
-      toast({ title: "PGN non valido", variant: "error" });
+      toast({ title: "Invalid PGN", variant: "error" });
     }
   };
 
@@ -96,13 +96,13 @@ export default function SandboxPage() {
       <div>
         <div className="flex items-center gap-3">
           <h1 className="font-display text-3xl font-semibold tracking-tight">
-            Sandbox scacchiera
+            Board sandbox
           </h1>
           <Badge variant="muted">dev</Badge>
         </div>
         <p className="mt-2 text-text-muted">
-          Strumento di sviluppo: gioca, carica una FEN o un PGN, naviga e gira la
-          scacchiera. Clic sulla board e poi usa ← → Home/End.
+          Development tool: play, load a FEN or PGN, navigate, and flip the
+          board. Click the board, then use ← → Home/End.
         </p>
       </div>
 
@@ -160,13 +160,13 @@ export default function SandboxPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Motore</CardTitle>
+                <CardTitle>Engine</CardTitle>
                 <Button
                   variant={engineOn ? "primary" : "secondary"}
                   size="sm"
                   onClick={() => setEngineOn((v) => !v)}
                 >
-                  {engineOn ? "Spegni" : "Accendi"}
+                  {engineOn ? "Turn off" : "Turn on"}
                 </Button>
               </div>
             </CardHeader>
@@ -175,7 +175,7 @@ export default function SandboxPage() {
                 <span className="flex items-center gap-2">
                   <Tooltip content={ENGINE_HELP.lines} side="bottom" className="max-w-xs whitespace-normal">
                     <span className="cursor-help text-text-muted underline decoration-dotted underline-offset-2">
-                      Linee
+                      Lines
                     </span>
                   </Tooltip>
                   {[1, 2, 3].map((n) => (
@@ -197,7 +197,7 @@ export default function SandboxPage() {
                 </span>
                 <Tooltip content={ENGINE_HELP.depth} side="bottom" className="max-w-xs whitespace-normal">
                   <span className="cursor-help font-mono text-xs text-text-muted">
-                    profondità {depth} · {engineLabel[engineState]}
+                    depth {depth} · {engineLabel[engineState]}
                   </span>
                 </Tooltip>
               </div>
@@ -206,8 +206,8 @@ export default function SandboxPage() {
                 <EngineLines fen={game.fen} lines={evaluation?.lines ?? []} />
               ) : (
                 <p className="text-sm text-text-muted">
-                  Analisi spenta. Accendi per far valutare la posizione al motore:
-                  ti dirà chi sta meglio e qual è la mossa migliore.
+                  Analysis off. Turn it on to have the engine evaluate the
+                  position: it tells you who&apos;s better and the best move.
                 </p>
               )}
             </CardContent>
@@ -215,7 +215,7 @@ export default function SandboxPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Mosse</CardTitle>
+              <CardTitle>Moves</CardTitle>
             </CardHeader>
             <CardContent>
               <MoveList
@@ -229,7 +229,7 @@ export default function SandboxPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Carica posizione</CardTitle>
+              <CardTitle>Load position</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
@@ -243,7 +243,7 @@ export default function SandboxPage() {
                     className="font-mono text-xs"
                   />
                   <Button variant="secondary" onClick={loadFen}>
-                    Carica
+                    Load
                   </Button>
                 </div>
               </div>
@@ -259,10 +259,10 @@ export default function SandboxPage() {
                 />
                 <div className="flex gap-2">
                   <Button variant="secondary" onClick={loadPgn}>
-                    Carica PGN
+                    Load PGN
                   </Button>
                   <Button variant="ghost" onClick={() => game.reset()}>
-                    Nuova partita
+                    New game
                   </Button>
                 </div>
               </div>

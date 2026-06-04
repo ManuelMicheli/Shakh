@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { RepairSession } from "@/components/repair/RepairSession";
 import { getRepairPuzzles, type RepairData } from "../../actions";
 
-export const metadata = { title: "Ripara errore — Shakh" };
+export const metadata = { title: "Fix mistake — Shakh" };
 
 export default async function RiparaDrillPage({
   params,
@@ -15,31 +15,31 @@ export default async function RiparaDrillPage({
   const plyNum = Number(ply);
   const data: RepairData = Number.isFinite(plyNum)
     ? await getRepairPuzzles(gameId, plyNum)
-    : { ok: false, error: "Mossa non valida." };
+    : { ok: false, error: "Invalid move." };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Ripara l&apos;errore</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Fix the mistake</h1>
         <Link href="/app/ripara" className="text-sm text-text-muted hover:text-text">
-          ← Errori
+          ← Mistakes
         </Link>
       </div>
 
       {data.ok && data.puzzles && data.puzzles.length > 0 ? (
         <RepairSession
           puzzles={data.puzzles}
-          motifLabel={data.motifLabel ?? "Allenamento"}
+          motifLabel={data.motifLabel ?? "Training"}
           gameId={gameId}
         />
       ) : (
         <Card>
           <CardContent className="space-y-3 py-6 text-center">
             <p className="text-text-muted">
-              {("error" in data && data.error) || "Impossibile generare i puzzle per questo errore."}
+              {("error" in data && data.error) || "Couldn't generate puzzles for this mistake."}
             </p>
             <Link href="/app/ripara">
-              <Button variant="secondary">Torna agli errori</Button>
+              <Button variant="secondary">Back to mistakes</Button>
             </Link>
           </CardContent>
         </Card>

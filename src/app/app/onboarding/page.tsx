@@ -4,7 +4,7 @@ import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import type { LinkedAccount } from "@/app/app/profilo/actions";
 import type { ExternalSource } from "@/lib/rating/calibration";
 
-export const metadata = { title: "Benvenuto — Shakh" };
+export const metadata = { title: "Welcome — Shakh" };
 
 /**
  * Primo accesso (prompt 07, §2): presentazione + autovalutazione + collegamento

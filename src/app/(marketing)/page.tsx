@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   // Landing pubblica: indicizzabile (default index/follow).
   alternates: { canonical: "/" },
   openGraph: {
-    title: `${siteConfig.name} — il coach di scacchi in italiano`,
+    title: `${siteConfig.name} — your chess coach`,
     description: siteConfig.description,
     url: siteConfig.url,
   },

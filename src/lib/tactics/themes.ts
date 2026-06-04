@@ -9,18 +9,18 @@ export interface TacticTheme {
 }
 
 export const TACTIC_THEMES: TacticTheme[] = [
-  { key: "fork", label: "Forchetta" },
-  { key: "pin", label: "Inchiodatura" },
-  { key: "skewer", label: "Infilata" },
-  { key: "discoveredAttack", label: "Scoperta" },
-  { key: "sacrifice", label: "Sacrificio" },
-  { key: "deflection", label: "Deviazione" },
-  { key: "hangingPiece", label: "Pezzo in presa" },
-  { key: "mateIn1", label: "Matto in 1" },
-  { key: "mateIn2", label: "Matto in 2" },
-  { key: "backRankMate", label: "Matto del corridoio" },
-  { key: "endgame", label: "Finali" },
-  { key: "advancedPawn", label: "Pedone avanzato" },
+  { key: "fork", label: "Fork" },
+  { key: "pin", label: "Pin" },
+  { key: "skewer", label: "Skewer" },
+  { key: "discoveredAttack", label: "Discovered attack" },
+  { key: "sacrifice", label: "Sacrifice" },
+  { key: "deflection", label: "Deflection" },
+  { key: "hangingPiece", label: "Hanging piece" },
+  { key: "mateIn1", label: "Mate in 1" },
+  { key: "mateIn2", label: "Mate in 2" },
+  { key: "backRankMate", label: "Back-rank mate" },
+  { key: "endgame", label: "Endgames" },
+  { key: "advancedPawn", label: "Advanced pawn" },
 ];
 
 /** Etichetta italiana di un tema (fallback alla chiave grezza). */

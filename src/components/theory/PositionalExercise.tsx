@@ -94,7 +94,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
       setShowPlan(false);
       try {
         await engine.init();
-        setPhase("Il motore analizza la posizione…");
+        setPhase("The engine is analyzing the position…");
         const before = await engine.analyze(fen, { depth: LINES_DEPTH, multiPV: 3 }).result;
         const lines: EngineLineFact[] = before.lines.slice(0, 3).map((l) => ({
           evalText: whiteEvalText(l.score, l.scoreType, turn),
@@ -103,7 +103,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
         const bestTop = before.lines[0];
         const bestCp = bestTop ? moverCp(bestTop.score, bestTop.scoreType) : 0;
 
-        setPhase(`Valuto ${played.san}…`);
+        setPhase(`Evaluating ${played.san}…`);
         const after = await engine.analyze(afterFen, { depth: MOVE_DEPTH }).result;
         const afterTop = after.lines[0];
         const afterTurn = (afterFen.split(" ")[1] as "w" | "b") ?? "w";
@@ -127,16 +127,16 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
           lines,
           askedMove: { san: played.san, evalText, isBest },
         };
-        setPhase("Il coach commenta…");
+        setPhase("The coach is commenting…");
         const res = await fetch("/api/coach/ask", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             fen: facts.fen,
             turn: facts.turn,
-            question: `Sto cercando un piano per il ${
-              exercise.userColor === "white" ? "Bianco" : "Nero"
-            }. La mossa ${played.san} è coerente con il piano corretto in questa posizione? Spiega brevemente perché sì o perché no.`,
+            question: `I'm looking for a plan for ${
+              exercise.userColor === "white" ? "White" : "Black"
+            }. Is the move ${played.san} consistent with the correct plan in this position? Briefly explain why or why not.`,
             lines: facts.lines,
             askedMove: facts.askedMove,
           }),
@@ -144,9 +144,9 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
         if (!res.ok || !res.body) {
           const msg = await res.text().catch(() => "");
           setAnswer(
-            msg.includes("non configurato")
+            msg.includes("not configured")
               ? null
-              : "Il coach non è disponibile ora; affidati alla valutazione del motore.",
+              : "The coach isn't available right now; rely on the engine's evaluation.",
           );
           return;
         }
@@ -160,7 +160,7 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
           setAnswer(acc);
         }
       } catch {
-        setAnswer("Non sono riuscito a valutare la mossa. Riprova.");
+        setAnswer("I couldn't evaluate the move. Try again.");
       } finally {
         setBusy(false);
         setPhase(null);
@@ -180,9 +180,9 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
-          <CardTitle>Esercizio: trova il piano</CardTitle>
+          <CardTitle>Exercise: find the plan</CardTitle>
           <span className="text-xs text-text-muted">
-            Muove il {exercise.userColor === "white" ? "Bianco" : "Nero"}
+            {exercise.userColor === "white" ? "White" : "Black"} to move
           </span>
         </div>
       </CardHeader>
@@ -218,11 +218,11 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
                       verdict.reasonable ? "bg-text text-bg" : "border border-border text-text-muted",
                     )}
                   >
-                    {verdict.reasonable ? "Piano ragionevole" : "Poco coerente"}
+                    {verdict.reasonable ? "Reasonable plan" : "Not very consistent"}
                   </span>
                 </div>
                 <p className="mt-1 font-mono text-xs text-text-muted">
-                  Valutazione dopo la mossa: {verdict.evalText}
+                  Evaluation after the move: {verdict.evalText}
                 </p>
               </div>
             )}
@@ -231,20 +231,20 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
 
             {!verdict && !busy && (
               <p className="text-sm text-text-muted">
-                Proponi una mossa sulla scacchiera: il motore la valuta e il coach
-                spiega se è in linea col piano.
+                Propose a move on the board: the engine evaluates it and the coach
+                explains whether it fits the plan.
               </p>
             )}
 
             <div className="flex flex-wrap gap-2">
               {verdict && (
                 <Button size="sm" variant="secondary" onClick={reset}>
-                  Prova un&apos;altra mossa
+                  Try another move
                 </Button>
               )}
               {exercise.planHint && verdict && (
                 <Button size="sm" variant="ghost" onClick={() => setShowPlan((v) => !v)}>
-                  {showPlan ? "Nascondi il piano" : "Mostra il piano"}
+                  {showPlan ? "Hide the plan" : "Show the plan"}
                 </Button>
               )}
             </div>
@@ -257,19 +257,19 @@ export function PositionalExercise({ exercise }: PositionalExerciseProps) {
 
             {exercise.relatedTacticsTheme && (
               <p className="text-xs text-text-muted">
-                Tema collegato:{" "}
+                Related theme:{" "}
                 <Link
                   href={`/app/tattiche?mode=theme&theme=${exercise.relatedTacticsTheme}`}
                   className="underline underline-offset-2 hover:text-text"
                 >
-                  allena le tattiche a tema →
+                  train themed tactics →
                 </Link>
               </p>
             )}
 
             <p className="text-[11px] leading-relaxed text-text-muted">
-              Non c&apos;è un&apos;unica soluzione: si valuta la ragionevolezza del
-              piano. Il motore dà i numeri, il coach le parole.
+              There&apos;s no single solution: what&apos;s evaluated is the reasonableness of the
+              plan. The engine gives the numbers, the coach the words.
             </p>
           </div>
         </div>

@@ -24,9 +24,9 @@ const SOURCE_LABEL: Record<ExternalSource, string> = {
 /** Dove incollare il token su ciascuna piattaforma. */
 const VERIFY_HINT: Record<ExternalSource, string> = {
   lichess:
-    "Incolla il token nella tua biografia Lichess (Preferenze → Modifica profilo → Biografia), salva, poi premi Verifica.",
+    "Paste the token into your Lichess bio (Preferences → Edit profile → Biography), save, then press Verify.",
   chesscom:
-    "Incolla il token nel campo Nome o Località del profilo Chess.com (Impostazioni → Profilo), salva, poi premi Verifica.",
+    "Paste the token into the Name or Location field of your Chess.com profile (Settings → Profile), save, then press Verify.",
 };
 
 export interface ExternalAccountsProps {
@@ -72,10 +72,10 @@ export function ExternalAccounts({ initial, bare = false, onAccountsChange }: Ex
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Account online</CardTitle>
+        <CardTitle>Online accounts</CardTitle>
         <CardDescription>
-          Collega Lichess o Chess.com: dopo la verifica, il tuo rating online incide molto sul
-          Rating Shakh, riportato alla scala reale (OTB).
+          Link Lichess or Chess.com: after verification, your online rating
+          weighs heavily on your Shakh Rating, mapped to the real-world (OTB) scale.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">{rows}</CardContent>
@@ -99,12 +99,12 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await beginLinkExternalAccount(source, username);
       if (!res.ok || !res.account) {
-        toast({ title: "Collegamento non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Linking failed", description: res.error, variant: "error" });
         return;
       }
       onChanged(res.account);
       setUsername("");
-      toast({ title: "Token generato", description: "Aggiungilo al profilo, poi verifica." });
+      toast({ title: "Token generated", description: "Add it to your profile, then verify." });
     });
   };
 
@@ -112,15 +112,15 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await verifyExternalAccount(source);
       if (!res.ok || !res.account) {
-        toast({ title: "Verifica non riuscita", description: res.error, variant: "error" });
+        toast({ title: "Verification failed", description: res.error, variant: "error" });
         return;
       }
       onChanged(res.account);
-      const parts = ["Rating Shakh aggiornato."];
-      if (res.seed?.importedGames) parts.push(`${res.seed.importedGames} partite scaricate.`);
+      const parts = ["Shakh Rating updated."];
+      if (res.seed?.importedGames) parts.push(`${res.seed.importedGames} games imported.`);
       if (res.seed?.startingLevel != null)
-        parts.push(`Percorso al livello ${res.seed.startingLevel}.`);
-      toast({ title: `${SOURCE_LABEL[source]} verificato`, description: parts.join(" ") });
+        parts.push(`Path at level ${res.seed.startingLevel}.`);
+      toast({ title: `${SOURCE_LABEL[source]} verified`, description: parts.join(" ") });
     });
   };
 
@@ -128,11 +128,11 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await refreshExternalAccount(source);
       if (!res.ok || !res.account) {
-        toast({ title: "Aggiornamento non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Update failed", description: res.error, variant: "error" });
         return;
       }
       onChanged(res.account);
-      toast({ title: "Rating aggiornato" });
+      toast({ title: "Rating updated" });
     });
   };
 
@@ -140,17 +140,17 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     start(async () => {
       const res = await unlinkExternalAccount(source);
       if (!res.ok) {
-        toast({ title: "Scollegamento non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Unlinking failed", description: res.error, variant: "error" });
         return;
       }
       onRemoved();
-      toast({ title: `${SOURCE_LABEL[source]} scollegato` });
+      toast({ title: `${SOURCE_LABEL[source]} unlinked` });
     });
   };
 
   const onCopy = (token: string) => {
     void navigator.clipboard?.writeText(token);
-    toast({ title: "Token copiato" });
+    toast({ title: "Token copied" });
   };
 
   // Stato 3: account verificato.
@@ -162,20 +162,20 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
             <p className="flex items-center gap-2 text-sm font-medium">
               {SOURCE_LABEL[source]}
               <span className="font-mono text-text-muted">@{account.username}</span>
-              <Badge variant="muted">verificato</Badge>
+              <Badge variant="muted">verified</Badge>
             </p>
             <p className="mt-1 font-mono text-xs text-text-muted">
               {account.ratingNative != null && `${account.ratingNative} online`}
               {account.ratingOtb != null && ` · ${account.ratingOtb} OTB`}
-              {` · ${account.nGames} partite`}
+              {` · ${account.nGames} games`}
             </p>
           </div>
           <div className="flex shrink-0 gap-2">
             <Button variant="secondary" size="sm" onClick={onRefresh} disabled={pending}>
-              {pending ? "…" : "Aggiorna"}
+              {pending ? "…" : "Refresh"}
             </Button>
             <Button variant="ghost" size="sm" onClick={onUnlink} disabled={pending}>
-              Scollega
+              Unlink
             </Button>
           </div>
         </div>
@@ -190,23 +190,23 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
         <p className="flex items-center gap-2 text-sm font-medium">
           {SOURCE_LABEL[source]}
           <span className="font-mono text-text-muted">@{account.username}</span>
-          <Badge variant="muted">da verificare</Badge>
+          <Badge variant="muted">to verify</Badge>
         </p>
         <div className="flex items-center gap-2">
           <code className="flex-1 rounded-md border border-border bg-surface px-3 py-2 font-mono text-sm">
             {account.verifyToken}
           </code>
           <Button variant="secondary" size="sm" onClick={() => onCopy(account.verifyToken!)}>
-            Copia
+            Copy
           </Button>
         </div>
         <p className="text-xs text-text-muted">{VERIFY_HINT[source]}</p>
         <div className="flex gap-2">
           <Button size="sm" onClick={onVerify} disabled={pending}>
-            {pending ? "Verifico…" : "Verifica"}
+            {pending ? "Verifying…" : "Verify"}
           </Button>
           <Button variant="ghost" size="sm" onClick={onUnlink} disabled={pending}>
-            Annulla
+            Cancel
           </Button>
         </div>
       </div>
@@ -218,20 +218,20 @@ function SourceRow({ source, account, onChanged, onRemoved, toast }: SourceRowPr
     <div className="space-y-2">
       <Label htmlFor={`ext-${source}`} className="flex items-center gap-2">
         {SOURCE_LABEL[source]}
-        <Badge variant="muted">non collegato</Badge>
+        <Badge variant="muted">not linked</Badge>
       </Label>
       <div className="flex gap-2">
         <Input
           id={`ext-${source}`}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder={source === "lichess" ? "username Lichess" : "username Chess.com"}
+          placeholder={source === "lichess" ? "Lichess username" : "Chess.com username"}
           onKeyDown={(e) => {
             if (e.key === "Enter" && username.trim()) onBegin();
           }}
         />
         <Button onClick={onBegin} disabled={pending || !username.trim()}>
-          {pending ? "…" : "Collega"}
+          {pending ? "…" : "Link"}
         </Button>
       </div>
     </div>

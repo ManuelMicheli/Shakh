@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { JoinClickwrap } from "@/components/groups/JoinClickwrap";
 import { GROUP_TYPE_LABEL, GROUP_ROLE_LABEL, type GroupRole, type GroupType } from "@/lib/groups/types";
 
-export const metadata = { title: "Unisciti a un gruppo — Shakh" };
+export const metadata = { title: "Join a group — Shakh" };
 
 interface PageProps {
   params: Promise<{ code: string }>;
@@ -31,15 +31,15 @@ export default async function JoinPage({ params }: PageProps) {
     <div className="mx-auto max-w-lg space-y-6 py-8">
       <Card>
         <CardHeader>
-          <CardTitle>Invito a un gruppo</CardTitle>
+          <CardTitle>Group invite</CardTitle>
           {preview && preview.valid ? (
             <CardDescription>
-              Sei stato invitato a unirti a <span className="text-text">{preview.group_name}</span>{" "}
-              ({GROUP_TYPE_LABEL[preview.group_type]}) come{" "}
+              You&apos;ve been invited to join <span className="text-text">{preview.group_name}</span>{" "}
+              ({GROUP_TYPE_LABEL[preview.group_type]}) as{" "}
               {GROUP_ROLE_LABEL[preview.role_in_group].toLowerCase()}.
             </CardDescription>
           ) : (
-            <CardDescription>Questo invito non è valido, è scaduto o è già stato usato.</CardDescription>
+            <CardDescription>This invite is invalid, has expired, or has already been used.</CardDescription>
           )}
         </CardHeader>
         <CardContent>
@@ -50,7 +50,7 @@ export default async function JoinPage({ params }: PageProps) {
               href="/app/gruppi"
               className="inline-flex h-9 items-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-surface-2"
             >
-              Vai ai gruppi
+              Go to groups
             </Link>
           )}
         </CardContent>

@@ -47,11 +47,11 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
     startSave(async () => {
       const res = await saveRepertoire(repertoireId, t.serialize());
       if (!res.ok) {
-        toast({ title: "Salvataggio non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Save failed", description: res.error, variant: "error" });
         return;
       }
       setDirty(false);
-      toast({ title: "Repertorio salvato" });
+      toast({ title: "Repertoire saved" });
     });
   };
 
@@ -63,12 +63,12 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">{name}</h1>
           <p className="mt-1 text-sm text-text-muted">
-            {color === "white" ? "Bianco" : "Nero"} · costruisci e annota le tue linee
+            {color === "white" ? "White" : "Black"} · build and annotate your lines
           </p>
         </div>
         <Button onClick={onSave} disabled={saving || !dirty}>
           <Save className="mr-1 h-4 w-4" />
-          {saving ? "Salvo…" : dirty ? "Salva" : "Salvato"}
+          {saving ? "Saving…" : dirty ? "Save" : "Saved"}
         </Button>
       </div>
 
@@ -114,9 +114,9 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
                   touch();
                 }}
                 disabled={t.atStart}
-                title="Rendi questa la linea principale"
+                title="Make this the main line"
               >
-                <ArrowUpToLine className="mr-1 h-4 w-4" /> Promuovi
+                <ArrowUpToLine className="mr-1 h-4 w-4" /> Promote
               </Button>
               <Button
                 variant="ghost"
@@ -126,9 +126,9 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
                   touch();
                 }}
                 disabled={t.atStart}
-                title="Elimina questa mossa e il suo seguito"
+                title="Delete this move and its continuation"
               >
-                <Trash2 className="mr-1 h-4 w-4" /> Elimina
+                <Trash2 className="mr-1 h-4 w-4" /> Delete
               </Button>
             </div>
           </div>
@@ -136,12 +136,12 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
           {/* Annotazione del nodo corrente */}
           <Card>
             <CardHeader>
-              <CardTitle>Annotazione</CardTitle>
+              <CardTitle>Annotation</CardTitle>
             </CardHeader>
             <CardContent>
               {t.atStart ? (
                 <p className="text-sm text-text-muted">
-                  Seleziona una mossa per annotarla.
+                  Select a move to annotate it.
                 </p>
               ) : (
                 <Input
@@ -150,7 +150,7 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
                     t.annotate(t.currentNodeId, { comment: e.target.value || undefined });
                     touch();
                   }}
-                  placeholder="Idea della mossa, piano, trappola…"
+                  placeholder="Move idea, plan, trap…"
                 />
               )}
             </CardContent>
@@ -160,7 +160,7 @@ export function RepertoireEditor({ repertoireId, name, color, tree }: Repertoire
         <div>
           <Tabs defaultValue="moves">
             <TabsList className="w-full">
-              <TabsTrigger value="moves">Linee</TabsTrigger>
+              <TabsTrigger value="moves">Lines</TabsTrigger>
               <TabsTrigger value="explorer">Explorer</TabsTrigger>
             </TabsList>
 

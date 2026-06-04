@@ -32,12 +32,12 @@ export function TrapReview({ items }: { items: ReviewItem[] }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Ripasso completato</CardTitle>
+          <CardTitle>Review complete</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-text-muted">Nessuna trappola in scadenza. Torna più tardi.</p>
+          <p className="text-text-muted">No traps due. Check back later.</p>
           <Link href="/app/trappole">
-            <Button variant="secondary">Catalogo trappole</Button>
+            <Button variant="secondary">Trap catalog</Button>
           </Link>
         </CardContent>
       </Card>
@@ -48,19 +48,19 @@ export function TrapReview({ items }: { items: ReviewItem[] }) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Ripasso completato</CardTitle>
+          <CardTitle>Review complete</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-text-muted">
-            Riviste <span className="font-mono text-text">{items.length}</span> trappole · ✓{" "}
+            Reviewed <span className="font-mono text-text">{items.length}</span> traps · ✓{" "}
             {score.ok} · ✗ {score.ko}
           </p>
           <div className="flex gap-2">
             <Link href="/app/trappole/ripasso">
-              <Button onClick={() => window.location.reload()}>Continua il ripasso</Button>
+              <Button onClick={() => window.location.reload()}>Continue reviewing</Button>
             </Link>
             <Link href="/app/trappole">
-              <Button variant="secondary">Catalogo</Button>
+              <Button variant="secondary">Catalog</Button>
             </Link>
           </div>
         </CardContent>
@@ -76,7 +76,7 @@ export function TrapReview({ items }: { items: ReviewItem[] }) {
         <div className="flex items-center gap-2">
           <Badge>{index + 1} / {items.length}</Badge>
           <span className="font-mono text-sm text-text-muted">
-            {item.mode === "tendi" ? "Tendi" : "Evita"} · {item.name}
+            {item.mode === "tendi" ? "Set" : "Avoid"} · {item.name}
           </span>
         </div>
         <span className="font-mono text-sm text-text-muted">
@@ -104,7 +104,7 @@ export function TrapReview({ items }: { items: ReviewItem[] }) {
 
       <div className="flex justify-end">
         <Button variant="secondary" size="sm" onClick={() => setIndex((i) => i + 1)}>
-          {index + 1 >= items.length ? "Concludi" : "Prossima trappola →"}
+          {index + 1 >= items.length ? "Finish" : "Next trap →"}
         </Button>
       </div>
     </div>

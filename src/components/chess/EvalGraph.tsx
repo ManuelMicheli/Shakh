@@ -57,7 +57,7 @@ export function EvalGraph({
   if (points.length === 0) {
     return (
       <div className={cn("font-mono text-sm text-text-muted", className)}>
-        Nessun dato d&apos;analisi.
+        No analysis data.
       </div>
     );
   }
@@ -72,7 +72,7 @@ export function EvalGraph({
       preserveAspectRatio="none"
       className={cn("h-32 w-full select-none", className)}
       role="img"
-      aria-label="Andamento della valutazione"
+      aria-label="Evaluation trend"
     >
       {/* Metà superiore = vantaggio Bianco, inferiore = vantaggio Nero. */}
       <rect x="0" y="0" width={W} height={H / 2} fill="var(--surface)" />
@@ -129,7 +129,7 @@ export function EvalGraph({
               className="cursor-pointer"
               onClick={() => onSelect(c.cursor)}
             >
-              <title>mossa {c.cursor + 1}</title>
+              <title>move {c.cursor + 1}</title>
             </circle>
           </g>
         );

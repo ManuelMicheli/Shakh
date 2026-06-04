@@ -22,7 +22,7 @@ export function WeaknessRow({ label, score, attempts, action, className }: Weakn
         <div className="flex items-baseline justify-between gap-2">
           <span className="truncate text-sm font-medium">{label}</span>
           <span className="font-mono text-xs text-text-muted">
-            {pct}% · {attempts} prove
+            {pct}% · {attempts} attempts
           </span>
         </div>
         <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-2" aria-hidden>

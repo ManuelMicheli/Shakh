@@ -12,13 +12,14 @@ export const metadata: Metadata = {
 export default function OfflinePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 text-center">
-      <h1 className="font-display text-2xl text-text">Sei offline</h1>
+      <h1 className="font-display text-2xl text-text">You&apos;re offline</h1>
       <p className="mt-3 text-text-muted">
-        Shakh ha bisogno della rete per il coach AI, l&apos;import delle partite
-        e l&apos;analisi col motore. Ricontrolla la connessione e riprova.
+        Shakh needs a connection for the AI coach, game imports, and engine
+        analysis. Check your connection and try again.
       </p>
       <p className="mt-6 text-sm text-text-muted">
-        Le pagine già visitate possono restare disponibili anche senza rete.
+        Pages you&apos;ve already visited may remain available even without a
+        connection.
       </p>
     </main>
   );

@@ -22,7 +22,7 @@ function formatDate(iso: string | null): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" });
+  return d.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function gameTitle(g: GameRow): string {
@@ -67,29 +67,29 @@ const OUTCOME_META: Record<
   { letter: string; label: string; tile: string; letterCls: string; resultCls: string }
 > = {
   win: {
-    letter: "V",
-    label: "Vittoria",
+    letter: "W",
+    label: "Win",
     tile: "bg-text",
     letterCls: "text-bg",
     resultCls: "text-bg",
   },
   draw: {
     letter: "½",
-    label: "Patta",
+    label: "Draw",
     tile: "border border-border bg-surface",
     letterCls: "text-text",
     resultCls: "text-text-muted",
   },
   loss: {
-    letter: "S",
-    label: "Sconfitta",
+    letter: "L",
+    label: "Loss",
     tile: "bg-surface-2",
     letterCls: "text-text",
     resultCls: "text-text",
   },
   unknown: {
     letter: "–",
-    label: "Esito ignoto",
+    label: "Unknown result",
     tile: "bg-surface-2",
     letterCls: "text-text-muted",
     resultCls: "text-text-muted",
@@ -107,16 +107,16 @@ export function GamesTable({ games }: { games: GameRow[] }) {
   const analyzing = job?.status === "running";
 
   const onDelete = (id: string) => {
-    if (!confirm("Eliminare questa partita e la sua analisi?")) return;
+    if (!confirm("Delete this game and its analysis?")) return;
     setDeletingId(id);
     startTransition(async () => {
       const res = await deleteGame(id);
       setDeletingId(null);
       if (!res.ok) {
-        toast({ title: "Eliminazione non riuscita", description: res.error, variant: "error" });
+        toast({ title: "Delete failed", description: res.error, variant: "error" });
         return;
       }
-      toast({ title: "Partita eliminata" });
+      toast({ title: "Game deleted" });
       setSelected((prev) => {
         const next = new Set(prev);
         next.delete(id);
@@ -135,8 +135,8 @@ export function GamesTable({ games }: { games: GameRow[] }) {
         next.add(id);
       } else {
         toast({
-          title: `Massimo ${MAX_BATCH_JOBS} partite per volta`,
-          description: "Deseleziona una partita per sceglierne un'altra.",
+          title: `Up to ${MAX_BATCH_JOBS} games at a time`,
+          description: "Deselect a game to pick another.",
         });
       }
       return next;
@@ -152,8 +152,8 @@ export function GamesTable({ games }: { games: GameRow[] }) {
     const n = startBatch(jobs);
     setSelected(new Set());
     toast({
-      title: n > 1 ? `${n} partite in coda` : "Analisi avviata",
-      description: "Vengono analizzate una alla volta in background.",
+      title: n > 1 ? `${n} games queued` : "Analysis started",
+      description: "They're analyzed one at a time in the background.",
     });
   };
 
@@ -165,7 +165,7 @@ export function GamesTable({ games }: { games: GameRow[] }) {
   if (games.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-border p-10 text-center text-text-muted">
-        Nessuna partita ancora. Importane una qui sopra per iniziare.
+        No games yet. Import one above to get started.
       </div>
     );
   }
@@ -175,14 +175,14 @@ export function GamesTable({ games }: { games: GameRow[] }) {
       {selectedCount > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-surface-2 px-4 py-2.5">
           <span className="text-sm text-text">
-            {selectedCount} di {MAX_BATCH_JOBS} selezionate
+            {selectedCount} of {MAX_BATCH_JOBS} selected
           </span>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
-              Annulla
+              Cancel
             </Button>
             <Button size="sm" onClick={onAnalyzeSelected} disabled={analyzing}>
-              {analyzing ? "Analisi in corso…" : "Analizza selezionate"}
+              {analyzing ? "Analyzing…" : "Analyze selected"}
             </Button>
           </div>
         </div>
@@ -194,9 +194,9 @@ export function GamesTable({ games }: { games: GameRow[] }) {
           const o = OUTCOME_META[outcomeOf(g)];
           const youColor =
             g.user_color === "white"
-              ? "Bianco"
+              ? "White"
               : g.user_color === "black"
-                ? "Nero"
+                ? "Black"
                 : "—";
           return (
             <div
@@ -243,12 +243,12 @@ export function GamesTable({ games }: { games: GameRow[] }) {
                     : "bg-text text-bg",
                 )}
               >
-                {g.analyzed ? "Rivedi" : "Analizza"}
+                {g.analyzed ? "Review" : "Analyze"}
               </Link>
 
               <button
                 type="button"
-                aria-label="Elimina partita"
+                aria-label="Delete game"
                 disabled={pending && deletingId === g.id}
                 onClick={() => onDelete(g.id)}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-text-muted hover:bg-surface-2 disabled:opacity-50"
@@ -275,7 +275,7 @@ export function GamesTable({ games }: { games: GameRow[] }) {
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => toggle(g.id)}
-                    aria-label={`Seleziona ${gameTitle(g)} per l'analisi`}
+                    aria-label={`Select ${gameTitle(g)} for analysis`}
                     className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)] sm:mt-0"
                   />
                 )}
@@ -299,7 +299,7 @@ export function GamesTable({ games }: { games: GameRow[] }) {
 
               <div className="flex items-center justify-between gap-2 sm:justify-end">
                 <Badge variant={g.analyzed ? "default" : "muted"}>
-                  {g.analyzed ? "analizzata" : "da analizzare"}
+                  {g.analyzed ? "analyzed" : "not analyzed"}
                 </Badge>
 
                 <div className="flex items-center gap-1">
@@ -312,12 +312,12 @@ export function GamesTable({ games }: { games: GameRow[] }) {
                         : "bg-text text-bg hover:opacity-90")
                     }
                   >
-                    {g.analyzed ? "Rivedi" : "Analizza"}
+                    {g.analyzed ? "Review" : "Analyze"}
                   </Link>
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="Elimina partita"
+                    aria-label="Delete game"
                     disabled={pending && deletingId === g.id}
                     onClick={() => onDelete(g.id)}
                   >

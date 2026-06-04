@@ -20,17 +20,17 @@ export default async function CoachPage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Il tuo allenatore"
+        eyebrow="Your coach"
         title="Coach"
-        desc="Sintesi dei tuoi punti deboli ricorrenti dai dati delle partite."
+        desc="A summary of your recurring weaknesses from your game data."
       />
       <div className="hidden md:block">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Coach</h1>
         <p className="mt-2 text-text-muted">
-          Il coach analizza i dati delle tue partite (calcolati dal motore) e sintetizza i tuoi
-          punti deboli ricorrenti. Per spiegazioni mossa per mossa apri una partita dalla{" "}
+          The coach analyzes your game data (computed by the engine) and summarizes your
+          recurring weaknesses. For move-by-move explanations, open a game from the{" "}
           <Link href="/app/partite" className="underline">
-            revisione
+            review
           </Link>
           .
         </p>
@@ -39,16 +39,16 @@ export default async function CoachPage() {
       {!hasData ? (
         <Card>
           <CardHeader>
-            <CardTitle>Nessun dato ancora</CardTitle>
+            <CardTitle>No data yet</CardTitle>
             <CardDescription>
-              Importa e analizza qualche partita: la sintesi del coach si basa sugli errori
-              rilevati dal motore.
+              Import and analyze a few games: the coach&apos;s summary is based on the errors
+              detected by the engine.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/app/partite">
               <Button variant="secondary" size="sm">
-                Vai alle partite
+                Go to games
               </Button>
             </Link>
           </CardContent>
@@ -57,21 +57,21 @@ export default async function CoachPage() {
         <>
           <Card>
             <CardHeader>
-              <CardTitle>I tuoi errori per fase</CardTitle>
+              <CardTitle>Your errors by phase</CardTitle>
               <CardDescription>
-                Su {metrics.games} partite, {metrics.userMoves} tue mosse esaminate.
+                Across {metrics.games} games, {metrics.userMoves} of your moves examined.
               </CardDescription>
             </CardHeader>
             <CardContent className="overflow-x-auto">
               <table className="w-full min-w-[26rem] text-sm">
                 <thead>
                   <tr className="text-text-muted">
-                    <th className="text-left font-normal">Fase</th>
-                    <th className="px-2 py-1 text-right font-normal">Mosse</th>
-                    <th className="px-2 py-1 text-right font-normal">Impr.</th>
-                    <th className="px-2 py-1 text-right font-normal">Errori</th>
-                    <th className="px-2 py-1 text-right font-normal">Gravi</th>
-                    <th className="px-2 py-1 text-right font-normal">Qualità</th>
+                    <th className="text-left font-normal">Phase</th>
+                    <th className="px-2 py-1 text-right font-normal">Moves</th>
+                    <th className="px-2 py-1 text-right font-normal">Inacc.</th>
+                    <th className="px-2 py-1 text-right font-normal">Mistakes</th>
+                    <th className="px-2 py-1 text-right font-normal">Blunders</th>
+                    <th className="px-2 py-1 text-right font-normal">Quality</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -80,7 +80,7 @@ export default async function CoachPage() {
                       <td className="py-1.5 capitalize">
                         {phaseLabel(p.phase)}
                         {metrics.worstPhase === p.phase && (
-                          <span className="ml-2 text-xs text-eval-mistake">più debole</span>
+                          <span className="ml-2 text-xs text-eval-mistake">weakest</span>
                         )}
                       </td>
                       <td className="px-2 py-1.5 text-right font-mono">{p.moves}</td>
@@ -99,9 +99,9 @@ export default async function CoachPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Sintesi del coach</CardTitle>
+              <CardTitle>Coach summary</CardTitle>
               <CardDescription>
-                Un riassunto motivante e azionabile dei tuoi pattern d&apos;errore.
+                A motivating, actionable recap of your error patterns.
               </CardDescription>
             </CardHeader>
             <CardContent>

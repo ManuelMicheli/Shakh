@@ -24,13 +24,13 @@ export function AnalyzePendingButton({ pending }: { pending: number }) {
     try {
       const jobs = await getPendingAnalysisJobs(MAX_BATCH_JOBS);
       if (jobs.length === 0) {
-        toast({ title: "Nessuna partita da analizzare" });
+        toast({ title: "No games to analyze" });
         return;
       }
       const n = startBatch(jobs);
       toast({
-        title: n > 1 ? `${n} partite in coda` : "Analisi avviata",
-        description: "Analizzate una alla volta in background.",
+        title: n > 1 ? `${n} games queued` : "Analysis started",
+        description: "Analyzed one at a time in the background.",
       });
     } finally {
       setLoading(false);
@@ -40,10 +40,10 @@ export function AnalyzePendingButton({ pending }: { pending: number }) {
   return (
     <Button onClick={onClick} disabled={loading || running || pending === 0}>
       {running
-        ? "Analisi in corso…"
+        ? "Analyzing…"
         : loading
-          ? "Avvio…"
-          : `Analizza ${count} ${count === 1 ? "partita" : "partite"}`}
+          ? "Starting…"
+          : `Analyze ${count} ${count === 1 ? "game" : "games"}`}
     </Button>
   );
 }

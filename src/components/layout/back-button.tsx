@@ -30,11 +30,11 @@ export function BackButton() {
     <button
       type="button"
       onClick={goBack}
-      aria-label="Torna indietro"
+      aria-label="Go back"
       className="-ml-1 flex items-center gap-1.5 rounded-md p-1.5 text-sm text-text-muted hover:bg-surface-2 hover:text-text"
     >
       <ArrowLeft className="h-5 w-5" aria-hidden />
-      <span className="hidden sm:inline">Indietro</span>
+      <span className="hidden sm:inline">Back</span>
     </button>
   );
 }

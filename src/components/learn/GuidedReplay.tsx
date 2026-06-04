@@ -61,13 +61,13 @@ export function GuidedReplay({ title, intro, pgn, comments }: GuidedReplayProps)
         )}
         <div className="flex items-center justify-between gap-3">
           <Button variant="secondary" size="sm" onClick={game.prev} disabled={atStart}>
-            ← Indietro
+            ← Back
           </Button>
           <span className="font-mono text-sm text-text-muted">
-            {atStart ? "inizio" : `mossa ${Math.ceil((cursor + 1) / 2)}`} {total > 0 && `/ ${Math.ceil(total / 2)}`}
+            {atStart ? "start" : `move ${Math.ceil((cursor + 1) / 2)}`} {total > 0 && `/ ${Math.ceil(total / 2)}`}
           </span>
           <Button size="sm" onClick={game.next} disabled={atEnd}>
-            Avanti →
+            Next →
           </Button>
         </div>
       </div>
@@ -82,7 +82,7 @@ export function GuidedReplay({ title, intro, pgn, comments }: GuidedReplayProps)
         {atEnd && total > 0 && (
           <Link href="/app/impara">
             <Button variant="secondary" className="w-full">
-              Torna a Impara
+              Back to Learn
             </Button>
           </Link>
         )}

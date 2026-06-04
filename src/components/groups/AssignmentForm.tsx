@@ -18,11 +18,11 @@ export interface AssignmentFormData {
 }
 
 const ENDGAMES: { key: string; label: string }[] = [
-  { key: "kq_vs_k", label: "Re+Donna contro Re" },
-  { key: "kp_vs_k", label: "Re e pedone contro Re" },
-  { key: "q_vs_p", label: "Donna contro pedone" },
-  { key: "lucena", label: "Posizione di Lucena" },
-  { key: "philidor", label: "Posizione di Philidor" },
+  { key: "kq_vs_k", label: "King+Queen vs King" },
+  { key: "kp_vs_k", label: "King and pawn vs King" },
+  { key: "q_vs_p", label: "Queen vs pawn" },
+  { key: "lucena", label: "Lucena position" },
+  { key: "philidor", label: "Philidor position" },
 ];
 
 const SELECT_CLS =
@@ -52,29 +52,29 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
   const buildPayload = (): { refId: string | null; params: AssignmentParams | null } | string => {
     switch (refType) {
       case "lesson":
-        if (!refId) return "Scegli una lezione.";
+        if (!refId) return "Choose a lesson.";
         return { refId, params: null };
       case "puzzle_set":
         return { refId: null, params: { theme, count: Math.max(1, Number(count) || 10) } };
       case "endgame":
         return { refId: null, params: { key: endgame } };
       case "trap":
-        if (!refId) return "Scegli una trappola.";
+        if (!refId) return "Choose a trap.";
         return { refId, params: null };
       case "repertoire":
-        if (!refId) return "Scegli un repertorio.";
+        if (!refId) return "Choose a repertoire.";
         return { refId, params: null };
       case "path_node":
-        if (!refId) return "Scegli un nodo del percorso.";
+        if (!refId) return "Choose a path node.";
         return { refId, params: null };
       default:
-        return "Tipo non valido.";
+        return "Invalid type.";
     }
   };
 
   const onSubmit = () => {
     if (targetType === "user" && !targetUserId) {
-      toast({ title: "Scegli un allievo", variant: "error" });
+      toast({ title: "Choose a student", variant: "error" });
       return;
     }
     const payload = buildPayload();
@@ -94,12 +94,12 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
         dueAt: due ? new Date(due).toISOString() : null,
       });
       if (!res.ok) {
-        toast({ title: "Non assegnato", description: res.error, variant: "error" });
+        toast({ title: "Not assigned", description: res.error, variant: "error" });
         return;
       }
       setNote("");
       setDue("");
-      toast({ title: "Assegnazione creata" });
+      toast({ title: "Assignment created" });
       router.refresh();
     });
   };
@@ -115,25 +115,25 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Destinatario */}
         <div className="space-y-1.5">
-          <span className="text-xs text-text-muted">Destinatario</span>
+          <span className="text-xs text-text-muted">Recipient</span>
           <select
             className={SELECT_CLS}
             value={targetType}
             onChange={(e) => setTargetType(e.target.value as "group" | "user")}
           >
-            <option value="group">Tutta la classe</option>
-            <option value="user">Un allievo</option>
+            <option value="group">The whole class</option>
+            <option value="user">A student</option>
           </select>
         </div>
         {targetType === "user" && (
           <div className="space-y-1.5">
-            <span className="text-xs text-text-muted">Allievo</span>
+            <span className="text-xs text-text-muted">Student</span>
             <select
               className={SELECT_CLS}
               value={targetUserId}
               onChange={(e) => setTargetUserId(e.target.value)}
             >
-              <option value="">— scegli —</option>
+              <option value="">— choose —</option>
               {data.members.map((m) => (
                 <option key={m.userId} value={m.userId}>
                   {m.name}
@@ -147,7 +147,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Tipo di attività */}
         <div className="space-y-1.5">
-          <span className="text-xs text-text-muted">Tipo di attività</span>
+          <span className="text-xs text-text-muted">Activity type</span>
           <select
             className={SELECT_CLS}
             value={refType}
@@ -165,13 +165,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
         <div className="space-y-1.5">
           {refType === "lesson" && (
             <>
-              <span className="text-xs text-text-muted">Lezione</span>
+              <span className="text-xs text-text-muted">Lesson</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— scegli —</option>
+                <option value="">— choose —</option>
                 {data.lessons.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.title}
@@ -182,7 +182,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "puzzle_set" && (
             <>
-              <span className="text-xs text-text-muted">Tema dei puzzle</span>
+              <span className="text-xs text-text-muted">Puzzle theme</span>
               <select
                 className={SELECT_CLS}
                 value={theme}
@@ -198,7 +198,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "endgame" && (
             <>
-              <span className="text-xs text-text-muted">Finale</span>
+              <span className="text-xs text-text-muted">Endgame</span>
               <select
                 className={SELECT_CLS}
                 value={endgame}
@@ -214,13 +214,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "trap" && (
             <>
-              <span className="text-xs text-text-muted">Trappola</span>
+              <span className="text-xs text-text-muted">Trap</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— scegli —</option>
+                <option value="">— choose —</option>
                 {data.traps.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
@@ -231,13 +231,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "repertoire" && (
             <>
-              <span className="text-xs text-text-muted">Repertorio di gruppo</span>
+              <span className="text-xs text-text-muted">Group repertoire</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— scegli —</option>
+                <option value="">— choose —</option>
                 {data.repertoires.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -248,13 +248,13 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
           )}
           {refType === "path_node" && (
             <>
-              <span className="text-xs text-text-muted">Nodo del percorso</span>
+              <span className="text-xs text-text-muted">Path node</span>
               <select
                 className={SELECT_CLS}
                 value={refId}
                 onChange={(e) => setRefId(e.target.value)}
               >
-                <option value="">— scegli —</option>
+                <option value="">— choose —</option>
                 {data.pathNodes.map((n) => (
                   <option key={n.id} value={n.id}>
                     {n.title}
@@ -269,7 +269,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       {refType === "puzzle_set" && (
         <div className="w-32 space-y-1.5">
           <label className="text-xs text-text-muted" htmlFor="puzzle-count">
-            Quanti puzzle
+            How many puzzles
           </label>
           <Input
             id="puzzle-count"
@@ -284,18 +284,18 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label className="text-xs text-text-muted" htmlFor="assign-note">
-            Nota (opzionale)
+            Note (optional)
           </label>
           <Input
             id="assign-note"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="es. concentrati sulla precisione"
+            placeholder="e.g. focus on accuracy"
           />
         </div>
         <div className="space-y-1.5">
           <label className="text-xs text-text-muted" htmlFor="assign-due">
-            Scadenza (opzionale)
+            Due date (optional)
           </label>
           <Input
             id="assign-due"
@@ -308,7 +308,7 @@ export function AssignmentForm({ groupId, data }: { groupId: string; data: Assig
 
       <div className="flex justify-end">
         <Button type="submit" disabled={pending}>
-          {pending ? "Assegnazione…" : "Assegna"}
+          {pending ? "Assigning…" : "Assign"}
         </Button>
       </div>
     </form>

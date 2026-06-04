@@ -97,7 +97,7 @@ export async function recordCalcResult(input: CalcResultInput): Promise<CalcResu
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   // Difficoltà = forza OTB del puzzle + bonus per la profondità calcolata.
   const opponentRating =
@@ -112,7 +112,7 @@ export async function recordCalcResult(input: CalcResultInput): Promise<CalcResu
       "calculation",
     );
   } catch {
-    return { ok: false, error: "Rating non aggiornato." };
+    return { ok: false, error: "Rating not updated." };
   }
   return { ok: true };
 }

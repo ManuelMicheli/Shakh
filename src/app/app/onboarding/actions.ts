@@ -87,7 +87,7 @@ export async function completeOnboarding(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   // Un account online VERIFICATO durante l'onboarding ha già posizionato l'utente
   // (rating reale OTB → vedi seedFromVerifiedAccount): segnale ben più affidabile

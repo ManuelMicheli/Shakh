@@ -29,7 +29,7 @@ export default async function LessonPage({
     return (
       <div className="mx-auto max-w-2xl py-12 text-center">
         <h1 className="font-display text-2xl font-semibold">{data.title}</h1>
-        <p className="mt-2 text-text-muted">Questa lezione non è ancora disponibile.</p>
+        <p className="mt-2 text-text-muted">This lesson isn&apos;t available yet.</p>
       </div>
     );
   }

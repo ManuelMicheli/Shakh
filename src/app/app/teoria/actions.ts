@@ -24,13 +24,13 @@ async function bumpProgress(
   success: boolean,
 ): Promise<ProgressResult> {
   const k = key.trim();
-  if (!k) return { ok: false, error: "Chiave di progresso mancante." };
+  if (!k) return { ok: false, error: "Missing progress key." };
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const { data: existing } = await supabase
     .from("user_progress")
@@ -117,7 +117,7 @@ export async function recordLessonCompletion(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const { error } = await supabase
     .from("content_completions")

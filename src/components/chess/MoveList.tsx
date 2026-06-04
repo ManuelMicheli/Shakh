@@ -63,7 +63,7 @@ export function MoveList({
   if (history.length === 0) {
     return (
       <div className={cn("font-mono text-sm text-text-muted", className)}>
-        Nessuna mossa.
+        No moves.
       </div>
     );
   }

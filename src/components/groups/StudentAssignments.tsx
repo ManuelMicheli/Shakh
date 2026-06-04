@@ -12,16 +12,16 @@ import type { StudentAssignment } from "@/lib/groups/assignments";
 import type { AssignmentStatus } from "@/lib/groups/types";
 
 const STATUS_LABEL: Record<AssignmentStatus, string> = {
-  assigned: "Da fare",
-  in_progress: "In corso",
-  completed: "Completata",
-  skipped: "Saltata",
+  assigned: "To do",
+  in_progress: "In progress",
+  completed: "Completed",
+  skipped: "Skipped",
 };
 
 function dueLabel(iso: string | null): string | null {
   if (!iso) return null;
   const d = new Date(iso);
-  return `entro il ${d.getDate()}/${d.getMonth() + 1}`;
+  return `due ${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 /** Sezione "Assegnato dal tuo istruttore" nella dashboard dell'allievo (09 §5). */
@@ -34,7 +34,7 @@ export function StudentAssignments({ items }: { items: StudentAssignment[] }) {
     start(async () => {
       const res = await markAssignmentDone(id, done);
       if (!res.ok) {
-        toast({ title: "Non aggiornato", description: res.error, variant: "error" });
+        toast({ title: "Not updated", description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -44,8 +44,8 @@ export function StudentAssignments({ items }: { items: StudentAssignment[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Assegnato dal tuo istruttore</CardTitle>
-        <CardDescription>Attività da svolgere, con scadenze e stato.</CardDescription>
+        <CardTitle>Assigned by your instructor</CardTitle>
+        <CardDescription>Activities to complete, with due dates and status.</CardDescription>
       </CardHeader>
       <CardContent>
         <ul className="divide-y divide-border">
@@ -75,7 +75,7 @@ export function StudentAssignments({ items }: { items: StudentAssignment[] }) {
                     href={a.href}
                     className="inline-flex h-8 items-center rounded-md border border-border bg-surface-2 px-3 text-sm font-medium text-text hover:bg-surface"
                   >
-                    Vai
+                    Go
                   </Link>
                   {/* Le attività non derivabili dall'engine si segnano a mano. */}
                   {!a.derivable && (
@@ -85,7 +85,7 @@ export function StudentAssignments({ items }: { items: StudentAssignment[] }) {
                       disabled={pending}
                       onClick={() => onToggle(a.id, !completed)}
                     >
-                      {completed ? "Annulla" : "Segna fatta"}
+                      {completed ? "Undo" : "Mark done"}
                     </Button>
                   )}
                 </div>

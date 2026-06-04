@@ -157,11 +157,11 @@ export function OpeningTrainer({
       if (res.ok && res.data.moves.length > 0) {
         const top = [...res.data.moves].sort((a, b) => moveGames(b) - moveGames(a))[0];
         setLineNote(
-          `L'avversario è uscito dal tuo repertorio con ${top.san} (la mossa più comune). Valuta se aggiungerla.`,
+          `The opponent left your repertoire with ${top.san} (the most common move). Consider adding it.`,
         );
         setOutOfBookFen(n.fen);
       } else {
-        setLineNote("Fine della linea coperta dal repertorio.");
+        setLineNote("End of the line covered by the repertoire.");
       }
       setPhase("end");
     }, 450);
@@ -200,7 +200,7 @@ export function OpeningTrainer({
     const match = children.find((c) => c.san === san);
 
     if (match) {
-      setFeedback({ type: "ok", text: `${san} — corretto.` });
+      setFeedback({ type: "ok", text: `${san} — correct.` });
       setStats((s) => ({ ...s, correct: s.correct + 1 }));
       void recordRepertoireAttempt(repertoireId, match.id, true);
       const nextId = match.id;
@@ -210,7 +210,7 @@ export function OpeningTrainer({
       // Errato: l'item atteso è la mainline; segnalo, mostro la mossa giusta, proseguo.
       const expected = children[0];
       const expectedSan = children.map((c) => c.san).join(" / ");
-      setFeedback({ type: "wrong", text: `${san} non è nel repertorio. Giusto: ${expectedSan}.` });
+      setFeedback({ type: "wrong", text: `${san} isn't in the repertoire. Correct: ${expectedSan}.` });
       setStats((s) => ({ ...s, wrong: s.wrong + 1 }));
       if (expected) {
         void recordRepertoireAttempt(repertoireId, expected.id, false);
@@ -225,15 +225,15 @@ export function OpeningTrainer({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">
-            Allena · {name}
+            Train · {name}
           </h1>
           <p className="mt-1 text-sm text-text-muted">
-            {reviewMode ? "Ripasso degli item in scadenza" : "Drill del repertorio"} ·{" "}
-            {color === "white" ? "Bianco" : "Nero"}
+            {reviewMode ? "Review of due items" : "Repertoire drill"} ·{" "}
+            {color === "white" ? "White" : "Black"}
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm">
-          {reviewMode && dueIds.length > 0 && <Badge>{dueIds.length} in scadenza</Badge>}
+          {reviewMode && dueIds.length > 0 && <Badge>{dueIds.length} due</Badge>}
           <span className="font-mono text-text-muted">
             ✓ {stats.correct} · ✗ {stats.wrong}
           </span>
@@ -244,7 +244,7 @@ export function OpeningTrainer({
         <div className="space-y-3">
           {currentTrap && (
             <div className="rounded-md border border-border bg-surface-2 px-3 py-2 text-sm">
-              ⚠ Attento: qui esiste la trappola{" "}
+              ⚠ Careful: there&apos;s a trap here,{" "}
               <Link
                 href={`/app/trappole/${currentTrap.slug}`}
                 className="font-medium underline underline-offset-2 hover:text-text"
@@ -272,7 +272,7 @@ export function OpeningTrainer({
 
           <div className="flex items-center justify-end gap-3">
             <Button variant="secondary" size="sm" onClick={startLine}>
-              Nuova linea
+              New line
             </Button>
           </div>
 
@@ -280,16 +280,16 @@ export function OpeningTrainer({
             <CardHeader>
               <CardTitle>
                 {phase === "user"
-                  ? "Tocca a te"
+                  ? "Your turn"
                   : phase === "opponent"
-                    ? "Muove l'avversario…"
-                    : "Fine linea"}
+                    ? "The opponent is moving…"
+                    : "End of line"}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {phase === "user" && !feedback && (
                 <p className="text-sm text-text-muted">
-                  Gioca la mossa del tuo repertorio.
+                  Play your repertoire move.
                 </p>
               )}
               {feedback && (
@@ -306,7 +306,7 @@ export function OpeningTrainer({
               {lineNote && <p className="text-sm text-text-muted">{lineNote}</p>}
               {phase === "end" && (
                 <Button size="sm" onClick={startLine}>
-                  Allena un&apos;altra linea
+                  Train another line
                 </Button>
               )}
             </CardContent>

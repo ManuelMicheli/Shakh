@@ -400,7 +400,7 @@ export function serializeTree(tree: MoveTree): SerializedMoveTree {
 /** Deserializza con validazione minima; lancia se la struttura è incoerente. */
 export function deserializeTree(data: SerializedMoveTree): MoveTree {
   if (!data || typeof data !== "object" || !data.nodes || !data.rootId) {
-    throw new Error("SerializedMoveTree non valido.");
+    throw new Error("Invalid SerializedMoveTree.");
   }
   if (!data.nodes[data.rootId]) {
     throw new Error("rootId assente tra i nodi.");

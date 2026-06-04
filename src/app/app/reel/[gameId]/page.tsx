@@ -44,9 +44,9 @@ export default async function ReelGeneratePage({
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Reel della partita</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Game reel</h1>
         <Link href={`/app/partite/${gameId}`} className="text-sm text-text-muted hover:text-text">
-          ← Partita
+          ← Game
         </Link>
       </div>
 
@@ -55,11 +55,11 @@ export default async function ReelGeneratePage({
           <CardContent className="space-y-3 py-6 text-center">
             <p className="text-text-muted">
               {game?.analyzed
-                ? "Nessuna mossa notevole da mettere in clip per questa partita."
-                : "Analizza prima la partita per generare il reel."}
+                ? "No standout move to clip for this game."
+                : "Analyze the game first to generate the reel."}
             </p>
             <Link href={`/app/partite/${gameId}`}>
-              <Button variant="secondary">Vai alla partita</Button>
+              <Button variant="secondary">Go to the game</Button>
             </Link>
           </CardContent>
         </Card>
@@ -68,9 +68,9 @@ export default async function ReelGeneratePage({
           <ReelPlayer data={reel} />
           <Card>
             <CardContent className="space-y-3 py-4">
-              <p className="text-sm font-medium">Condividi la clip</p>
+              <p className="text-sm font-medium">Share the clip</p>
               <p className="text-xs text-text-muted">
-                Il link è autocontenuto: chi lo apre vede solo questa mossa, non l&apos;intera partita.
+                The link is self-contained: anyone who opens it sees only this move, not the whole game.
               </p>
               <ShareReel encoded={encodeReel(reel)} />
             </CardContent>

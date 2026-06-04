@@ -139,16 +139,16 @@ export function HotseatGame() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Stesso dispositivo</CardTitle>
+          <CardTitle>Same device</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           <p className="text-sm text-text-muted">
-            Giocate a turno sullo stesso schermo. La scacchiera può girarsi
-            automaticamente dal lato di chi muove.
+            Take turns on the same screen. The board can flip automatically to
+            the side that&apos;s to move.
           </p>
           <div>
             <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-              Tempo
+              Time control
             </div>
             <TimeControlPicker value={tcId} onChange={setTcId} />
           </div>
@@ -159,9 +159,9 @@ export function HotseatGame() {
               onChange={(e) => setAutoFlip(e.target.checked)}
               className="h-4 w-4 accent-[var(--text)]"
             />
-            Gira la scacchiera a ogni mossa
+            Flip the board on every move
           </label>
-          <Button onClick={start}>Inizia a giocare</Button>
+          <Button onClick={start}>Start playing</Button>
         </CardContent>
       </Card>
     );
@@ -176,7 +176,7 @@ export function HotseatGame() {
       ? [
           ...gameStatsFromFen(game.fen),
           {
-            label: "Durata",
+            label: "Duration",
             value: formatDuration(
               tc.initialMs * 2 + tc.incMs * game.history.length - (whiteMs + blackMs),
             ),
@@ -186,7 +186,7 @@ export function HotseatGame() {
   const topColor: "w" | "b" = orientation === "white" ? "b" : "w";
   const bottomColor: "w" | "b" = orientation === "white" ? "w" : "b";
   const msOf = (c: "w" | "b") => (c === "w" ? whiteMs : blackMs);
-  const nameOf = (c: "w" | "b") => (c === "w" ? "Bianco" : "Nero");
+  const nameOf = (c: "w" | "b") => (c === "w" ? "White" : "Black");
 
   const atEnd = game.cursor >= game.history.length - 1;
 
@@ -225,7 +225,7 @@ export function HotseatGame() {
                 onDismiss={() => setOverlayOff(true)}
                 actions={
                   <Button size="sm" className="w-full" onClick={() => setPhase("setup")}>
-                    Nuova partita
+                    New game
                   </Button>
                 }
               />
@@ -281,7 +281,7 @@ export function HotseatGame() {
             className="flex-1"
             onClick={game.first}
             disabled={game.cursor < 0}
-            aria-label="Prima mossa"
+            aria-label="First move"
           >
             <ChevronsLeft className="h-5 w-5" />
           </Button>
@@ -291,7 +291,7 @@ export function HotseatGame() {
             className="flex-1"
             onClick={game.prev}
             disabled={game.cursor < 0}
-            aria-label="Mossa precedente"
+            aria-label="Previous move"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -301,7 +301,7 @@ export function HotseatGame() {
             className="flex-1"
             onClick={game.next}
             disabled={atEnd}
-            aria-label="Mossa successiva"
+            aria-label="Next move"
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
@@ -311,7 +311,7 @@ export function HotseatGame() {
             className="flex-1"
             onClick={game.last}
             disabled={atEnd}
-            aria-label="Ultima mossa"
+            aria-label="Last move"
           >
             <ChevronsRight className="h-5 w-5" />
           </Button>
@@ -321,7 +321,7 @@ export function HotseatGame() {
               variant="secondary"
               size="icon"
               onClick={() => setMenuOpen((v) => !v)}
-              aria-label="Azioni partita"
+              aria-label="Game actions"
               aria-expanded={menuOpen}
             >
               <MoreVertical className="h-5 w-5" />
@@ -343,7 +343,7 @@ export function HotseatGame() {
                     className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm hover:bg-surface-2"
                   >
                     <RefreshCw className="h-4 w-4" />
-                    Gira scacchiera
+                    Flip board
                   </button>
                   <button
                     type="button"
@@ -355,7 +355,7 @@ export function HotseatGame() {
                     className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm hover:bg-surface-2 disabled:opacity-50"
                   >
                     <Undo2 className="h-4 w-4" />
-                    Annulla mossa
+                    Undo move
                   </button>
                   <button
                     type="button"
@@ -366,7 +366,7 @@ export function HotseatGame() {
                     className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-sm hover:bg-surface-2"
                   >
                     <RotateCcw className="h-4 w-4" />
-                    Nuova partita
+                    New game
                   </button>
                 </div>
               </>
@@ -384,16 +384,16 @@ export function HotseatGame() {
             disabled={game.history.length === 0}
           >
             <Undo2 className="h-4 w-4" />
-            Annulla mossa
+            Undo move
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setPhase("setup")}>
             <RotateCcw className="h-4 w-4" />
-            Nuova partita
+            New game
           </Button>
         </div>
         <Card>
           <CardHeader>
-            <CardTitle>Mosse</CardTitle>
+            <CardTitle>Moves</CardTitle>
           </CardHeader>
           <CardContent>
             <MoveList
@@ -413,13 +413,13 @@ function hotseatStatus(
   game: ReturnType<typeof useChessGame>,
   flagged: null | "w" | "b",
 ): string {
-  if (flagged) return `${flagged === "w" ? "Bianco" : "Nero"} perde per tempo`;
+  if (flagged) return `${flagged === "w" ? "White" : "Black"} loses on time`;
   if (game.isCheckmate)
-    return `Scacco matto — vince il ${game.turn === "w" ? "Nero" : "Bianco"}`;
-  if (game.isStalemate) return "Stallo — patta";
-  if (game.isDraw) return "Patta";
-  const side = game.turn === "w" ? "Bianco" : "Nero";
-  return game.isCheck ? `Scacco — muove il ${side}` : `Muove il ${side}`;
+    return `Checkmate — ${game.turn === "w" ? "Black" : "White"} wins`;
+  if (game.isStalemate) return "Stalemate — draw";
+  if (game.isDraw) return "Draw";
+  const side = game.turn === "w" ? "White" : "Black";
+  return game.isCheck ? `Check — ${side} to move` : `${side} to move`;
 }
 
 /** Esito strutturato per la schermata finale (hotseat: due giocatori, nessun "tu"). */
@@ -428,14 +428,14 @@ function hotseatResult(
   flagged: null | "w" | "b",
 ): { title: string; subtitle?: string; checkmate: boolean; outcome: GameOutcome } | null {
   if (flagged) {
-    const winner = flagged === "w" ? "Nero" : "Bianco";
-    return { title: `Vince il ${winner}`, subtitle: "Tempo scaduto.", checkmate: false, outcome: "win" };
+    const winner = flagged === "w" ? "Black" : "White";
+    return { title: `${winner} wins`, subtitle: "Time's up.", checkmate: false, outcome: "win" };
   }
   if (game.isCheckmate) {
-    const winner = game.turn === "w" ? "Nero" : "Bianco";
-    return { title: `Vince il ${winner}`, checkmate: true, outcome: "win" };
+    const winner = game.turn === "w" ? "Black" : "White";
+    return { title: `${winner} wins`, checkmate: true, outcome: "win" };
   }
-  if (game.isStalemate) return { title: "Patta", subtitle: "Stallo.", checkmate: false, outcome: "draw" };
-  if (game.isDraw) return { title: "Patta", checkmate: false, outcome: "draw" };
+  if (game.isStalemate) return { title: "Draw", subtitle: "Stalemate.", checkmate: false, outcome: "draw" };
+  if (game.isDraw) return { title: "Draw", checkmate: false, outcome: "draw" };
   return null;
 }

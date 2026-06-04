@@ -13,42 +13,42 @@ const RAMI: {
   lessons: { title: string; summary: string; eco?: string }[];
 }[] = [
   {
-    title: "Aperture",
-    browse: "Sfoglia l'albero ECO",
+    title: "Openings",
+    browse: "Browse the ECO tree",
     lessons: [
       {
-        title: "Difesa Siciliana",
-        summary: "Il contrattacco asimmetrico più giocato.",
+        title: "Sicilian Defense",
+        summary: "The most played asymmetrical counterattack.",
         eco: "B20",
       },
       {
-        title: "Partita Italiana",
-        summary: "Sviluppo rapido e pressione su f7.",
+        title: "Italian Game",
+        summary: "Quick development and pressure on f7.",
         eco: "C50",
       },
     ],
   },
   {
-    title: "Mediogioco",
-    browse: "Sfoglia i temi",
+    title: "Middlegame",
+    browse: "Browse the themes",
     lessons: [
       {
-        title: "Pedoni isolati",
-        summary: "Forza dinamica contro debolezza statica.",
+        title: "Isolated pawns",
+        summary: "Dynamic strength against static weakness.",
       },
       {
-        title: "Colonne aperte",
-        summary: "Dove mettere le torri e perché.",
+        title: "Open files",
+        summary: "Where to place the rooks and why.",
       },
     ],
   },
   {
-    title: "Finali",
-    browse: "Sfoglia tutti i finali",
+    title: "Endgames",
+    browse: "Browse all endgames",
     lessons: [
       {
-        title: "Re e pedone contro re",
-        summary: "L'opposizione e la regola del quadrato.",
+        title: "King and pawn vs king",
+        summary: "Opposition and the rule of the square.",
       },
     ],
   },
@@ -59,10 +59,10 @@ export default function TeoriaShowcasePage() {
     <div className="space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Redesign mobile · Teoria
+          Mobile redesign · Theory
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Sezioni per ramo, lezioni a list-card. Guarda e conferma.
+          Sections by branch, lessons as list cards. Take a look and confirm.
         </p>
       </header>
 
@@ -75,13 +75,13 @@ export default function TeoriaShowcasePage() {
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-xs uppercase tracking-wider text-text-muted">
-                    Studio guidato
+                    Guided study
                   </p>
                   <h2 className="mt-0.5 font-display text-[1.7rem] font-semibold leading-tight tracking-tight">
-                    Teoria
+                    Theory
                   </h2>
                   <p className="mt-2 text-sm text-text-muted">
-                    Capisci il <em>perché</em> delle mosse, coi dati reali.
+                    Understand the <em>why</em> behind the moves, with real data.
                   </p>
                 </div>
                 <span
@@ -169,7 +169,7 @@ function PhoneChrome() {
         </button>
         <span className="font-display text-lg font-semibold tracking-tight">Shakh</span>
         <div className="flex items-center gap-1">
-          <button type="button" aria-label="Notifiche" className="rounded-md p-1.5 text-text-muted">
+          <button type="button" aria-label="Notifications" className="rounded-md p-1.5 text-text-muted">
             <Bell className="h-5 w-5" />
           </button>
           <div className="grid h-8 w-8 place-items-center rounded-full bg-text text-xs font-semibold text-bg">

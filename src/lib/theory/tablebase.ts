@@ -69,7 +69,7 @@ export function isTablebaseEligible(fen: string): boolean {
 /** Interroga la tablebase. Risultato cachato per FEN. */
 export async function fetchTablebase(fen: string): Promise<TablebaseResult> {
   if (!isTablebaseEligible(fen)) {
-    return { ok: false, error: "Posizione con più di 7 pezzi: fuori dalla tablebase.", tooManyPieces: true };
+    return { ok: false, error: "Position with more than 7 pieces: outside the tablebase.", tooManyPieces: true };
   }
 
   const cached = cache.get(fen);
@@ -85,19 +85,19 @@ export async function fetchTablebase(fen: string): Promise<TablebaseResult> {
         headers: { Accept: "application/json" },
       });
     } catch {
-      return { ok: false, error: "Errore di rete contattando la tablebase." };
+      return { ok: false, error: "Network error contacting the tablebase." };
     }
     if (res.status === 429) {
-      return { ok: false, error: "Troppe richieste alla tablebase. Riprova tra poco.", rateLimited: true };
+      return { ok: false, error: "Too many requests to the tablebase. Try again shortly.", rateLimited: true };
     }
     if (!res.ok) {
-      return { ok: false, error: `La tablebase ha risposto con stato ${res.status}.` };
+      return { ok: false, error: `The tablebase responded with status ${res.status}.` };
     }
     let raw: TablebaseData;
     try {
       raw = (await res.json()) as TablebaseData;
     } catch {
-      return { ok: false, error: "Risposta della tablebase non valida." };
+      return { ok: false, error: "Invalid tablebase response." };
     }
     const data: TablebaseData = {
       category: raw.category ?? "unknown",

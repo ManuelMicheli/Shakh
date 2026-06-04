@@ -51,7 +51,7 @@ export function TrapFrequency({ triggerFen, lureSan }: TrapFrequencyProps) {
   if (state.status === "loading") {
     return (
       <p className="flex items-center gap-2 text-sm text-text-muted">
-        <Spinner /> Interrogo l&apos;explorer…
+        <Spinner /> Querying the explorer…
       </p>
     );
   }
@@ -63,7 +63,7 @@ export function TrapFrequency({ triggerFen, lureSan }: TrapFrequencyProps) {
   if (state.total === 0) {
     return (
       <p className="text-sm text-text-muted">
-        Nessuna partita registrata in questa posizione: trappola rara o teorica.
+        No games recorded in this position: a rare or theoretical trap.
       </p>
     );
   }
@@ -71,9 +71,9 @@ export function TrapFrequency({ triggerFen, lureSan }: TrapFrequencyProps) {
   if (state.share === null || state.games === 0) {
     return (
       <p className="text-sm leading-relaxed">
-        Nelle partite reali (su {state.total.toLocaleString("it-IT")}) l&apos;esca{" "}
-        {lureSan ? <span className="font-mono">{lureSan}</span> : "chiave"} non compare
-        quasi mai: è una trappola più da manuale che da torneo.
+        In real games (out of {state.total.toLocaleString("en-US")}) the{" "}
+        {lureSan ? <span className="font-mono">{lureSan}</span> : "key"} lure hardly ever
+        appears: it&apos;s more of a textbook trap than a tournament one.
       </p>
     );
   }
@@ -81,19 +81,19 @@ export function TrapFrequency({ triggerFen, lureSan }: TrapFrequencyProps) {
   const pct = Math.round(state.share);
   const verdict =
     pct >= 25
-      ? "scatta di continuo: vale davvero la pena conoscerla."
+      ? "it springs constantly: it's well worth knowing."
       : pct >= 8
-        ? "capita con regolarità: tienila d'occhio."
-        : "è ormai poco frequente: più una chicca che un'arma quotidiana.";
+        ? "it comes up regularly: keep an eye on it."
+        : "it's now uncommon: more of a curiosity than an everyday weapon.";
 
   return (
     <div className="space-y-2 text-sm leading-relaxed">
       <p>
-        Nelle partite reali l&apos;avversario gioca l&apos;esca{" "}
-        {lureSan && <span className="font-mono">{lureSan}</span>} nel{" "}
-        <span className="font-mono text-text">{pct}%</span> dei casi (
-        {state.games.toLocaleString("it-IT")} su {state.total.toLocaleString("it-IT")}{" "}
-        partite).
+        In real games the opponent plays the lure{" "}
+        {lureSan && <span className="font-mono">{lureSan}</span>} in{" "}
+        <span className="font-mono text-text">{pct}%</span> of cases (
+        {state.games.toLocaleString("en-US")} of {state.total.toLocaleString("en-US")}{" "}
+        games).
       </p>
       <p className="text-text-muted">{verdict}</p>
     </div>

@@ -205,7 +205,7 @@ export function LessonViewer({
               size="sm"
               onClick={() => setEngineOn((v) => !v)}
             >
-              Motore {engineOn ? "on" : "off"}
+              Engine {engineOn ? "on" : "off"}
             </Button>
           </div>
 
@@ -215,10 +215,10 @@ export function LessonViewer({
               <div className="flex items-center justify-between">
                 <CardTitle>
                   {isDeviation
-                    ? "Hai lasciato la linea"
+                    ? "You left the line"
                     : currentStepIndex !== null
-                      ? `Passo ${currentStepIndex + 1} di ${lesson.steps.length}`
-                      : "Esplorazione libera"}
+                      ? `Step ${currentStepIndex + 1} of ${lesson.steps.length}`
+                      : "Free exploration"}
                 </CardTitle>
                 {lesson.steps.length > 0 && !isDeviation && (
                   <div className="flex gap-1">
@@ -228,7 +228,7 @@ export function LessonViewer({
                       onClick={prevStep}
                       disabled={(currentStepIndex ?? guided) <= 0}
                     >
-                      ← Indietro
+                      ← Back
                     </Button>
                     <Button
                       variant="secondary"
@@ -236,7 +236,7 @@ export function LessonViewer({
                       onClick={nextStep}
                       disabled={(currentStepIndex ?? guided) >= lesson.steps.length - 1}
                     >
-                      Avanti →
+                      Next →
                     </Button>
                   </div>
                 )}
@@ -246,8 +246,8 @@ export function LessonViewer({
               {isDeviation ? (
                 <>
                   <p className="text-sm text-text-muted">
-                    Stai esplorando una mossa fuori dalla lezione. Valutala con il
-                    motore o chiedi al coach perché non è la scelta migliore.
+                    You&apos;re exploring a move outside the lesson. Evaluate it with the
+                    engine or ask the coach why it isn&apos;t the best choice.
                   </p>
                   {deviationParentFen && tree.currentNode.san && (
                     <DeviationCoach
@@ -257,7 +257,7 @@ export function LessonViewer({
                     />
                   )}
                   <Button variant="ghost" size="sm" onClick={tree.prev}>
-                    ← Torna alla linea
+                    ← Back to the line
                   </Button>
                 </>
               ) : currentStep ? (
@@ -265,13 +265,13 @@ export function LessonViewer({
                   <p className="text-sm leading-relaxed">{currentStep.text}</p>
                   {completed && isLastStep && (
                     <p className="text-sm font-medium text-text">
-                      ✓ Lezione completata — registrata nel percorso.
+                      ✓ Lesson completed — recorded in your path.
                     </p>
                   )}
                 </>
               ) : (
                 <p className="text-sm text-text-muted">
-                  Naviga le mosse o muovi sulla scacchiera per esplorare.
+                  Navigate the moves or play on the board to explore.
                 </p>
               )}
             </CardContent>
@@ -282,8 +282,8 @@ export function LessonViewer({
         <div>
           <Tabs defaultValue="moves">
             <TabsList className="w-full">
-              <TabsTrigger value="moves">Mosse</TabsTrigger>
-              <TabsTrigger value="engine">Motore</TabsTrigger>
+              <TabsTrigger value="moves">Moves</TabsTrigger>
+              <TabsTrigger value="engine">Engine</TabsTrigger>
               {contextTab && (
                 <TabsTrigger value="context">
                   {type === "opening" ? "Explorer" : "Tablebase"}
@@ -321,11 +321,11 @@ export function LessonViewer({
                         }}
                       />
                     ) : (
-                      <p className="text-sm text-text-muted">Il motore sta pensando…</p>
+                      <p className="text-sm text-text-muted">The engine is thinking…</p>
                     )
                   ) : (
                     <p className="text-sm text-text-muted">
-                      Motore spento. Accendilo per valutare la posizione e le deviazioni.
+                      Engine off. Turn it on to evaluate the position and deviations.
                     </p>
                   )}
                 </CardContent>

@@ -41,14 +41,14 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (age === null) {
-      toast({ title: "Inserisci la data di nascita", variant: "error" });
+      toast({ title: "Enter your date of birth", variant: "error" });
       return;
     }
     if (isMinor && (!parentalConsent || !parentalEmail.trim())) {
       toast({
-        title: "Serve il consenso di un genitore",
+        title: "Parental consent required",
         description:
-          "Sotto i 14 anni occorre l'email e il consenso di un genitore o tutore.",
+          "Under 14, a parent or guardian's email and consent are required.",
         variant: "error",
       });
       return;
@@ -74,7 +74,7 @@ export default function SignupPage() {
     setLoading(false);
 
     if (error) {
-      toast({ title: "Registrazione fallita", description: error.message, variant: "error" });
+      toast({ title: "Sign-up failed", description: error.message, variant: "error" });
       return;
     }
 
@@ -84,8 +84,8 @@ export default function SignupPage() {
       router.refresh();
     } else {
       toast({
-        title: "Conferma la tua email",
-        description: "Ti abbiamo inviato un link per attivare l'account.",
+        title: "Confirm your email",
+        description: "We've sent you a link to activate your account.",
         variant: "success",
       });
     }
@@ -94,15 +94,15 @@ export default function SignupPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Crea il tuo account</h1>
+        <h1 className="font-display text-2xl font-semibold">Create your account</h1>
         <p className="mt-1 text-sm text-text-muted">
-          Inizia il percorso da principiante a giocatore di club.
+          Start the path from beginner to club player.
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="displayName">Nome</Label>
+          <Label htmlFor="displayName">Name</Label>
           <Input
             id="displayName"
             autoComplete="name"
@@ -133,11 +133,11 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <p className="text-xs text-text-muted">Almeno 8 caratteri.</p>
+          <p className="text-xs text-text-muted">At least 8 characters.</p>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="birthDate">Data di nascita</Label>
+          <Label htmlFor="birthDate">Date of birth</Label>
           <Input
             id="birthDate"
             type="date"
@@ -147,17 +147,17 @@ export default function SignupPage() {
             onChange={(e) => setBirthDate(e.target.value)}
           />
           <p className="text-xs text-text-muted">
-            Serve a verificare il consenso digitale (in Italia: 14 anni).
+            Used to verify digital consent (in Italy: age 14).
           </p>
         </div>
 
         {isMinor && (
           <div className="space-y-3 rounded-md border border-border bg-surface-2 p-4">
             <p className="text-sm">
-              Hai meno di 14 anni: serve il consenso di un genitore o tutore.
+              You&apos;re under 14: a parent or guardian&apos;s consent is required.
             </p>
             <div className="space-y-1.5">
-              <Label htmlFor="parentalEmail">Email del genitore/tutore</Label>
+              <Label htmlFor="parentalEmail">Parent/guardian email</Label>
               <Input
                 id="parentalEmail"
                 type="email"
@@ -173,10 +173,10 @@ export default function SignupPage() {
                 className="mt-1 h-4 w-4 accent-[var(--accent)]"
               />
               <span className="text-text-muted">
-                Sono un genitore/tutore e acconsento alla creazione dell&apos;account
-                e al trattamento dei dati come da{" "}
+                I am a parent/guardian and I consent to the creation of the account
+                and to the processing of data as described in the{" "}
                 <Link href="/privacy" className="underline underline-offset-2">
-                  informativa privacy
+                  privacy policy
                 </Link>
                 .
               </span>
@@ -185,14 +185,14 @@ export default function SignupPage() {
         )}
 
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Attendi…" : "Registrati"}
+          {loading ? "Please wait…" : "Sign up"}
         </Button>
       </form>
 
       <p className="text-center text-sm text-text-muted">
-        Hai già un account?{" "}
+        Already have an account?{" "}
         <Link href="/login" className="text-text underline underline-offset-4">
-          Accedi
+          Sign in
         </Link>
       </p>
     </div>

@@ -17,7 +17,7 @@ export function ClassSynthesis({ groupId }: { groupId: string }) {
     start(async () => {
       const res = await refreshClassSynthesis(groupId);
       if (!res.ok || !res.data) {
-        toast({ title: "Sintesi non riuscita", description: res.error, variant: "error" });
+        toast({ title: "Summary failed", description: res.error, variant: "error" });
         return;
       }
       setSynth(res.data.synthesis);
@@ -38,19 +38,19 @@ export function ClassSynthesis({ groupId }: { groupId: string }) {
           )}
           {synth.suggestion && (
             <p className="text-sm text-text-muted">
-              <span className="font-medium text-text">Proposta: </span>
+              <span className="font-medium text-text">Suggestion: </span>
               {synth.suggestion}
             </p>
           )}
         </div>
       ) : (
         <p className="text-sm text-text-muted">
-          Genera una sintesi in italiano dei punti deboli aggregati della classe, con una
-          proposta di lezione. I dati sono deterministici; il coach scrive solo la sintesi.
+          Generate a summary of the class&apos;s aggregated weaknesses, with a lesson
+          suggestion. The data is deterministic; the coach only writes the summary.
         </p>
       )}
       <Button variant="secondary" size="sm" onClick={onRun} disabled={pending}>
-        {pending ? "Generazione…" : synth ? "Rigenera sintesi" : "Genera sintesi di classe"}
+        {pending ? "Generating…" : synth ? "Regenerate summary" : "Generate class summary"}
       </Button>
     </div>
   );

@@ -4,12 +4,12 @@
  */
 
 const GLYPHS: { glyph: string; name: string; pages: string }[] = [
-  { glyph: "♞", name: "Cavallo", pages: "Dashboard · Sparring · Mediogioco" },
-  { glyph: "♟", name: "Pedone", pages: "Oggi · Impara · Gioca · Gruppi" },
-  { glyph: "♜", name: "Torre", pages: "Le mie partite · Punti deboli · Ripara" },
-  { glyph: "♚", name: "Re", pages: "Percorso · Coach · Profilo · Finali" },
-  { glyph: "♝", name: "Alfiere", pages: "Teoria · Preparazione · Repertorio · Aperture" },
-  { glyph: "♛", name: "Donna", pages: "Tattiche" },
+  { glyph: "♞", name: "Knight", pages: "Dashboard · Sparring · Middlegame" },
+  { glyph: "♟", name: "Pawn", pages: "Today · Learn · Play · Groups" },
+  { glyph: "♜", name: "Rook", pages: "My games · Weaknesses · Fix mistakes" },
+  { glyph: "♚", name: "King", pages: "Path · Coach · Profile · Endgames" },
+  { glyph: "♝", name: "Bishop", pages: "Theory · Preparation · Repertoire · Openings" },
+  { glyph: "♛", name: "Queen", pages: "Tactics" },
 ];
 
 export default function GlifiGalleryPage() {
@@ -17,11 +17,12 @@ export default function GlifiGalleryPage() {
     <div className="space-y-8">
       <header>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Galleria glifi (unicode)
+          Glyph gallery (unicode)
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          Tutti i simboli usati nelle testate. A sinistra l&apos;emblema (opacità
-          20%, come ora), a destra il watermark grande (come la Dashboard).
+          All the symbols used in the headers. On the left the emblem (20%
+          opacity, as it is now), on the right the large watermark (like the
+          Dashboard).
         </p>
       </header>
 
@@ -60,8 +61,8 @@ export default function GlifiGalleryPage() {
       </div>
 
       <p className="text-xs text-text-muted">
-        Colonna 1: emblema attuale (20%). Colonna 2: glifo pieno (100%) — per
-        valutare la forma del simbolo nel font serif.
+        Column 1: current emblem (20%). Column 2: solid glyph (100%) — to judge
+        the shape of the symbol in the serif font.
       </p>
     </div>
   );

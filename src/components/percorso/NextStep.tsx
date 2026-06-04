@@ -25,15 +25,15 @@ export function NextStep({ step, compact = false }: NextStepProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Prossimo passo</CardTitle>
+          <CardTitle>Next step</CardTitle>
           <CardDescription>
-            Completa il diagnostico per ricevere un consiglio personalizzato.
+            Complete the diagnostic to get a personalized recommendation.
           </CardDescription>
         </CardHeader>
         {!compact && (
           <CardContent>
             <Link href="/app/onboarding" className={PRIMARY_LINK}>
-              Inizia il diagnostico
+              Start the diagnostic
             </Link>
           </CardContent>
         )}
@@ -47,15 +47,15 @@ export function NextStep({ step, compact = false }: NextStepProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
-          <CardTitle>Prossimo passo</CardTitle>
+          <CardTitle>Next step</CardTitle>
           <Badge variant={autonomous ? "outline" : "muted"}>
             {autonomous ? (
               <span className="flex items-center gap-1">
-                <Compass className="h-3 w-3" /> Modalità libera
+                <Compass className="h-3 w-3" /> Free mode
               </span>
             ) : (
               <span className="flex items-center gap-1">
-                <Route className="h-3 w-3" /> Percorso
+                <Route className="h-3 w-3" /> Path
               </span>
             )}
           </Badge>
@@ -72,7 +72,7 @@ export function NextStep({ step, compact = false }: NextStepProps) {
           )}
           {autonomous && (
             <Link href="/app/percorso" className={GHOST_LINK}>
-              Vedi il percorso
+              View the path
             </Link>
           )}
         </div>

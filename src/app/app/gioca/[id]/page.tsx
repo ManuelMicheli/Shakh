@@ -4,7 +4,7 @@ import { OnlineGame } from "@/components/play/OnlineGame";
 import { Button } from "@/components/ui/button";
 import type { FriendGameRow } from "@/lib/play/types";
 
-export const metadata = { title: "Partita — Shakh" };
+export const metadata = { title: "Game — Shakh" };
 
 export default async function GiocaIdPage({
   params,
@@ -27,13 +27,13 @@ export default async function GiocaIdPage({
     return (
       <div className="mx-auto max-w-md space-y-4 py-16 text-center">
         <h1 className="font-display text-2xl font-semibold">
-          Partita non trovata
+          Game not found
         </h1>
         <p className="text-text-muted">
-          La partita non esiste, è già al completo, oppure non hai accesso.
+          The game doesn&apos;t exist, is already full, or you don&apos;t have access.
         </p>
         <Link href="/app/gioca">
-          <Button variant="secondary">Torna alle partite</Button>
+          <Button variant="secondary">Back to games</Button>
         </Link>
       </div>
     );
@@ -43,11 +43,11 @@ export default async function GiocaIdPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Partita con un amico
+          Game with a friend
         </h1>
         <Link href="/app/gioca">
           <Button variant="ghost" size="sm">
-            ← Tutte le partite
+            ← All games
           </Button>
         </Link>
       </div>

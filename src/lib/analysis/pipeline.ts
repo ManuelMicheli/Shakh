@@ -66,11 +66,11 @@ export async function analyzeGame(
   try {
     chess.loadPgn(pgn);
   } catch {
-    throw new InvalidPgnError("PGN non valido.");
+    throw new InvalidPgnError("Invalid PGN.");
   }
   const verbose = chess.history({ verbose: true });
   const n = verbose.length;
-  if (n === 0) throw new EmptyGameError("La partita non contiene mosse.");
+  if (n === 0) throw new EmptyGameError("The game contains no moves.");
 
   // posFens[i] = posizione dopo i semimosse (posFens[0] = iniziale).
   const posFens: string[] = [verbose[0].before, ...verbose.map((m) => m.after)];

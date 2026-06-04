@@ -16,10 +16,10 @@ export function JoinClickwrap({ code }: { code: string }) {
     start(async () => {
       const res = await joinByCode(code);
       if (!res.ok || !res.data) {
-        toast({ title: "Join non riuscito", description: res.error, variant: "error" });
+        toast({ title: "Join failed", description: res.error, variant: "error" });
         return;
       }
-      toast({ title: "Sei entrato nel gruppo" });
+      toast({ title: "You joined the group" });
       router.push(`/app/gruppi/${res.data.groupId}`);
     });
   };
@@ -27,15 +27,15 @@ export function JoinClickwrap({ code }: { code: string }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-text-muted">
-        Entrando nel gruppo, l&apos;istruttore potrà vedere i tuoi progressi (in sola lettura)
-        per aiutarti a migliorare. Puoi lasciare il gruppo in qualunque momento.
+        By joining the group, the instructor will be able to see your progress (read-only)
+        to help you improve. You can leave the group at any time.
       </p>
       <div className="flex gap-2">
         <Button onClick={onAccept} disabled={pending}>
-          {pending ? "Ingresso…" : "Accetto ed entro"}
+          {pending ? "Joining…" : "Accept and join"}
         </Button>
         <Button variant="ghost" onClick={() => router.push("/app/gruppi")} disabled={pending}>
-          Annulla
+          Cancel
         </Button>
       </div>
     </div>

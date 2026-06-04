@@ -130,7 +130,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
     startReset(async () => {
       const res = await resetGameAnalysis(game.id);
       if (!res.ok) {
-        toast({ title: "Operazione non riuscita", description: res.error, variant: "error" });
+        toast({ title: "Operation failed", description: res.error, variant: "error" });
         return;
       }
       router.refresh();
@@ -149,7 +149,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
       {/* Header compatto (non scrolla). */}
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
-          <h1 className="font-display text-xl font-semibold tracking-tight">Analisi partita</h1>
+          <h1 className="font-display text-xl font-semibold tracking-tight">Game analysis</h1>
           {game.result && (
             <span className="font-mono text-xs text-text-muted">{game.result}</span>
           )}
@@ -158,11 +158,11 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
           <div className="flex gap-2">
             <Link href={`/app/reel/${game.id}`}>
               <Button variant="secondary" size="sm">
-                Crea reel
+                Create reel
               </Button>
             </Link>
             <Button variant="secondary" size="sm" onClick={onReanalyze} disabled={resetting}>
-              {resetting ? "…" : "Rianalizza"}
+              {resetting ? "…" : "Reanalyze"}
             </Button>
           </div>
         )}
@@ -247,9 +247,9 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
 
           <Tabs defaultValue="moves" className="flex min-h-0 flex-1 flex-col">
             <TabsList className="shrink-0 self-start">
-              <TabsTrigger value="moves">Mosse</TabsTrigger>
+              <TabsTrigger value="moves">Moves</TabsTrigger>
               <TabsTrigger value="coach">Coach</TabsTrigger>
-              {game.analyzed && <TabsTrigger value="summary">Riepilogo</TabsTrigger>}
+              {game.analyzed && <TabsTrigger value="summary">Summary</TabsTrigger>}
             </TabsList>
 
             <TabsContent value="moves" className="min-h-0 flex-1 space-y-3 overflow-y-auto">
@@ -281,7 +281,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
                 {graphPoints.length > 1 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Andamento</CardTitle>
+                      <CardTitle>Evaluation over time</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <EvalGraph
@@ -296,13 +296,13 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
                 <AnalysisLegend />
                 <Card>
                   <CardHeader>
-                    <CardTitle>Riepilogo</CardTitle>
+                    <CardTitle>Summary</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <SummaryTable white={summary.white} black={summary.black} />
                     <p className="text-xs text-text-muted">
-                      L&apos;accuratezza % è una stima basata sulla perdita media in
-                      centipawn, non lo standard ufficiale di Lichess/Chess.com.
+                      The accuracy % is an estimate based on average centipawn
+                      loss, not the official Lichess/Chess.com standard.
                     </p>
                   </CardContent>
                 </Card>
@@ -381,7 +381,7 @@ function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
     <div className="space-y-2 rounded-md border border-border bg-surface p-3">
       <div className="flex items-center gap-2">
         <span className="text-sm">
-          Mossa <span className="font-mono">{row.san}</span>
+          Move <span className="font-mono">{row.san}</span>
         </span>
         {meta && row.classification && (
           <span className="inline-flex items-center gap-1 font-medium">
@@ -393,7 +393,7 @@ function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
 
       {beforeLabel && afterLabel && (
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="text-text-muted">Valutazione</span>
+          <span className="text-text-muted">Evaluation</span>
           <span className="font-mono">{beforeLabel}</span>
           <span aria-hidden="true" className="text-text-muted">
             →
@@ -404,7 +404,7 @@ function MoveAnalysisDetails({ row }: { row: AnalysisRow }) {
 
       {showBest && (
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="text-text-muted">Mossa migliore</span>
+          <span className="text-text-muted">Best move</span>
           <span className="font-mono" style={{ color: "var(--eval-best)" }}>
             {row.best_move_san}
           </span>
@@ -423,14 +423,14 @@ function AnalysisLegend() {
   return (
     <details className="rounded-md border border-border bg-surface px-3 py-2 text-sm">
       <summary className="cursor-pointer font-medium text-text">
-        Come leggere l&apos;analisi
+        How to read the analysis
       </summary>
       <div className="mt-3 space-y-2.5">
         <p className="text-xs leading-snug text-text-muted">
-          La <span className="font-medium text-text">barra</span> e il numero in pedoni
-          dicono chi sta meglio: valori col <span className="font-mono">+</span> favoriscono
-          il Bianco, col <span className="font-mono">−</span> il Nero. Ogni mossa è
-          etichettata così:
+          The <span className="font-medium text-text">bar</span> and the number in pawns
+          tell you who&apos;s better: values with <span className="font-mono">+</span> favor
+          White, with <span className="font-mono">−</span> Black. Each move is
+          labeled like this:
         </p>
         <ul className="space-y-1.5">
           {CLASSIFICATION_ORDER.map((k) => {
@@ -453,19 +453,19 @@ function AnalysisLegend() {
 
 function SummaryTable({ white, black }: { white: SideSummary; black: SideSummary }) {
   const rows: { label: string; w: string | number; b: string | number }[] = [
-    { label: "Accuratezza", w: `${white.accuracy}%`, b: `${black.accuracy}%` },
-    { label: "Imprecisioni", w: white.inaccuracy, b: black.inaccuracy },
-    { label: "Errori", w: white.mistake, b: black.mistake },
-    { label: "Mosse mancate", w: white.miss, b: black.miss },
-    { label: "Errori gravi", w: white.blunder, b: black.blunder },
+    { label: "Accuracy", w: `${white.accuracy}%`, b: `${black.accuracy}%` },
+    { label: "Inaccuracies", w: white.inaccuracy, b: black.inaccuracy },
+    { label: "Mistakes", w: white.mistake, b: black.mistake },
+    { label: "Missed moves", w: white.miss, b: black.miss },
+    { label: "Blunders", w: white.blunder, b: black.blunder },
   ];
   return (
     <table className="w-full text-sm">
       <thead>
         <tr className="text-text-muted">
           <th className="text-left font-normal" />
-          <th className="px-2 py-1 text-right font-normal">Bianco</th>
-          <th className="px-2 py-1 text-right font-normal">Nero</th>
+          <th className="px-2 py-1 text-right font-normal">White</th>
+          <th className="px-2 py-1 text-right font-normal">Black</th>
         </tr>
       </thead>
       <tbody>

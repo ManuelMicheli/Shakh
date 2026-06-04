@@ -57,7 +57,7 @@ export async function recordTrapAttempt(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sessione scaduta. Accedi di nuovo." };
+  if (!user) return { ok: false, error: "Session expired. Please sign in again." };
 
   const { data: prev } = await supabase
     .from("user_trap_progress")

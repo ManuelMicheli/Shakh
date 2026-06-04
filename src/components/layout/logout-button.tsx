@@ -24,7 +24,7 @@ export function LogoutButton() {
       size="icon"
       onClick={logout}
       disabled={loading}
-      aria-label="Esci"
+      aria-label="Sign out"
     >
       <LogOut className="h-4 w-4" />
     </Button>

@@ -29,7 +29,7 @@ export function LegalShell({
           href="/login"
           className="text-sm text-text-muted hover:text-text"
         >
-          Accedi
+          Sign in
         </Link>
       </header>
 
@@ -37,7 +37,7 @@ export function LegalShell({
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           {title}
         </h1>
-        <p className="mt-2 text-sm text-text-muted">Ultimo aggiornamento: {updated}</p>
+        <p className="mt-2 text-sm text-text-muted">Last updated: {updated}</p>
         <div className="mt-8 space-y-6 text-sm leading-relaxed text-text [&_h2]:font-display [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-text [&_h2]:mt-2 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5 [&_a]:underline [&_a]:underline-offset-2 [&_p]:text-text-muted [&_li]:text-text-muted">
           {children}
         </div>

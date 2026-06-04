@@ -183,7 +183,7 @@ export function AnalysisJobProvider({ children }: { children: React.ReactNode })
         if (!res.ok) {
           setJob((j) => (j ? { ...j, status: "error", error: res.error } : j));
           toast({
-            title: "Salvataggio non riuscito",
+            title: "Save failed",
             description: res.error,
             variant: "error",
           });
@@ -191,7 +191,7 @@ export function AnalysisJobProvider({ children }: { children: React.ReactNode })
         }
         setJob((j) => (j ? { ...j, status: "done" } : j));
         toast({
-          title: "Analisi completata",
+          title: "Analysis complete",
           description: p.title,
           variant: "success",
         });
@@ -200,9 +200,9 @@ export function AnalysisJobProvider({ children }: { children: React.ReactNode })
         const msg =
           e instanceof InvalidPgnError || e instanceof EmptyGameError
             ? e.message
-            : "Errore durante l'analisi.";
+            : "Error during analysis.";
         setJob((j) => (j ? { ...j, status: "error", error: msg } : j));
-        toast({ title: "Analisi non riuscita", description: msg, variant: "error" });
+        toast({ title: "Analysis failed", description: msg, variant: "error" });
       } finally {
         currentRef.current = null;
         persist();

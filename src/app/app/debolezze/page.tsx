@@ -7,7 +7,7 @@ import { loadWeaknesses, MIN_ANALYZED_GAMES, type WeaknessPattern } from "@/lib/
 import { AnalyzePendingButton } from "@/components/analysis/AnalyzePendingButton";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 
-export const metadata = { title: "Punti deboli — Shakh" };
+export const metadata = { title: "Weaknesses — Shakh" };
 
 export default async function DebolezzePage() {
   const supabase = await createClient();
@@ -26,15 +26,15 @@ export default async function DebolezzePage() {
   return (
     <div className="space-y-8">
       <MobilePageHeader
-        eyebrow="Pattern ricorrenti"
-        title="Punti deboli"
-        desc="Le perdite che si ripetono, raggruppate e ordinate per gravità."
+        eyebrow="Recurring patterns"
+        title="Weaknesses"
+        desc="The losses that repeat, grouped and sorted by severity."
       />
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Punti deboli</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-tight">Weaknesses</h1>
         <p className="mt-2 max-w-2xl text-text-muted">
-          Non i singoli errori, ma le perdite che si <em>ripetono</em> fra le tue partite.
-          Il motore le raggruppa, le ordina per gravità e ti indica dove allenarti.
+          Not single mistakes, but the losses that <em>repeat</em> across your games.
+          The engine groups them, sorts them by severity, and points you to where to train.
         </p>
       </div>
 
@@ -67,14 +67,14 @@ function PatternCard({ pattern }: { pattern: WeaknessPattern }) {
         <SeverityBar value={pattern.severity} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-muted">
-            <span>Esempi:</span>
+            <span>Examples:</span>
             {pattern.examples.map((ex, i) => (
               <Link
                 key={`${ex.gameId}-${ex.ply}`}
                 href={`/app/partite/${ex.gameId}`}
                 className="font-mono underline-offset-2 hover:underline"
               >
-                partita {i + 1} (mossa {Math.ceil(ex.ply / 2)})
+                game {i + 1} (move {Math.ceil(ex.ply / 2)})
               </Link>
             ))}
           </div>
@@ -92,7 +92,7 @@ function SeverityBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs uppercase tracking-wide text-text-muted">Gravità</span>
+      <span className="text-xs uppercase tracking-wide text-text-muted">Severity</span>
       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
         <div className="h-full rounded-full bg-text" style={{ width: `${pct}%` }} />
       </div>
@@ -105,10 +105,10 @@ function EmptyState({ analyzed, pending }: { analyzed: number; pending: number }
     <Card>
       <CardContent className="space-y-3 py-6 text-center">
         <p className="text-text-muted">
-          Servono almeno {MIN_ANALYZED_GAMES} partite analizzate per individuare pattern
-          affidabili. Ne hai {analyzed}
+          You need at least {MIN_ANALYZED_GAMES} analyzed games to detect reliable
+          patterns. You have {analyzed}
           {pending > 0
-            ? `, ma ${pending} importate sono ancora in attesa di analisi.`
+            ? `, but ${pending} imported are still waiting to be analyzed.`
             : "."}
         </p>
         {pending > 0 ? (
@@ -118,12 +118,12 @@ function EmptyState({ analyzed, pending }: { analyzed: number; pending: number }
               href="/app/partite"
               className="text-xs text-text-muted underline-offset-2 hover:underline"
             >
-              Gestisci tutte le partite
+              Manage all games
             </Link>
           </div>
         ) : (
           <Link href="/app/partite">
-            <Button>Importa e analizza partite</Button>
+            <Button>Import and analyze games</Button>
           </Link>
         )}
       </CardContent>
@@ -135,8 +135,8 @@ function NoPatterns() {
   return (
     <Card>
       <CardContent className="py-6 text-center text-text-muted">
-        Nessuna debolezza ricorrente evidente nelle partite recenti. Continua così —
-        analizza altre partite per affinare il quadro.
+        No recurring weaknesses stand out in your recent games. Keep it up —
+        analyze more games to sharpen the picture.
       </CardContent>
     </Card>
   );

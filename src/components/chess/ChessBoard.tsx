@@ -76,10 +76,10 @@ function glyphCorner(square: Square, orientation: BoardOrientation): { left: num
 }
 
 const PROMOTION_PIECES: { role: PieceSymbol; label: string }[] = [
-  { role: "q", label: "Donna" },
-  { role: "r", label: "Torre" },
-  { role: "b", label: "Alfiere" },
-  { role: "n", label: "Cavallo" },
+  { role: "q", label: "Queen" },
+  { role: "r", label: "Rook" },
+  { role: "b", label: "Bishop" },
+  { role: "n", label: "Knight" },
 ];
 
 const GLYPHS: Record<"white" | "black", Record<PieceSymbol, string>> = {
@@ -318,7 +318,7 @@ export function ChessBoard({
           className="absolute inset-0 z-20 flex items-center justify-center bg-bg/70 backdrop-blur-sm"
           onClick={cancelPromotion}
           role="dialog"
-          aria-label="Scegli il pezzo di promozione"
+          aria-label="Choose the promotion piece"
         >
           <div
             className="flex gap-2 rounded-lg border border-border bg-surface p-2 shadow-xl"

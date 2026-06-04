@@ -31,7 +31,7 @@ export default async function DashboardPage() {
       onboarding_completed: boolean;
     }>();
 
-  const name = profile?.display_name ?? profile?.username ?? "giocatore";
+  const name = profile?.display_name ?? profile?.username ?? "player";
 
   // Primo accesso: il diagnostico non è ancora stato fatto. Porta l'utente nel
   // flusso di benvenuto (presentazione + collegamento account + mini-test).
@@ -74,21 +74,21 @@ export default async function DashboardPage() {
         {assignments.length > 0 && <StudentAssignments items={assignments} />}
         <Card>
           <CardHeader>
-            <CardTitle>Inizia a raccogliere dati</CardTitle>
+            <CardTitle>Start collecting data</CardTitle>
             <CardDescription>
-              Risolvi qualche puzzle o importa una partita: la dashboard si
-              popolerà di progressi, grafici e consigli su misura.
+              Solve a few puzzles or import a game: the dashboard will fill up
+              with progress, charts, and tailored advice.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             <Link href="/app/tattiche" className={PRIMARY_LINK}>
-              Allenati sui puzzle
+              Train with puzzles
             </Link>
             <Link
               href="/app/partite"
               className="inline-flex h-9 items-center rounded-md border border-border px-4 text-sm font-medium text-text hover:bg-surface-2"
             >
-              Importa una partita
+              Import a game
             </Link>
           </CardContent>
         </Card>
@@ -122,12 +122,12 @@ function PendingAnalysisNudge({ pending }: { pending: number }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Analizza le partite importate</CardTitle>
+        <CardTitle>Analyze your imported games</CardTitle>
         <CardDescription>
-          Hai {pending}{" "}
-          {pending === 1 ? "partita importata" : "partite importate"} ancora da
-          analizzare. Analizzale per sbloccare punti deboli, accuratezza e i
-          consigli del coach.
+          You have {pending}{" "}
+          {pending === 1 ? "imported game" : "imported games"} still to
+          analyze. Analyze them to unlock weaknesses, accuracy, and the coach&apos;s
+          advice.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -140,8 +140,8 @@ function PendingAnalysisNudge({ pending }: { pending: number }) {
 function Header({ name }: { name: string }) {
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Ciao, {name}</h1>
-      <p className="mt-2 text-text-muted">Il quadro dei tuoi progressi.</p>
+      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">Hi, {name}</h1>
+      <p className="mt-2 text-text-muted">An overview of your progress.</p>
     </div>
   );
 }

@@ -25,13 +25,13 @@ export default async function TrapTrainPage({
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-semibold tracking-tight">
-        {mode === "tendi" ? "Tendi" : "Evita"} · {trap.name}
+        {mode === "tendi" ? "Set" : "Avoid"} · {trap.name}
       </h1>
 
       <p className="text-text-muted">
         {mode === "tendi"
-          ? "L'avversario gioca l'esca: trova la punizione (il sacrificio o la tattica)."
-          : "Sei dalla parte di chi rischia: trova la mossa sicura che non abbocca."}
+          ? "The opponent plays the lure: find the punishment (the sacrifice or the tactic)."
+          : "You're the one at risk: find the safe move that doesn't take the bait."}
       </p>
 
       <TrapTrainer
