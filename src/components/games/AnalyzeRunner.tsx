@@ -44,11 +44,13 @@ export function AnalyzeRunner({
   // è già attivo per questa o altre partite.
   const autoStarted = useRef(false);
   useEffect(() => {
-    if (autoStart && !autoStarted.current && !job) {
+    // Parte se richiesto e non c'è già un job IN CORSO (di questa o altra
+    // partita). Un job concluso/in errore non deve bloccare l'auto-avvio.
+    if (autoStart && !autoStarted.current && !running && !otherRunning && !thisJob) {
       autoStarted.current = true;
       start(gameId, pgn, title ?? "Game", { depth });
     }
-  }, [autoStart, job, gameId, pgn, title, depth, start]);
+  }, [autoStart, running, otherRunning, thisJob, gameId, pgn, title, depth, start]);
 
   return (
     <div className="space-y-4 rounded-md border border-border bg-surface p-5">

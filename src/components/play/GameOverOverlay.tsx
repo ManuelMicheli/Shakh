@@ -191,6 +191,15 @@ function BreakdownBlock({
                 />
                 <span className="font-mono font-semibold tabular-nums text-text">{n}</span>
                 <span className="text-text-muted">{meta.label}</span>
+                {meta.glyph && (
+                  <span
+                    className="ml-auto font-mono text-base font-bold leading-none"
+                    style={{ color: meta.color }}
+                    aria-hidden
+                  >
+                    {meta.glyph}
+                  </span>
+                )}
               </li>
             );
           })}
