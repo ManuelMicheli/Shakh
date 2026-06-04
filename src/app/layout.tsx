@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
@@ -12,6 +12,14 @@ import {
 import { LenisProvider } from "@/components/providers/lenis-provider";
 import { ToastProvider } from "@/components/ui/toast";
 import { ConsentProvider } from "@/components/consent/ConsentProvider";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { PWA_BG } from "@/lib/pwa/render-icon";
+
+export const viewport: Viewport = {
+  themeColor: PWA_BG,
+  // L'app installata copre la status bar / notch: layout a tutto schermo.
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -21,6 +29,13 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
+  // PWA: <link rel="manifest"> e meta apple iniettati da Next.
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: siteConfig.name,
+    statusBarStyle: "black-translucent",
+  },
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
@@ -64,6 +79,7 @@ export default async function RootLayout({
             <ToastProvider>
               <ConsentProvider>
                 <LenisProvider>{children}</LenisProvider>
+                <ServiceWorkerRegister />
               </ConsentProvider>
             </ToastProvider>
           </ThemeProvider>
