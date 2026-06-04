@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { CLASSIFICATION_META } from "@/lib/analysis/labels";
+import { MoveBadge } from "@/components/analysis/MoveBadge";
 import type { BreakdownGroup } from "@/lib/analysis/useGameBreakdown";
 import { Button } from "@/components/ui/button";
 
@@ -184,22 +185,9 @@ function BreakdownBlock({
             const meta = CLASSIFICATION_META[c];
             return (
               <li key={c} className="flex items-center gap-2 text-sm">
-                <span
-                  className="h-2 w-2 shrink-0 rounded-full"
-                  style={{ backgroundColor: meta.color }}
-                  aria-hidden
-                />
+                <MoveBadge classification={c} size={20} />
                 <span className="font-mono font-semibold tabular-nums text-text">{n}</span>
                 <span className="text-text-muted">{meta.label}</span>
-                {meta.glyph && (
-                  <span
-                    className="ml-auto font-mono text-base font-bold leading-none"
-                    style={{ color: meta.color }}
-                    aria-hidden
-                  >
-                    {meta.glyph}
-                  </span>
-                )}
               </li>
             );
           })}

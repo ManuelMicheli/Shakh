@@ -111,7 +111,7 @@ export async function saveGameForReview(input: {
       black: input.black,
       result: input.result,
       eco_code: null,
-      user_color: input.userColor,
+      user_color: input.userColor === "w" ? "white" : "black",
       played_at: new Date().toISOString(),
       counts_for_profile: false,
     })
