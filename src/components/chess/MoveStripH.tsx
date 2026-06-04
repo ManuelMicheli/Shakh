@@ -37,15 +37,20 @@ export function MoveStripH({
   const pairCount = Math.ceil(history.length / 2);
 
   return (
+    // Scroller = blocco a larghezza vincolata al genitore (`w-full min-w-0`): la sua
+    // larghezza NON dipende dal contenuto, quindi non può crescere con le mosse né
+    // spostare la scacchiera. Il contenuto flex `w-max` interno tiene la larghezza
+    // naturale e scorre sotto (barra orizzontale), come richiesto.
     <div
       ref={containerRef}
-      className="flex min-w-0 max-w-full gap-1 overflow-x-auto overscroll-x-contain rounded-md border border-border bg-surface px-2 py-1.5 [touch-action:pan-x]"
+      className="w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain rounded-md border border-border bg-surface [touch-action:pan-x]"
     >
-      {Array.from({ length: pairCount }).map((_, p) => {
-        const wi = p * 2;
-        const bi = p * 2 + 1;
-        return (
-          <div key={p} className="flex shrink-0 items-center gap-1">
+      <div className="flex w-max gap-1 px-2 py-1.5">
+        {Array.from({ length: pairCount }).map((_, p) => {
+          const wi = p * 2;
+          const bi = p * 2 + 1;
+          return (
+            <div key={p} className="flex shrink-0 items-center gap-1">
             <span className="select-none font-mono text-[11px] tabular-nums text-text-muted/60">
               {p + 1}.
             </span>
@@ -74,8 +79,9 @@ export function MoveStripH({
               </button>
             )}
           </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
