@@ -3,11 +3,18 @@
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import type { Square, PieceSymbol } from "chess.js";
+import {
+  ChevronsLeft,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsRight,
+} from "lucide-react";
 import { useChessGame } from "@/lib/chess/useChessGame";
 import { engine } from "@/lib/engine/engine";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmResignButton } from "@/components/play/ConfirmResignButton";
+import { MoveStripH } from "@/components/chess/MoveStripH";
 import { cn } from "@/lib/utils";
 import { chooseEngineMove, strengthFor, STYLE_LABEL, type Style } from "@/lib/sparring/opponent";
 
@@ -74,6 +81,9 @@ export function SparringBoard() {
   // Mossa del motore quando tocca a lui.
   useEffect(() => {
     if (phase !== "play" || resigned || game.isGameOver) return;
+    // Solo a posizione corrente (live): se l'utente sta rivedendo mosse passate,
+    // il motore non deve muovere (troncherebbe la partita).
+    if (game.cursor < game.history.length - 1) return;
     if (game.turn !== engineColorChar) return;
 
     let cancelled = false;
@@ -104,6 +114,8 @@ export function SparringBoard() {
   const onUserMove = useCallback(
     (from: Square, to: Square, promotion?: PieceSymbol) => {
       if (thinking || game.turn !== userColor[0]) return;
+      // Si muove solo dalla posizione corrente (live), mai rivedendo il passato.
+      if (game.cursor < game.history.length - 1) return;
       game.move(from, to, promotion);
     },
     [thinking, game, userColor],
@@ -160,7 +172,9 @@ export function SparringBoard() {
   }
 
   // ---------- Play ----------
-  const canMove = !thinking && !resigned && !game.isGameOver && game.turn === userColor[0];
+  const atLive = game.cursor >= game.history.length - 1;
+  const canMove =
+    !thinking && !resigned && !game.isGameOver && game.turn === userColor[0] && atLive;
   const status = gameStatus(game, userColor, resigned);
 
   return (
@@ -169,13 +183,67 @@ export function SparringBoard() {
         <ChessBoard
           fen={game.fen}
           orientation={userColor}
-          mode="play"
+          mode={canMove ? "play" : "view"}
           movableColor={userColor}
           dests={canMove ? game.legalDests : new Map()}
           lastMove={game.lastMove}
           check={game.isCheck}
           onMove={onUserMove}
         />
+
+        {/* Mobile: striscia mosse orizzontale + controlli inizio/indietro/avanti/fine. */}
+        {game.history.length > 0 && (
+          <div className="lg:hidden">
+            <MoveStripH
+              history={game.history}
+              cursor={game.cursor}
+              onSelect={game.goTo}
+            />
+          </div>
+        )}
+        <div className="flex items-center gap-2 lg:hidden">
+          <Button
+            variant="secondary"
+            size="icon"
+            className="flex-1"
+            onClick={game.first}
+            disabled={game.cursor < 0}
+            aria-label="Prima mossa"
+          >
+            <ChevronsLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="flex-1"
+            onClick={game.prev}
+            disabled={game.cursor < 0}
+            aria-label="Mossa precedente"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="flex-1"
+            onClick={game.next}
+            disabled={atLive}
+            aria-label="Mossa successiva"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="flex-1"
+            onClick={game.last}
+            disabled={atLive}
+            aria-label="Ultima mossa"
+          >
+            <ChevronsRight className="h-5 w-5" />
+          </Button>
+        </div>
+
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm text-text-muted">
             {status ?? (thinking ? "L'avversario pensa…" : `Muovi tu (${userColor === "white" ? "Bianco" : "Nero"})`)}
@@ -201,7 +269,9 @@ export function SparringBoard() {
             className="w-full"
           />
         )}
-        <MoveList history={game.history} />
+        <div className="hidden lg:block">
+          <MoveList history={game.history} />
+        </div>
       </aside>
     </div>
   );

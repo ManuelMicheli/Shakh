@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BRAND_NAME } from "@/config/brand";
+import { BrandMark } from "./BrandMark";
 import { ConsentPreferencesButton } from "@/components/consent/ConsentPreferencesButton";
 
 /**
@@ -15,7 +16,8 @@ export async function SiteFooter() {
     <footer className="border-t border-border px-6 py-12 md:px-10">
       <div className="mx-auto flex max-w-5xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <div className="max-w-xs">
-          <span className="font-display text-lg font-semibold tracking-tight">
+          <span className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
+            <BrandMark className="h-5 w-5 shrink-0" />
             {BRAND_NAME}
           </span>
           <p className="mt-2 text-sm text-text-muted">{t("tagline")}</p>

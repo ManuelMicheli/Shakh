@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { DrawShape } from "chessground/draw";
 import { useChessGame } from "@/lib/chess/useChessGame";
+import { MoveStripH } from "@/components/chess/MoveStripH";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -55,6 +56,9 @@ export function GuidedReplay({ title, intro, pgn, comments }: GuidedReplayProps)
           check={game.isCheck}
           shapes={shapes}
         />
+        {total > 0 && (
+          <MoveStripH history={game.history} cursor={cursor} onSelect={game.goTo} />
+        )}
         <div className="flex items-center justify-between gap-3">
           <Button variant="secondary" size="sm" onClick={game.prev} disabled={atStart}>
             ← Indietro

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useChessGame } from "@/lib/chess/useChessGame";
 import { MoveList } from "@/components/chess/MoveList";
+import { MoveStripH } from "@/components/chess/MoveStripH";
 import { BoardControls } from "@/components/chess/BoardControls";
 import { EvalBar } from "@/components/chess/EvalBar";
 import { EvalGraph, type EvalPoint } from "@/components/chess/EvalGraph";
@@ -170,8 +171,9 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
       <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] 2xl:grid-cols-[auto_22rem] 2xl:justify-center">
         {/* Scacchiera + controlli: si auto-dimensiona per stare in pagina. */}
         <div className="board-sized analysis-board flex min-h-0 flex-col gap-2">
-          {/* Controlli avanti/indietro in ALTO, sopra la scacchiera. */}
-          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 xl:max-w-[820px] 2xl:max-w-[980px]">
+          {/* Desktop: controlli avanti/indietro in ALTO, sopra la scacchiera.
+              Su mobile vanno IN BASSO (vedi sotto), con la striscia mosse. */}
+          <div className="mx-auto hidden w-full max-w-3xl items-center justify-between gap-3 lg:flex xl:max-w-[820px] 2xl:max-w-[980px]">
             <BoardControls
               onFirst={chess.first}
               onPrev={chess.prev}
@@ -214,6 +216,27 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
 
           {/* Nome del giocatore in basso (lato dell'orientamento). */}
           <PlayerTag name={nameOf(bottomColor)} color={bottomColor} indented={Boolean(shownEval)} />
+
+          {/* Mobile: striscia mosse orizzontale + controlli inizio/indietro/avanti/fine. */}
+          <div className="space-y-2 lg:hidden">
+            {chess.history.length > 0 && (
+              <MoveStripH
+                history={chess.history}
+                cursor={chess.cursor}
+                onSelect={chess.goTo}
+              />
+            )}
+            <BoardControls
+              onFirst={chess.first}
+              onPrev={chess.prev}
+              onNext={chess.next}
+              onLast={chess.last}
+              onFlip={() => setOrientation((o) => (o === "white" ? "black" : "white"))}
+              atStart={chess.cursor < 0}
+              atEnd={chess.cursor >= chess.history.length - 1}
+              keyboardTarget={boardWrapRef}
+            />
+          </div>
         </div>
 
         {/* Pannello laterale a schede: tutto raggiungibile senza scrollare la pagina. */}

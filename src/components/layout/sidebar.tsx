@@ -13,6 +13,7 @@ import {
 } from "./nav";
 import { Badge } from "@/components/ui/badge";
 import { BRAND_NAME } from "@/config/brand";
+import { BrandMark } from "./BrandMark";
 import { cn } from "@/lib/utils";
 
 /**
@@ -149,10 +150,11 @@ export function Sidebar({
       >
         <Link
           href="/app"
-          className="font-display text-xl font-semibold tracking-tight"
+          className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight"
           aria-label={BRAND_NAME}
         >
-          {collapsed ? BRAND_NAME.charAt(0) : BRAND_NAME}
+          <BrandMark className="h-5 w-5 shrink-0" />
+          {!collapsed && BRAND_NAME}
         </Link>
       </div>
 

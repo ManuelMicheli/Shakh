@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { BRAND_NAME } from "@/config/brand";
+import { BrandMark } from "@/components/layout/BrandMark";
 
 const reveal = {
   hidden: { opacity: 0, y: 24 },
@@ -50,7 +51,8 @@ export function Landing() {
   return (
     <>
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border/60 bg-bg/80 px-6 backdrop-blur md:px-10">
-        <span className="font-display text-xl font-semibold tracking-tight">
+        <span className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight">
+          <BrandMark className="h-5 w-5 shrink-0" />
           {BRAND_NAME}
         </span>
         <div className="flex items-center gap-2">
