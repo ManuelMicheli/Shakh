@@ -27,15 +27,37 @@ export interface Strength {
   depth: number;
   /** Probabilità di giocare una mossa non ottimale (fra le candidate ragionevoli). */
   weakProb: number;
+  /**
+   * Probabilità di giocare una mossa legale completamente a caso (papera).
+   * Serve sotto ~800 Elo: le multiPV restano fra le top mosse, troppo forti,
+   * quindi la debolezza vera arriva da mosse casuali occasionali.
+   */
+  blunderProb: number;
 }
 
 /** Mappa un Elo bersaglio a profondità + rumore. Più basso → più debole e impreciso. */
 export function strengthFor(targetElo: number): Strength {
-  if (targetElo < 1000) return { depth: 4, weakProb: 0.5 };
-  if (targetElo < 1400) return { depth: 6, weakProb: 0.34 };
-  if (targetElo < 1800) return { depth: 8, weakProb: 0.2 };
-  if (targetElo < 2200) return { depth: 10, weakProb: 0.08 };
-  return { depth: 12, weakProb: 0.02 };
+  if (targetElo < 500) return { depth: 2, weakProb: 0.7, blunderProb: 0.45 };
+  if (targetElo < 700) return { depth: 3, weakProb: 0.6, blunderProb: 0.28 };
+  if (targetElo < 900) return { depth: 4, weakProb: 0.55, blunderProb: 0.15 };
+  if (targetElo < 1100) return { depth: 5, weakProb: 0.45, blunderProb: 0.06 };
+  if (targetElo < 1400) return { depth: 6, weakProb: 0.34, blunderProb: 0.02 };
+  if (targetElo < 1800) return { depth: 8, weakProb: 0.2, blunderProb: 0 };
+  if (targetElo < 2200) return { depth: 10, weakProb: 0.08, blunderProb: 0 };
+  return { depth: 12, weakProb: 0.02, blunderProb: 0 };
+}
+
+/** Una mossa legale a caso (UCI) nella posizione. Null se nessuna. */
+function randomLegalMove(fen: string, rng: () => number): string | null {
+  try {
+    const c = new Chess(fen);
+    const moves = c.moves({ verbose: true });
+    if (moves.length === 0) return null;
+    const m = moves[Math.floor(rng() * moves.length)];
+    return `${m.from}${m.to}${m.promotion ?? ""}`;
+  } catch {
+    return null;
+  }
 }
 
 /** Punteggio in centipawn dal punto di vista del motore (matto = valore grande con segno). */
@@ -73,6 +95,12 @@ export function chooseEngineMove(
   const valid = lines.filter((l) => l.pv.length > 0).sort((a, b) => a.multipv - b.multipv);
   if (valid.length === 0) return null;
   const best = valid[0];
+
+  // Papera: ogni tanto (bot deboli) gioca una mossa legale a caso, anche pessima.
+  if (strength.blunderProb > 0 && rng() < strength.blunderProb) {
+    const r = randomLegalMove(fen, rng);
+    if (r) return r;
+  }
 
   // Cap di forza: a volte gioca una candidata peggiore (ma comunque fra le top multiPV).
   if (valid.length > 1 && rng() < strength.weakProb) {
