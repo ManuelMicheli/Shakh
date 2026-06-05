@@ -171,49 +171,7 @@ function RatingCard({
           </div>
         )}
       </div>
-
-      {/* Colonna destra: sparkline dello storico, più ampia. */}
-      {series.length >= 2 && (
-        <div className="relative hidden w-[18rem] shrink-0 lg:block">
-          <Sparkline points={series} />
-        </div>
-      )}
     </div>
-  );
-}
-
-/** Sparkline monocromatica dalla serie reale del rating tattico. Decorativa. */
-function Sparkline({ points }: { points: number[] }) {
-  const w = 240;
-  const h = 56;
-  const min = Math.min(...points);
-  const max = Math.max(...points);
-  const span = max - min || 1;
-  const step = w / (points.length - 1);
-  const xy = points.map((v, i) => [i * step, h - ((v - min) / span) * (h - 6) - 3]);
-  const line = xy.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
-  const area = `0,${h} ${line} ${w},${h}`;
-  const [lx, ly] = xy[xy.length - 1];
-
-  return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      className="h-14 w-full text-text"
-      preserveAspectRatio="none"
-      aria-hidden
-    >
-      <polygon points={area} fill="currentColor" opacity={0.06} />
-      <polyline
-        points={line}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.5}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
-      />
-      <circle cx={lx} cy={ly} r={3} fill="currentColor" />
-    </svg>
   );
 }
 
