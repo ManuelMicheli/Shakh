@@ -31,6 +31,30 @@ interface Pair {
   black?: { san: string; index: number };
 }
 
+/**
+ * Porta `el` in vista scorrendo SOLO il primo antenato realmente scrollabile in
+ * verticale, fermandosi lì: non risale fino al documento, quindi la pagina non si
+ * sposta (fix mobile: la lista mosse sotto la board non trascina più lo schermo).
+ */
+function scrollNearestParentIntoView(el: HTMLElement | null) {
+  if (!el) return;
+  let parent = el.parentElement;
+  while (parent) {
+    const overflowY = getComputedStyle(parent).overflowY;
+    const scrollable =
+      /(auto|scroll|overlay)/.test(overflowY) &&
+      parent.scrollHeight > parent.clientHeight;
+    if (scrollable) {
+      const er = el.getBoundingClientRect();
+      const pr = parent.getBoundingClientRect();
+      if (er.top < pr.top) parent.scrollTop += er.top - pr.top;
+      else if (er.bottom > pr.bottom) parent.scrollTop += er.bottom - pr.bottom;
+      return;
+    }
+    parent = parent.parentElement;
+  }
+}
+
 /** Raggruppa la storia lineare in coppie numerate (1. e4 e5  2. Nf3 ...). */
 function toPairs(history: HistoryMove[]): Pair[] {
   const pairs: Pair[] = [];
@@ -56,8 +80,12 @@ export function MoveList({
   const activeRef = useRef<HTMLButtonElement>(null);
 
   // Scroll automatico per tenere visibile la mossa corrente.
+  // `scrollIntoView` risalirebbe ogni antenato scrollabile FINO al viewport: su
+  // mobile la lista verticale sta sotto la board, così a ogni mossa la pagina
+  // "scendeva". Scorriamo SOLO il contenitore scrollabile più vicino (come
+  // MoveStripH per la striscia orizzontale), senza mai toccare la finestra.
   useEffect(() => {
-    activeRef.current?.scrollIntoView({ block: "nearest" });
+    scrollNearestParentIntoView(activeRef.current);
   }, [cursor]);
 
   if (history.length === 0) {
