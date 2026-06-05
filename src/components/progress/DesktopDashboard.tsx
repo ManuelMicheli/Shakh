@@ -56,7 +56,7 @@ export async function DesktopDashboard({ name, data, step }: DesktopDashboardPro
 
   return (
     <div className="hidden md:block">
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="space-y-8">
         {/* Masthead editoriale: data + saluto. Nessun glifo qui (solo nella card). */}
         <div className="relative">
           <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted first-letter:uppercase">
@@ -224,9 +224,9 @@ function DimensionRows({ data, t }: { data: DashboardData; t: T }) {
 
   if (breakdown.length > 0) {
     return (
-      <div className="divide-y divide-border border-y border-border">
+      <div className="grid border-t border-border xl:grid-cols-2 xl:gap-x-12">
         {breakdown.map((b) => (
-          <div key={b.domain} className="flex items-baseline justify-between gap-4 py-4">
+          <div key={b.domain} className="flex items-baseline justify-between gap-4 border-b border-border py-4">
             <div className="min-w-0">
               <p className="text-sm">{b.label}</p>
               <p className="mt-0.5 font-mono text-[11px] text-text-muted">
@@ -249,9 +249,9 @@ function DimensionRows({ data, t }: { data: DashboardData; t: T }) {
   // Fallback: competenze per area come percentuale (solo aree con dati).
   const areas = data.competence.filter((c) => c.score != null);
   return (
-    <div className="divide-y divide-border border-y border-border">
+    <div className="grid border-t border-border xl:grid-cols-2 xl:gap-x-12">
       {areas.map((c) => (
-        <div key={c.area} className="flex items-baseline justify-between gap-4 py-4">
+        <div key={c.area} className="flex items-baseline justify-between gap-4 border-b border-border py-4">
           <div className="min-w-0">
             <p className="text-sm">{c.label}</p>
             <p className="mt-0.5 font-mono text-[11px] text-text-muted">

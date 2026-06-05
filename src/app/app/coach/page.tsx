@@ -163,7 +163,7 @@ export default async function CoachPage() {
 
           {/* ── DESKTOP: redesign Variante B · Conversation ── */}
           <div className="hidden md:block">
-            <div className="mx-auto max-w-6xl space-y-6">
+            <div className="space-y-6">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
                   {t("coach.eyebrow")}

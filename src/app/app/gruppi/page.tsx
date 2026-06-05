@@ -133,7 +133,7 @@ export default async function GruppiPage() {
       {/* Desktop: redesign approvato — masthead + due colonne (Roster).     */}
       {/* ---------------------------------------------------------------- */}
       <div className="hidden md:block">
-        <div className="mx-auto max-w-6xl space-y-8">
+        <div className="space-y-8">
           {/* Masthead editoriale */}
           <div>
             <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
@@ -146,10 +146,10 @@ export default async function GruppiPage() {
           </div>
 
           <div className="grid grid-cols-[1fr_20rem] gap-8">
-            {/* Colonna sinistra — i tuoi gruppi come card */}
-            <div className="space-y-3">
+            {/* Colonna sinistra — i tuoi gruppi come card (2 colonne larghe) */}
+            <div className="grid gap-3 xl:grid-cols-2">
               {groups.length === 0 ? (
-                <div className="rounded-2xl border border-border bg-surface p-8 text-center">
+                <div className="rounded-2xl border border-border bg-surface p-8 text-center xl:col-span-2">
                   <span className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-surface-2">
                     <Users className="h-5 w-5 text-text-muted" />
                   </span>

@@ -170,10 +170,10 @@ export default async function TeoriaPage() {
                   </Link>
                 </div>
 
-                {/* DESKTOP: lezioni come righe editoriali numerate. */}
-                <ol className="hidden divide-y divide-border border-y border-border md:block">
+                {/* DESKTOP: lezioni numerate; a piena larghezza su due colonne. */}
+                <ol className="hidden border-t border-border md:grid md:grid-cols-1 xl:grid-cols-2 xl:gap-x-12">
                   {items.map((l, i) => (
-                    <li key={l.slug}>
+                    <li key={l.slug} className="border-b border-border">
                       <Link
                         href={`/app/teoria/${l.slug}`}
                         className="group flex w-full items-baseline gap-4 py-4 text-left"

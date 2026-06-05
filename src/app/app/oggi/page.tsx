@@ -101,7 +101,7 @@ export default async function OggiPage() {
 
       {/* ===== DESKTOP: layout Session (pannello sessione + piano) ===== */}
       <div className="hidden md:block">
-        <div className="mx-auto grid max-w-6xl grid-cols-[20rem_1fr] gap-8">
+        <div className="grid grid-cols-[20rem_1fr] gap-8">
           {/* Pannello sessione */}
           <div className="space-y-6">
             <div>
@@ -143,14 +143,16 @@ export default async function OggiPage() {
             )}
           </div>
 
-          {/* Blocchi */}
+          {/* Blocchi: a piena larghezza si dispongono su due colonne. */}
           <div className="space-y-3">
             <p className="text-xs font-medium uppercase tracking-wider text-text-muted">
               The plan
             </p>
-            {plan.blocks.map((b) => (
-              <BlockRowDesktop key={b.kind} block={b} />
-            ))}
+            <div className="grid gap-3 xl:grid-cols-2">
+              {plan.blocks.map((b) => (
+                <BlockRowDesktop key={b.kind} block={b} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -247,8 +247,8 @@ export function SkillTree({
               ))}
             </div>
 
-            {/* DESKTOP: griglia di schede Roadmap. */}
-            <div className="hidden gap-3 md:grid md:grid-cols-2">
+            {/* DESKTOP: griglia di schede Roadmap (3 colonne a piena larghezza). */}
+            <div className="hidden gap-3 md:grid md:grid-cols-2 xl:grid-cols-3">
               {ofLevel.map((n) => (
                 <NodeCardDesktop key={n.id} node={n} />
               ))}
