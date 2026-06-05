@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Clock, ChevronRight, Globe, Swords } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -16,6 +17,12 @@ import type { FriendGameRow } from "@/lib/play/types";
 import { HotseatGame } from "./HotseatGame";
 import { TimeControlPicker } from "./TimeControlPicker";
 import { createOnlineGame } from "@/app/app/gioca/actions";
+
+// Stessa scacchiera reale (chessground) usata in tutte le altre sezioni.
+const ChessBoard = dynamic(
+  () => import("@/components/chess/ChessBoard").then((m) => m.ChessBoard),
+  { ssr: false },
+);
 
 type ColorChoice = "w" | "b" | "random";
 
@@ -103,9 +110,9 @@ function PlayHubTable({
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_24rem] gap-8">
-      {/* Scacchiera (anteprima statica, posizione iniziale) */}
-      <div className="mx-auto w-full max-w-lg">
-        <MiniBoard />
+      {/* Scacchiera reale (anteprima posizione iniziale, sola lettura) */}
+      <div className="board-sized mx-auto w-full">
+        <ChessBoard mode="view" />
         <p className="mt-3 text-center font-mono text-[11px] uppercase tracking-wide text-text-muted">
           {t("status.toMove", { side: t("color.white") })}
         </p>
@@ -157,55 +164,6 @@ function PlayModeTabs({
       >
         <Swords className="h-4 w-4" /> {t("hub.tabLocal")}
       </button>
-    </div>
-  );
-}
-
-/* Scacchiera decorativa statica (posizione iniziale), glifi unicode mono. */
-const START_RANKS = [
-  "rnbqkbnr",
-  "pppppppp",
-  "........",
-  "........",
-  "........",
-  "........",
-  "PPPPPPPP",
-  "RNBQKBNR",
-];
-const PIECE_GLYPH: Record<string, string> = {
-  r: "♜", n: "♞", b: "♝", q: "♛", k: "♚", p: "♟",
-  R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔", P: "♙",
-};
-
-function MiniBoard({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "grid aspect-square w-full grid-cols-8 overflow-hidden rounded-lg border border-border",
-        className,
-      )}
-    >
-      {START_RANKS.flatMap((rank, r) =>
-        rank.split("").map((ch, c) => {
-          const dark = (r + c) % 2 === 1;
-          const glyph = ch !== "." ? PIECE_GLYPH[ch] : null;
-          return (
-            <div
-              key={`${r}-${c}`}
-              className={cn(
-                "grid place-items-center",
-                dark ? "bg-surface-2" : "bg-surface",
-              )}
-            >
-              {glyph && (
-                <span className="font-display text-[clamp(0.9rem,2.4vw,1.8rem)] leading-none text-text">
-                  {glyph}
-                </span>
-              )}
-            </div>
-          );
-        }),
-      )}
     </div>
   );
 }
