@@ -30,16 +30,74 @@ export interface Division {
   min: number;
   /** Soglia massima inclusiva (Infinity per la più alta). */
   max: number;
+  /** Titolo onorifico conquistato raggiungendo la divisione (riconoscimento). */
+  title: string;
+  /** Riconoscimento/premio sbloccato in questa divisione (una riga, cosmetico). */
+  reward: string;
 }
 
 /** Divisioni dalla più bassa alla più alta. Bande contigue, niente buchi. */
 export const DIVISIONS: Division[] = [
-  { key: "pedone", tier: 0, name: "Pedone", glyph: "♙", min: 0, max: 999 },
-  { key: "cavallo", tier: 1, name: "Cavallo", glyph: "♘", min: 1000, max: 1299 },
-  { key: "alfiere", tier: 2, name: "Alfiere", glyph: "♗", min: 1300, max: 1599 },
-  { key: "torre", tier: 3, name: "Torre", glyph: "♖", min: 1600, max: 1899 },
-  { key: "donna", tier: 4, name: "Donna", glyph: "♕", min: 1900, max: 2199 },
-  { key: "re", tier: 5, name: "Re", glyph: "♔", min: 2200, max: Infinity },
+  {
+    key: "pedone",
+    tier: 0,
+    name: "Pedone",
+    glyph: "♙",
+    min: 0,
+    max: 999,
+    title: "Esordiente",
+    reward: "L'inizio del percorso: ogni partita conta.",
+  },
+  {
+    key: "cavallo",
+    tier: 1,
+    name: "Cavallo",
+    glyph: "♘",
+    min: 1000,
+    max: 1299,
+    title: "Combattente",
+    reward: "Primo distintivo e accesso al Campionato di divisione.",
+  },
+  {
+    key: "alfiere",
+    tier: 2,
+    name: "Alfiere",
+    glyph: "♗",
+    min: 1300,
+    max: 1599,
+    title: "Stratega",
+    reward: "Sigillo dell'Alfiere sul profilo.",
+  },
+  {
+    key: "torre",
+    tier: 3,
+    name: "Torre",
+    glyph: "♖",
+    min: 1600,
+    max: 1899,
+    title: "Veterano",
+    reward: "Riconoscimento da giocatore di club affermato.",
+  },
+  {
+    key: "donna",
+    tier: 4,
+    name: "Donna",
+    glyph: "♕",
+    min: 1900,
+    max: 2199,
+    title: "Maestro di Club",
+    reward: "Onorificenza della Donna: élite della Lega.",
+  },
+  {
+    key: "re",
+    tier: 5,
+    name: "Re",
+    glyph: "♔",
+    min: 2200,
+    max: Infinity,
+    title: "Campione",
+    reward: "La vetta: corona del Re e posto nell'albo d'oro.",
+  },
 ];
 
 const BY_KEY = new Map(DIVISIONS.map((d) => [d.key, d]));

@@ -48,7 +48,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <Ctx.Provider value={{ toast }}>
       {children}
       <div
-        className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-full max-w-sm flex-col gap-2"
+        className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-full max-w-[16rem] flex-col gap-2 sm:max-w-sm"
         role="region"
         aria-label={t("notifications")}
       >
@@ -58,15 +58,15 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             role="status"
             aria-live="polite"
             className={cn(
-              "pointer-events-auto rounded-md border bg-surface p-4 shadow-lg",
+              "pointer-events-auto rounded-md border bg-surface p-2.5 shadow-lg sm:p-4",
               t.variant === "success" && "border-eval-best",
               t.variant === "error" && "border-eval-blunder",
               t.variant === "default" && "border-border",
             )}
           >
-            <p className="text-sm font-medium text-text">{t.title}</p>
+            <p className="text-xs font-medium text-text sm:text-sm">{t.title}</p>
             {t.description && (
-              <p className="mt-1 text-sm text-text-muted">{t.description}</p>
+              <p className="mt-1 text-xs text-text-muted sm:text-sm">{t.description}</p>
             )}
           </div>
         ))}
