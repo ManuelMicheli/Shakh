@@ -689,6 +689,13 @@
       "tabLocal": "Stesso dispositivo",
       "tabOnline": "Online (in differita)"
     },
+    "quickMatch": {
+      "title": "Trova avversario",
+      "desc": "Vieni accoppiato con un giocatore di tutto il mondo. Scegli il tempo e via.",
+      "searching": "Ricerca di un avversario…",
+      "cancel": "Annulla",
+      "orPrivate": "oppure sfida un amico"
+    },
     "notFound": {
       "title": "Partita non trovata",
       "desc": "La partita non esiste, è già al completo, oppure non hai accesso.",
@@ -724,7 +731,8 @@
       "opening": "Apertura…",
       "analyzeGame": "Analizza partita",
       "viewBoard": "Rivedi la scacchiera",
-      "noMoves": "Nessuna mossa"
+      "noMoves": "Nessuna mossa",
+      "ratingShakh": "Rating Shakh"
     },
     "color": {
       "white": "Bianco",

@@ -40,6 +40,8 @@ import {
   offerDrawOnline,
   respondDrawOnline,
   claimTimeoutOnline,
+  rateOnlineGame,
+  type RatingChange,
 } from "@/app/app/gioca/actions";
 
 const ChessBoard = dynamic(
@@ -168,6 +170,20 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
+
+  // Partita "rated" finita → applica il mio aggiornamento di rating una sola volta
+  // e cattura la variazione per mostrarla nell'overlay. L'azione è idempotente
+  // lato server (guardia *_rated_at); il ref evita doppie chiamate in volo.
+  const ratedRef = useRef(false);
+  const [ratingChange, setRatingChange] = useState<RatingChange>(null);
+  useEffect(() => {
+    if (ratedRef.current) return;
+    if (game.status !== "finished" || !game.rated || !isPlayer) return;
+    ratedRef.current = true;
+    void rateOnlineGame(initialGame.id).then((res) => {
+      if (res.ok && res.data) setRatingChange(res.data);
+    });
+  }, [game.status, game.rated, isPlayer, initialGame.id]);
 
   const canMove =
     game.status === "ongoing" && isPlayer && game.turn === myColor && atLive;
@@ -439,6 +455,7 @@ export function OnlineGame({ initialGame, currentUserId }: OnlineGameProps) {
                     checkmate={r.checkmate}
                     outcome={r.outcome}
                     stats={stats}
+                    ratingChange={ratingChange}
                     breakdown={breakdown.groups}
                     analyzing={breakdown.loading}
                     analyzeLoading={analyzeLoading}

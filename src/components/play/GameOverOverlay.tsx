@@ -23,12 +23,19 @@ export interface GameStat {
   value: string;
 }
 
+/** Variazione del Rating Shakh dopo una partita "rated". */
+export interface RatingChangeView {
+  rating: number;
+  delta: number | null;
+}
+
 export function GameOverOverlay({
   title,
   subtitle,
   checkmate = false,
   outcome,
   stats,
+  ratingChange,
   breakdown,
   analyzing = false,
   onAnalyze,
@@ -46,6 +53,8 @@ export function GameOverOverlay({
   outcome?: GameOutcome;
   /** Statistiche sintetiche della partita (catture, durata). */
   stats?: GameStat[];
+  /** Variazione del Rating Shakh (solo partite online "rated"). */
+  ratingChange?: RatingChangeView | null;
   /** Riepilogo qualità mosse (per giocatore). Mostrato se presente. */
   breakdown?: BreakdownGroup[] | null;
   /** True mentre l'analisi del motore è in corso: mostra lo spinner. */
@@ -92,6 +101,23 @@ export function GameOverOverlay({
             )}
           </div>
         </div>
+
+        {/* Variazione Rating Shakh (partite online "rated") */}
+        {ratingChange && (
+          <div className="flex items-center justify-center gap-2 border-t border-border bg-bg/40 px-5 py-3">
+            <span className="font-mono text-[0.62rem] uppercase tracking-[0.15em] text-text-muted">
+              {t("overlay.ratingShakh")}
+            </span>
+            <span className="font-mono text-base font-semibold tabular-nums text-text">
+              {ratingChange.rating}
+            </span>
+            {ratingChange.delta != null && (
+              <span className="font-mono text-sm font-medium tabular-nums text-text-muted">
+                {ratingChange.delta >= 0 ? `+${ratingChange.delta}` : `−${Math.abs(ratingChange.delta)}`}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Riepilogo qualità mosse (analisi motore) */}
         {(analyzing || (breakdown && breakdown.length > 0)) && (

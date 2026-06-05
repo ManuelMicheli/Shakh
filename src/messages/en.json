@@ -689,6 +689,13 @@
       "tabLocal": "Same device",
       "tabOnline": "Online (turn-based)"
     },
+    "quickMatch": {
+      "title": "Find an opponent",
+      "desc": "Get paired with a player from anywhere in the world. Pick a time control and go.",
+      "searching": "Looking for an opponent…",
+      "cancel": "Cancel",
+      "orPrivate": "or challenge a friend"
+    },
     "notFound": {
       "title": "Game not found",
       "desc": "The game doesn't exist, is already full, or you don't have access.",
@@ -724,7 +731,8 @@
       "opening": "Opening…",
       "analyzeGame": "Analyze game",
       "viewBoard": "View the board",
-      "noMoves": "No moves"
+      "noMoves": "No moves",
+      "ratingShakh": "Shakh Rating"
     },
     "color": {
       "white": "White",

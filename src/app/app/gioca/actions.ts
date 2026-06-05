@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { findTimeControl } from "@/lib/play/time-controls";
+import { loadOverallRating, recordDomainOutcomes } from "@/lib/rating/store";
+import { GLICKO_ANCHOR, RD_START } from "@/lib/rating/glicko2";
 import type { FriendGameRow, FriendMove } from "@/lib/play/types";
 
 export type ActionResult<T> =
@@ -124,6 +126,114 @@ export async function saveGameForReview(input: {
   if (error) return { ok: false, error: error.message };
   revalidatePath("/app/partite");
   return { ok: true, data: { id: data.id as string } };
+}
+
+/**
+ * Matchmaking: entra in coda per un controllo di tempo e prova ad accoppiarti.
+ * `band` è la tolleranza di rating (allargata dal client col passare dell'attesa).
+ * Ritorna `{ gameId }` con l'id della partita se accoppiato, `null` se in attesa.
+ */
+export async function enqueueMatch(input: {
+  timeControlId: string;
+  band: number;
+}): Promise<ActionResult<{ gameId: string | null }>> {
+  const supabase = await createClient();
+  const t = await getTranslations("play");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: t("error.signInToPlay") };
+
+  const overall = await loadOverallRating(supabase, user.id);
+  const rating = overall?.rating ?? GLICKO_ANCHOR;
+  const rd = overall?.rd ?? RD_START;
+  const tc = findTimeControl(input.timeControlId);
+
+  const { data, error } = await supabase.rpc("mm_enqueue", {
+    p_tc: tc.id,
+    p_initial_ms: tc.initialMs,
+    p_inc_ms: tc.incMs,
+    p_rating: rating,
+    p_rd: rd,
+    p_band: input.band,
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: { gameId: (data as string | null) ?? null } };
+}
+
+/** Esci dalla coda di matchmaking. */
+export async function cancelMatch(): Promise<ActionResult<null>> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("mm_cancel");
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, data: null };
+}
+
+/**
+ * Applica l'aggiornamento di rating per la partita online finita, SOLO per il
+ * proprio lato (RLS: ogni utente scrive le proprie righe `user_ratings`). Usa lo
+ * snapshot del rating avversario fissato all'accoppiamento. Idempotente via la
+ * guardia `*_rated_at`. Chiamata da entrambi i client a fine partita.
+ */
+export type RatingChange = { rating: number; delta: number | null } | null;
+
+export async function rateOnlineGame(
+  id: string,
+): Promise<ActionResult<RatingChange>> {
+  const supabase = await createClient();
+  const uid = await getUserId();
+  if (!uid) return { ok: true, data: null };
+
+  const g = await loadGame(id);
+  if (!g || !g.rated || g.status !== "finished") return { ok: true, data: null };
+
+  const myColor =
+    g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
+  if (!myColor) return { ok: true, data: null };
+
+  // Già valutato per il mio lato → restituisci comunque il rating attuale (così
+  // l'overlay può mostrarlo dopo un refresh), ma senza delta.
+  if (myColor === "w" ? g.white_rated_at : g.black_rated_at) {
+    const after = await loadOverallRating(supabase, uid);
+    return {
+      ok: true,
+      data: after?.rating != null ? { rating: Math.round(after.rating), delta: null } : null,
+    };
+  }
+
+  // Punteggio dal mio punto di vista (1 vittoria, 0.5 patta, 0 sconfitta).
+  let score: number;
+  if (g.result === "1/2-1/2") score = 0.5;
+  else if (g.result === "1-0") score = myColor === "w" ? 1 : 0;
+  else if (g.result === "0-1") score = myColor === "b" ? 1 : 0;
+  else return { ok: true, data: null }; // risultato non rateabile
+
+  const opponentRating =
+    (myColor === "w" ? g.black_rating : g.white_rating) ?? GLICKO_ANCHOR;
+  const opponentRd =
+    (myColor === "w" ? g.black_rd : g.white_rd) ?? RD_START;
+
+  const before = await loadOverallRating(supabase, uid);
+
+  await recordDomainOutcomes(
+    supabase,
+    uid,
+    "games",
+    [{ opponentRating, opponentRd, score }],
+    "online_game",
+  );
+
+  const stamp = myColor === "w" ? "white_rated_at" : "black_rated_at";
+  await supabase
+    .from("friend_games")
+    .update({ [stamp]: new Date().toISOString() })
+    .eq("id", id);
+
+  const after = await loadOverallRating(supabase, uid);
+  if (after?.rating == null) return { ok: true, data: null };
+  const delta =
+    before?.rating != null ? Math.round(after.rating - before.rating) : null;
+  return { ok: true, data: { rating: Math.round(after.rating), delta } };
 }
 
 /** Unisciti come avversario a una partita in attesa (via funzione SECURITY DEFINER). */

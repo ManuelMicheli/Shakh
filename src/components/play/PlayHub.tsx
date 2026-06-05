@@ -16,6 +16,7 @@ import { findTimeControl } from "@/lib/play/time-controls";
 import type { FriendGameRow } from "@/lib/play/types";
 import { HotseatGame } from "./HotseatGame";
 import { TimeControlPicker } from "./TimeControlPicker";
+import { QuickMatch } from "./QuickMatch";
 import { createOnlineGame } from "@/app/app/gioca/actions";
 
 // Stessa scacchiera reale (chessground) usata in tutte le altre sezioni.
@@ -71,9 +72,13 @@ function PlayHubMobile({
       </TabsContent>
 
       <TabsContent value="online">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <CreateOnlineForm />
-          <MyGames games={myGames} currentUserId={currentUserId} />
+        <div className="space-y-6">
+          <QuickMatch currentUserId={currentUserId} />
+          <OrPrivateDivider />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <CreateOnlineForm />
+            <MyGames games={myGames} currentUserId={currentUserId} />
+          </div>
         </div>
       </TabsContent>
     </Tabs>
@@ -121,6 +126,8 @@ function PlayHubTable({
       {/* Configuratore */}
       <div className="space-y-4">
         <PlayModeTabs mode={mode} onChange={setMode} />
+        <QuickMatch currentUserId={currentUserId} />
+        <OrPrivateDivider />
         <CreateOnlineForm />
         <MyGames games={myGames} currentUserId={currentUserId} compact />
       </div>
@@ -164,6 +171,17 @@ function PlayModeTabs({
       >
         <Swords className="h-4 w-4" /> {t("hub.tabLocal")}
       </button>
+    </div>
+  );
+}
+
+function OrPrivateDivider() {
+  const t = useTranslations("play");
+  return (
+    <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-text-muted">
+      <span className="h-px flex-1 bg-border" />
+      {t("quickMatch.orPrivate")}
+      <span className="h-px flex-1 bg-border" />
     </div>
   );
 }

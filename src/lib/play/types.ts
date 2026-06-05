@@ -33,6 +33,28 @@ export interface FriendGameRow {
   result: string | null;
   end_reason: string | null;
   draw_offer_by: "w" | "b" | null;
+  // Matchmaking online "rated" (vedi migration 0024). Le partite-amico hanno
+  // `rated = false` e tutti gli snapshot a null.
+  rated: boolean;
+  white_rating: number | null;
+  white_rd: number | null;
+  black_rating: number | null;
+  black_rd: number | null;
+  white_rated_at: string | null;
+  black_rated_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Riga della coda `matchmaking_queue` (vedi migration 0024). */
+export interface MatchmakingRow {
+  user_id: string;
+  display_name: string | null;
+  time_control_id: string;
+  initial_ms: number | null;
+  increment_ms: number;
+  rating: number;
+  rd: number;
+  game_id: string | null;
+  enqueued_at: string;
 }
