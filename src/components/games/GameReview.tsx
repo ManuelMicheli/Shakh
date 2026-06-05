@@ -222,7 +222,9 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
           {/* Nome del giocatore in basso (lato dell'orientamento). */}
           <PlayerTag name={nameOf(bottomColor)} color={bottomColor} indented={Boolean(shownEval)} />
 
-          {/* Mobile: striscia mosse orizzontale + controlli inizio/indietro/avanti/fine. */}
+          {/* Mobile: striscia mosse ORIZZONTALE + descrizione mossa + controlli.
+              Tutto sotto la board, così navigando avanti/indietro la scacchiera
+              resta ferma e si legge subito l'analisi della mossa corrente. */}
           <div className="space-y-2 lg:hidden">
             {chess.history.length > 0 && (
               <MoveStripH
@@ -241,6 +243,7 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
               atEnd={chess.cursor >= chess.history.length - 1}
               keyboardTarget={boardWrapRef}
             />
+            {game.analyzed && currentRow && <MoveAnalysisDetails row={currentRow} />}
           </div>
         </div>
 
@@ -258,7 +261,12 @@ export function GameReview({ game, analysis, coachConfigured }: GameReviewProps)
             </TabsList>
 
             <TabsContent value="moves" className="min-h-0 flex-1 space-y-3 overflow-y-auto">
-              {game.analyzed && currentRow && <MoveAnalysisDetails row={currentRow} />}
+              {/* Su mobile questa scheda vive sotto la board (vedi blocco lg:hidden). */}
+              {game.analyzed && currentRow && (
+                <div className="hidden lg:block">
+                  <MoveAnalysisDetails row={currentRow} />
+                </div>
+              )}
               <MoveList
                 history={chess.history}
                 cursor={chess.cursor}

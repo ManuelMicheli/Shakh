@@ -38,8 +38,14 @@ interface Pair {
  */
 function scrollNearestParentIntoView(el: HTMLElement | null) {
   if (!el) return;
+  // Fermati PRIMA del documento: su mobile il pannello mosse non ha contenitore
+  // interno scrollabile (cresce col contenuto), quindi l'unico antenato scrollabile
+  // sarebbe la pagina stessa — ed è proprio ciò che NON dobbiamo scrollare. Se non
+  // c'è uno scroller interno reale, non facciamo nulla (la striscia orizzontale
+  // basta a seguire la mossa su mobile).
+  const root = el.ownerDocument.scrollingElement ?? el.ownerDocument.documentElement;
   let parent = el.parentElement;
-  while (parent) {
+  while (parent && parent !== root && parent !== el.ownerDocument.body) {
     const overflowY = getComputedStyle(parent).overflowY;
     const scrollable =
       /(auto|scroll|overlay)/.test(overflowY) &&
