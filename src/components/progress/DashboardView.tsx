@@ -19,9 +19,11 @@ const pct = (v: number | null): string => (v == null ? "—" : `${Math.round(v *
 /** Funzione di traduzione del namespace "dashboard" (server-side). */
 type T = Awaited<ReturnType<typeof getTranslations<"dashboard">>>;
 
-/** Card del Rating Shakh: numero complessivo (OTB) + scomposizione per dominio. */
+/**
+ * Card del Rating Shakh: solo il numero complessivo (OTB). La scomposizione per
+ * dominio non si mostra qui — le singole competenze vivono nella mappa competenze.
+ */
 function ShakhRatingCard({ rating, t }: { rating: OverallRating; t: T }) {
-  const shown = rating.breakdown.filter((b) => b.rating != null);
   // Dati raccolti finora = somma dei campioni per dominio (coerente con la soglia
   // che decide `provisional` in aggregateOverall). Gap = quanti ancora ne mancano.
   const collected = rating.breakdown.reduce((s, b) => s + b.samples, 0);
@@ -53,27 +55,6 @@ function ShakhRatingCard({ rating, t }: { rating: OverallRating; t: T }) {
                 })
               : t("shakhRating.refining")}
           </p>
-        )}
-        {shown.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {shown.map((b) => (
-              <div
-                key={b.domain}
-                className="rounded-md border border-border bg-surface-2 px-3 py-2"
-              >
-                <p className="text-xs text-text-muted">{b.label}</p>
-                <p className="mt-0.5 flex items-center gap-1.5 font-mono text-sm tabular-nums">
-                  {b.rating}
-                  {b.provisional && (
-                    <span
-                      className="inline-block h-1.5 w-1.5 rounded-full bg-text-muted"
-                      title={t("shakhRating.notCalibrated")}
-                    />
-                  )}
-                </p>
-              </div>
-            ))}
-          </div>
         )}
       </CardContent>
     </Card>

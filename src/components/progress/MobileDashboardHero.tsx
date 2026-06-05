@@ -59,7 +59,6 @@ export async function MobileDashboardHero({
 }) {
   const t = await getTranslations("dashboard");
   const locale = await getLocale();
-  const breakdown = rating?.breakdown.filter((b) => b.rating != null) ?? [];
 
   return (
     <div className="space-y-5 md:hidden">
@@ -96,24 +95,6 @@ export async function MobileDashboardHero({
                   ± {rating.rd}
                 </span>
               </div>
-              {breakdown.length > 0 && (
-                <div className="mt-4 grid grid-cols-4 gap-x-3 gap-y-3">
-                  {breakdown.map((b) => (
-                    <div key={b.domain}>
-                      <p className="flex items-center gap-1 font-mono text-sm tabular-nums">
-                        {b.rating}
-                        {b.provisional && (
-                          <span
-                            className="inline-block h-1 w-1 rounded-full bg-text-muted"
-                            title={t("shakhRating.notCalibrated")}
-                          />
-                        )}
-                      </p>
-                      <p className="text-[10px] text-text-muted">{b.label}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
             </>
           ) : (
             <p className="mt-4 text-sm text-text-muted">

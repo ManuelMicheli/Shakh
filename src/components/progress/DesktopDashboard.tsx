@@ -69,11 +69,9 @@ export async function DesktopDashboard({ name, data, step }: DesktopDashboardPro
 
         <div className="chess-rule h-1.5 w-full opacity-80" />
 
-        {/* Rating hero + dimensioni del rating come righe editoriali. */}
-        <div className="grid grid-cols-[20rem_1fr] gap-8">
-          <RatingCard rating={data.shakhRating} trend={data.trends.rating} t={t} />
-          <DimensionRows data={data} t={t} />
-        </div>
+        {/* Rating hero: solo l'Elo principale. Le singole competenze vivono nella
+            mappa competenze più in basso, non più scomposte qui. */}
+        <RatingCard rating={data.shakhRating} trend={data.trends.rating} t={t} />
 
         {/* Prossimo passo (feature) + allenamenti (tessere). */}
         <div className="grid grid-cols-[1fr_22rem] gap-8">
@@ -128,50 +126,55 @@ function RatingCard({
     series.length >= 2 ? series[series.length - 1] - series[0] : null;
 
   return (
-    <div className="chess-corners relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface p-7">
+    <div className="chess-corners relative flex items-center gap-8 overflow-hidden rounded-2xl border border-border bg-surface px-9 py-8">
       <GlyphWatermark glyph="♞" />
 
-      <div className="relative flex items-center justify-between">
-        <span className="text-xs uppercase tracking-[0.2em] text-text-muted">
-          {t("shakhRating.title")}
-        </span>
-        <span className="rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-muted">
-          OTB
-        </span>
-      </div>
-
-      <div className="relative mt-5 flex items-baseline gap-3">
-        <span className="font-mono text-[5.5rem] font-semibold leading-none tabular-nums tracking-tighter">
-          {rating?.rating != null ? rating.rating : "—"}
-        </span>
-        {rating?.rating != null && (
-          <span className="mb-1 rounded-md bg-surface-2 px-2 py-1 font-mono text-xs text-text-muted">
-            ± {rating.rd}
+      {/* Colonna sinistra: etichetta, numero grande, ± RD, trend. */}
+      <div className="relative min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <span className="text-xs uppercase tracking-[0.2em] text-text-muted">
+            {t("shakhRating.title")}
           </span>
+          <span className="rounded-full border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-muted">
+            OTB
+          </span>
+          {rating?.provisional && (
+            <span className="rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-muted">
+              {t("shakhRating.notCalibrated")}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-3 flex items-baseline gap-3">
+          <span className="font-mono text-[5.5rem] font-semibold leading-none tabular-nums tracking-tighter">
+            {rating?.rating != null ? rating.rating : "—"}
+          </span>
+          {rating?.rating != null && (
+            <span className="mb-1 rounded-md bg-surface-2 px-2 py-1 font-mono text-xs text-text-muted">
+              ± {rating.rd}
+            </span>
+          )}
+        </div>
+
+        {/* Didascalia di trend: dal delta reale dello storico. */}
+        {trendDelta != null && trendDelta !== 0 && (
+          <div className="mt-3 flex items-center gap-2 font-mono text-xs">
+            <span className="inline-flex items-center gap-1 text-text">
+              <ArrowUpRight
+                className={cn("h-3.5 w-3.5", trendDelta < 0 && "rotate-90")}
+                aria-hidden
+              />
+              {trendDelta > 0 ? "+" : ""}
+              {trendDelta}
+            </span>
+            <span className="text-text-muted">{t("trendRating.title")}</span>
+          </div>
         )}
       </div>
 
-      {/* Didascalia di trend: dal delta reale dello storico, o stato di calibrazione. */}
-      {trendDelta != null && trendDelta !== 0 ? (
-        <div className="relative mt-4 flex items-center gap-2 font-mono text-xs">
-          <span className="inline-flex items-center gap-1 text-text">
-            <ArrowUpRight
-              className={cn("h-3.5 w-3.5", trendDelta < 0 && "rotate-90")}
-              aria-hidden
-            />
-            {trendDelta > 0 ? "+" : ""}
-            {trendDelta}
-          </span>
-          <span className="text-text-muted">{t("trendRating.title")}</span>
-        </div>
-      ) : rating?.provisional ? (
-        <p className="relative mt-4 font-mono text-xs text-text-muted">
-          {t("shakhRating.notCalibrated")}
-        </p>
-      ) : null}
-
+      {/* Colonna destra: sparkline dello storico, più ampia. */}
       {series.length >= 2 && (
-        <div className="relative mt-6">
+        <div className="relative hidden w-[18rem] shrink-0 lg:block">
           <Sparkline points={series} />
         </div>
       )}
@@ -211,59 +214,6 @@ function Sparkline({ points }: { points: number[] }) {
       />
       <circle cx={lx} cy={ly} r={3} fill="currentColor" />
     </svg>
-  );
-}
-
-/**
- * Dimensioni del rating come righe editoriali (colonna destra). Usa la
- * scomposizione per dominio del Rating Shakh se disponibile (valore + nº campioni),
- * altrimenti ripiega sulle competenze per area (percentuale) — entrambe reali.
- */
-function DimensionRows({ data, t }: { data: DashboardData; t: T }) {
-  const breakdown = data.shakhRating?.breakdown.filter((b) => b.rating != null) ?? [];
-
-  if (breakdown.length > 0) {
-    return (
-      <div className="grid border-t border-border xl:grid-cols-2 xl:gap-x-12">
-        {breakdown.map((b) => (
-          <div key={b.domain} className="flex items-baseline justify-between gap-4 border-b border-border py-4">
-            <div className="min-w-0">
-              <p className="text-sm">{b.label}</p>
-              <p className="mt-0.5 font-mono text-[11px] text-text-muted">
-                {t("weaknesses.attempts", { count: b.samples })}
-                {b.provisional ? ` · ${t("shakhRating.notCalibrated")}` : ""}
-              </p>
-            </div>
-            <p className="flex shrink-0 items-baseline gap-2 text-right">
-              <span className="font-display text-3xl font-semibold tabular-nums">
-                {b.rating}
-              </span>
-              <span className="w-8 font-mono text-xs text-text-muted">± {b.rd}</span>
-            </p>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // Fallback: competenze per area come percentuale (solo aree con dati).
-  const areas = data.competence.filter((c) => c.score != null);
-  return (
-    <div className="grid border-t border-border xl:grid-cols-2 xl:gap-x-12">
-      {areas.map((c) => (
-        <div key={c.area} className="flex items-baseline justify-between gap-4 border-b border-border py-4">
-          <div className="min-w-0">
-            <p className="text-sm">{c.label}</p>
-            <p className="mt-0.5 font-mono text-[11px] text-text-muted">
-              {t("weaknesses.attempts", { count: c.attempts })}
-            </p>
-          </div>
-          <span className="shrink-0 font-display text-3xl font-semibold tabular-nums">
-            {Math.round((c.score ?? 0) * 100)}%
-          </span>
-        </div>
-      ))}
-    </div>
   );
 }
 
