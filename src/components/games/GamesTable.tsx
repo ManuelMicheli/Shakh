@@ -6,12 +6,11 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { deleteGame } from "@/app/app/partite/actions";
 import { useAnalysisJob, MAX_BATCH_JOBS } from "@/components/analysis/AnalysisJobContext";
 import { cn } from "@/lib/utils";
-import type { GameRow } from "@/lib/games/types";
+import type { GameRow, PieceColor } from "@/lib/games/types";
 
 const SOURCE_LABEL: Record<string, string> = {
   pgn: "PGN",
@@ -56,6 +55,41 @@ function opponentOf(g: GameRow): string {
   if (g.user_color === "white") return g.black ?? "?";
   if (g.user_color === "black") return g.white ?? "?";
   return gameTitle(g);
+}
+
+/** Pallino colore pezzo giocato dall'utente (bianco/nero) come da scacchiera. */
+function ColorDot({ color }: { color: PieceColor | null }) {
+  return (
+    <span
+      className={cn(
+        "inline-block h-2.5 w-2.5 shrink-0 rounded-full border",
+        color === "white"
+          ? "border-border bg-bg"
+          : color === "black"
+            ? "border-text bg-text"
+            : "border-border bg-surface-2",
+      )}
+    />
+  );
+}
+
+/** Esito come glifo editoriale: ½ per patta, 1/0 per vittoria/sconfitta. */
+function ResultMark({ outcome }: { outcome: Outcome }) {
+  const mark =
+    outcome === "win" ? "1" : outcome === "loss" ? "0" : outcome === "draw" ? "½" : "–";
+  return (
+    <span
+      className={cn(
+        "inline-grid h-6 w-6 place-items-center rounded-md border font-mono text-xs",
+        outcome === "win" && "border-text bg-text text-bg",
+        outcome === "loss" && "border-border text-text-muted",
+        outcome === "draw" && "border-border text-text",
+        outcome === "unknown" && "border-border text-text-muted",
+      )}
+    >
+      {mark}
+    </span>
+  );
 }
 
 /**
@@ -164,6 +198,26 @@ export function GamesTable({ games }: { games: GameRow[] }) {
     [games, selected],
   );
 
+  // Banda riepilogo (desktop): record V–P–S, analizzate/totali, % vittorie.
+  // Calcolata solo sui dati realmente presenti su `games`: niente accuratezza
+  // (vive in `game_analysis`, non sulla riga) né rating avversario (non salvato).
+  const summary = useMemo(() => {
+    let wins = 0;
+    let draws = 0;
+    let losses = 0;
+    let analyzed = 0;
+    for (const g of games) {
+      const o = outcomeOf(g);
+      if (o === "win") wins++;
+      else if (o === "draw") draws++;
+      else if (o === "loss") losses++;
+      if (g.analyzed) analyzed++;
+    }
+    const decided = wins + draws + losses;
+    const winRate = decided > 0 ? Math.round((wins / decided) * 100) : 0;
+    return { wins, draws, losses, analyzed, total: games.length, winRate, decided };
+  }, [games]);
+
   if (games.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-border p-10 text-center text-text-muted">
@@ -262,75 +316,129 @@ export function GamesTable({ games }: { games: GameRow[] }) {
         })}
       </div>
 
-      {/* DESKTOP: lista densa con selezione batch. */}
-      <ul className="hidden divide-y divide-border overflow-hidden rounded-md border border-border md:block">
-        {games.map((g) => {
-          const isSelected = selected.has(g.id);
-          return (
-            <li
-              key={g.id}
-              className="flex flex-col gap-3 bg-surface px-4 py-3 sm:flex-row sm:flex-nowrap sm:items-center"
-            >
-              <div className="flex min-w-0 flex-1 items-start gap-3">
-                {!g.analyzed && (
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => toggle(g.id)}
-                    aria-label={t("selectForAnalysis", { title: gameTitle(g) })}
-                    className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)] sm:mt-0"
-                  />
-                )}
+      {/* DESKTOP: banda riepilogo + tabella dati densa (Ledger). */}
+      <div className="hidden md:block">
+        {/* Banda riepilogo: record, analizzate/totali, % vittorie. */}
+        <div className="grid grid-cols-3 divide-x divide-border rounded-xl border border-border bg-surface">
+          <div className="p-5">
+            <p className="font-mono text-2xl font-semibold tabular-nums">
+              {summary.wins}–{summary.draws}–{summary.losses}
+            </p>
+            <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
+              {t("summaryRecord")}
+            </p>
+          </div>
+          <div className="p-5">
+            <p className="font-mono text-2xl font-semibold tabular-nums">
+              {summary.analyzed}/{summary.total}
+            </p>
+            <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
+              {t("summaryAnalyzed")}
+            </p>
+          </div>
+          <div className="p-5">
+            <p className="font-mono text-2xl font-semibold tabular-nums">
+              {summary.decided > 0 ? `${summary.winRate}%` : "—"}
+            </p>
+            <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
+              {t("summaryWinRate")}
+            </p>
+          </div>
+        </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-mono text-sm text-text">
-                    <span className="break-words">{g.white ?? "?"}</span>
-                    <span className="text-text-muted">vs</span>
-                    <span className="break-words">{g.black ?? "?"}</span>
-                    {g.result && (
-                      <span className="text-text-muted">· {g.result}</span>
-                    )}
-                  </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-muted">
-                    <span>{SOURCE_LABEL[g.source] ?? g.source}</span>
-                    <span>· {formatDate(g.played_at ?? g.created_at)}</span>
-                    {g.eco_code && <span className="font-mono">· {g.eco_code}</span>}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 sm:justify-end">
-                <Badge variant={g.analyzed ? "default" : "muted"}>
-                  {g.analyzed ? t("badgeAnalyzed") : t("badgeNotAnalyzed")}
-                </Badge>
-
-                <div className="flex items-center gap-1">
-                  <Link
-                    href={`/app/partite/${g.id}`}
-                    className={
-                      "inline-flex h-8 items-center justify-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 " +
-                      (g.analyzed
-                        ? "border border-border bg-surface-2 text-text hover:bg-surface"
-                        : "bg-text text-bg hover:opacity-90")
-                    }
+        {/* Tabella partite. */}
+        <div className="mt-6 overflow-hidden rounded-xl border border-border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-surface text-left font-mono text-[11px] uppercase tracking-wide text-text-muted">
+                <th className="w-10 px-4 py-2.5" />
+                <th className="px-4 py-2.5 font-medium">{t("colDate")}</th>
+                <th className="px-4 py-2.5 font-medium">{t("colOpponent")}</th>
+                <th className="px-4 py-2.5 font-medium">{t("colOpening")}</th>
+                <th className="px-4 py-2.5 text-center font-medium">{t("colResult")}</th>
+                <th className="px-4 py-2.5 text-right font-medium">{t("colStatus")}</th>
+                <th className="w-10 px-4 py-2.5" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {games.map((g) => {
+                const isSelected = selected.has(g.id);
+                return (
+                  <tr
+                    key={g.id}
+                    className="bg-surface transition-colors hover:bg-surface-2"
                   >
-                    {g.analyzed ? t("review") : t("analyze")}
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={t("deleteGame")}
-                    disabled={pending && deletingId === g.id}
-                    onClick={() => onDelete(g.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+                    <td className="px-4 py-3">
+                      {!g.analyzed ? (
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggle(g.id)}
+                          aria-label={t("selectForAnalysis", { title: gameTitle(g) })}
+                          className="h-4 w-4 accent-[var(--accent)]"
+                        />
+                      ) : null}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 font-mono text-text-muted">
+                      {formatDate(g.played_at ?? g.created_at)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/app/partite/${g.id}`}
+                        className="flex items-center gap-2"
+                      >
+                        <ColorDot color={g.user_color} />
+                        <span className="truncate font-medium">{opponentOf(g)}</span>
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="flex items-center gap-2 text-text-muted">
+                        <span>{SOURCE_LABEL[g.source] ?? g.source}</span>
+                        {g.eco_code && (
+                          <span className="font-mono text-[11px]">{g.eco_code}</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className="inline-flex justify-center">
+                        <ResultMark outcome={outcomeOf(g)} />
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {g.analyzed ? (
+                        <Link
+                          href={`/app/partite/${g.id}`}
+                          className="font-mono text-[11px] text-text-muted underline-offset-2 hover:text-text hover:underline"
+                        >
+                          {t("review")}
+                        </Link>
+                      ) : (
+                        <Link
+                          href={`/app/partite/${g.id}`}
+                          className="inline-flex items-center rounded-full bg-text px-2.5 py-0.5 text-[11px] font-medium text-bg"
+                        >
+                          {t("analyze")}
+                        </Link>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t("deleteGame")}
+                        disabled={pending && deletingId === g.id}
+                        onClick={() => onDelete(g.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

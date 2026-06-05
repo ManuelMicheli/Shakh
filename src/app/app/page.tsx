@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { NextStep } from "@/components/percorso/NextStep";
 import { DashboardView } from "@/components/progress";
+import { DesktopDashboard } from "@/components/progress/DesktopDashboard";
 import { MobileDashboardHero } from "@/components/progress/MobileDashboardHero";
 import { StudentAssignments } from "@/components/groups/StudentAssignments";
 import { AnalyzePendingButton } from "@/components/analysis/AnalyzePendingButton";
@@ -68,13 +68,8 @@ export default async function DashboardPage() {
           rating={data.shakhRating ?? null}
           step={step}
         />
-        <div className="hidden md:block">
-          <Header name={name} />
-        </div>
+        <DesktopDashboard name={name} data={data} step={step} />
         {showNudge && <PendingAnalysisNudge pending={pendingGames} />}
-        <div className="hidden md:block">
-          <NextStep step={step} />
-        </div>
         {assignments.length > 0 && <StudentAssignments items={assignments} />}
         <Card>
           <CardHeader>
@@ -104,16 +99,13 @@ export default async function DashboardPage() {
         rating={data.shakhRating ?? null}
         step={step}
       />
-      <div className="hidden md:block">
-        <Header name={name} />
-      </div>
+      <DesktopDashboard name={name} data={data} step={step} />
       {showNudge && <PendingAnalysisNudge pending={pendingGames} />}
       {assignments.length > 0 && <StudentAssignments items={assignments} />}
-      <DashboardView
-        data={data}
-        middleSlot={<NextStep step={step} />}
-        heroOnMobile
-      />
+      {/* Hero/testata (saluto, rating, prossimo passo) resi sopra: su desktop dalla
+          Broadsheet, su telefono dalla MobileDashboardHero. Qui restano solo le
+          sezioni analitiche, perciò la sintesi in alto è soppressa ovunque. */}
+      <DashboardView data={data} heroOnMobile suppressTop />
     </div>
   );
 }
@@ -131,15 +123,5 @@ async function PendingAnalysisNudge({ pending }: { pending: number }) {
         <AnalyzePendingButton pending={pending} />
       </CardContent>
     </Card>
-  );
-}
-
-async function Header({ name }: { name: string }) {
-  const t = await getTranslations("dashboard");
-  return (
-    <div>
-      <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{t("greeting", { name })}</h1>
-      <p className="mt-2 text-text-muted">{t("subtitle")}</p>
-    </div>
   );
 }

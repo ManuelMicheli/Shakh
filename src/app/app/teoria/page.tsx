@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { activeLocale, pickLocale } from "@/lib/i18n/content";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import type { TheoryType } from "@/lib/theory/types";
@@ -90,10 +90,15 @@ export default async function TeoriaPage() {
         desc={t("home.mobileDesc")}
       />
 
-      {/* DESKTOP: testata classica. */}
+      {/* DESKTOP: masthead "indice / table of contents". */}
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">{t("home.title")}</h1>
-        <p className="mt-2 max-w-2xl text-text-muted">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
+          {t("home.eyebrow")}
+        </p>
+        <h1 className="mt-2 font-display text-5xl font-semibold leading-[1.02] tracking-tight">
+          {t("home.title")}
+        </h1>
+        <p className="mt-3 max-w-2xl text-text-muted">
           {t.rich("home.desc", { em: (chunks) => <em>{chunks}</em> })}
         </p>
       </div>
@@ -110,12 +115,13 @@ export default async function TeoriaPage() {
               <div className="chess-rule h-1 flex-1 opacity-60" />
             </div>
 
-            {/* DESKTOP: intestazione con link "sfoglia". */}
-            <div className="hidden items-baseline justify-between gap-3 md:flex">
-              <h2 className="font-display text-xl font-semibold tracking-tight">{ramo.title}</h2>
+            {/* DESKTOP: intestazione editoriale con regola damier + link "sfoglia". */}
+            <div className="hidden items-baseline gap-4 md:flex">
+              <h2 className="font-display text-2xl font-semibold tracking-tight">{ramo.title}</h2>
+              <div className="chess-rule h-1 flex-1 opacity-60" />
               <Link
                 href={ramo.browseHref}
-                className="text-sm text-text-muted hover:text-text"
+                className="shrink-0 text-sm text-text-muted transition-colors hover:text-text"
               >
                 {ramo.browseLabel} →
               </Link>
@@ -164,24 +170,37 @@ export default async function TeoriaPage() {
                   </Link>
                 </div>
 
-                {/* DESKTOP: griglia di schede. */}
-                <div className="hidden gap-3 md:grid md:grid-cols-2">
-                  {items.map((l) => (
-                    <Link key={l.slug} href={`/app/teoria/${l.slug}`} className="group">
-                      <Card className="h-full transition-colors group-hover:border-text">
-                        <CardHeader>
-                          <div className="flex items-center justify-between gap-2">
-                            <CardTitle>{l.title}</CardTitle>
-                            {l.eco_code && (
-                              <span className="font-mono text-xs text-text-muted">{l.eco_code}</span>
-                            )}
-                          </div>
-                          {l.summary && <CardDescription>{l.summary}</CardDescription>}
-                        </CardHeader>
-                      </Card>
-                    </Link>
+                {/* DESKTOP: lezioni come righe editoriali numerate. */}
+                <ol className="hidden divide-y divide-border border-y border-border md:block">
+                  {items.map((l, i) => (
+                    <li key={l.slug}>
+                      <Link
+                        href={`/app/teoria/${l.slug}`}
+                        className="group flex w-full items-baseline gap-4 py-4 text-left"
+                      >
+                        <span className="w-6 shrink-0 font-mono text-sm text-text-muted">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="font-medium transition-colors group-hover:text-text">
+                            {l.title}
+                          </span>
+                          {l.summary && (
+                            <span className="mt-0.5 block text-sm text-text-muted">
+                              {l.summary}
+                            </span>
+                          )}
+                        </span>
+                        {l.eco_code && (
+                          <span className="shrink-0 font-mono text-xs text-text-muted">
+                            {l.eco_code}
+                          </span>
+                        )}
+                        <ChevronRight className="h-4 w-4 shrink-0 text-text-muted" aria-hidden />
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ol>
               </>
             )}
           </section>

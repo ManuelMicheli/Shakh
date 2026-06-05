@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import {
   Infinity as InfinityIcon,
   Target,
@@ -9,8 +9,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { createClient, getUser } from "@/lib/supabase/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { TacticsTrainer } from "@/components/tactics/TacticsTrainer";
 import { ensureStats, selectNextPuzzle, dueReviewCount } from "@/lib/tactics/query";
 import { TACTIC_THEMES, themeLabel } from "@/lib/tactics/themes";
@@ -67,6 +66,7 @@ export default async function TattichePage({
 
 async function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: number }) {
   const t = await getTranslations("tactics");
+  const locale = (await getLocale()) as "it" | "en";
   return (
     <div className="space-y-8">
       {/* ===== MOBILE: testata editoriale + rating hero + modalità a list-card ===== */}
@@ -133,38 +133,88 @@ async function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: nu
         </section>
       </div>
 
-      {/* ===== DESKTOP: layout esistente ===== */}
+      {/* ===== DESKTOP: variante B · Themes ===== */}
       <div className="hidden space-y-8 md:block">
-        <div>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="mt-2 text-text-muted">
-            {t("hubIntro")}
-          </p>
+        {/* Banda rating */}
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
+              {t("tacticalVision")}
+            </p>
+            <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight">
+              {t("title")}
+            </h1>
+          </div>
+          <div className="flex items-baseline gap-3">
+            <span className="font-mono text-5xl font-semibold tabular-nums tracking-tight">
+              {stats.rating}
+            </span>
+            <span className="flex gap-2">
+              {[
+                { label: t("streak"), value: stats.currentStreak },
+                { label: t("best"), value: stats.bestStreak },
+                { label: t("solved"), value: stats.puzzlesSolved },
+              ].map((s) => (
+                <span
+                  key={s.label}
+                  className="rounded-full border border-border px-3 py-1 font-mono text-xs tabular-nums"
+                >
+                  <span className="text-text-muted">{s.label} </span>
+                  {s.value}
+                </span>
+              ))}
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label={t("tacticalRating")} value={stats.rating} />
-          <Stat label={t("currentStreak")} value={stats.currentStreak} />
-          <Stat label={t("bestStreak")} value={stats.bestStreak} />
-          <Stat label={t("solved")} value={stats.puzzlesSolved} />
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          {MODES.map((m) => (
-            <Link key={m.mode} href={`/app/tattiche?mode=${m.mode}`} className="group">
-              <Card className="h-full transition-colors group-hover:border-text">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>{t(`modes.${m.mode}.title`)}</CardTitle>
+        {/* Modalità in riga */}
+        <div className="grid grid-cols-4 gap-3">
+          {MODES.map((m) => {
+            const Icon = m.icon;
+            return (
+              <Link
+                key={m.mode}
+                href={`/app/tattiche?mode=${m.mode}`}
+                className="group flex items-center gap-3 rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-text"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-surface-2">
+                  <Icon className="h-[1.05rem] w-[1.05rem]" aria-hidden />
+                </span>
+                <span className="min-w-0">
+                  <span className="flex items-center gap-2 text-sm font-medium">
+                    {t(`modes.${m.mode}.title`)}
                     {m.mode === "review" && reviewCount > 0 && (
-                      <Badge>{t("due", { count: reviewCount })}</Badge>
+                      <span className="shrink-0 rounded-full bg-text px-1.5 py-0.5 text-[9px] font-medium text-bg">
+                        {t("due", { count: reviewCount })}
+                      </span>
                     )}
-                  </div>
-                  <CardDescription>{t(`modes.${m.mode}.desc`)}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="chess-rule h-1 w-full opacity-70" />
+
+        {/* Temi in griglia */}
+        <div>
+          <div className="mb-4 flex items-baseline justify-between">
+            <p className="text-xs font-medium uppercase tracking-wider text-text-muted">
+              {t("trainTheme")}
+            </p>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            {TACTIC_THEMES.map((theme) => (
+              <Link
+                key={theme.key}
+                href={`/app/tattiche?mode=theme&theme=${theme.key}`}
+                className="group rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-text"
+              >
+                <span className="font-medium">{themeLabel(theme.key, locale)}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -201,15 +251,6 @@ async function ThemePicker() {
           </Link>
         ))}
       </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-lg border border-border bg-surface p-4">
-      <div className="text-xs uppercase tracking-wide text-text-muted">{label}</div>
-      <div className="mt-1 font-mono text-2xl">{value}</div>
     </div>
   );
 }

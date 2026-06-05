@@ -38,14 +38,14 @@ export default async function PartitePage() {
         desc={t("headerDesc")}
       />
 
-      {/* DESKTOP: testata classica. */}
+      {/* DESKTOP: masthead editoriale (Ledger). */}
       <div className="hidden md:block">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
+          {t("ledgerEyebrow")}
+        </p>
+        <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight">
           {t("headerTitle")}
         </h1>
-        <p className="mt-2 text-text-muted">
-          {t("pageIntro")}
-        </p>
       </div>
 
       <ImportPanel hasVerifiedAccount={hasVerifiedAccount} />

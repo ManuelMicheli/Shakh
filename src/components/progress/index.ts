@@ -10,4 +10,6 @@ export { TrendLine } from "./TrendLine";
 export type { TrendLineProps, TrendPoint } from "./TrendLine";
 export { DashboardView } from "./DashboardView";
 export type { DashboardViewProps } from "./DashboardView";
+export { DesktopDashboard } from "./DesktopDashboard";
+export type { DesktopDashboardProps } from "./DesktopDashboard";
 export { Glossary } from "./Glossary";

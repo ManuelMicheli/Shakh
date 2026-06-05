@@ -104,6 +104,13 @@ export interface DashboardViewProps {
    * visibili da `md` in su.
    */
   heroOnMobile?: boolean;
+  /**
+   * Anche su desktop i blocchi di sintesi in alto sono resi altrove (testata
+   * Broadsheet della dashboard reale): con questo flag vengono nascosti a OGNI
+   * larghezza, lasciando solo le sezioni analitiche (mappa competenze, punti
+   * deboli, statistiche, andamenti, attività). Implica `heroOnMobile`.
+   */
+  suppressTop?: boolean;
 }
 
 /**
@@ -115,11 +122,13 @@ export async function DashboardView({
   readOnly = false,
   middleSlot,
   heroOnMobile = false,
+  suppressTop = false,
 }: DashboardViewProps) {
   const t = await getTranslations("dashboard");
   const radarAreas = data.competence.map((c) => ({ label: c.label, value: c.score }));
-  // Sintesi in alto duplicata dall'hero mobile: nascosta sotto md quando attivo.
-  const topHidden = heroOnMobile ? "hidden md:block" : undefined;
+  // Sintesi in alto: nascosta sotto md se resa dall'hero mobile, nascosta del
+  // tutto se resa altrove anche su desktop (testata Broadsheet).
+  const topHidden = suppressTop ? "hidden" : heroOnMobile ? "hidden md:block" : undefined;
 
   return (
     <div className="space-y-8">

@@ -52,7 +52,7 @@ export default async function PercorsoPage() {
 
       <NextStep step={step} />
 
-      <SkillTree nodes={nodes} />
+      <SkillTree nodes={nodes} currentLevel={currentLevel} />
 
       <p className="text-xs text-text-muted">
         {t("path.curriculumNote")}

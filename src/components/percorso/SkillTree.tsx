@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Lock, Circle, CircleDot, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { PathNodeStatus, PathNodeView } from "@/lib/path/types";
 
@@ -33,35 +32,47 @@ function ProgressBar({ value }: { value: number }) {
   );
 }
 
-function NodeCard({ node }: { node: PathNodeView }) {
+/**
+ * Scheda nodo desktop (design Roadmap): icona di stato, titolo, etichetta di
+ * stato compatta in alto a destra, barra per i nodi in corso, attività come chip
+ * `<Link>` reali, hint di sblocco per i nodi bloccati.
+ */
+function NodeCardDesktop({ node }: { node: PathNodeView }) {
   const t = useTranslations("study");
   const Icon = STATUS_ICON[node.status];
   const label = t(STATUS_LABEL_KEY[node.status]);
   const locked = node.status === "locked";
   const completed = node.status === "completed";
-  const inProgress = node.status === "in_progress";
 
   return (
     <div
       className={cn(
-        "rounded-lg border border-border bg-surface p-4",
-        locked && "opacity-60",
+        "rounded-xl border bg-surface p-4",
+        completed ? "border-text/40" : "border-border",
+        locked && "opacity-55",
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-2">
-          <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", completed ? "text-text" : "text-text-muted")} />
-          <div>
+        <div className="flex items-start gap-2.5">
+          <Icon
+            className={cn(
+              "mt-0.5 h-5 w-5 shrink-0",
+              completed ? "text-text" : "text-text-muted",
+            )}
+          />
+          <div className="min-w-0">
             <h3 className="font-display font-medium leading-tight">{node.title}</h3>
             {node.description && (
               <p className="mt-1 text-sm text-text-muted">{node.description}</p>
             )}
           </div>
         </div>
-        <Badge variant={completed ? "default" : "muted"}>{label}</Badge>
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-text-muted">
+          {label}
+        </span>
       </div>
 
-      {inProgress && (
+      {node.status === "in_progress" && (
         <div className="mt-3 flex items-center gap-2">
           <ProgressBar value={node.progress} />
           <span className="font-mono text-xs text-text-muted">
@@ -158,7 +169,14 @@ function NodeRow({ node }: { node: PathNodeView }) {
 }
 
 /** Skill tree: nodi raggruppati per livello, con stato e sblocco progressivo. */
-export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
+export function SkillTree({
+  nodes,
+  currentLevel,
+}: {
+  nodes: PathNodeView[];
+  /** Livello corrente: la banda relativa mostra "sei qui". */
+  currentLevel?: number;
+}) {
   const t = useTranslations("study");
   const levels = Array.from(new Set(nodes.map((n) => n.level))).sort((a, b) => a - b);
   // Titoli dei livelli noti (0..4); per livelli fuori range si usa il fallback.
@@ -177,12 +195,13 @@ export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
           .filter((n) => n.level === level)
           .sort((a, b) => a.order_index - b.order_index);
         const done = ofLevel.filter((n) => n.status === "completed").length;
+        const current = currentLevel != null && level === currentLevel;
         const title =
           level in LEVEL_TITLE_KEYS
             ? t(LEVEL_TITLE_KEYS[level])
             : t("skillTree.levelFallback", { level });
         return (
-          <section key={level} className="space-y-3">
+          <section key={level} className="space-y-3 md:space-y-4">
             {/* MOBILE: intestazione con regola damier. */}
             <div className="flex items-center gap-3 md:hidden">
               <h2 className="font-display text-base font-semibold">{title}</h2>
@@ -191,10 +210,28 @@ export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
                 {done}/{ofLevel.length}
               </span>
             </div>
-            {/* DESKTOP: intestazione classica. */}
-            <div className="hidden items-baseline justify-between md:flex">
-              <h2 className="font-display text-lg font-semibold">{title}</h2>
-              <span className="font-mono text-xs text-text-muted">
+            {/* DESKTOP (Roadmap): badge livello, titolo + "sei qui", regola damier, conteggio. */}
+            <div className="hidden items-center gap-4 md:flex">
+              <span
+                className={cn(
+                  "grid h-10 w-10 shrink-0 place-items-center rounded-lg font-mono text-lg font-semibold",
+                  current ? "bg-text text-bg" : "bg-surface-2 text-text-muted",
+                )}
+              >
+                {level}
+              </span>
+              <div>
+                <h2 className="font-display text-xl font-semibold tracking-tight">
+                  {title}
+                </h2>
+                {current && (
+                  <p className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
+                    {t("skillTree.youAreHere")}
+                  </p>
+                )}
+              </div>
+              <div className="chess-rule h-1 flex-1 opacity-50" />
+              <span className="shrink-0 font-mono text-sm text-text-muted">
                 {done}/{ofLevel.length}
               </span>
             </div>
@@ -210,10 +247,10 @@ export function SkillTree({ nodes }: { nodes: PathNodeView[] }) {
               ))}
             </div>
 
-            {/* DESKTOP: griglia di schede. */}
+            {/* DESKTOP: griglia di schede Roadmap. */}
             <div className="hidden gap-3 md:grid md:grid-cols-2">
               {ofLevel.map((n) => (
-                <NodeCard key={n.id} node={n} />
+                <NodeCardDesktop key={n.id} node={n} />
               ))}
             </div>
           </section>

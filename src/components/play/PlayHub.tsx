@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Clock, ChevronRight, Globe, Swords } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,31 @@ import { createOnlineGame } from "@/app/app/gioca/actions";
 type ColorChoice = "w" | "b" | "random";
 
 export function PlayHub({
+  myGames,
+  currentUserId,
+}: {
+  myGames: FriendGameRow[];
+  currentUserId: string;
+}) {
+  return (
+    <>
+      {/* Mobile / sotto md: layout impilato a tab (stesso dispositivo / online). */}
+      <div className="md:hidden">
+        <PlayHubMobile myGames={myGames} currentUserId={currentUserId} />
+      </div>
+
+      {/* Desktop (md+): layout "Table" — scacchiera a sinistra, configuratore a destra. */}
+      <div className="hidden md:block">
+        <PlayHubTable myGames={myGames} currentUserId={currentUserId} />
+      </div>
+    </>
+  );
+}
+
+/* ============================================================
+   Layout mobile — invariato: tab Stesso dispositivo / Online.
+   ============================================================ */
+function PlayHubMobile({
   myGames,
   currentUserId,
 }: {
@@ -44,6 +70,143 @@ export function PlayHub({
         </div>
       </TabsContent>
     </Tabs>
+  );
+}
+
+/* ============================================================
+   Layout desktop · TABLE
+   Scacchiera (anteprima posizione iniziale) a sinistra; a destra il
+   configuratore con tab Online/Stesso dispositivo, colore, tempo, crea, e
+   sotto la lista delle partite. In modalità "stesso dispositivo" il
+   configuratore lascia spazio all'hotseat reale.
+   ============================================================ */
+type PlayMode = "online" | "local";
+
+function PlayHubTable({
+  myGames,
+  currentUserId,
+}: {
+  myGames: FriendGameRow[];
+  currentUserId: string;
+}) {
+  const t = useTranslations("play");
+  const [mode, setMode] = useState<PlayMode>("online");
+
+  if (mode === "local") {
+    return (
+      <div className="space-y-4">
+        <PlayModeTabs mode={mode} onChange={setMode} />
+        <HotseatGame />
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)_24rem] gap-8">
+      {/* Scacchiera (anteprima statica, posizione iniziale) */}
+      <div className="mx-auto w-full max-w-lg">
+        <MiniBoard />
+        <p className="mt-3 text-center font-mono text-[11px] uppercase tracking-wide text-text-muted">
+          {t("status.toMove", { side: t("color.white") })}
+        </p>
+      </div>
+
+      {/* Configuratore */}
+      <div className="space-y-4">
+        <PlayModeTabs mode={mode} onChange={setMode} />
+        <CreateOnlineForm />
+        <MyGames games={myGames} currentUserId={currentUserId} compact />
+      </div>
+    </div>
+  );
+}
+
+function PlayModeTabs({
+  mode,
+  onChange,
+}: {
+  mode: PlayMode;
+  onChange: (m: PlayMode) => void;
+}) {
+  const t = useTranslations("play");
+  return (
+    <div className="flex rounded-lg border border-border p-1">
+      <button
+        type="button"
+        onClick={() => onChange("online")}
+        aria-pressed={mode === "online"}
+        className={cn(
+          "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm transition-colors",
+          mode === "online"
+            ? "bg-surface-2 font-medium text-text"
+            : "text-text-muted hover:text-text",
+        )}
+      >
+        <Globe className="h-4 w-4" /> {t("hub.tabOnline")}
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange("local")}
+        aria-pressed={mode === "local"}
+        className={cn(
+          "flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm transition-colors",
+          mode === "local"
+            ? "bg-surface-2 font-medium text-text"
+            : "text-text-muted hover:text-text",
+        )}
+      >
+        <Swords className="h-4 w-4" /> {t("hub.tabLocal")}
+      </button>
+    </div>
+  );
+}
+
+/* Scacchiera decorativa statica (posizione iniziale), glifi unicode mono. */
+const START_RANKS = [
+  "rnbqkbnr",
+  "pppppppp",
+  "........",
+  "........",
+  "........",
+  "........",
+  "PPPPPPPP",
+  "RNBQKBNR",
+];
+const PIECE_GLYPH: Record<string, string> = {
+  r: "♜", n: "♞", b: "♝", q: "♛", k: "♚", p: "♟",
+  R: "♖", N: "♘", B: "♗", Q: "♕", K: "♔", P: "♙",
+};
+
+function MiniBoard({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "grid aspect-square w-full grid-cols-8 overflow-hidden rounded-lg border border-border",
+        className,
+      )}
+    >
+      {START_RANKS.flatMap((rank, r) =>
+        rank.split("").map((ch, c) => {
+          const dark = (r + c) % 2 === 1;
+          const glyph = ch !== "." ? PIECE_GLYPH[ch] : null;
+          return (
+            <div
+              key={`${r}-${c}`}
+              className={cn(
+                "grid place-items-center",
+                dark ? "bg-surface-2" : "bg-surface",
+              )}
+            >
+              {glyph && (
+                <span className="font-display text-[clamp(0.9rem,2.4vw,1.8rem)] leading-none text-text">
+                  {glyph}
+                </span>
+              )}
+            </div>
+          );
+        }),
+      )}
+    </div>
   );
 }
 
@@ -93,7 +256,7 @@ function CreateOnlineForm() {
                 onClick={() => setColor(c.id)}
                 aria-pressed={color === c.id}
                 className={cn(
-                  "rounded-md border px-3 py-1.5 text-sm transition-colors",
+                  "flex-1 rounded-md border px-3 py-1.5 text-sm transition-colors",
                   color === c.id
                     ? "border-text bg-text text-bg"
                     : "border-border text-text-muted hover:text-text",
@@ -105,13 +268,14 @@ function CreateOnlineForm() {
           </div>
         </div>
         <div>
-          <div className="mb-2 text-xs uppercase tracking-wide text-text-muted">
-            {t("timeControl")}
+          <div className="mb-2 flex items-center gap-1.5 text-xs uppercase tracking-wide text-text-muted">
+            <Clock className="h-3.5 w-3.5" /> {t("timeControl")}
           </div>
           <TimeControlPicker value={tcId} onChange={setTcId} />
         </div>
-        <Button onClick={create} disabled={pending}>
+        <Button onClick={create} disabled={pending} className="w-full">
           {pending ? t("create.creating") : t("create.submit")}
+          {!pending && <ChevronRight className="h-4 w-4" />}
         </Button>
       </CardContent>
     </Card>
@@ -121,9 +285,11 @@ function CreateOnlineForm() {
 function MyGames({
   games,
   currentUserId,
+  compact = false,
 }: {
   games: FriendGameRow[];
   currentUserId: string;
+  compact?: boolean;
 }) {
   const t = useTranslations("play");
   return (
@@ -137,7 +303,7 @@ function MyGames({
             {t("myGames.empty")}
           </p>
         ) : (
-          <ul className="divide-y divide-border">
+          <ul className={cn("divide-y divide-border", compact && "-my-1")}>
             {games.map((g) => {
               const myColor = g.white_user_id === currentUserId ? "w" : "b";
               const oppName =
