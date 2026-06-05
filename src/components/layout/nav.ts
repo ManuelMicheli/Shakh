@@ -17,6 +17,8 @@ import {
   Users,
   User,
   Gamepad2,
+  Shield,
+  Trophy,
   type LucideIcon,
 } from "lucide-react";
 
@@ -78,6 +80,8 @@ export const navGroups: NavGroup[] = [
     label: "group.playAnalyze",
     items: [
       { label: "item.playFriend", href: "/app/gioca", icon: Gamepad2 },
+      { label: "item.league", href: "/app/lega", icon: Shield },
+      { label: "item.championship", href: "/app/campionato", icon: Trophy },
       { label: "item.myGames", href: "/app/partite", icon: Swords },
       { label: "item.weaknesses", href: "/app/debolezze", icon: Crosshair },
       { label: "item.fixMistakes", href: "/app/ripara", icon: Wrench },

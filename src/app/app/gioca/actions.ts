@@ -187,6 +187,10 @@ export async function rateOnlineGame(
   const g = await loadGame(id);
   if (!g || !g.rated || g.status !== "finished") return { ok: true, data: null };
 
+  // Se è una partita di Campionato, registra l'esito in classifica (idempotente,
+  // no-op per le partite non-campionato). Best-effort: non blocca il rating.
+  await supabase.rpc("champ_score", { p_friend_game_id: id });
+
   const myColor =
     g.white_user_id === uid ? "w" : g.black_user_id === uid ? "b" : null;
   if (!myColor) return { ok: true, data: null };
