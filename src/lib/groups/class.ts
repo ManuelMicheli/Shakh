@@ -124,10 +124,10 @@ export async function loadClassData(
   const it = locale === "it";
   const AREAS: { area: AreaKey; label: string }[] = [
     { area: "tattica", label: it ? "Tattica" : "Tactics" },
+    { area: "calcolo", label: it ? "Calcolo" : "Calculation" },
     { area: "aperture", label: it ? "Aperture" : "Openings" },
     { area: "mediogioco", label: it ? "Mediogioco" : "Middlegame" },
     { area: "finali", label: it ? "Finali" : "Endgames" },
-    { area: "trappole", label: it ? "Trappole" : "Traps" },
   ];
   const competenceByArea: ClassAreaCompetence[] = AREAS.map(({ area, label }) => {
     const scores = students

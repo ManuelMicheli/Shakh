@@ -16,16 +16,22 @@ export interface CompetenceRadarProps {
   className?: string;
 }
 
-const SIZE = 320;
-const C = SIZE / 2;
-const R = 108;
+// ViewBox più LARGO che alto: le etichette laterali (anche lunghe come
+// "Mediogioco") hanno margine orizzontale e non vengono tagliate, su mobile
+// compreso. La ragnatela resta centrata.
+const VBW = 360;
+const VBH = 300;
+const CX = VBW / 2;
+const CY = VBH / 2;
+const R = 92;
+const LABEL_R = R * 1.18;
 // Anelli della ragnatela: dal centro al bordo. Più anelli = trama più fitta.
 const RINGS = [0.2, 0.4, 0.6, 0.8, 1];
 
-/** Punto sull'asse `i` (di `n`) a raggio proporzionale a `t` (0..1). Parte dall'alto. */
-function point(i: number, n: number, t: number): [number, number] {
+/** Punto sull'asse `i` (di `n`) a raggio `radius * t`. Parte dall'alto, orario. */
+function point(i: number, n: number, t: number, radius = R): [number, number] {
   const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-  return [C + Math.cos(angle) * R * t, C + Math.sin(angle) * R * t];
+  return [CX + Math.cos(angle) * radius * t, CY + Math.sin(angle) * radius * t];
 }
 
 function polygon(pts: [number, number][]): string {
@@ -36,6 +42,9 @@ function polygon(pts: [number, number][]): string {
  * Mappa delle competenze come "ragnatela" (radar) — SVG inline, niente librerie
  * di charting. Trama concentrica + raggi + area piena con gradiente; rigorosamente
  * monocroma (il colore qui non rappresenta un esito, da design system).
+ *
+ * `overflow-visible` + viewBox con margine orizzontale garantiscono che nessuna
+ * etichetta venga tagliata a nessuna larghezza.
  */
 export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
   const t = useTranslations("dashboard");
@@ -47,17 +56,17 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
   const geom = useMemo(() => {
     const valuePts = areas.map((a, i) => point(i, n, a.value ?? 0));
     const axisPts = areas.map((_, i) => point(i, n, 1));
-    const labelPts = areas.map((_, i) => point(i, n, 1.16));
+    const labelPts = areas.map((_, i) => point(i, n, 1, LABEL_R));
     return { valuePts, axisPts, labelPts };
   }, [areas, n]);
 
   const hasData = areas.some((a) => a.value != null && a.value > 0);
 
   return (
-    <div className={cn("flex justify-center", className)}>
+    <div className={cn("flex justify-center px-2", className)}>
       <svg
-        viewBox={`0 0 ${SIZE} ${SIZE}`}
-        className="h-auto w-full max-w-[340px]"
+        viewBox={`0 0 ${VBW} ${VBH}`}
+        className="h-auto w-full max-w-[380px] overflow-visible"
         role="img"
         aria-label={t("skillsMap.title")}
       >
@@ -84,7 +93,7 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
             fill="none"
             stroke="var(--border)"
             strokeWidth={idx === RINGS.length - 1 ? 1.25 : 1}
-            strokeOpacity={0.45 + 0.55 * (ring)}
+            strokeOpacity={0.4 + 0.6 * ring}
             strokeLinejoin="round"
           />
         ))}
@@ -93,8 +102,8 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
         {geom.axisPts.map(([x, y], i) => (
           <line
             key={i}
-            x1={C}
-            y1={C}
+            x1={CX}
+            y1={CY}
             x2={x}
             y2={y}
             stroke="var(--border)"
@@ -135,10 +144,13 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
             </g>
           ))}
 
-        {/* Etichette: nome area + percentuale su due righe. */}
+        {/* Etichette: nome area + valore su due righe, ancoraggio per lato così
+            non escono mai dal riquadro. */}
         {areas.map((a, i) => {
           const [x, y] = geom.labelPts[i];
-          const anchor = x < C - 4 ? "end" : x > C + 4 ? "start" : "middle";
+          const anchor = x < CX - 6 ? "end" : x > CX + 6 ? "start" : "middle";
+          // Le etichette in basso scendono un filo per non toccare la trama.
+          const dyName = y > CY + 6 ? "0em" : "-0.4em";
           return (
             <text
               key={a.label}
@@ -149,8 +161,8 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
             >
               <tspan
                 x={x}
-                dy="-0.35em"
-                className="fill-text-muted text-[10px] font-medium uppercase tracking-wide"
+                dy={dyName}
+                className="fill-text-muted text-[11px] font-medium"
                 fill="var(--text-muted)"
               >
                 {a.label}
@@ -158,7 +170,7 @@ export function CompetenceRadar({ areas, className }: CompetenceRadarProps) {
               <tspan
                 x={x}
                 dy="1.25em"
-                className="fill-text font-mono text-[11px] font-semibold tabular-nums"
+                className="fill-text font-mono text-[12px] font-semibold tabular-nums"
                 fill="var(--text)"
               >
                 {a.value != null ? `${Math.round(a.value * 100)}` : "—"}

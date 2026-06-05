@@ -21,7 +21,7 @@ type DB = SupabaseClient;
 // Tipi della dashboard
 // ============================================================
 
-export type AreaKey = "tattica" | "aperture" | "mediogioco" | "finali" | "trappole";
+export type AreaKey = "tattica" | "calcolo" | "aperture" | "mediogioco" | "finali";
 
 export interface AreaCompetence {
   area: AreaKey;
@@ -117,18 +117,18 @@ export interface DashboardData {
 
 const AREA_LABEL: Record<AreaKey, string> = {
   tattica: "Tactics",
+  calcolo: "Calculation",
   aperture: "Openings",
   mediogioco: "Middlegame",
   finali: "Endgames",
-  trappole: "Traps",
 };
 
 const AREA_LABEL_IT: Record<AreaKey, string> = {
   tattica: "Tattica",
+  calcolo: "Calcolo",
   aperture: "Aperture",
   mediogioco: "Mediogioco",
   finali: "Finali",
-  trappole: "Trappole",
 };
 
 function areaLabel(area: AreaKey, locale: Locale): string {
@@ -227,7 +227,7 @@ export async function loadDashboard(
 ): Promise<DashboardData> {
   const [
     progressRows,
-    trapAgg,
+    calcAgg,
     gameData,
     tactic,
     ratingHistory,
@@ -237,7 +237,7 @@ export async function loadDashboard(
     shakhRating,
   ] = await Promise.all([
     loadProgressRows(supabase, userId),
-    loadTrapCompetence(supabase, userId),
+    loadCalcCompetence(supabase, userId),
     loadGameStats(supabase, userId),
     loadTacticSummary(supabase, userId),
     loadRatingTrend(supabase, userId),
@@ -247,20 +247,30 @@ export async function loadDashboard(
     loadOverallRating(supabase, userId),
   ]);
 
-  // Competenza per area (4 da user_progress + trappole da user_trap_progress).
-  const competence: AreaCompetence[] = (
+  // Competenza per area: i 5 pilastri di uno scacchista. Quattro da user_progress
+  // (tattica, aperture, mediogioco, finali) + calcolo dal dominio di rating
+  // `calculation`. Ordine pensato per la ragnatela: calcolo accanto alla tattica.
+  const masteryAreas = (
     ["tattica", "aperture", "mediogioco", "finali"] as AreaKey[]
   ).map((area) => {
     const rows = progressRows.filter((r) => AREA_OF_DIMENSION[r.dimension] === area);
     const w = weighted(rows);
     return { area, label: areaLabel(area, locale), score: w.score, attempts: w.attempts };
   });
-  competence.push({
-    area: "trappole",
-    label: areaLabel("trappole", locale),
-    score: trapAgg.score,
-    attempts: trapAgg.attempts,
-  });
+  const calcolo: AreaCompetence = {
+    area: "calcolo",
+    label: areaLabel("calcolo", locale),
+    score: calcAgg.score,
+    attempts: calcAgg.attempts,
+  };
+  const byArea = new Map(masteryAreas.map((c) => [c.area, c]));
+  const competence: AreaCompetence[] = [
+    byArea.get("tattica")!,
+    calcolo,
+    byArea.get("aperture")!,
+    byArea.get("mediogioco")!,
+    byArea.get("finali")!,
+  ];
 
   // Punti deboli prioritari: score basso e abbastanza tentativi, ordinati.
   const MIN_ATTEMPTS = 3;
@@ -283,7 +293,7 @@ export async function loadDashboard(
   const empty =
     gameData.stats.analyzed === 0 &&
     progressRows.length === 0 &&
-    trapAgg.attempts === 0 &&
+    calcAgg.attempts === 0 &&
     tactic.rating === null;
 
   return {
@@ -313,19 +323,34 @@ async function loadProgressRows(supabase: DB, userId: string): Promise<ProgressR
   return (data as ProgressRow[] | null) ?? [];
 }
 
-async function loadTrapCompetence(
+/**
+ * Competenza di CALCOLO come valore 0..1, dal dominio di rating `calculation`.
+ * Il calcolo non ha una mastery in user_progress (è una feature a rating): la
+ * esprimiamo come quanto il rating di calcolo si avvicina al tetto raggiungibile
+ * dal giocatore (finestra di 700 punti sotto il tetto → 0..1). Reale, coerente
+ * con un radar di competenze. `attempts` = campioni dietro la stima (0 → nessun
+ * dato, asse vuoto).
+ */
+async function loadCalcCompetence(
   supabase: DB,
   userId: string,
 ): Promise<{ score: number | null; attempts: number }> {
   const { data } = await supabase
-    .from("user_trap_progress")
-    .select("attempts, successes")
-    .eq("user_id", userId);
-  const rows = (data as { attempts: number; successes: number }[] | null) ?? [];
-  const attempts = rows.reduce((s, r) => s + r.attempts, 0);
-  const successes = rows.reduce((s, r) => s + r.successes, 0);
-  if (attempts === 0) return { score: null, attempts: 0 };
-  return { score: successes / attempts, attempts };
+    .from("user_ratings")
+    .select("domain, rating, samples, ceiling")
+    .eq("user_id", userId)
+    .in("domain", ["calculation", "overall"]);
+  const rows =
+    (data as { domain: string; rating: number; samples: number; ceiling: number | null }[] | null) ??
+    [];
+  const calc = rows.find((r) => r.domain === "calculation");
+  if (!calc || calc.samples === 0) return { score: null, attempts: 0 };
+
+  const ceiling = rows.find((r) => r.domain === "overall")?.ceiling ?? calc.rating;
+  const floor = Math.max(400, ceiling - 700);
+  const span = ceiling - floor || 1;
+  const score = Math.max(0, Math.min(1, (calc.rating - floor) / span));
+  return { score, attempts: calc.samples };
 }
 
 interface GameRowLite {
