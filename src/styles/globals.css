@@ -8,25 +8,28 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ============================================================
-   DESIGN TOKENS — valori di partenza (vedi prompt §5)
-   Identità bianco/nero monocromatica, niente bianco/nero puri.
+   DESIGN TOKENS — "Sala Torneo" (vedi DESIGN.md)
+   Monocromo RISCALDATO (carbone/carta, mai grigio hex-neutro)
+   + un solo accento arancio segnale. Disciplina: l'accento mai
+   oltre il ~5% della schermata, mai decorativo.
    ============================================================ */
 :root,
 .dark {
-  /* Tema scuro (default) */
-  --bg: #0e0e0e;
-  --surface: #161616;
-  --surface-2: #1f1f1f;
-  --text: #fafafa;
-  --text-muted: #9a9a9a;
-  --border: #2a2a2a;
+  /* Tema scuro "Carbone" (default) */
+  --bg: #0e0d0b;
+  --surface: #161412;
+  --surface-2: #1e1b18;
+  --text: #f2efe9;
+  --text-muted: #9a938a;
+  --border: #2a2622;
 
-  /* Accento neutro: azione per inversione (eredita text/bg) */
-  --accent: var(--text);
-  --accent-contrast: var(--bg);
+  /* Accento segnale: rating/delta, CTA primaria, ultima mossa, Lega. */
+  --accent: #ff4d00;
+  --accent-contrast: #0d0c0b;
 
-  /* Colori semantici analisi — UNICA eccezione al monocromatico.
-     Usare SOLO nel contesto valutazione mosse, mai nella UI generale. */
+  /* Colori semantici analisi — UNICA eccezione cromatica oltre l'accento.
+     Usare SOLO nel contesto valutazione mosse, mai nella UI generale.
+     mistake/miss ricalibrati su terracotta per non collidere con l'accento. */
   --eval-brilliant: #3aa6b9; /* Geniale — !! ciano/teal */
   --eval-great: #5b8bb0; /* Grande — ! blu */
   --eval-book: #a88865; /* Libro — tonalità legno/marrone */
@@ -34,21 +37,22 @@
   --eval-excellent: #7aa757; /* Ottima — verde chiaro */
   --eval-good: #8a9a6b; /* Buona — ✓ verde oliva */
   --eval-inaccuracy: #c9a24b; /* Imprecisione — ?! giallo */
-  --eval-mistake: #cf8a4a; /* Errore — ? arancio */
-  --eval-miss: #d76b4d; /* Mossa mancata — ✕ arancio-rosso */
+  --eval-mistake: #b05c35; /* Errore — ? terracotta */
+  --eval-miss: #bf4f3a; /* Mossa mancata — ✕ terracotta-rosso */
   --eval-blunder: #c0564a; /* Errore grave — ?? rosso */
 }
 
 .light {
-  --bg: #ffffff;
-  --surface: #f7f7f7;
-  --surface-2: #efefef;
-  --text: #0e0e0e;
-  --text-muted: #6b6b6b;
-  --border: #e2e2e2;
+  /* Tema chiaro "Carta da torneo" */
+  --bg: #f5f2ec;
+  --surface: #ffffff;
+  --surface-2: #ece8e0;
+  --text: #15130f;
+  --text-muted: #6b655c;
+  --border: #d8d2c6;
 
-  --accent: var(--text);
-  --accent-contrast: var(--bg);
+  --accent: #d63a00;
+  --accent-contrast: #ffffff;
 }
 
 /* ============================================================
@@ -76,10 +80,23 @@
   --color-eval-miss: var(--eval-miss);
   --color-eval-blunder: var(--eval-blunder);
 
-  /* Famiglie font (collegate alle CSS var iniettate da next/font) */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  /* Famiglie font (collegate alle CSS var iniettate da next/font).
+     Un'unica variable font (Archivo, asse wdth): larghezza normale per la UI,
+     Expanded (wdth 125) per i display — vedi regola .font-display più sotto. */
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Spigoli vivi: l'unico gesto geometrico del brand è il taglio a 45°.
+     rounded-full resta intatto (non passa da queste variabili). */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
 
   /* Scala tipografica fluida per i titoli display (clamp) */
   --text-display-sm: clamp(1.75rem, 1.2rem + 2.5vw, 2.75rem);
@@ -122,6 +139,46 @@
     background: var(--text);
     color: var(--bg);
   }
+
+  /* Display "livrea sportiva": Archivo Expanded. La utility Tailwind
+     `font-display` imposta solo la famiglia; qui aggiungiamo larghezza e
+     peso di default (le utility weight possono comunque sovrascrivere). */
+  .font-display {
+    font-variation-settings: "wdth" 125;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ============================================================
+   LA DIAGONALE — elemento firma (vedi DESIGN.md).
+   Taglio a 45° sull'angolo alto-destro, come un biglietto da
+   torneo obliterato. Un solo gesto geometrico, ovunque.
+   ============================================================ */
+.cut-45 {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Hover "wipe" a 45°: l'accento entra sempre in diagonale, mai in fade
+   (DESIGN.md, Motion). Velo scuro che attraversa il bottone da destra. */
+.btn-wipe {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-contrast) 14%, transparent) 0 50%,
+    transparent 50%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  transition: background-position 150ms ease-out;
+}
+.btn-wipe:hover {
+  background-position: 0 0;
 }
 
 /* ============================================================
@@ -350,7 +407,8 @@ html.lenis body {
    trucco a linear-gradient. */
 .cg-wrap cg-board {
   /* Caselle a colore fisso (oggetto di studio, identico nei due temi):
-     chiara = bianca, scura = grigio medio. */
+     chiara = bianca, scura = grigio medio. Scacchiera e pezzi (cburnett)
+     restano FUORI dal rebranding "Sala Torneo": sono già perfetti. */
   --sq-light: #ffffff;
   --sq-dark: #8b8b8b;
   background-color: var(--sq-light);

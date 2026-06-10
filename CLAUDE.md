@@ -56,3 +56,13 @@ Next.js 15 (App Router, RSC + Server Actions) · TypeScript strict · Tailwind C
 - TypeScript strict; explicit types on component props and hook return values; avoid unjustified `any`.
 - No third-party client-side font/resource calls (GDPR). Serve chess assets (piece sets, CSS) locally — no CDNs.
 - When implementing a chess module: `chess.js` is the sole authority on rules and legality; `chessground` only renders and captures input (it must be told legal `dests`, never validates). Wrap chessground in a React component (`'use client'`, `dynamic(..., { ssr: false })`) and update it via `.set()` rather than recreating the instance.
+
+## Design System
+
+Always read DESIGN.md before making any visual or UI decisions.
+All font choices, colors, spacing, and aesthetic direction are defined there
+(direzione "Sala Torneo": carbone caldo + accento arancio segnale + Archivo + diagonale 45°).
+Do not deviate without explicit user approval.
+In QA mode, flag any code that doesn't match DESIGN.md.
+Note: DESIGN.md supersedes the monochrome/inversion description in the
+"Design system" paragraph above where the two conflict; implementation status is tracked in DESIGN.md.

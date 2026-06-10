@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "@/styles/globals.css";
-import { fraunces, inter, jetbrainsMono } from "./fonts";
+import { archivo, jetbrainsMono } from "./fonts";
 import { siteConfig } from "@/config/site";
 import {
   ThemeProvider,
@@ -64,7 +64,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${archivo.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>

@@ -14,8 +14,9 @@ const base =
   "inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2";
 
 const variants: Record<Variant, string> = {
-  // Azione primaria per INVERSIONE: testo del tema su sfondo del tema.
-  primary: "bg-text text-bg hover:opacity-90",
+  // Azione primaria: accento segnale + taglio 45° (la Diagonale, DESIGN.md)
+  // con hover in wipe diagonale, mai in fade.
+  primary: "cut-45 btn-wipe bg-accent text-accent-contrast font-semibold",
   secondary:
     "bg-surface-2 text-text border border-border hover:bg-surface",
   ghost: "bg-transparent text-text hover:bg-surface-2",

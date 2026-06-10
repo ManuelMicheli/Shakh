@@ -67,7 +67,7 @@ export function Landing() {
           </Link>
           <Link
             href="/signup"
-            className="inline-flex h-9 items-center rounded-md bg-text px-4 text-sm font-medium text-bg transition-opacity hover:opacity-90"
+            className="cut-45 btn-wipe inline-flex h-9 items-center bg-accent px-4 text-sm font-semibold text-accent-contrast"
           >
             {t("navCta")}
           </Link>
@@ -99,7 +99,7 @@ export function Landing() {
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link
                 href="/signup"
-                className="inline-flex h-12 items-center justify-center rounded-md bg-text px-7 text-base font-medium text-bg transition-opacity hover:opacity-90"
+                className="cut-45 btn-wipe inline-flex h-12 items-center justify-center bg-accent px-7 text-base font-semibold text-accent-contrast"
               >
                 {t("heroCtaPrimary")}
               </Link>
@@ -196,7 +196,7 @@ export function Landing() {
             <p className="mx-auto mt-5 max-w-md text-text-muted">{t("finalSub")}</p>
             <Link
               href="/signup"
-              className="mt-10 inline-flex h-12 items-center justify-center rounded-md bg-text px-8 text-base font-medium text-bg transition-opacity hover:opacity-90"
+              className="cut-45 btn-wipe mt-10 inline-flex h-12 items-center justify-center bg-accent px-8 text-base font-semibold text-accent-contrast"
             >
               {t("finalCta")}
             </Link>
