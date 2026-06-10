@@ -141,11 +141,12 @@
   }
 
   /* Display "livrea sportiva": Archivo Expanded. La utility Tailwind
-     `font-display` imposta solo la famiglia; qui aggiungiamo larghezza e
-     peso di default (le utility weight possono comunque sovrascrivere). */
+     `font-display` imposta solo la famiglia; qui aggiungiamo la larghezza.
+     NIENTE font-weight di default: il peso lo dichiarano i componenti, e un
+     default bold qui ingrassirebbe (bold sintetico) i glifi scacchistici
+     ♞/♟ dei watermark, che devono restare identici a prima. */
   .font-display {
     font-variation-settings: "wdth" 125;
-    font-weight: 800;
     letter-spacing: -0.01em;
   }
 }

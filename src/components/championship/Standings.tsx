@@ -62,8 +62,8 @@ export function Standings({ members, currentUserId, closed }: Props) {
                 <td className="py-2 px-2 text-right font-mono tabular-nums">{m.losses}</td>
                 {closed && (
                   <td className="py-2 pl-2 text-right text-xs">
-                    {m.rank_shift === 1 && <span className="text-eval-best">▲ Promosso</span>}
-                    {m.rank_shift === -1 && <span className="text-eval-mistake">▼ Retrocesso</span>}
+                    {m.rank_shift === 1 && <span className="text-accent">◢ Promosso</span>}
+                    {m.rank_shift === -1 && <span className="text-text-muted">◥ Retrocesso</span>}
                     {(m.rank_shift ?? 0) === 0 && <span className="text-text-muted">—</span>}
                   </td>
                 )}

@@ -102,7 +102,8 @@ Gradienti viola · badge/streak/coppe gamificate · border-radius bolla · verde
 - ✅ `fonts.ts` + root layout: Archivo (display+UI), Fraunces/Inter rimossi.
 - ✅ Button primario + CTA landing: accent, taglio 45°, wipe hover.
 - ✅ Scacchiera: VOLUTAMENTE invariata (vedi sopra).
-- ⬜ Chevron delta `◢` nei componenti progress/dashboard (rifinitura futura).
+- ✅ Chevron delta `◢`/`◥` in StatTile, RatingCard, GameOverOverlay, Standings (positivo = accento, negativo = attenuato).
+- ⚠️ I glifi scacchistici dei watermark (♞/♟, `GlyphWatermark`) NON devono ricevere peso/stile dal brand: la regola `.font-display` resta senza `font-weight` di default proprio per questo (decisione utente: i glifi erano perfetti).
 
 ## Decisions Log
 | Data | Decisione | Rationale |

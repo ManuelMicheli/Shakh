@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Compass, Target, Crosshair, Wrench, ChevronRight, ArrowUpRight } from "lucide-react";
+import { Compass, Target, Crosshair, Wrench, ChevronRight } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { cn } from "@/lib/utils";
@@ -158,14 +158,17 @@ function RatingCard({
           )}
         </div>
 
-        {/* Didascalia di trend: dal delta reale dello storico. */}
+        {/* Didascalia di trend: chevron a 45° (la Diagonale, DESIGN.md),
+            positivo in accento, negativo attenuato. */}
         {trendDelta != null && trendDelta !== 0 && (
           <div className="mt-3 flex items-center gap-2 font-mono text-xs">
-            <span className="inline-flex items-center gap-1 text-text">
-              <ArrowUpRight
-                className={cn("h-3.5 w-3.5", trendDelta < 0 && "rotate-90")}
-                aria-hidden
-              />
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 tabular-nums",
+                trendDelta > 0 ? "text-accent" : "text-text-muted",
+              )}
+            >
+              <span aria-hidden>{trendDelta > 0 ? "◢" : "◥"}</span>
               {trendDelta > 0 ? "+" : ""}
               {trendDelta}
             </span>

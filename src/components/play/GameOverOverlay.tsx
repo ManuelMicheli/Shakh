@@ -112,7 +112,16 @@ export function GameOverOverlay({
               {ratingChange.rating}
             </span>
             {ratingChange.delta != null && (
-              <span className="font-mono text-sm font-medium tabular-nums text-text-muted">
+              <span
+                className={
+                  ratingChange.delta > 0
+                    ? "font-mono text-sm font-medium tabular-nums text-accent"
+                    : "font-mono text-sm font-medium tabular-nums text-text-muted"
+                }
+              >
+                {ratingChange.delta !== 0 && (
+                  <span aria-hidden>{ratingChange.delta > 0 ? "◢ " : "◥ "}</span>
+                )}
                 {ratingChange.delta >= 0 ? `+${ratingChange.delta}` : `−${Math.abs(ratingChange.delta)}`}
               </span>
             )}
