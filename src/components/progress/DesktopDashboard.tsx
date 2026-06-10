@@ -21,7 +21,7 @@ import type { NextStep as NextStepData } from "@/lib/path/recommend";
  */
 
 const TILE_BASE =
-  "group flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-text";
+  "group flex items-center rounded-xl border border-border bg-surface px-4 py-3 text-left transition-colors hover:border-text";
 
 // Tessere di allenamento rapido: stesse rotte/etichette i18n della hero mobile.
 const TRAIN: { labelKey: string; detailKey: string; href: string; icon: LucideIcon }[] = [
@@ -57,14 +57,39 @@ export async function DesktopDashboard({ name, data, step }: DesktopDashboardPro
   return (
     <div className="hidden md:block">
       <div className="space-y-8">
-        {/* Masthead editoriale: data + saluto. Nessun glifo qui (solo nella card). */}
-        <div className="relative">
-          <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted first-letter:uppercase">
-            {todayLabel(locale)} · {t("subtitle")}
-          </p>
-          <h1 className="mt-2 font-display text-5xl font-semibold leading-[1.02] tracking-tight">
-            {t("greeting", { name })}.
-          </h1>
+        {/* Masthead editoriale: data + saluto a sinistra, azioni rapide a destra. */}
+        <div className="relative flex items-end justify-between gap-8">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted first-letter:uppercase">
+              {todayLabel(locale)} · {t("subtitle")}
+            </p>
+            <h1 className="mt-2 font-display text-5xl font-semibold leading-[1.02] tracking-tight">
+              {t("greeting", { name })}.
+            </h1>
+          </div>
+          <div className="shrink-0">
+            <p className="mb-2 text-right text-xs font-medium uppercase tracking-wider text-text-muted">
+              {t("trainNow")}
+            </p>
+            <div className="flex gap-3">
+              {TRAIN.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href} className={TILE_BASE}>
+                    <span className="flex items-center gap-2.5">
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-surface-2">
+                        <Icon className="h-4 w-4" aria-hidden />
+                      </span>
+                      <span>
+                        <span className="block text-sm font-medium leading-tight">{t(item.labelKey)}</span>
+                        <span className="block text-xs text-text-muted">{t(item.detailKey)}</span>
+                      </span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         <div className="chess-rule h-1.5 w-full opacity-80" />
@@ -73,31 +98,8 @@ export async function DesktopDashboard({ name, data, step }: DesktopDashboardPro
             mappa competenze più in basso, non più scomposte qui. */}
         <RatingCard rating={data.shakhRating} trend={data.trends.rating} t={t} />
 
-        {/* Prossimo passo (feature) + allenamenti (tessere). */}
-        <div className="grid grid-cols-[1fr_22rem] gap-8">
-          <FeatureNextStep step={step} tStudy={tStudy} />
-          <div>
-            <p className="mb-3 text-xs font-medium uppercase tracking-wider text-text-muted">
-              {t("trainNow")}
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {TRAIN.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link key={item.href} href={item.href} className={TILE_BASE}>
-                    <span className="grid h-9 w-9 place-items-center rounded-lg bg-surface-2">
-                      <Icon className="h-[1.05rem] w-[1.05rem]" aria-hidden />
-                    </span>
-                    <span>
-                      <span className="block text-sm font-medium">{t(item.labelKey)}</span>
-                      <span className="block text-xs text-text-muted">{t(item.detailKey)}</span>
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        {/* Prossimo passo: feature card a tutta larghezza. */}
+        <FeatureNextStep step={step} tStudy={tStudy} />
       </div>
     </div>
   );

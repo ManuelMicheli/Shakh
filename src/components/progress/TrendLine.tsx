@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,8 @@ export function TrendLine({
   className,
 }: TrendLineProps) {
   const t = useTranslations("dashboard");
+  // Id univoco per la clipPath (più istanze del grafico nella stessa pagina).
+  const clipId = useId();
   // Nome del dato di default (singolare/plurale) localizzato; sovrascrivibile da chi chiama.
   const noun = dataNoun ?? { one: t("trend.nounOne"), many: t("trend.nounMany") };
   const geom = useMemo(() => {
@@ -85,25 +87,55 @@ export function TrendLine({
         role="img"
         aria-label={t("trend.ariaLabel")}
       >
-        <motion.path
-          d={geom.line}
-          fill="none"
-          stroke="var(--text)"
-          strokeWidth="2"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        />
-        {geom.coords.map((c, i) => (
-          <circle key={i} cx={c.px} cy={c.py} r="3" fill="var(--text)" vectorEffect="non-scaling-stroke">
-            <title>
-              {c.label}: {c.value}
-              {suffix}
-            </title>
-          </circle>
-        ))}
+        {/*
+          Reveal con clipPath invece di pathLength/stroke-dasharray: il trucco
+          del dash, con vector-effect non-scaling-stroke + preserveAspectRatio
+          "none", calcola la lunghezza in spazi diversi e tronca la linea prima
+          dell'ultimo punto. La clip è geometrica, quindi immune alla scala.
+        */}
+        <defs>
+          <clipPath id={clipId}>
+            <motion.rect
+              x="0"
+              y="0"
+              height={H}
+              initial={{ width: 0 }}
+              animate={{ width: W }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${clipId})`}>
+          <path
+            d={geom.line}
+            fill="none"
+            stroke="var(--text)"
+            strokeWidth="2"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          {/*
+            Punti come segmenti di lunghezza ~0 con linecap rotondo e stroke
+            non scalabile: restano cerchi perfetti anche con la viewBox
+            stirata (un <circle> diventerebbe un'ellisse).
+          */}
+          {geom.coords.map((c, i) => (
+            <path
+              key={i}
+              d={`M ${c.px.toFixed(1)} ${c.py.toFixed(1)} h 0.01`}
+              fill="none"
+              stroke="var(--text)"
+              strokeWidth="6"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            >
+              <title>
+                {c.label}: {c.value}
+                {suffix}
+              </title>
+            </path>
+          ))}
+        </g>
       </svg>
     </div>
   );
