@@ -12,7 +12,7 @@ import { createClient, getUser } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { TacticsTrainer } from "@/components/tactics/TacticsTrainer";
 import { ensureStats, selectNextPuzzle, dueReviewCount } from "@/lib/tactics/query";
-import { TACTIC_THEMES, themeLabel } from "@/lib/tactics/themes";
+import { THEME_GROUPS, themesOfGroup, themeLabel, groupLabel } from "@/lib/tactics/themes";
 import type { TacticMode, TacticStats } from "@/lib/tactics/types";
 
 export async function generateMetadata() {
@@ -204,15 +204,24 @@ async function Hub({ stats, reviewCount }: { stats: TacticStats; reviewCount: nu
               {t("trainTheme")}
             </p>
           </div>
-          <div className="grid grid-cols-4 gap-3">
-            {TACTIC_THEMES.map((theme) => (
-              <Link
-                key={theme.key}
-                href={`/app/tattiche?mode=theme&theme=${theme.key}`}
-                className="group rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-text"
-              >
-                <span className="font-medium">{themeLabel(theme.key, locale)}</span>
-              </Link>
+          <div className="space-y-6">
+            {THEME_GROUPS.map((g) => (
+              <div key={g.key}>
+                <p className="mb-2 font-mono text-[11px] uppercase tracking-widest text-text-muted">
+                  {groupLabel(g.key, locale)}
+                </p>
+                <div className="grid grid-cols-4 gap-3">
+                  {themesOfGroup(g.key).map((theme) => (
+                    <Link
+                      key={theme.key}
+                      href={`/app/tattiche?mode=theme&theme=${theme.key}`}
+                      className="group rounded-xl border border-border bg-surface p-4 text-left transition-colors hover:border-text"
+                    >
+                      <span className="font-medium">{themeLabel(theme.key, locale)}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -232,6 +241,7 @@ function Mini({ label, value }: { label: string; value: number }) {
 
 async function ThemePicker() {
   const t = await getTranslations("tactics");
+  const locale = (await getLocale()) as "it" | "en";
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
@@ -242,15 +252,24 @@ async function ThemePicker() {
           {t("backToTacticsArrow")}
         </Link>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {TACTIC_THEMES.map((t) => (
-          <Link key={t.key} href={`/app/tattiche?mode=theme&theme=${t.key}`}>
-            <Card className="transition-colors hover:border-text">
-              <CardContent className="py-4 text-center font-medium">{themeLabel(t.key)}</CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {THEME_GROUPS.map((g) => (
+        <div key={g.key} className="space-y-2">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-text-muted">
+            {groupLabel(g.key, locale)}
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {themesOfGroup(g.key).map((theme) => (
+              <Link key={theme.key} href={`/app/tattiche?mode=theme&theme=${theme.key}`}>
+                <Card className="transition-colors hover:border-text">
+                  <CardContent className="py-4 text-center font-medium">
+                    {themeLabel(theme.key, locale)}
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

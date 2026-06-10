@@ -20,9 +20,13 @@ export interface OpeningTreeProps {
   nodes: OpeningNode[];
 }
 
+// Tetto dei risultati di ricerca renderizzati (il catalogo ECO ha ~3.700 voci).
+const MAX_RESULTS = 200;
+
 /** Albero ECO espandibile: famiglia → apertura → variante. SAN/ECO in monospace. */
 export function OpeningTree({ nodes }: OpeningTreeProps) {
   const t = useTranslations("theory");
+  const [query, setQuery] = useState("");
   const { roots, childrenOf } = useMemo(() => {
     const ids = new Set(nodes.map((n) => n.id));
     const childrenOf = new Map<string | null, OpeningNode[]>();
@@ -36,6 +40,15 @@ export function OpeningTree({ nodes }: OpeningTreeProps) {
     return { roots: childrenOf.get(null) ?? [], childrenOf };
   }, [nodes]);
 
+  // Ricerca piatta su titolo + ECO: con migliaia di voci l'albero da solo non basta.
+  const q = query.trim().toLowerCase();
+  const matches = useMemo(() => {
+    if (q.length < 2) return null;
+    return nodes.filter(
+      (n) => n.title.toLowerCase().includes(q) || (n.eco ?? "").toLowerCase().includes(q),
+    );
+  }, [nodes, q]);
+
   if (nodes.length === 0) {
     return (
       <p className="text-sm text-text-muted">
@@ -45,11 +58,39 @@ export function OpeningTree({ nodes }: OpeningTreeProps) {
   }
 
   return (
-    <ul className="space-y-1">
-      {roots.map((n) => (
-        <TreeRow key={n.id} node={n} childrenOf={childrenOf} depth={0} />
-      ))}
-    </ul>
+    <div className="space-y-3">
+      <input
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={t("openingTree.searchPlaceholder")}
+        className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm outline-none placeholder:text-text-muted focus:border-text-muted"
+      />
+      {matches ? (
+        matches.length === 0 ? (
+          <p className="text-sm text-text-muted">{t("openingTree.noResults")}</p>
+        ) : (
+          <>
+            {matches.length > MAX_RESULTS && (
+              <p className="text-xs text-text-muted">
+                {t("openingTree.resultsCapped", { count: MAX_RESULTS })}
+              </p>
+            )}
+            <ul className="space-y-1">
+              {matches.slice(0, MAX_RESULTS).map((n) => (
+                <TreeRow key={n.id} node={n} childrenOf={new Map()} depth={0} />
+              ))}
+            </ul>
+          </>
+        )
+      ) : (
+        <ul className="space-y-1">
+          {roots.map((n) => (
+            <TreeRow key={n.id} node={n} childrenOf={childrenOf} depth={0} />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

@@ -20,29 +20,44 @@ interface Row {
   eco_code: string | null;
   summary_it: string | null;
   summary_en: string | null;
-  body: unknown | null;
+  line_pgn: string | null;
 }
+
+// Pagina della finestra di fetch: il catalogo ECO (0028) supera il tetto
+// PostgREST di 1000 righe per richiesta, quindi si pagina con .range().
+const PAGE = 1000;
 
 export default async function AperturePage() {
   const supabase = await createClient();
   const locale = await activeLocale();
   const t = await getTranslations("theory");
-  const { data } = await supabase
-    .from("content_items")
-    .select("id, parent_id, slug, title_it, title_en, eco_code, summary_it, summary_en, body")
-    .eq("type", "opening")
-    .eq("published", true)
-    .order("order_index", { ascending: true });
+
+  // NIENTE `body` nella lista: con ~3.700 righe il jsonb delle lezioni
+  // peserebbe megabyte. `line_pgn` basta per sapere se la scheda esiste.
+  const rows: Row[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data } = await supabase
+      .from("content_items")
+      .select("id, parent_id, slug, title_it, title_en, eco_code, summary_it, summary_en, line_pgn")
+      .eq("type", "opening")
+      .eq("published", true)
+      .order("order_index", { ascending: true })
+      .order("slug", { ascending: true })
+      .range(from, from + PAGE - 1);
+    const page = (data as Row[] | null) ?? [];
+    rows.push(...page);
+    if (page.length < PAGE) break;
+  }
 
   // Title/summary risolti alla lingua attiva; il resto della forma resta invariato.
-  const nodes: OpeningNode[] = ((data as Row[] | null) ?? []).map((r) => ({
+  const nodes: OpeningNode[] = rows.map((r) => ({
     id: r.id,
     parentId: r.parent_id,
     slug: r.slug,
     title: pickLocale(r.title_it, r.title_en, locale) ?? "",
     eco: r.eco_code,
     summary: pickLocale(r.summary_it, r.summary_en, locale),
-    hasLesson: r.body !== null,
+    hasLesson: r.line_pgn !== null,
   }));
 
   return (

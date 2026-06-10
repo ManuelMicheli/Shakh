@@ -65,10 +65,13 @@ export default async function TeoriaPage() {
     },
   ];
   // Solo le lezioni pubblicate (RLS: lettura pubblica dei contenuti published).
+  // level=0 = lezioni curate "in evidenza": il catalogo ECO (level=1, ~3.700
+  // righe della 0028) si sfoglia dalla pagina Aperture, non dall'indice.
   const { data } = await supabase
     .from("content_items")
     .select("slug, title_it, title_en, summary_it, summary_en, type, eco_code, order_index")
     .eq("published", true)
+    .eq("level", 0)
     .order("order_index", { ascending: true });
 
   // Risolve title/summary alla lingua attiva, mantenendo la stessa forma di output.
