@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { activeLocale, pickLocale } from "@/lib/i18n/content";
 import { Card, CardContent } from "@/components/ui/card";
 import { OpeningTree, type OpeningNode } from "@/components/theory/OpeningTree";
@@ -27,27 +28,47 @@ interface Row {
 // PostgREST di 1000 righe per richiesta, quindi si pagina con .range().
 const PAGE = 1000;
 
+/**
+ * Catalogo ECO con cache server (1h). Il catalogo è contenuto pubblico
+ * staff-writable che cambia quasi mai: senza cache ogni visita pagava ~4
+ * round-trip Supabase sequenziali da 1.000 righe. Dentro `unstable_cache` non
+ * sono disponibili i cookie, quindi si usa un client anon cookie-less — i dati
+ * sono comunque public-readable via RLS.
+ */
+const getCatalogRows = unstable_cache(
+  async (): Promise<Row[]> => {
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { persistSession: false } },
+    );
+    // NIENTE `body` nella lista: con ~3.700 righe il jsonb delle lezioni
+    // peserebbe megabyte. `line_pgn` basta per sapere se la scheda esiste.
+    const rows: Row[] = [];
+    for (let from = 0; ; from += PAGE) {
+      const { data } = await supabase
+        .from("content_items")
+        .select("id, parent_id, slug, title_it, title_en, eco_code, summary_it, summary_en, line_pgn")
+        .eq("type", "opening")
+        .eq("published", true)
+        .order("order_index", { ascending: true })
+        .order("slug", { ascending: true })
+        .range(from, from + PAGE - 1);
+      const page = (data as Row[] | null) ?? [];
+      rows.push(...page);
+      if (page.length < PAGE) break;
+    }
+    return rows;
+  },
+  ["openings-catalog"],
+  { revalidate: 3600 },
+);
+
 export default async function AperturePage() {
-  const supabase = await createClient();
   const locale = await activeLocale();
   const t = await getTranslations("theory");
 
-  // NIENTE `body` nella lista: con ~3.700 righe il jsonb delle lezioni
-  // peserebbe megabyte. `line_pgn` basta per sapere se la scheda esiste.
-  const rows: Row[] = [];
-  for (let from = 0; ; from += PAGE) {
-    const { data } = await supabase
-      .from("content_items")
-      .select("id, parent_id, slug, title_it, title_en, eco_code, summary_it, summary_en, line_pgn")
-      .eq("type", "opening")
-      .eq("published", true)
-      .order("order_index", { ascending: true })
-      .order("slug", { ascending: true })
-      .range(from, from + PAGE - 1);
-    const page = (data as Row[] | null) ?? [];
-    rows.push(...page);
-    if (page.length < PAGE) break;
-  }
+  const rows = await getCatalogRows();
 
   // Title/summary risolti alla lingua attiva; il resto della forma resta invariato.
   const nodes: OpeningNode[] = rows.map((r) => ({

@@ -15,6 +15,7 @@ const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 let userLimiter: Ratelimit | null = null;
 let ipLimiter: Ratelimit | null = null;
+let explorerLimiter: Ratelimit | null = null;
 
 if (url && token) {
   const redis = new Redis({ url, token });
@@ -33,6 +34,15 @@ if (url && token) {
     prefix: "rl:coach:ip",
     analytics: false,
   });
+  // Explorer (proxy Lichess, endpoint pubblico): limita solo i cache-miss che
+  // generano una richiesta upstream — evita che un anonimo usi il server come
+  // amplificatore verso Lichess. La navigazione normale (cache calda) non paga.
+  explorerLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(30, "60 s"),
+    prefix: "rl:explorer:ip",
+    analytics: false,
+  });
 }
 
 export interface RateResult {
@@ -43,11 +53,18 @@ export interface RateResult {
 
 const OK: RateResult = { ok: true };
 
-/** IP del client dietro il proxy Vercel. */
+/**
+ * IP del client dietro il proxy Vercel. `x-real-ip` è impostato dal proxy della
+ * piattaforma e non è influenzabile dal client: è la fonte primaria.
+ * `x-forwarded-for` è spoofabile (il client può anteporre valori arbitrari),
+ * quindi resta solo come fallback fuori da Vercel.
+ */
 export function clientIp(req: Request): string {
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) return realIp.trim();
   const xff = req.headers.get("x-forwarded-for");
   if (xff) return xff.split(",")[0].trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
+  return "unknown";
 }
 
 async function consume(limiter: Ratelimit | null, key: string): Promise<RateResult> {
@@ -62,6 +79,11 @@ export async function limitCoach(userId: string, ip: string): Promise<RateResult
   const byIp = await consume(ipLimiter, ip);
   if (!byIp.ok) return byIp;
   return consume(userLimiter, userId);
+}
+
+/** Limite per-IP delle richieste explorer che vanno upstream (cache-miss). */
+export async function limitExplorer(ip: string): Promise<RateResult> {
+  return consume(explorerLimiter, ip);
 }
 
 /** Risposta 429 standard con header Retry-After. */

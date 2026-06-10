@@ -1485,6 +1485,71 @@
       "keepTraining": "Keep training"
     }
   },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back. Pick up where you left off.",
+      "email": "Email",
+      "password": "Password",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "wait": "Please wait…",
+      "or": "or",
+      "magicLink": "Sign in with magic link",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up",
+      "errSignInTitle": "Sign-in failed",
+      "errEnterEmail": "Enter your email",
+      "errTitle": "Error",
+      "magicSentTitle": "Check your email",
+      "magicSentDesc": "We've sent you a sign-in link."
+    },
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "Start the path from beginner to club player.",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "At least 8 characters.",
+      "birthDate": "Date of birth",
+      "birthDateHint": "Used to verify digital consent (in Italy: age 14).",
+      "minorNotice": "You're under 14: a parent or guardian's consent is required.",
+      "parentalEmail": "Parent/guardian email",
+      "parentalConsentLabel": "I am a parent/guardian and I consent to the creation of the account and to the processing of data as described in the <link>privacy policy</link>.",
+      "submit": "Sign up",
+      "wait": "Please wait…",
+      "errSignUpTitle": "Sign-up failed",
+      "errBirthDateTitle": "Enter your date of birth",
+      "errParentalTitle": "Parental consent required",
+      "errParentalDesc": "Under 14, a parent or guardian's email and consent are required.",
+      "confirmTitle": "Confirm your email",
+      "confirmDesc": "We've sent you a link to activate your account.",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "reset": {
+      "title": "Reset your password",
+      "subtitle": "We'll send you a link to choose a new password.",
+      "email": "Email",
+      "submit": "Send link",
+      "wait": "Please wait…",
+      "errTitle": "Error",
+      "sentTitle": "Email sent",
+      "sentDesc": "Check your inbox to reset your password.",
+      "sentNote": "If an account exists for <email></email>, you'll receive an email shortly.",
+      "back": "Back to sign in"
+    }
+  },
+  "legal": {
+    "signIn": "Sign in",
+    "lastUpdated": "Last updated: {date}"
+  },
+  "notFound": {
+    "eyebrow": "404",
+    "title": "Page not found",
+    "desc": "The page you're looking for doesn't exist or has been moved.",
+    "home": "Back to home"
+  },
   "metadata": {
     "joinGroup": "Join a group — Shakh",
     "explainedGame": "Explained game — Learn — Shakh",

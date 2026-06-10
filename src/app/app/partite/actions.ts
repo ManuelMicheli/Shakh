@@ -217,9 +217,33 @@ export async function importChesscom(
 
 const VALID_CLASSIFICATIONS: ReadonlySet<string> = new Set<string>(CLASSIFICATION_ORDER);
 
+/**
+ * Difesa in profondità: vero solo se la partita appartiene all'utente loggato.
+ * La RLS resta l'autorità (game_analysis è scoped via games.user_id), ma le
+ * action che ricevono `gameId` dal client verificano comunque la proprietà —
+ * così un eventuale allentamento futuro delle policy non apre un IDOR.
+ */
+async function ownsGame(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  gameId: string,
+): Promise<boolean> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data } = await supabase
+    .from("games")
+    .select("id")
+    .eq("id", gameId)
+    .eq("user_id", user.id)
+    .maybeSingle<{ id: string }>();
+  return !!data;
+}
+
 /** Ply già analizzati di una partita (per saltarli alla ripresa). RLS-scoped. */
 export async function getSavedAnalysisPlies(gameId: string): Promise<number[]> {
   const supabase = await createClient();
+  if (!(await ownsGame(supabase, gameId))) return [];
   const { data } = await supabase
     .from("game_analysis")
     .select("ply")
@@ -260,6 +284,8 @@ export async function saveAnalysisChunk(
 ): Promise<ActionResult> {
   if (rows.length === 0) return { ok: true };
   const supabase = await createClient();
+  if (!(await ownsGame(supabase, gameId)))
+    return { ok: false, error: "Not allowed." };
   // Sanifica i valori dal client: classification entro l'enum, stringhe limitate.
   const payload = rows.map((r) => ({
     game_id: gameId,
@@ -283,6 +309,8 @@ export async function saveAnalysisChunk(
 /** Marca la partita come analizzata (fine job) e alimenta il motore di rating. */
 export async function finalizeGameAnalysis(gameId: string): Promise<ActionResult> {
   const supabase = await createClient();
+  if (!(await ownsGame(supabase, gameId)))
+    return { ok: false, error: "Not allowed." };
   const { error } = await supabase
     .from("games")
     .update({ analyzed: true })
@@ -335,6 +363,8 @@ async function feedRatingFromGame(
 /** Cancella l'analisi esistente e riporta la partita a "da analizzare". */
 export async function resetGameAnalysis(gameId: string): Promise<ActionResult> {
   const supabase = await createClient();
+  if (!(await ownsGame(supabase, gameId)))
+    return { ok: false, error: "Not allowed." };
   const del = await supabase.from("game_analysis").delete().eq("game_id", gameId);
   if (del.error) return { ok: false, error: del.error.message };
   const { error } = await supabase
@@ -442,6 +472,8 @@ export async function generateKeyErrorComments(
 /** Elimina una partita (e, a cascata, la sua analisi). */
 export async function deleteGame(gameId: string): Promise<ActionResult> {
   const supabase = await createClient();
+  if (!(await ownsGame(supabase, gameId)))
+    return { ok: false, error: "Not allowed." };
   const { error } = await supabase.from("games").delete().eq("id", gameId);
   if (error) return { ok: false, error: error.message };
   revalidatePath("/app/partite");

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import Lenis from "lenis";
+import type Lenis from "lenis";
 
 /**
  * Smooth scroll Lenis sulla sola superficie pubblica. Rispetta
@@ -10,6 +10,10 @@ import Lenis from "lenis";
  * scroll della finestra (h-dvh overflow-hidden) e scrolla dentro <main>, quindi
  * Lenis (che pilota lo scroll della finestra) mangerebbe gli eventi wheel e lo
  * scroll risulterebbe morto.
+ *
+ * Il modulo `lenis` è importato dinamicamente: il provider vive nel root
+ * layout, ma il peso della libreria viene scaricato solo dove serve davvero
+ * (superficie pubblica, senza reduced-motion) e non sotto /app.
  */
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -20,17 +24,25 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
 
-    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    let lenis: Lenis | null = null;
     let raf = 0;
-    const loop = (time: number) => {
-      lenis.raf(time);
+    let cancelled = false;
+
+    void import("lenis").then(({ default: LenisCtor }) => {
+      if (cancelled) return;
+      lenis = new LenisCtor({ lerp: 0.1, smoothWheel: true });
+      const loop = (time: number) => {
+        lenis?.raf(time);
+        raf = requestAnimationFrame(loop);
+      };
       raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    });
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(raf);
-      lenis.destroy();
+      lenis?.destroy();
+      lenis = null;
     };
   }, [isApp]);
 

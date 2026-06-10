@@ -151,7 +151,6 @@ export function HotseatGame() {
       }
     }
     return c.pgn();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [over, game.history]);
   const breakdown = useGameBreakdown(over, pgn, "both");
   const { analyze, loading: analyzeLoading } = useAnalyzePlayedGame();

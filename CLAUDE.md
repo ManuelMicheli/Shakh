@@ -16,7 +16,7 @@ npm run build   # production build — must stay clean
 npm run lint    # eslint (next lint)
 ```
 
-No test setup exists yet. Database migrations live in `supabase/migrations/` (`0001`–`0012`); apply via `supabase db push` or the Supabase SQL editor — they apply cleanly in order from zero. `DEPLOY.md` is the pre-launch checklist (Vercel env, Node runtime for AI routes, wasm MIME, RLS, region UE).
+Tests: `npm test` (vitest, config in `vitest.config.ts`) — unit test sui moduli puri (`src/lib/**/*.test.ts`: parsing PGN, SRS, encode/decode delle valutazioni, formato coach). Niente test DOM/E2E. Database migrations live in `supabase/migrations/` (`0001`–`0012`); apply via `supabase db push` or the Supabase SQL editor — they apply cleanly in order from zero. `DEPLOY.md` is the pre-launch checklist (Vercel env, Node runtime for AI routes, wasm MIME, RLS, region UE).
 
 Env vars (`.env.local`, never committed): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY` (coach AI, server-only), `NEXT_PUBLIC_APP_URL`, `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` (coach rate limit — no-op if absent), `RESEND_API_KEY` (transactional email/invites, optional). See `.env.example`.
 
@@ -42,7 +42,7 @@ Next.js 15 (App Router, RSC + Server Actions) · TypeScript strict · Tailwind C
 - **RLS is on for every table with user data.** Users access only their own rows; instructors can *read* (not write) data of members in groups they own, via the `security definer` helper `is_group_instructor_of(target_user)` (avoids RLS recursion). `content_items`/`puzzles` are public-readable content, staff-writable.
 
 **Design system (`src/styles/globals.css` + `src/config`).** Editorial, sober, "study tool" aesthetic — strict black/white/neutral-gray monochrome, no decorative accent color. Primary actions express by **inversion** (dark theme → light button; light theme → dark button), driven by `--accent`/`--accent-contrast` CSS variables. The **one exception**: `--eval-*` semantic colors (brilliant/best/good/inaccuracy/mistake/blunder) appear *only* in move analysis context, never in general UI.
-- Dual theme, **dark by default**. Theme is a class (`dark`/`light`) on `<html>`, persisted to both localStorage and a cookie. An anti-FOUC inline script (`themeInitScript` in `theme-provider.tsx`) applies the theme in `<head>` before render; `ThemeProvider` reads the already-applied class to stay in sync.
+- Dual theme: **la scelta salvata vince; al primo accesso segue `prefers-color-scheme`, fallback dark**. Theme is a class (`dark`/`light`) on `<html>`, persisted to both localStorage and a cookie. An anti-FOUC inline script (`themeInitScript` in `theme-provider.tsx`) applies the theme in `<head>` before render; `ThemeProvider` reads the already-applied class to stay in sync.
 - **Fonts** (`src/app/fonts.ts`) are self-hosted via `next/font` (GDPR — no runtime Google Fonts calls): Fraunces (display), Inter (UI), **JetBrains Mono for ALL chess notation** (SAN, FEN, PGN, ECO codes, evals like `+1.4`) — a product rule, not a style choice.
 - UI primitives in `src/components/ui/` (re-exported from `index.ts`), composed with `cn()` (`src/lib/utils.ts` = clsx + tailwind-merge). No heavy external component libraries.
 

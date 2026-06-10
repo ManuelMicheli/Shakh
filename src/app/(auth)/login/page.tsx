@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ function LoginForm() {
   const params = useSearchParams();
   const redirect = params.get("redirect") ?? "/app";
   const { toast } = useToast();
+  const t = useTranslations("auth.login");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +28,7 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      toast({ title: "Sign-in failed", description: error.message, variant: "error" });
+      toast({ title: t("errSignInTitle"), description: error.message, variant: "error" });
       return;
     }
     router.push(redirect);
@@ -35,7 +37,7 @@ function LoginForm() {
 
   const onMagicLink = async () => {
     if (!email) {
-      toast({ title: "Enter your email", variant: "error" });
+      toast({ title: t("errEnterEmail"), variant: "error" });
       return;
     }
     setLoading(true);
@@ -49,23 +51,21 @@ function LoginForm() {
     setLoading(false);
     toast(
       error
-        ? { title: "Error", description: error.message, variant: "error" }
-        : { title: "Check your email", description: "We've sent you a sign-in link.", variant: "success" },
+        ? { title: t("errTitle"), description: error.message, variant: "error" }
+        : { title: t("magicSentTitle"), description: t("magicSentDesc"), variant: "success" },
     );
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Sign in</h1>
-        <p className="mt-1 text-sm text-text-muted">
-          Welcome back. Pick up where you left off.
-        </p>
+        <h1 className="font-display text-2xl font-semibold">{t("title")}</h1>
+        <p className="mt-1 text-sm text-text-muted">{t("subtitle")}</p>
       </div>
 
       <form onSubmit={onPassword} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("email")}</Label>
           <Input
             id="email"
             type="email"
@@ -77,12 +77,12 @@ function LoginForm() {
         </div>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Link
               href="/reset-password"
               className="text-xs text-text-muted hover:text-text"
             >
-              Forgot password?
+              {t("forgot")}
             </Link>
           </div>
           <Input
@@ -95,13 +95,13 @@ function LoginForm() {
           />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Please wait…" : "Sign in"}
+          {loading ? t("wait") : t("submit")}
         </Button>
       </form>
 
       <div className="flex items-center gap-3 text-xs text-text-muted">
         <span className="h-px flex-1 bg-border" />
-        or
+        {t("or")}
         <span className="h-px flex-1 bg-border" />
       </div>
 
@@ -111,13 +111,13 @@ function LoginForm() {
         onClick={onMagicLink}
         disabled={loading}
       >
-        Sign in with magic link
+        {t("magicLink")}
       </Button>
 
       <p className="text-center text-sm text-text-muted">
-        Don&apos;t have an account?{" "}
+        {t("noAccount")}{" "}
         <Link href="/signup" className="text-text underline underline-offset-4">
-          Sign up
+          {t("signupLink")}
         </Link>
       </p>
     </div>

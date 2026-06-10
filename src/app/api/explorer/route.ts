@@ -15,6 +15,7 @@
  */
 
 import { NextResponse, type NextRequest } from "next/server";
+import { clientIp, limitExplorer } from "@/lib/security/ratelimit";
 import type {
   ExplorerData,
   ExplorerDb,
@@ -114,8 +115,28 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return json({ ok: true, data: hit.data });
   }
 
+  // Endpoint pubblico: il rate limit scatta solo sui cache-miss, cioè quando la
+  // richiesta genererebbe traffico verso Lichess. I colpi in cache restano liberi.
   let pending = inflight.get(key);
   if (!pending) {
+    const rate = await limitExplorer(clientIp(req));
+    if (!rate.ok) {
+      // Se c'è un dato stantio servilo comunque: meglio di un errore secco.
+      if (hit) return json({ ok: true, data: hit.data });
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Too many requests. Try again shortly.",
+          rateLimited: true,
+        } satisfies ExplorerResult,
+        {
+          status: 429,
+          headers: rate.retryAfter
+            ? { "Retry-After": String(rate.retryAfter) }
+            : undefined,
+        },
+      );
+    }
     pending = (async () => {
       try {
         const data = await fetchUpstream(db, fen);

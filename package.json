@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
     "copy-engine": "node scripts/copy-engine.mjs",
     "import-puzzles": "npx --yes tsx scripts/import-puzzles.ts",
     "tauri": "tauri",
@@ -40,14 +41,15 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
-    "@tauri-apps/cli": "^2.1.0",
     "@tailwindcss/postcss": "^4.3.0",
+    "@tauri-apps/cli": "^2.1.0",
     "@types/node": "^25.9.1",
     "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.19",
     "tailwindcss": "^4.3.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
   }
 }

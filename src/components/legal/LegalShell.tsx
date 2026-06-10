@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { BRAND_NAME } from "@/config/brand";
 import { SiteFooter } from "@/components/layout/site-footer";
 
@@ -16,6 +17,7 @@ export function LegalShell({
   updated: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("legal");
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="flex h-16 items-center justify-between px-6 md:px-10">
@@ -29,7 +31,7 @@ export function LegalShell({
           href="/login"
           className="text-sm text-text-muted hover:text-text"
         >
-          Sign in
+          {t("signIn")}
         </Link>
       </header>
 
@@ -37,7 +39,7 @@ export function LegalShell({
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           {title}
         </h1>
-        <p className="mt-2 text-sm text-text-muted">Last updated: {updated}</p>
+        <p className="mt-2 text-sm text-text-muted">{t("lastUpdated", { date: updated })}</p>
         <div className="mt-8 space-y-6 text-sm leading-relaxed text-text [&_h2]:font-display [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-text [&_h2]:mt-2 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5 [&_a]:underline [&_a]:underline-offset-2 [&_p]:text-text-muted [&_li]:text-text-muted">
           {children}
         </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { useToast } from "@/components/ui/toast";
 
 export default function ResetPasswordPage() {
   const { toast } = useToast();
+  const t = useTranslations("auth.reset");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -23,13 +25,13 @@ export default function ResetPasswordPage() {
     });
     setLoading(false);
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "error" });
+      toast({ title: t("errTitle"), description: error.message, variant: "error" });
       return;
     }
     setSent(true);
     toast({
-      title: "Email sent",
-      description: "Check your inbox to reset your password.",
+      title: t("sentTitle"),
+      description: t("sentDesc"),
       variant: "success",
     });
   };
@@ -37,23 +39,20 @@ export default function ResetPasswordPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">
-          Reset your password
-        </h1>
-        <p className="mt-1 text-sm text-text-muted">
-          We&apos;ll send you a link to choose a new password.
-        </p>
+        <h1 className="font-display text-2xl font-semibold">{t("title")}</h1>
+        <p className="mt-1 text-sm text-text-muted">{t("subtitle")}</p>
       </div>
 
       {sent ? (
         <p className="text-sm text-text-muted">
-          If an account exists for <span className="text-text">{email}</span>,
-          you&apos;ll receive an email shortly.
+          {t.rich("sentNote", {
+            email: () => <span className="text-text">{email}</span>,
+          })}
         </p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               type="email"
@@ -64,14 +63,14 @@ export default function ResetPasswordPage() {
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Please wait…" : "Send link"}
+            {loading ? t("wait") : t("submit")}
           </Button>
         </form>
       )}
 
       <p className="text-center text-sm text-text-muted">
         <Link href="/login" className="text-text underline underline-offset-4">
-          Back to sign in
+          {t("back")}
         </Link>
       </p>
     </div>

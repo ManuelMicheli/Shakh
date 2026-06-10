@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ function ageFromDate(iso: string): number | null {
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const t = useTranslations("auth.signup");
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -41,14 +43,13 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (age === null) {
-      toast({ title: "Enter your date of birth", variant: "error" });
+      toast({ title: t("errBirthDateTitle"), variant: "error" });
       return;
     }
     if (isMinor && (!parentalConsent || !parentalEmail.trim())) {
       toast({
-        title: "Parental consent required",
-        description:
-          "Under 14, a parent or guardian's email and consent are required.",
+        title: t("errParentalTitle"),
+        description: t("errParentalDesc"),
         variant: "error",
       });
       return;
@@ -74,7 +75,7 @@ export default function SignupPage() {
     setLoading(false);
 
     if (error) {
-      toast({ title: "Sign-up failed", description: error.message, variant: "error" });
+      toast({ title: t("errSignUpTitle"), description: error.message, variant: "error" });
       return;
     }
 
@@ -84,8 +85,8 @@ export default function SignupPage() {
       router.refresh();
     } else {
       toast({
-        title: "Confirm your email",
-        description: "We've sent you a link to activate your account.",
+        title: t("confirmTitle"),
+        description: t("confirmDesc"),
         variant: "success",
       });
     }
@@ -94,15 +95,13 @@ export default function SignupPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold">Create your account</h1>
-        <p className="mt-1 text-sm text-text-muted">
-          Start the path from beginner to club player.
-        </p>
+        <h1 className="font-display text-2xl font-semibold">{t("title")}</h1>
+        <p className="mt-1 text-sm text-text-muted">{t("subtitle")}</p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="displayName">Name</Label>
+          <Label htmlFor="displayName">{t("name")}</Label>
           <Input
             id="displayName"
             autoComplete="name"
@@ -112,7 +111,7 @@ export default function SignupPage() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("email")}</Label>
           <Input
             id="email"
             type="email"
@@ -123,7 +122,7 @@ export default function SignupPage() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <Input
             id="password"
             type="password"
@@ -133,11 +132,11 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <p className="text-xs text-text-muted">At least 8 characters.</p>
+          <p className="text-xs text-text-muted">{t("passwordHint")}</p>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="birthDate">Date of birth</Label>
+          <Label htmlFor="birthDate">{t("birthDate")}</Label>
           <Input
             id="birthDate"
             type="date"
@@ -146,18 +145,14 @@ export default function SignupPage() {
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
           />
-          <p className="text-xs text-text-muted">
-            Used to verify digital consent (in Italy: age 14).
-          </p>
+          <p className="text-xs text-text-muted">{t("birthDateHint")}</p>
         </div>
 
         {isMinor && (
           <div className="space-y-3 rounded-md border border-border bg-surface-2 p-4">
-            <p className="text-sm">
-              You&apos;re under 14: a parent or guardian&apos;s consent is required.
-            </p>
+            <p className="text-sm">{t("minorNotice")}</p>
             <div className="space-y-1.5">
-              <Label htmlFor="parentalEmail">Parent/guardian email</Label>
+              <Label htmlFor="parentalEmail">{t("parentalEmail")}</Label>
               <Input
                 id="parentalEmail"
                 type="email"
@@ -173,26 +168,27 @@ export default function SignupPage() {
                 className="mt-1 h-4 w-4 accent-[var(--accent)]"
               />
               <span className="text-text-muted">
-                I am a parent/guardian and I consent to the creation of the account
-                and to the processing of data as described in the{" "}
-                <Link href="/privacy" className="underline underline-offset-2">
-                  privacy policy
-                </Link>
-                .
+                {t.rich("parentalConsentLabel", {
+                  link: (chunks) => (
+                    <Link href="/privacy" className="underline underline-offset-2">
+                      {chunks}
+                    </Link>
+                  ),
+                })}
               </span>
             </label>
           </div>
         )}
 
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Please wait…" : "Sign up"}
+          {loading ? t("wait") : t("submit")}
         </Button>
       </form>
 
       <p className="text-center text-sm text-text-muted">
-        Already have an account?{" "}
+        {t("haveAccount")}{" "}
         <Link href="/login" className="text-text underline underline-offset-4">
-          Sign in
+          {t("loginLink")}
         </Link>
       </p>
     </div>
