@@ -280,6 +280,18 @@ export function LessonViewer({
               )}
             </CardContent>
           </Card>
+
+          {/* Piano: come continuare quando la linea della lezione finisce. */}
+          {lesson.plan && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("lessonViewer.planTitle")}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm leading-relaxed">{lesson.plan}</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Pannelli laterali (in tab: anche su mobile board sopra, pannelli sotto) */}

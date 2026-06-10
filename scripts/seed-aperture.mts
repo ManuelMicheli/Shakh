@@ -1,9 +1,13 @@
 /**
  * Seed-vetrina del ramo Aperture (prompt 06b §6): UNA apertura per colore,
- * "profondità prima di ampiezza". Pipeline motore-verificata: le linee (SAN)
- * sono validate da chess.js (loadPgnWithVariations rifiuta le illegali e qui
- * assertiamo la mainline attesa); le mosse principali seguono ciò che si gioca
- * davvero; NIENTE valutazioni inventate (campo eval lasciato vuoto).
+ * "profondità prima di ampiezza". Le linee sono ESTESE fino al mediogioco
+ * (mosse 15-16) con un piano "come continuare" (Lesson.plan): l'utente vede
+ * l'applicazione pratica della teoria, non solo le prime mosse.
+ * Pipeline motore-verificata: le linee (SAN) sono validate da chess.js
+ * (loadPgnWithVariations rifiuta le illegali e qui assertiamo la mainline
+ * attesa); le mosse principali seguono ciò che si gioca davvero; NIENTE
+ * valutazioni inventate (campo eval lasciato vuoto).
+ * Output: supabase/migrations/0031_aperture_extended_seed.sql (0006 resta storica).
  *
  * Contenuti marcati BOZZA DA REVISIONE: punto di partenza, non verità definitiva.
  *
@@ -53,7 +57,13 @@ interface StepSpec {
   highlightMoves?: string[];
 }
 
-function buildLesson(intro: string, pgn: string, mainline: string[], specs: StepSpec[]): {
+function buildLesson(
+  intro: string,
+  pgn: string,
+  mainline: string[],
+  specs: StepSpec[],
+  plan?: string,
+): {
   lesson: Lesson;
   linePgn: string;
 } {
@@ -66,14 +76,21 @@ function buildLesson(intro: string, pgn: string, mainline: string[], specs: Step
     highlightMoves: s.highlightMoves,
   }));
   for (const s of steps) if (!tree.nodes[s.nodeId]) throw new Error(`Step verso nodo assente: ${s.nodeId}`);
-  return { lesson: { intro, tree: serializeTree(tree), steps }, linePgn: toPgn(tree) };
+  return { lesson: { intro, tree: serializeTree(tree), steps, plan }, linePgn: toPgn(tree) };
 }
 
 // ───────────────────────────── Bianco: Italiana ──────────────────────────────
+// Linea classica estesa FINO AL MEDIOGIOCO (mossa 15): l'utente vede come si
+// continua dopo la teoria, non solo le prime mosse.
+const ITALIANA_MAIN = [
+  "e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5", "c3", "Nf6", "d4", "exd4", "cxd4", "Bb4+",
+  "Nc3", "Nxe4", "O-O", "Bxc3", "bxc3", "d5", "Ba3", "dxc4", "Re1", "Be6", "Rxe4",
+  "Qd5", "Qe2", "O-O-O", "Ne5", "Nxe5", "Rxe5", "Qd7",
+];
 const italiana = buildLesson(
-  "Bozza da revisione. La Partita Italiana (Giuoco Piano): sviluppo naturale e pressione su f7, poi c3-d4 per il centro.",
-  "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 (3... Nf6 4. Ng5 {Difesa dei due cavalli, tagliente.}) (3... Be7 {più prudente.}) 4. c3 Nf6 5. d4 exd4 6. cxd4 Bb4+ 7. Nc3",
-  ["e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5", "c3", "Nf6", "d4", "exd4", "cxd4", "Bb4+", "Nc3"],
+  "Bozza da revisione. La Partita Italiana (Giuoco Piano): sviluppo naturale e pressione su f7, poi c3-d4 per il centro. La linea arriva fino al mediogioco, così vedi COME si continua dopo le mosse di teoria.",
+  "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 (3... Nf6 4. Ng5 {Difesa dei due cavalli, tagliente.}) (3... Be7 {più prudente.}) 4. c3 Nf6 5. d4 exd4 6. cxd4 Bb4+ 7. Nc3 Nxe4 8. O-O Bxc3 (8... Nxc3 9. bxc3 Bxc3 {Avidità punita:} 10. Qb3 {con doppio attacco su f7 e sull'alfiere: il Nero crolla.}) 9. bxc3 d5 10. Ba3 dxc4 11. Re1 Be6 12. Rxe4 Qd5 13. Qe2 O-O-O 14. Ne5 Nxe5 15. Rxe5 Qd7",
+  ITALIANA_MAIN,
   [
     {
       path: ["e4", "e5", "Nf3", "Nc6", "Bc4"],
@@ -90,14 +107,39 @@ const italiana = buildLesson(
       path: ["e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5", "c3", "Nf6", "d4"],
       text: "Rotto il centro con d4: si aprono le linee e inizia il vero gioco. Prova a deviare per vedere cosa dice il motore.",
     },
+    {
+      path: ITALIANA_MAIN.slice(0, 13), // 7.Nc3
+      text: "Cc3 è un gambetto: il Bianco lascia prendere e4 per sviluppare più in fretta. Se il Nero arraffa pedoni e pezzi (vedi la variante 8…Cxc3 9.bxc3 Axc3?), Db3! punisce subito.",
+      shapes: [{ orig: "e4", brush: "red" }],
+    },
+    {
+      path: ITALIANA_MAIN.slice(0, 18), // 9...d5
+      text: "Il contro-colpo d5! è la risorsa difensiva chiave: blocca l'attacco dell'alfiere c4 e apre la diagonale all'alfiere c8. Senza questa mossa il Nero soffocherebbe.",
+      shapes: [{ orig: "d7", dest: "d5", brush: "green" }],
+    },
+    {
+      path: ITALIANA_MAIN.slice(0, 26), // 13...O-O-O
+      text: "Siamo nel mediogioco: il Nero arrocca lungo e la struttura è definita. Il Bianco ha attività sulle colonne centrali e l'alfiere in a3 che taglia la scacchiera; il Nero ha un pedone in più (c4) e gioco sulla colonna d.",
+    },
+    {
+      path: ITALIANA_MAIN, // 15...Qd7
+      text: "Posizione tipica di mediogioco dell'Italiana classica: pezzi pesanti attivi per il Bianco contro struttura e pedone in più del Nero. Da qui si gioca coi piani descritti sotto in «Come continuare».",
+    },
   ],
+  "Col Bianco: tieni i pezzi pesanti attivi sulle colonne centrali (Te1/Te5, Dd2-f4 o De2-e4), punta ai pedoni neri dell'ala di donna (a7, c4) e sfrutta l'alfiere in a3 che impedisce al Re nero di trovare pace. Col Nero: consolida con f6 e Td8-d5, restituisci se serve il pedone c4 per cambiare i pezzi pesanti — ogni cambio avvicina un finale dove il pedone in più conta. In generale: chi ha l'iniziativa evita i cambi, chi ha la struttura migliore li cerca.",
 );
 
 // ──────────────────────── Nero contro 1.e4: Caro-Kann ─────────────────────────
+// Linea classica estesa FINO AL MEDIOGIOCO (mossa 16, rottura tematica …c5).
+const CARO_MAIN = [
+  "e4", "c6", "d4", "d5", "Nc3", "dxe4", "Nxe4", "Bf5", "Ng3", "Bg6", "h4", "h6",
+  "Nf3", "Nd7", "h5", "Bh7", "Bd3", "Bxd3", "Qxd3", "e6", "Bd2", "Ngf6", "O-O-O",
+  "Be7", "Kb1", "O-O", "Ne4", "Nxe4", "Qxe4", "Nf6", "Qe2", "c5",
+];
 const caro = buildLesson(
-  "Bozza da revisione. La Caro-Kann: solida e istruttiva. Il Nero apre alla difesa con c6+d5 senza chiudere l'alfiere campochiaro.",
-  "1. e4 c6 2. d4 d5 3. Nc3 (3. exd5 cxd5 4. Bd3 Nc6 {Variante di cambio.}) dxe4 4. Nxe4 Bf5 5. Ng3 Bg6 6. h4 h6 7. Nf3 Nd7",
-  ["e4", "c6", "d4", "d5", "Nc3", "dxe4", "Nxe4", "Bf5", "Ng3", "Bg6", "h4", "h6", "Nf3", "Nd7"],
+  "Bozza da revisione. La Caro-Kann: solida e istruttiva. Il Nero apre alla difesa con c6+d5 senza chiudere l'alfiere campochiaro. La linea prosegue fino al mediogioco, con la rottura tematica c5: così vedi il PIANO, non solo le mosse.",
+  "1. e4 c6 2. d4 d5 3. Nc3 (3. exd5 cxd5 4. Bd3 Nc6 {Variante di cambio.}) dxe4 4. Nxe4 Bf5 5. Ng3 Bg6 6. h4 h6 7. Nf3 Nd7 8. h5 Bh7 9. Bd3 Bxd3 10. Qxd3 e6 11. Bd2 Ngf6 12. O-O-O Be7 13. Kb1 O-O 14. Ne4 Nxe4 15. Qxe4 Nf6 16. Qe2 c5",
+  CARO_MAIN,
   [
     {
       path: ["e4", "c6", "d4", "d5"],
@@ -110,10 +152,24 @@ const caro = buildLesson(
       shapes: [{ orig: "f5", brush: "green" }],
     },
     {
-      path: ["e4", "c6", "d4", "d5", "Nc3", "dxe4", "Nxe4", "Bf5", "Ng3", "Bg6", "h4", "h6", "Nf3", "Nd7"],
-      text: "Struttura tipica raggiunta: il Nero è solido, pronto a e6, Ngf6, Bd6 e arrocco corto. Esplora le alternative col motore e l'explorer.",
+      path: CARO_MAIN.slice(0, 14), // 7...Nd7
+      text: "Struttura tipica raggiunta: il Nero è solido, pronto a e6, Cgf6, Ae7 e arrocco corto. La lezione continua: guarda come i due piani prendono forma.",
+    },
+    {
+      path: CARO_MAIN.slice(0, 18), // 9.Bd3 Bxd3
+      text: "Il cambio degli alfieri campochiari è tema fisso: il Nero cede l'alfiere «buono» ma resta senza pezzi deboli, e la donna bianca in d3 non minaccia nulla di concreto.",
+    },
+    {
+      path: CARO_MAIN.slice(0, 26), // 13.Kb1 O-O
+      text: "Arrocchi eterogenei: Bianco lungo, Nero corto. Inizia il mediogioco: il Bianco vorrebbe attaccare con g4-g5, il Nero risponde al centro e sulla colonna c.",
+    },
+    {
+      path: CARO_MAIN, // 16...c5
+      text: "Eccola: la rottura tematica c5! Apre la colonna c contro il re bianco e attiva tutti i pezzi neri. Questo è il piano da ricordare in ogni Caro-Kann classica.",
+      shapes: [{ orig: "c6", dest: "c5", brush: "green" }],
     },
   ],
+  "Col Nero il piano è sempre lo stesso: completare lo sviluppo senza debolezze, poi colpire con c5 (o e5) per aprire la colonna c verso il re bianco arroccato lungo; le torri vanno in c8 e d8, la donna spesso in a5 o b6. Col Bianco: spazio e attacco sull'ala di re con g4, Ce5 e la leva g5 contro h6 — ma senza affrettarsi, perché la struttura nera non ha bersagli. Se l'attacco bianco non sfonda, i cambi portano a un finale comodo per il Nero grazie alla struttura di pedoni sana.",
 );
 
 /** Literal SQL stringa (o null), con escape degli apici. */
@@ -163,9 +219,10 @@ const cols =
   "id, type, parent_id, eco_code, title, slug, summary, body, start_fen, line_pgn, level, order_index, published";
 const allRows = allSpecs.map(buildRow).join(",\n");
 
-const sql = `-- 0006_aperture_seed.sql
--- Seed-vetrina del ramo Aperture (prompt 06b §6): una apertura per colore,
--- pipeline motore-verificata (linee validate da chess.js). Contenuti marcati
+const sql = `-- 0031_aperture_extended_seed.sql
+-- Aperture-vetrina con linee ESTESE FINO AL MEDIOGIOCO + piano "come continuare"
+-- (campo plan della Lesson). Aggiorna le righe seminate da 0006 (stessi slug).
+-- Pipeline motore-verificata (linee validate da chess.js). Contenuti marcati
 -- BOZZA DA REVISIONE. Generato da scripts/seed-aperture.mts — idempotente sullo slug.
 -- Le righe 'body' (jsonb) usano il cast esplicito ::jsonb dove presenti.
 
@@ -185,7 +242,7 @@ on conflict (slug) do update set
   published = excluded.published;
 `;
 
-const out = join(process.cwd(), "supabase", "migrations", "0006_aperture_seed.sql");
+const out = join(process.cwd(), "supabase", "migrations", "0031_aperture_extended_seed.sql");
 await writeFile(out, sql, "utf8");
 console.log("Scritto", out);
 console.log("Italiana mainline:", italiana.linePgn);

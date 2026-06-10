@@ -31,6 +31,11 @@ export interface Lesson {
   tree: SerializedMoveTree;
   /** Passi guidati che puntano a nodi del tree. */
   steps: LessonStep[];
+  /**
+   * "Come continuare": il piano da seguire quando la linea della lezione
+   * finisce (idee di mediogioco, conversione del vantaggio…). Opzionale.
+   */
+  plan?: string;
 }
 
 /** Riga `content_items` come letta dal DB (campi usati dalla Teoria). */
