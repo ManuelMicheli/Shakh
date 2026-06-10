@@ -174,8 +174,11 @@ const caro = buildLesson(
 
 /** Literal SQL stringa (o null), con escape degli apici. */
 const q = (v: string | null): string => (v === null ? "null" : `'${v.replace(/'/g, "''")}'`);
+/** JSON con a-capo dopo ogni "}," strutturale (mai dentro le stringhe): righe corte, jsonb identico. */
+const wrapJson = (s: string): string =>
+  s.replace(/("(?:[^"\\]|\\.)*")|},/g, (m, str) => (str !== undefined ? str : "},\n"));
 /** Literal jsonb. */
-const jb = (obj: unknown): string => `'${JSON.stringify(obj).replace(/'/g, "''")}'::jsonb`;
+const jb = (obj: unknown): string => `'${wrapJson(JSON.stringify(obj)).replace(/'/g, "''")}'::jsonb`;
 
 interface RowSpec {
   id: string;

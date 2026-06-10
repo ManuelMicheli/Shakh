@@ -230,6 +230,9 @@ function buildMiddlegame(seed: MiddlegameSeed) {
 }
 
 const q = (s: string) => s.replace(/'/g, "''");
+/** JSON con a-capo dopo ogni "}," strutturale (mai dentro le stringhe): righe corte, jsonb identico. */
+const wrapJson = (s: string): string =>
+  s.replace(/("(?:[^"\\]|\\.)*")|},/g, (m, str) => (str !== undefined ? str : "},\n"));
 
 const built = MIDDLEGAMES.map(buildMiddlegame);
 for (const b of built) console.log(`✓ ${b.slug} — ${b.linePgn}`);
@@ -241,7 +244,7 @@ const values = built
   '${q(b.title)}',
   '${b.slug}',
   '${q(b.summary)}',
-  '${q(JSON.stringify(b.body))}'::jsonb,
+  '${q(wrapJson(JSON.stringify(b.body)))}'::jsonb,
   '${b.startFen}',
   '${q(b.linePgn)}',
   ${b.order},

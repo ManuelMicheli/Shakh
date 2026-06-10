@@ -543,7 +543,10 @@ const SPECS: TrapSpec[] = [
 // ─────────────────────────────────── Genera SQL ──────────────────────────────
 
 const q = (v: string | null): string => (v === null ? "null" : `'${v.replace(/'/g, "''")}'`);
-const jb = (obj: unknown): string => `'${JSON.stringify(obj).replace(/'/g, "''")}'::jsonb`;
+/** JSON con a-capo dopo ogni "}," strutturale (mai dentro le stringhe): righe corte, jsonb identico. */
+const wrapJson = (s: string): string =>
+  s.replace(/("(?:[^"\\]|\\.)*")|},/g, (m, str) => (str !== undefined ? str : "},\n"));
+const jb = (obj: unknown): string => `'${wrapJson(JSON.stringify(obj)).replace(/'/g, "''")}'::jsonb`;
 const arr = (xs: string[]): string =>
   xs.length === 0 ? "'{}'::text[]" : `array[${xs.map((x) => q(x)).join(", ")}]::text[]`;
 
