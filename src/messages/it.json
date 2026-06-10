@@ -638,6 +638,19 @@
     "assigningPending": "Assegnazione…",
     "assignButton": "Assegna"
   },
+  "famous": {
+    "list": {
+      "title": "Partite indimenticabili",
+      "subtitle": "Le partite più celebri della storia degli scacchi, mossa per mossa, con il racconto di cosa le rende immortali."
+    },
+    "viewer": {
+      "back": "Indietro",
+      "next": "Avanti",
+      "start": "Posizione iniziale",
+      "move": "Mossa {n}",
+      "keyboardHint": "Suggerimento: naviga con le frecce ← → della tastiera."
+    }
+  },
   "nav": {
     "item": {
       "dashboard": "Dashboard",
@@ -646,6 +659,7 @@
       "coach": "Coach",
       "learn": "Impara",
       "theory": "Teoria",
+      "famousGames": "Indimenticabili",
       "repertoire": "Repertorio",
       "preparation": "Preparazione",
       "tactics": "Tattiche",
@@ -1475,6 +1489,7 @@
     "trapReview": "Ripasso trappole · Shakh",
     "playFriend": "Gioca con un amico — Shakh",
     "game": "Partita — Shakh",
-    "fixMistakes": "Correggi i tuoi errori — Shakh"
+    "fixMistakes": "Correggi i tuoi errori — Shakh",
+    "famousGames": "Partite indimenticabili — Shakh"
   }
 }

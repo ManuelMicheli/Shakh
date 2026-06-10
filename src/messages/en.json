@@ -638,6 +638,19 @@
     "assigningPending": "Assigning…",
     "assignButton": "Assign"
   },
+  "famous": {
+    "list": {
+      "title": "Unforgettable games",
+      "subtitle": "The most celebrated games in chess history, move by move, with the story of what makes them immortal."
+    },
+    "viewer": {
+      "back": "Back",
+      "next": "Next",
+      "start": "Starting position",
+      "move": "Move {n}",
+      "keyboardHint": "Tip: navigate with the ← → arrow keys."
+    }
+  },
   "nav": {
     "item": {
       "dashboard": "Dashboard",
@@ -646,6 +659,7 @@
       "coach": "Coach",
       "learn": "Learn",
       "theory": "Theory",
+      "famousGames": "Unforgettable",
       "repertoire": "Repertoire",
       "preparation": "Preparation",
       "tactics": "Tactics",
@@ -1475,6 +1489,7 @@
     "trapReview": "Trap review · Shakh",
     "playFriend": "Play a friend — Shakh",
     "game": "Game — Shakh",
-    "fixMistakes": "Fix your mistakes — Shakh"
+    "fixMistakes": "Fix your mistakes — Shakh",
+    "famousGames": "Unforgettable games — Shakh"
   }
 }

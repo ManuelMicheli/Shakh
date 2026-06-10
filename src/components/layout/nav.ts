@@ -19,6 +19,7 @@ import {
   Gamepad2,
   Shield,
   Trophy,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
@@ -63,6 +64,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { label: "item.learn", href: "/app/impara", icon: GraduationCap },
       { label: "item.theory", href: "/app/teoria", icon: BookOpen },
+      { label: "item.famousGames", href: "/app/indimenticabili", icon: Sparkles },
       { label: "item.repertoire", href: "/app/repertorio", icon: Library },
       { label: "item.preparation", href: "/app/preparazione", icon: Radar },
     ],
