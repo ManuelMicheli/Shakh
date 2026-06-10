@@ -44,3 +44,4 @@ build-full.log
 
 # build logs
 build*.log
+.gstack/
