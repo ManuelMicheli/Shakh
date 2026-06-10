@@ -878,6 +878,15 @@
       },
       "result": {
         "resignedGame": "You resigned the game."
+      },
+      "coach": {
+        "title": "Coach",
+        "on": "On",
+        "off": "Off",
+        "observing": "The coach is watching your move…",
+        "unavailable": "Coach not available.",
+        "yourMove": "On your move {san}",
+        "empty": "Play a move: the coach will tell you what it changes on the board."
       }
     },
     "bot": {
@@ -1309,7 +1318,10 @@
     "openingTree": {
       "empty": "No published openings. Content comes with the seeds.",
       "collapse": "Collapse",
-      "expand": "Expand"
+      "expand": "Expand",
+      "searchPlaceholder": "Search opening or ECO code…",
+      "noResults": "No openings match your search.",
+      "resultsCapped": "Showing the first {count} matches — refine your search."
     },
     "tablebase": {
       "title": "Exact endgame (tablebase)",
@@ -1399,6 +1411,7 @@
       "backToLine": "Back to the line",
       "lessonCompleted": "Lesson completed — recorded in your path.",
       "navigateExplore": "Navigate the moves or play on the board to explore.",
+      "planTitle": "How to continue",
       "movesTab": "Moves",
       "engineTab": "Engine",
       "explorerTab": "Explorer",

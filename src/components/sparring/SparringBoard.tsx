@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Chess, type Square, type PieceSymbol } from "chess.js";
@@ -24,6 +24,10 @@ import { MoveStripH } from "@/components/chess/MoveStripH";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import { cn } from "@/lib/utils";
 import { chooseEngineMove, strengthFor, STYLE_LABEL, type Style } from "@/lib/sparring/opponent";
+import { classifyMove } from "@/lib/analysis/classify";
+import type { PovEval } from "@/lib/analysis/evalScore";
+import { formatEval } from "@/lib/engine/score";
+import type { Classification } from "@/lib/games/types";
 
 const ChessBoard = dynamic(
   () => import("@/components/chess/ChessBoard").then((m) => m.ChessBoard),
@@ -94,6 +98,23 @@ export function SparringBoard() {
   // Pre-mossa: trattenuta mentre tocca all'avversario, giocata appena torna il turno.
   const [premove, setPremove] = useState<{ from: Square; to: Square } | null>(null);
 
+  // ---- Coach di allenamento: spiega cosa cambia sulla scacchiera a ogni tua mossa ----
+  const [coachOn, setCoachOn] = useState(true);
+  const [coachUnavailable, setCoachUnavailable] = useState(false);
+  const [coachItem, setCoachItem] = useState<{ san: string; text: string; busy: boolean } | null>(null);
+  // Analisi della posizione PRIMA della mossa dell'utente (fatta mentre pensa).
+  const preAnalysisRef = useRef<{
+    fen: string;
+    bestUci: string | null;
+    bestSan: string | null;
+    evalWhite: PovEval;
+  } | null>(null);
+  // Mossa dell'utente in attesa della valutazione "dopo" (dall'analisi di risposta).
+  const pendingCoachRef = useRef<{ ply: number; fenBefore: string; san: string; uci: string } | null>(null);
+  const lastCoachPlyRef = useRef(-1);
+  const openingPliesRef = useRef(0);
+  const coachAbortRef = useRef<AbortController | null>(null);
+
   const strength = strengthFor(activeElo);
   const engineColorChar = userColor === "white" ? "b" : "w";
 
@@ -111,6 +132,12 @@ export function SparringBoard() {
     setResigned(false);
     setOverlayOff(false);
     setPremove(null);
+    // Reset del coach di allenamento: niente feedback sulle mosse seminate.
+    coachAbortRef.current?.abort();
+    setCoachItem(null);
+    preAnalysisRef.current = null;
+    pendingCoachRef.current = null;
+    lastCoachPlyRef.current = -1;
     game.reset();
     const realOpeningKey = openingRandom
       ? OPENINGS[Math.floor(Math.random() * OPENINGS.length)].key
@@ -122,8 +149,162 @@ export function SparringBoard() {
         game.move(p.from, p.to, p.promotion);
       }
     }
+    openingPliesRef.current = opening ? opening.moves.length : 0;
     setPhase("play");
   }, [colorChoice, openingKey, openingRandom, style, styleRandom, elo, eloRandom, game]);
+
+  /**
+   * Invia al coach la mossa dell'utente in attesa: il server ricalcola gli
+   * effetti sulla scacchiera e il modello li spiega in streaming.
+   * `evalAfterWhite` può mancare (matto immediato, motore ko): si manda comunque.
+   */
+  const sendCoachRequest = useCallback(
+    async (evalAfterWhite: PovEval | null) => {
+      const pending = pendingCoachRef.current;
+      if (!pending) return;
+      pendingCoachRef.current = null;
+
+      const pre =
+        preAnalysisRef.current && preAnalysisRef.current.fen === pending.fenBefore
+          ? preAnalysisRef.current
+          : null;
+      let classification: Classification | null = null;
+      if (pre?.bestUci && evalAfterWhite) {
+        try {
+          classification = classifyMove({
+            evalBefore: pre.evalWhite,
+            evalAfter: evalAfterWhite,
+            moverIsWhite: userColor === "white",
+            playedUci: pending.uci,
+            bestUci: pre.bestUci,
+          });
+        } catch {
+          classification = null;
+        }
+      }
+      const fmt = (e: PovEval | null) =>
+        e ? formatEval(e.value, e.type).replace("-", "−") : null;
+
+      coachAbortRef.current?.abort();
+      const ac = new AbortController();
+      coachAbortRef.current = ac;
+      try {
+        const res = await fetch("/api/coach/train-move", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fenBefore: pending.fenBefore,
+            playedSan: pending.san,
+            bestMoveSan: pre?.bestSan ?? null,
+            evalBeforeText: fmt(pre?.evalWhite ?? null),
+            evalAfterText: fmt(evalAfterWhite),
+            classification,
+          }),
+          signal: ac.signal,
+        });
+        if (res.status === 503) {
+          setCoachUnavailable(true);
+          setCoachItem(null);
+          return;
+        }
+        if (!res.ok || !res.body) {
+          setCoachItem(null);
+          return;
+        }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let acc = "";
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          acc += decoder.decode(value, { stream: true });
+          if (ac.signal.aborted) return;
+          setCoachItem({ san: pending.san, text: acc, busy: true });
+        }
+        setCoachItem({ san: pending.san, text: acc, busy: false });
+      } catch {
+        if (!ac.signal.aborted) setCoachItem(null);
+      }
+    },
+    [userColor],
+  );
+
+  // Coach: mentre l'utente pensa, analizza la posizione corrente (valutazione
+  // "prima" + mossa migliore). Il motore è comunque inattivo in questo momento.
+  useEffect(() => {
+    if (!coachOn || coachUnavailable) return;
+    if (phase !== "play" || resigned || game.isGameOver) return;
+    if (game.cursor < game.history.length - 1) return;
+    if (game.turn !== userColor[0]) return;
+
+    let cancelled = false;
+    const fen = game.fen;
+    const turn = game.turn;
+    (async () => {
+      try {
+        const handle = engine.analyze(fen, { depth: 12, multiPV: 1 });
+        const res = await handle.result;
+        if (cancelled) return;
+        const line = res.lines[0];
+        if (!line) return;
+        const evalWhite: PovEval = {
+          type: line.scoreType,
+          value: turn === "w" ? line.score : -line.score,
+        };
+        const bestUci = res.bestMove || line.pv[0] || null;
+        let bestSan: string | null = null;
+        if (bestUci) {
+          try {
+            const c = new Chess(fen);
+            const p = uciParts(bestUci);
+            bestSan = c.move({ from: p.from, to: p.to, promotion: p.promotion })?.san ?? null;
+          } catch {
+            bestSan = null;
+          }
+        }
+        preAnalysisRef.current = { fen, bestUci, bestSan, evalWhite };
+      } catch {
+        /* analisi soppiantata o motore ko: il coach farà senza */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coachOn, coachUnavailable, phase, game.fen, game.turn, game.isGameOver, resigned, userColor]);
+
+  // Coach: intercetta la mossa appena giocata dall'utente e mette in coda il feedback.
+  useEffect(() => {
+    if (!coachOn || coachUnavailable || phase !== "play" || resigned) return;
+    const i = game.history.length - 1;
+    if (i < 0 || i < openingPliesRef.current || i === lastCoachPlyRef.current) return;
+    if (game.cursor < game.history.length - 1) return;
+    const mover: Color = i % 2 === 0 ? "white" : "black";
+    if (mover !== userColor) return;
+
+    lastCoachPlyRef.current = i;
+    const last = game.history[i];
+    // FEN prima della mossa: ricostruita rigiocando la storia (deterministico).
+    const c = new Chess();
+    try {
+      for (let k = 0; k < i; k++) {
+        const m = game.history[k];
+        c.move({ from: m.from, to: m.to, promotion: m.promotion });
+      }
+    } catch {
+      return;
+    }
+    pendingCoachRef.current = {
+      ply: i,
+      fenBefore: c.fen(),
+      san: last.san,
+      uci: `${last.from}${last.to}${last.promotion ?? ""}`,
+    };
+    setCoachItem({ san: last.san, text: "", busy: true });
+    // Se la mossa chiude la partita il motore non risponderà: manda subito.
+    if (game.isGameOver) void sendCoachRequest(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coachOn, coachUnavailable, phase, resigned, game.history.length, game.isGameOver, userColor]);
 
   // Mossa del motore quando tocca a lui.
   useEffect(() => {
@@ -141,6 +322,15 @@ export function SparringBoard() {
         const handle = engine.analyze(fen, { depth: strength.depth, multiPV: 4 });
         const result = await handle.result;
         if (cancelled) return;
+        // Coach: la stessa analisi fornisce la valutazione "dopo" la mossa
+        // dell'utente (white-relative) per classificare e commentare.
+        if (pendingCoachRef.current) {
+          const top = result.lines[0];
+          const evalAfterWhite: PovEval | null = top
+            ? { type: top.scoreType, value: engineColorChar === "w" ? top.score : -top.score }
+            : null;
+          void sendCoachRequest(evalAfterWhite);
+        }
         const uci = chooseEngineMove(fen, result.lines, activeStyle, strength);
         if (uci) {
           const p = uciParts(uci);
@@ -195,7 +385,6 @@ export function SparringBoard() {
       }
     }
     return c.pgn();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [over, game.history]);
   const breakdown = useGameBreakdown(over, pgn, userColor[0] as "w" | "b");
   const { analyze, loading: analyzeLoading } = useAnalyzePlayedGame();
@@ -275,6 +464,14 @@ export function SparringBoard() {
   }
 
   // ---------- Play ----------
+  const toggleCoach = () => {
+    if (coachOn) {
+      coachAbortRef.current?.abort();
+      pendingCoachRef.current = null;
+      setCoachItem(null);
+    }
+    setCoachOn(!coachOn);
+  };
   const atLive = game.cursor >= game.history.length - 1;
   // Partita "viva": posizione corrente, non finita, non abbandonata.
   const liveOpen = atLive && !resigned && !game.isGameOver;
@@ -429,6 +626,17 @@ export function SparringBoard() {
             </Button>
           </div>
         </div>
+
+        {/* Mobile: feedback del coach sotto la scacchiera. */}
+        <div className="lg:hidden">
+          <TrainerCoachCard
+            t={t}
+            enabled={coachOn}
+            unavailable={coachUnavailable}
+            item={coachItem}
+            onToggle={toggleCoach}
+          />
+        </div>
       </div>
 
       <aside className="space-y-4">
@@ -438,6 +646,15 @@ export function SparringBoard() {
             className="w-full"
           />
         )}
+        <div className="hidden lg:block">
+          <TrainerCoachCard
+            t={t}
+            enabled={coachOn}
+            unavailable={coachUnavailable}
+            item={coachItem}
+            onToggle={toggleCoach}
+          />
+        </div>
         <div className="hidden lg:block">
           <MoveList history={game.history} />
         </div>
@@ -486,6 +703,62 @@ function sparringResult(
 
 /** Tipo del traduttore next-intl per il namespace "play", per i helper non-componenti. */
 type PlayTranslator = ReturnType<typeof useTranslations<"play">>;
+
+/** Pannello del coach di allenamento: cosa cambia sulla scacchiera con la tua mossa. */
+function TrainerCoachCard({
+  t,
+  enabled,
+  unavailable,
+  item,
+  onToggle,
+}: {
+  t: PlayTranslator;
+  enabled: boolean;
+  unavailable: boolean;
+  item: { san: string; text: string; busy: boolean } | null;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-surface p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-xs uppercase tracking-wide text-text-muted">
+          {t("sparring.coach.title")}
+        </span>
+        {!unavailable && (
+          <button
+            type="button"
+            onClick={onToggle}
+            className={cn(
+              "rounded-md border px-2 py-0.5 text-xs transition-colors",
+              enabled
+                ? "border-text bg-text text-bg"
+                : "border-border text-text-muted hover:text-text",
+            )}
+          >
+            {enabled ? t("sparring.coach.on") : t("sparring.coach.off")}
+          </button>
+        )}
+      </div>
+      {unavailable ? (
+        <p className="text-sm text-text-muted">{t("sparring.coach.unavailable")}</p>
+      ) : !enabled ? null : item ? (
+        <div className="space-y-1">
+          <div className="font-mono text-xs text-text-muted">
+            {t("sparring.coach.yourMove", { san: item.san })}
+          </div>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">
+            {item.text || t("sparring.coach.observing")}
+            {item.busy && item.text ? (
+              <span className="ml-0.5 inline-block h-3 w-1 animate-pulse bg-text align-middle" aria-hidden />
+            ) : null}
+          </p>
+        </div>
+      ) : (
+        <p className="text-sm text-text-muted">{t("sparring.coach.empty")}</p>
+      )}
+    </div>
+  );
+}
 
 function MoveList({ history }: { history: ReturnType<typeof useChessGame>["history"] }) {
   const t = useTranslations("play");

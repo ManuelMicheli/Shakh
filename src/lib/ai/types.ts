@@ -29,6 +29,13 @@ export interface MoveFacts {
   phase: GamePhase;
   /** Lato che ha mosso. */
   mover: "white" | "black";
+  /**
+   * Effetti DETERMINISTICI della mossa giocata sulla scacchiera (traiettorie
+   * aperte/chiuse, minacce nuove, pezzi in presa), calcolati con chess.js.
+   */
+  playedEffects?: string | null;
+  /** Effetti della mossa migliore del motore, se diversa da quella giocata. */
+  bestEffects?: string | null;
 }
 
 /** Una linea di motore fornita come base fattuale alla Q&A. */

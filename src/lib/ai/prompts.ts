@@ -37,14 +37,16 @@ function levelHint(elo: number | null): string {
 export function explainSystemPrompt(elo: number | null): string {
   return `${COMMON_RULES}${levelHint(elo)}
 
-Spiegherai perché una mossa giocata è (o non è) un errore. Rispondi in 2–4 frasi, solo prosa, niente elenchi puntati.
+Spiegherai perché una mossa giocata è (o non è) un errore. Rispondi in 3–5 frasi, solo prosa, niente elenchi puntati.
+
+Insieme ai dati del motore ricevi gli "effetti sulla scacchiera" della mossa giocata (ed eventualmente della mossa migliore): traiettorie aperte o chiuse, minacce nuove, pezzi lasciati in presa. Anche questi sono FATTI calcolati: la tua spiegazione deve APPOGGIARSI a essi e dire concretamente cosa la mossa cambia sulla scacchiera — quali linee apre o chiude, cosa minaccia, cosa lascia scoperto. Non limitarti al giudizio: l'utente deve capire COSA è cambiato.
 
 Quando la mossa è un errore (imprecisione, errore, occasione mancata o errore grave) e ti viene data una mossa migliore diversa da quella giocata, la spiegazione DEVE contenere tre cose:
-1. PERCHÉ la mossa giocata è sbagliata (il piano mancato, la debolezza creata, il pezzo lasciato in presa, la tattica non vista, il vantaggio buttato);
+1. PERCHÉ la mossa giocata è sbagliata, ancorato ai suoi effetti sulla scacchiera (la traiettoria aperta all'avversario, il pezzo lasciato in presa, la tattica non vista, il vantaggio buttato);
 2. QUAL È la mossa migliore, citandola esplicitamente in notazione SAN così com'è scritta nei dati;
-3. COSA otteneva quella mossa migliore (il vantaggio mantenuto, la minaccia parata, l'iniziativa).
+3. COSA quella mossa migliore avrebbe cambiato sulla scacchiera (la linea aperta o chiusa, la minaccia creata o parata, il vantaggio mantenuto), usando gli effetti forniti.
 
-Quando invece la mossa è buona o la migliore, spiega brevemente perché funziona, senza inventare alternative.`;
+Quando invece la mossa è buona o la migliore, spiega brevemente perché funziona descrivendo cosa cambia sulla scacchiera, senza inventare alternative.`;
 }
 
 export function explainUserMessage(facts: MoveFacts): string {
@@ -59,6 +61,18 @@ export function explainUserMessage(facts: MoveFacts): string {
     lines.push(
       `Valutazione (dal punto di vista del Bianco): da ${facts.evalBeforeText} a ${facts.evalAfterText} dopo la mossa giocata.`,
     );
+  if (facts.playedEffects) {
+    lines.push(
+      `Effetti della mossa giocata ${facts.playedSan} sulla scacchiera (fatti calcolati):`,
+      facts.playedEffects,
+    );
+  }
+  if (facts.bestEffects && facts.bestMoveSan) {
+    lines.push(
+      `Effetti che avrebbe avuto la mossa migliore ${facts.bestMoveSan} (fatti calcolati):`,
+      facts.bestEffects,
+    );
+  }
 
   const isError =
     facts.classification === "inaccuracy" ||

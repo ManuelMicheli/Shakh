@@ -3,6 +3,7 @@ import { streamExplainMove } from "@/lib/ai/coach";
 import { isCoachConfigured } from "@/lib/ai/client";
 import { limitCoach, clientIp, tooMany } from "@/lib/security/ratelimit";
 import { evalText, phaseFromFen, moverFromPly } from "@/lib/ai/format";
+import { describeMoveEffects } from "@/lib/chess/moveEffects";
 import type { MoveFacts } from "@/lib/ai/types";
 import type { Classification } from "@/lib/games/types";
 
@@ -82,6 +83,13 @@ export async function POST(req: Request) {
     .eq("id", user.id)
     .maybeSingle<{ elo_estimate: number | null }>();
 
+  // Effetti deterministici sulla scacchiera (chess.js): mai inventati dal modello.
+  const playedEffects = describeMoveEffects(prevFen, row.san);
+  const bestEffects =
+    row.best_move_san && row.best_move_san !== row.san
+      ? describeMoveEffects(prevFen, row.best_move_san)
+      : null;
+
   const facts: MoveFacts = {
     fenBefore: prevFen,
     playedSan: row.san,
@@ -91,6 +99,8 @@ export async function POST(req: Request) {
     evalAfterText: evalText(row.eval_after),
     phase: phaseFromFen(prevFen),
     mover: moverFromPly(ply),
+    playedEffects,
+    bestEffects,
   };
 
   const stream = new ReadableStream<Uint8Array>({

@@ -878,6 +878,15 @@
       },
       "result": {
         "resignedGame": "Hai abbandonato la partita."
+      },
+      "coach": {
+        "title": "Coach",
+        "on": "Attivo",
+        "off": "Spento",
+        "observing": "Il coach osserva la tua mossa…",
+        "unavailable": "Coach non disponibile.",
+        "yourMove": "Sulla tua mossa {san}",
+        "empty": "Gioca una mossa: il coach ti dirà cosa cambia sulla scacchiera."
       }
     },
     "bot": {
@@ -1309,7 +1318,10 @@
     "openingTree": {
       "empty": "Nessuna apertura pubblicata. Il contenuto arriva con i seed.",
       "collapse": "Comprimi",
-      "expand": "Espandi"
+      "expand": "Espandi",
+      "searchPlaceholder": "Cerca apertura o codice ECO…",
+      "noResults": "Nessuna apertura corrisponde alla ricerca.",
+      "resultsCapped": "Mostro i primi {count} risultati — affina la ricerca."
     },
     "tablebase": {
       "title": "Finale esatto (tablebase)",
@@ -1399,6 +1411,7 @@
       "backToLine": "Torna alla linea",
       "lessonCompleted": "Lezione completata — registrata nel tuo percorso.",
       "navigateExplore": "Naviga le mosse o gioca sulla scacchiera per esplorare.",
+      "planTitle": "Come continuare",
       "movesTab": "Mosse",
       "engineTab": "Motore",
       "explorerTab": "Explorer",
