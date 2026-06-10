@@ -21,6 +21,7 @@ import { CapturedMaterial } from "@/components/chess/CapturedMaterial";
 import { useGameBreakdown } from "@/lib/analysis/useGameBreakdown";
 import { useAnalyzePlayedGame } from "@/lib/play/useAnalyzePlayedGame";
 import { MoveStripH } from "@/components/chess/MoveStripH";
+import { BoardControls } from "@/components/chess/BoardControls";
 import { MobilePageHeader } from "@/components/layout/MobilePageHeader";
 import { cn } from "@/lib/utils";
 import { chooseEngineMove, strengthFor, STYLE_LABEL, type Style } from "@/lib/sparring/opponent";
@@ -89,6 +90,9 @@ export function SparringBoard() {
   const [openingRandom, setOpeningRandom] = useState(false);
 
   const [userColor, setUserColor] = useState<Color>("white");
+  // Scacchiera girata manualmente (controllo "flip" desktop); si resetta a ogni partita.
+  const [flipped, setFlipped] = useState(false);
+  const boardWrapRef = useRef<HTMLDivElement>(null);
   // Avversario effettivo della partita in corso (dopo aver risolto i "casuale").
   const [activeStyle, setActiveStyle] = useState<Style>("positional");
   const [activeElo, setActiveElo] = useState(1200);
@@ -132,6 +136,7 @@ export function SparringBoard() {
     setResigned(false);
     setOverlayOff(false);
     setPremove(null);
+    setFlipped(false);
     // Reset del coach di allenamento: niente feedback sulle mosse seminate.
     coachAbortRef.current?.abort();
     setCoachItem(null);
@@ -489,10 +494,14 @@ export function SparringBoard() {
           note={thinking ? t("sparring.thinking") : undefined}
           material={<CapturedMaterial fen={game.fen} color={engineColorChar} />}
         />
-        <div className="relative">
+        <div
+          ref={boardWrapRef}
+          tabIndex={0}
+          className="relative rounded-md outline-none focus-visible:ring-2 focus-visible:ring-text"
+        >
           <ChessBoard
             fen={game.fen}
-            orientation={userColor}
+            orientation={flipped ? (userColor === "white" ? "black" : "white") : userColor}
             mode={liveOpen ? "play" : "view"}
             movableColor={userColor}
             dests={canMove ? game.legalDests : new Map()}
@@ -552,6 +561,20 @@ export function SparringBoard() {
           active={!status && game.turn === userColor[0]}
           material={<CapturedMaterial fen={game.fen} color={userColor[0] as "w" | "b"} />}
         />
+
+        {/* Desktop: controlli inizio/indietro/avanti/fine + gira scacchiera. */}
+        <div className="hidden lg:flex">
+          <BoardControls
+            onFirst={game.first}
+            onPrev={game.prev}
+            onNext={game.next}
+            onLast={game.last}
+            onFlip={() => setFlipped((f) => !f)}
+            atStart={game.cursor < 0}
+            atEnd={atLive}
+            keyboardTarget={boardWrapRef}
+          />
+        </div>
 
         {/* Mobile: striscia mosse orizzontale + controlli inizio/indietro/avanti/fine. */}
         {game.history.length > 0 && (
